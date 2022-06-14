@@ -16,17 +16,19 @@ picom --config ~/.config/leftwm/themes/current/picom.conf &
 leftwm command "LoadTheme $SCRIPTPATH/theme.toml"
 
 # Set background
-feh --bg-fill "$SCRIPTPATH"/background.jpg
+ if [ -x "$(command -v feh)" ]; then
+  feh --randomize --bg-fill "$SCRIPTPATH"/wallpapers/*
+fi
 
 dunst &
 
 playerctld daemon &
 
 index=0
-leftwm-state -q -n -t "$SCRIPTPATH"/sizes.liquid | sed -r '/^\s*$/d' | while read -r width
+leftwm-state -q -n -t "$SCRIPTPATH"/polybar/sizes.liquid | sed -r '/^\s*$/d' | while read -r width
 do
   barname="mainbar$index"
   monitor="$(polybar -m | awk -v i="$(( index + 1 ))" 'NR==i{print}' | sed s/:.*// | tr -d '\n')"
-  monitor=$monitor width=$(( width - 16 )) polybar -c "$SCRIPTPATH"/polybar.config $barname &
+  monitor=$monitor width=$(( width - 16 )) polybar -c "$SCRIPTPATH"/polybar/config.ini $barname &
   index=$((index+1))
 done

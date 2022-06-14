@@ -7,5 +7,5 @@ feh --bg-scale "$SCRIPTPATH"/down.jpg
 leftwm command "UnloadTheme"
 
 pkill picom
-kill polybar
+pkill polybar
 pkill dunst
