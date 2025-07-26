@@ -22,3 +22,9 @@
 [submodule "yazi/.config/yazi/flavors/gruvbox-dark.yazi"]
 	path = yazi/.config/yazi/flavors/gruvbox-dark.yazi
 	url = https://github.com/ghaerdi/gruvbox-dark.yazi
+[submodule "zsh/.zsh/fzf-tab"]
+	path = zsh/.zsh/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab.git
+[submodule "zsh/.zsh/zsh-autocomplete"]
+	path = zsh/.zsh/zsh-autocomplete
+	url = https://github.com/lincheney/fzf-tab-completion.git

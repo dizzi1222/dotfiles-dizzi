@@ -1,0 +1,11 @@
+# git config --global user.name "dizzi1222"
+# git config --global user.email "diegosamuel042@gmail.com"
+[user]
+    name = dizzi1222
+    email = diegosamuel042@gmail.com
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/local/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/local/bin/gh auth git-credential
