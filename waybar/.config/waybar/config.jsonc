@@ -35,7 +35,8 @@
     "on-click": "~/.config/rofi/scripts/powermenu.sh"
   },
   "clock": {
-    "format": "{:%I:%M:%S %p}",
+"format": "{:%a %d %b %I:%M:%S %p}"
+
     "interval": 1,
     "tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
     "calendar-weeks-pos": "right",

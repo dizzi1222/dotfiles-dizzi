@@ -1,4 +1,4 @@
-@import url("/home/vanzuh/.cache/wal/colors-waybar.css");
+@import url("/home/diego/.cache/wal/colors-waybar.css");
 
 * {
     border: none;
@@ -8,9 +8,14 @@
     min-height: 23px;
 }
 
+/* # ${ MODIFICADO POR DIEGO}  */
+
 window#waybar {
   background: @background;
+  background-color: rgba(33, 33, 54, 0.85); /* O cualquier valor con alpha < 1 */
  }
+
+/*FIN # ${ MODIFICADO POR DIEGO}  */
 
 .modules-center {
   background-color: rgba(0,0,0,0.5);
