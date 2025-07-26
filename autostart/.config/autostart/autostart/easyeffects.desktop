@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=EasyEffects
+Comment=Ecualizador de sistema
+Exec=easyeffects --gapplication-service
+
+Type=Application
+Terminal=false
+Hidden=false
+

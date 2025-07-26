@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/diego/montar_gdrive.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Montar Google Drive
+Comment=Montar GDrive al iniciar sesión
+

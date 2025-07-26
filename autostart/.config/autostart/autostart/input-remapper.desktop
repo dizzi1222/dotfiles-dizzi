@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Input Remapper
+Comment=Remapea teclado y mouse
+Exec=input-remapper-control --quiet
+
+Type=Application
+Terminal=false
+Hidden=false
+
