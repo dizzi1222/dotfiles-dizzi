@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# === Token de Gyazo ===
+API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+
+# === Menu con rofi ===
+option=$(printf "📷 Captura Completa\n🔲 Seleccionar Área" | rofi -dmenu -p "Tipo de captura")
+
+# === Salir si no se elige nada ===
+[ -z "$option" ] && notify-send "❌ Cancelado" && exit 1
+
+# === Ruta temporal para la imagen ===
+IMG_PATH="/tmp/gyazo_$(date +%s).png"
+
+# === Capturar imagen ===
+if [[ "$option" == *Completa* ]]; then
+  grim "$IMG_PATH"
+elif [[ "$option" == *Área* ]]; then
+  grim -g "$(slurp)" "$IMG_PATH"
+else
+  notify-send "❌ Opción inválida"
+  exit 1
+fi
+
+# === Subir a Gyazo ===
+response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
+  -F "access_token=$API_TOKEN" \
+  -F "imagedata=@$IMG_PATH")
+
+# === Extraer link ===
+link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+
+# === Acciones ===
+if [ -n "$link" ]; then
+  # Copiar imagen al portapapeles
+  wl-copy --type image/png <"$IMG_PATH"
+
+  # Abrir el enlace en navegador
+  xdg-open "$link" &
+
+  # Notificación
+  notify-send "✅ Captura subida y copiada" "$link"
+else
+  notify-send "❌ Error al subir a Gyazo"
+fi
