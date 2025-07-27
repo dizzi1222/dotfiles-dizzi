@@ -1,8 +1,27 @@
+
 gtk-titlebar = false
 
-theme=/home/diego/.cache/wal/colors-ghostty
 
-background-opacity = 0.86
+# Mi configuración personal de Ghostty (dizzi)
+
+# ${ MODIFICADO POR DIEGO} FIN
+
+# quitar el topbar
+
+# puedes usar cualquiera de las 2 de arriba
+# window-decoration = true
+
+# FIN ${ MODIFICADO POR DIEGO} FIN
+
+
+# |-- wal - Importar colores de Rofi - dmenu - wal/colors - fondo detect colors--| 
+# |-- wal - Importar colores de Rofi - dmenu - wal/colors - fondo detect colors--| 
+# |-- wal - Importar colores de Rofi - dmenu - wal/colors - fondo detect colors--| 
+theme=/home/diego/.cache/wal/colors-ghostty
+# Esto no funciona por la paleta de colores
+# ya que entra en conflicto
+
+background-opacity = 0.75
 
 window-padding-x = 10
 window-padding-y = 10
@@ -18,25 +37,106 @@ confirm-close-surface = false
 clipboard-read = allow
 clipboard-write = allow
 
-font-size = 13
+font-size = 10
+
+
+# |-- para que wal - cambiar fondo y colores - fucnione - debes de comentar la paleta de colores de abajo --|
+# |-- para que wal - cambiar fondo y colores - fucnione - debes de comentar la paleta de colores de abajo --|
+# |-- para que wal - cambiar fondo y colores - fucnione - debes de comentar la paleta de colores de abajo --|
+
+
+# |-- colores raros - minttyPastel - rosaditaaa@aa --|
+# |-- colores raros - minttyPastel - rosaditaaa@aa --|
+# |-- c
+
+# background = #282A36
+# foreground = #9083C7
+# selection-background = #282A36
+# selection-foreground = #a393f5
+# cursor-color = #BD93F9
+# cursor-text = #282A36
+# cursor-style = bar
+# cursor-opacity = 0.9
+# background-opacity = 0.8
+#
+# palette = 0=#101211
+# palette = 1=#89defa
+# palette = 2=#FFF1AA
+# # lo cambie por crema: #FFF1AA
+#
+# # originalmente era color teal: #A6E3A1
+#
+# palette = 3=#F1FA8C
+#
+# palette = 4=#89B4FA
+# # lo cambie por azul marino: #89B4FA
+#
+# # originalmente era color teal - celeste: #A6E3A1
+#
+# palette = 5=#d48eb6
+# palette = 6=#575555
+# palette = 7=#b0bfbc
+# palette = 8=#b0bfbc
+# palette = 9=#FF6E6E
+# palette = 10=#9083C7
+# palette = 11=#A6E3A1
+# # lo cambie por teal: #A6E3A1
+#
+# # originalmente era color azul marino: #89B4FA
+#
+# #B5BD68 - color verde pasto, no se donde ponerlo - 
+#
+# palette = 12=#D6ACFF
+# palette = 13=#c79fbb
+# palette = 14=#DDBDFF
+# palette = 15=#4f4f4d
+
+# |-- fin de colores --|
+# |-- fin de colores --|
+# |-- fin de colores --|
+
+
+
+#esconder mouse tras tipado
 mouse-hide-while-typing = true
 
 
 ####################
 ### KEYBINDINGSS ###
 ####################
-# cerrar pantalla
+# cerrar tab
 keybind = ctrl+w=close_surface
+# cerrar windows
 keybind = ctrl+shift+w=close_tab
-
 #Dividir pantalla
 #Para  horizontal (nueva ventana a la derecha):
 keybind = ctrl+shift+enter=new_split:right
 #Para división vertical (nueva ventana abajo):
-keybind = ctrl+shift+enter=new_split:down
+keybind = shift+enter=new_split:down
 
-# quitar el topbar
-window-decoration = false
+# --- Navegación entre paneles/superficies ---
+# (Opcional) Reordenar pestañas
+keybind = ctrl+shift+left=move_tab:-1
+keybind = ctrl+shift+right=move_tab:1
+
+# Vista general de pestañas (como Ctrl+Tab moderno) 
+# SOLO FUNCIONA.. CON EL MOUSE XD.... -.- .-.
+keybind = ctrl+1=toggle_tab_overview
+
+# Opción 1: Usa letras (estilo Vim)
+
+# --- Navegación entre splits/paneles ---
+keybind = ctrl+left=goto_split:left
+keybind = ctrl+right=goto_split:right
+keybind = ctrl+up=goto_split:up
+keybind = ctrl+down=goto_split:down
+
+
+# Navegar entre splits por orden de creación
+keybind = ctrl+tab=goto_split:next
+keybind = ctrl+shift+tab=goto_split:previous
+
 
 # FIN ${ MODIFICADO POR DIEGO} FIN
+
 

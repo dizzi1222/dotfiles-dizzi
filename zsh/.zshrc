@@ -194,3 +194,9 @@ source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 fastfetch
 
 PATH=~/.console-ninja/.bin:$PATH
+
+# guardar el historial:
+alias history='(history; cat ~/.zhistory ~/.zsh_history) > /tmp/ 
+ 					history && cat /tmp/history'
+
+
