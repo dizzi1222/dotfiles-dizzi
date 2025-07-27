@@ -199,4 +199,11 @@ PATH=~/.console-ninja/.bin:$PATH
 alias history='(history; cat ~/.zhistory ~/.zsh_history) > /tmp/ 
  					history && cat /tmp/history'
 
+# agrega VLC al menu de aplicaciones de 
+alias vlc='flatpak run org.videolan.VLC'
+
+# Shell Integration para Ghostty
+if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
+    source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+fi
 
