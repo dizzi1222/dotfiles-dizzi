@@ -154,8 +154,8 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# gokuzshconfig="mate ~/.zshrc"
+# gokuohmyzsh="mate ~/.oh-my-zsh"
 
 # /////////////////////////////////////////////////////////////////////////////
 # ---------------------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ source $ZSH/oh-my-zsh.sh
 # ACA ESTAN IMPORTADOS LOS PLUGINS
 
 # ls - 🖼️ Ver imágenes en la terminal
-alias ls='exa --icons --color=always'
+gokuls='exa --icons --color=always'
 
 #Búsqueda interactiva: Cuando presionas Tab para autocompletar un comando, argumento o archivo [tab o ArrowUp o ArrowDown]
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
@@ -196,11 +196,11 @@ fastfetch
 PATH=~/.console-ninja/.bin:$PATH
 
 # guardar el historial:
-alias history='(history; cat ~/.zhistory ~/.zsh_history) > /tmp/ 
- 					history && cat /tmp/history'
+# gokuhistory='(history; cat ~/.zhistory ~/.zsh_history) > /tmp/ 
+#  					history && cat /tmp/history'
 
-# agrega VLC al menu de aplicaciones de 
-alias vlc='flatpak run org.videolan.VLC'
+
+gokuvlc='flatpak run org.videolan.VLC'
 
 # Shell Integration para Ghostty
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
