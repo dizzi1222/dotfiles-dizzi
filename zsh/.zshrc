@@ -191,7 +191,9 @@ source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 # ACA CARGA EL NEOFETCH CON EL ASCII ETC
 # ACA CARGA EL NEOFETCH CON EL ASCII ETC
 
-fastfetch
+# podria ser fastfetch - mas rapido
+neofetch
+# neofetch tiene mas comunidad
 
 PATH=~/.console-ninja/.bin:$PATH
 
