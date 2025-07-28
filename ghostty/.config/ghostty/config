@@ -2,8 +2,9 @@
 gtk-titlebar = false
 
 
-# Mi configuración personal de Ghostty (dizzi)
+# para abrir links usa Ctrl + Click
 
+# Mi configuración personal de Ghostty (dizzi)
 # ${ MODIFICADO POR DIEGO} FIN
 
 # quitar el topbar
@@ -18,6 +19,7 @@ gtk-titlebar = false
 # |-- wal - Importar colores de Rofi - dmenu - wal/colors - fondo detect colors--| 
 # |-- wal - Importar colores de Rofi - dmenu - wal/colors - fondo detect colors--| 
 theme=/home/diego/.cache/wal/colors-ghostty
+# para que cargue cargue debes de comentarlo/n't# para que cargue cargue debes de comentarlo/n't# para que cargue cargue debes de comentarlo/n't
 # Esto no funciona por la paleta de colores
 # ya que entra en conflicto
 
@@ -95,6 +97,15 @@ font-size = 10
 # |-- fin de colores --|
 # |-- fin de colores --|
 
+
+# --- Comportamiento del Cursor ---
+
+cursor-style = block 
+# puede ser:
+# cursor-style = underline    # Línea baja
+# cursor-style = bar # Barra vertical
+cursor-style-blink = false
+shell-integration-features = no-cursor
 
 
 #esconder mouse tras tipado

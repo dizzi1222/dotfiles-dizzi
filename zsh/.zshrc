@@ -154,8 +154,8 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# gokuzshconfig="mate ~/.zshrc"
-# gokuohmyzsh="mate ~/.oh-my-zsh"
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # /////////////////////////////////////////////////////////////////////////////
 # ---------------------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ source $ZSH/oh-my-zsh.sh
 # ACA ESTAN IMPORTADOS LOS PLUGINS
 
 # ls - 🖼️ Ver imágenes en la terminal
-gokuls='exa --icons --color=always'
+alias ls='exa --icons --color=always'
 
 #Búsqueda interactiva: Cuando presionas Tab para autocompletar un comando, argumento o archivo [tab o ArrowUp o ArrowDown]
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
@@ -196,11 +196,44 @@ fastfetch
 PATH=~/.console-ninja/.bin:$PATH
 
 # guardar el historial:
-# gokuhistory='(history; cat ~/.zhistory ~/.zsh_history) > /tmp/ 
-#  					history && cat /tmp/history'
+# guardar el historial:
+# guardar el historial:
+
+# === Configuración del Historial de Zsh ===
+HISTFILE=~/.zsh_history # Dónde se guarda el historial
+HISTSIZE=10000         # Número de líneas de historial en memoria
+SAVEHIST=10000         # Número de líneas de historial que se guardan en el archivo
+
+# Opciones para el historial (asegúrate de que estén presentes y activas)
+setopt appendhistory      # Añadir cada comando al archivo del historial
+setopt sharehistory       # Compartir historial entre todas las sesiones de Zsh
+setopt hist_ignore_dups   # No guardar comandos duplicados consecutivamente
+setopt hist_ignore_space  # No guardar comandos que empiecen con espacio
+setopt hist_verify        # Confirmar un comando si hay sustitución en él
+setopt extendedhistory    # Guardar marcas de tiempo en el historial
+
+# Esto es para que Zsh maneje la escritura del historial correctamente al salir
+# y para que cada comando se guarde inmediatamente.
+function zle-line-finish() {
+    zle .accept-line
+    # Guarda la línea actual en el historial cuando se completa
+    print -s $BUFFER
+}
+zle -N zle-line-finish
+
+# === Tu Alias para Guardar y Mostrar el Historial ===
+# Aseguramos que /tmp/history sea un archivo y no un directorio.
+rm -f /tmp/history
+
+# El alias ahora usará 'fc -l 1' para listar todo el historial desde el principio,
+# o 'history 0' que también debería funcionar para obtener todo el historial.
+# 'fc -l 1' es a menudo más robusto para obtener todo el historial sin límites.
+alias history='fc -l 1 > /tmp/history && cat /tmp/history'
+
+# === Tus otros aliases y configuraciones ===
 
 
-gokuvlc='flatpak run org.videolan.VLC'
+alias vlc='flatpak run org.videolan.VLC'
 
 # Shell Integration para Ghostty
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
