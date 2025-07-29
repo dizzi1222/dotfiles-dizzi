@@ -1,0 +1,304 @@
+
+;;;;;; Widgets ;;;;;;
+
+;; Launcher ;;
+(defwidget power-vert []
+  (eventbox :onhover "${eww} update power-vert=true"
+            :onhoverlost "${eww} update power-vert=false"
+            :cursor "pointer"
+    (box  :orientation "vertical"
+          :space-evenly "false"
+      (button :class "power-vert"
+              :onclick "~/.config/eww/scripts/app-launcher.sh" "󰣇")
+      (revealer :transition "slideup"
+                :reveal power-vert
+                :duration "300ms"
+        (box  :class "powermenu-vert"
+              :orientation "vertical"
+              :space-evenly "true"
+              :spacing 4
+          (button :class "shutdown"
+                  :tooltip "Power Off"
+                  :onclick "shutdown now" "")
+          (button :class "lock"
+                  :tooltip "Lock"
+                  :onclick "~/.config/eww/scripts/lock.sh" "")
+          (button :class "reboot"
+                  :tooltip "Reboot"
+                  :onclick "reboot" "")
+          (button :class "suspend"
+                  :tooltip "Suspend"
+                  :onclick "systemctl suspend" "")
+          (button :class "exit"
+                  :tooltip "exit Hyprland"
+                  :onclick "hyprctl dispatch exit" ""))))))
+
+;; Workspaces ;;
+(defwidget workspaces-vert []
+  (eventbox :onscroll "sh ~/.config/eww/bar/scripts/change-active-workspace.sh {} ${current_workspace}"
+    (box :orientation "vertical"
+         :space-evenly false
+         :class "workspaces-vert"
+         :vexpand "false"
+      (for workspace in workspaces
+        (button :class "workspace-vert ${current_workspace == workspace.id ? "current" : ""}"
+                :onclick "hyprctl dispatch workspace ${workspace.id}"
+                "${current_workspace == workspace.id ? "" : ""}")))))
+
+;; Music Vertical ;;
+(defwidget music-vert []
+  (eventbox :onhover "${eww} update music-control=true"
+            :onhoverlost "${eww} update music-control=false"
+            :cursor "pointer"
+    (revealer :transition "slidedown"
+              :reveal {current-music-seek != "" ? "true" : "false"}
+              :duration "500ms"
+    (box  :class "music-vert"
+          :orientation "vertical"
+          :space-evenly "false"
+          :halign "center"
+                  (revealer :transition "slideup"
+                  :reveal music-control
+                  :duration "300ms"
+          (box  :class "music-control-vert"
+                :orientation "vertical"
+                :space-evenly "true"
+                :spacing "8"
+            (button :class "prev"
+                    :onclick "playerctl --player=ncspot previous" "")
+            (button :class "pause"
+                    :onclick "playerctl --player=ncspot play-pause" "")
+            (button :class "next"
+                    :onclick "playerctl --player=ncspot next" "")))
+      (box :class "parentbox-vert"
+            :orientation "horizontal"
+        (label  :text {music != "" ? "${music}" : ""}
+                :truncate "true"
+                :angle 90
+                :limit-width "8")
+        (scale :class "musicbar-vert"
+               :value {current-music-seek != '' ? "${current-music-seek}" : "0"}
+               :orientation "vertical"
+               :flipped "true"
+               :max 101
+               :min 0
+               :onchange "~/.config/eww/scripts/set-music-seek.sh {}"))
+          (box :class "song-cover-art-vert" :vexpand "false" :hexpand "false" :style "background-image: url('${current-music-cover}');")))))
+
+
+;; Battery ;;
+(defwidget battery-vert []
+  (eventbox :onhover "${eww} update battery=true"
+            :onhoverlost "${eww} update battery=false"
+    (box  :class "battery-vert"
+          :orientation "vertical"
+          :space-evenly "false"
+          :visible has-battery
+                (revealer :transition "slideup"
+                :reveal battery
+                :duration "300ms"
+        (label :class "battery-label-vert"
+               :tooltip time-left
+               :text "${current-battery}"))
+      (circular-progress :value current-battery
+                         :class "batterybar-vert"
+                         :thickness 4
+        (button :class "battery-icon"
+                :tooltip time-left
+                "")))))
+
+;; Memory ;;
+(defwidget memory-vert []
+(eventbox :onhover "${eww} update memory=true"
+          :onhoverlost "${eww} update memory=false"
+  (box  :class "memory-vert"
+        :orientation "vertical"
+        :space-evenly "false"
+      (revealer :transition "slideup"
+                :reveal memory
+                :duration "300ms"
+        (label  :class "memory-label-vert"
+                :tooltip "memory used: ${current-memory}%"
+                :text "${current-memory}"))
+    (circular-progress :value current-memory
+                       :class "memorybar"
+                       :thickness 4
+      (button :class "memory-icon-vert"
+              :tooltip "memory used: ${current-memory}%"
+              "")))))
+
+;; Clock ;;
+(defwidget clock-vert []
+  (eventbox :onhover "${eww} update calendar=true"
+            :onhoverlost "${eww} update calendar=false"
+            :cursor "pointer"
+    (box :class "clock-vert"
+         :orientation "vertical"
+         :space-evenly false
+         hour minute)))
+
+;; Wifi ;;
+(defwidget wifi-vert []
+  (eventbox :cursor "pointer"
+            :tooltip "Connected to ${current-wifi}"
+  (box  :class "wifi-vert"
+        :orientation "horizontal"
+        :space-evenly "false"
+    (button :class "wifi-icon-vert"
+            :onclick "~/.config/eww/scripts/wifi-menu.sh" wifi-strength))))
+
+;; Brightness ;;
+(defwidget brightness-vert []
+  (eventbox :onhover "${eww} update brightness=true"
+            :onhoverlost "${eww} update brightness=false"
+            :cursor "pointer"
+    (box  :class "brightness-vert"
+          :tooltip "Brightness: ${current-brightness}%"
+          :orientation "vertical"
+          :space-evenly "false"
+          :spacing "2"
+          :visible adjustable-brightness
+      (revealer :transition "slideup"
+                :reveal brightness
+                :duration "300ms"
+        (scale :class "brightnessbar-vert"
+               :flipped true
+               :value current-brightness
+               :orientation "vertical"
+               :max 101
+               :min 0
+               :onchange "brightnessctl s {}%"))
+      (button :class "brightness-icon-vert" "󰖨"))))
+
+;; Volume ;;
+(defwidget volume-vert []
+  (eventbox :onhover "${eww} update volume=true"
+            :onhoverlost "${eww} update volume=false"
+            :cursor "pointer"
+    (box  :class "volume-vert"
+          :tooltip "Volume: ${current-volume}%"
+          :orientation "vertical"
+          :space-evenly "false"
+          :spacing "2"
+      (revealer :transition "slideup"
+                :reveal volume
+                :duration "300ms"
+        (scale :class "volbar-vert"
+               :flipped true
+               :value current-volume
+               :orientation "vertical"
+               :max 101
+               :min 0
+               :onchange "pactl set-sink-volume $(pactl get-default-sink) {}%"))
+      (button :class "volume-icon-vert" volume-icon))))
+
+;; Idle Toggle ;;
+(defwidget toggle-idle []
+  (button :class "toggle-idle"
+          :tooltip {idle ? "idle disabled" : "idle enabled" }
+          :onclick "~/.config/eww/scripts/toggle-idle.sh"
+          {idle ? "" : ""  }))
+
+;;;;;; Groups ;;;;;;
+
+;; Device Control Group ;;
+(defwidget device []
+  (eventbox
+       :cursor "pointer"
+  (box :class "device"
+       :orientation "vertical"
+       :space-evenly "false"
+       :halign "start"
+       :vexpand "false"
+       :hexpand "false"
+       (toggle-idle)
+       (wifi-vert)
+       (volume-vert)
+       (brightness-vert))))
+
+;; Resource Group ;;
+(defwidget resource []
+  (eventbox
+       :cursor "pointer"
+  (box :class "resource"
+       :orientation "vertical"
+       :space-evenly "false"
+       :halign "start"
+       :vexpand "false"
+       :hexpand "false"
+       (memory-vert)
+       (battery-vert))))
+
+;; Time Group ;;
+(defwidget time-vert []
+  (eventbox
+       :cursor "pointer"
+  (box :class "time-vert"
+       :orientation "vertical"
+       :space-evenly "false"
+       :halign "start"
+       :vexpand "false"
+       :hexpand "false"
+       (clock-vert))))
+
+;; Top Group ;;
+(defwidget top []
+  (box :class "top"
+       :orientation "vertical"
+       :space-evenly "false"
+       :halign "start"
+       :vexpand "false"
+       :hexpand "false"
+       (power-vert)
+       (workspaces-vert)))
+
+;; Bottom Group ;;
+(defwidget bottom []
+  (box :class "bottom"
+       :orientation "vertical"
+       :space-evenly "false"
+       :valign "end"
+       :vexpand "false"
+       :hexpand "false"
+       (device)
+       (resource)
+       (time-vert)))
+
+;; Mid Group ;;
+(defwidget mid []
+  (box :class "mid"
+       :orientation "vertical"
+       :space-evenly "false"
+       :valign "center"
+       :vexpand "false"
+       :hexpand "false"
+       (music-vert)))
+
+;; Bar ;;
+(defwidget side-bar []
+  (box :class "side-bar"
+       :orientation "vertical"
+       :vexpand "false"
+       :space-evenly "true"
+       :hexpand "false"
+       (top)
+       (mid)
+       (bottom)))
+
+;;;;;;;;;;;;;;;;;;;;
+
+;;;;;; Window ;;;;;;
+
+;; bar ;;
+(defwindow side-bar
+  :monitor '[1, 0]'
+  :geometry (geometry :x "0.5%"
+                      :y "0.5%"
+                      :width "0%"
+                      :height "98%"
+                      :anchor "left center")
+  :stacking "bg"
+  :exclusive "true"
+  :focusable "false"
+  (side-bar))
+

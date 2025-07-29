@@ -1,0 +1,16 @@
+@import "../../../.cache/wal/colors.scss";
+
+*{
+  all: unset;
+  font-family: "Iosevka";
+  font-weight: bold;
+}
+
+@import "scss/bar.scss";
+@import "scss/side-bar.scss";
+@import "scss/wallpaper.scss";
+@import "scss/device-control.scss";
+@import "scss/resource-monitor.scss";
+@import "scss/notification.scss";
+@import "scss/custom-calendar.scss";
+@import "scss/music-control.scss";

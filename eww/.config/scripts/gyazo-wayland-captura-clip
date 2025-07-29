@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# === Configuración ===
+API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+IMG_PATH="/tmp/gyazo_$(date +%s).png"
+
+# === Asegura entorno Wayland ===
+export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-1}
+
+# === Captura de pantalla con grim y slurp ===
+grim -g "$(slurp)" "$IMG_PATH" || exit 1
+
+# === Copiar imagen como archivo binario al portapapeles ===
+wl-copy --type image/png <"$IMG_PATH"
+
+# === Subida a Gyazo ===
+response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
+  -F "access_token=$API_TOKEN" \
+  -F "imagedata=@$IMG_PATH")
+
+# === Extraer link del JSON ===
+link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+
+# === Acciones finales ===
+if [ -n "$link" ]; then
+  echo -n "$link" | wl-copy --primary # copia también el link como texto por si acaso
+  xdg-open "$link" &
+  notify-send "✅ Imagen copiada y subida" "$link"
+else
+  notify-send "❌ Error al subir a Gyazo"
+fi
