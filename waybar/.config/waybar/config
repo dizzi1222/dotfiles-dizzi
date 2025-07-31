@@ -54,16 +54,19 @@
 		"on-click": "cliphist list | rofi -dmenu | cliphist decode | wl-copy",
 		"interval": 86400
 	},
-	"clock": {
-		"format": "{:%H:%M}",
-		"interval": 1,
-		"tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-		"calendar-weeks-pos": "right",
-		"today-format": "<span color='#7645AD'><b><u>{}</u></b></span>",
-		"format-calendar": "<span color='#aeaeae'><b>{}</b></span>",
-		"format-calendar-weeks": "<span color='#aeaeae'><b>W{:%V}</b></span>",
-		"format-calendar-weekdays": "<span color='#aeaeae'><b>{}</b></span>"
-	},
+
+  "clock": {
+    "format": "{:%H:%M}",
+    "format-alt": "{:%Y-%m-%d}",
+    "interval": 1,
+    "tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "calendar-weeks-pos": "right",
+    "today-format": "<span color='#7645AD'><b><u>{}</u></b></span>",
+    "format-calendar": "<span color='#aeaeae'><b>{}</b></span>",
+    "format-calendar-weeks": "<span color='#aeaeae'><b>W{:%V}</b></span>",
+    "format-calendar-weekdays": "<span color='#aeaeae'><b>{}</b></span>"
+  },
+
 	"battery": {
 		"interval": 1,
 		"states": {
@@ -103,7 +106,7 @@
 			]
 		},
 		"justify": "center",
-		"on-click": "pavucontrol",
+		"on-click": "easyeffects",
 		"tooltip-format": "{icon}  {volume}%"
 	},
 	"tray": {

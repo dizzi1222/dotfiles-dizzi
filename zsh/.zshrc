@@ -191,8 +191,8 @@ source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 # ACA CARGA EL NEOFETCH CON EL ASCII ETC
 # ACA CARGA EL NEOFETCH CON EL ASCII ETC
 
-# podria ser fastfetch - mas rapido
-neofetch
+# podria ser neofetch - pero mas lento
+fastfetch
 # neofetch tiene mas comunidad
 
 PATH=~/.console-ninja/.bin:$PATH
@@ -242,3 +242,5 @@ if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
     source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
 fi
 
+export PATH=/home/diego/musicpresence/musicpresence-2.3.2-linux-x86_64/usr/bin:$PATH
+export PATH=$HOME/cmus/bin:$PATH

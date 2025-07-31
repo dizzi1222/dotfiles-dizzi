@@ -1,0 +1,157 @@
+{
+//   _____ _____ _____ _____ _____ _____ _____ _____ _____ 
+//  |   __|  _  |   __|_   _|   __|   __|_   _|     |  |  |
+//  |   __|     |__   | | | |   __|   __| | | |   --|     |
+//  |__|  |__|__|_____| |_| |__|  |_____| |_| |_____|__|__|  ARCH  
+//
+//  by Bina
+
+
+// execute with: fastfetch --colors-block-range-start 9 --colors-block-width 3
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "~/.local/share/fastfetch/ascii/arch.txt",
+        "padding": {
+            "top": 2,
+            "right": 6
+        }
+    },
+    "display": {
+        "separator": " "
+    },
+    "modules": [
+        "break",
+        "break",
+        {
+            "type": "title",
+            "keyWidth": 10
+        },
+        "break",
+        {
+            "type": "os",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "kernel",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "packages",
+            "format": "{} (pacman)",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "shell",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "terminal",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "wm",
+            "key": " ",
+            "keyColor": "33"
+        },
+        {
+            "type": "uptime",
+            "key": " ",
+            "keyColor": "33"
+        },
+        // --- Nuevos Módulos Añadidos ---
+        {
+            "type": "cpu",
+            "key": "PU ", // Icono de CPU, puedes cambiarlo si tienes otro
+            "keyColor": "33"
+        },
+        {
+            "type": "memory",
+            "key": "󰍛 ", // Icono de memoria
+            "keyColor": "33"
+        },
+        {
+            "type": "display",
+            "key": "󰍹 ", // Icono de pantalla
+            "keyColor": "33"
+        },
+        {
+            "type": "theme",
+            "key": "󰌵 ", // Icono de tema
+            "keyColor": "33",
+            "compact": true // Para mostrar solo el nombre del tema, si prefieres
+        },
+        {
+            "type": "icons",
+            "key": "󰋥 ", // Icono de iconos
+            "keyColor": "33",
+            "compact": true
+        },
+        {
+            "type": "font",
+            "key": " ", // Icono de fuente
+            "keyColor": "33",
+            "compact": true
+        },
+        {
+            "type": "cursor",
+            "key": " ", // Icono de cursor
+            "keyColor": "33"
+        },
+        {
+            "type": "terminalFont",
+            "key": " ", // Icono de fuente de terminal
+            "keyColor": "33",
+            "compact": true
+        },
+        {
+            "type": "gpu",
+            "key": "󰍸 ", // Icono de GPU
+            "keyColor": "33"
+        },
+        {
+            "type": "disk",
+            "key": "󰋊 ", // Icono de disco
+            "keyColor": "33",
+          "disk": {
+            "type": "disk",
+            "key": "󰋊 ", // Icono de disco
+            "keyColor": "33",
+            "format": "{name}: {used} / {total} ({usage})",
+            "mountPoints": [
+              "/",
+              "/home",
+              "/boot",
+              "/run/media/diego/ext.Fp 1",
+              "/home/diego/mi_gdrive",
+              "/run/media/diego/ext.Fp 2",
+              "/run/media/diego/Nuevo vol [Linux Steam]"
+            ]
+          },
+        },
+        {
+            "type": "localip",
+            "key": "󰛿 ", // Icono de IP local
+            "keyColor": "33"
+        },
+        {
+            "type": "battery",
+            "key": "󰁹 ", // Icono de batería
+            "keyColor": "33"
+        },
+        {
+            "type": "locale",
+            "key": "󰇫 ", // Icono de localización
+            "keyColor": "33"
+        },
+        // --- Fin de Nuevos Módulos ---
+        "break",
+        "colors",
+        "break",
+        "break"
+    ]
+}
