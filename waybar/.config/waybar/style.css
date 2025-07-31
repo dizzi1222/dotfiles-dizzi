@@ -4,24 +4,24 @@
     border: none;
     font-size: 13px;
     font-family: "JetBrainsMono NL";
-		color: @foreground;
+    color: @foreground;
     min-height: 23px;
 }
 
 /* # ${ MODIFICADO POR DIEGO}  */
 
 window#waybar {
-  background: @background;
-  background-color: rgba(33, 33, 54, 0.85); /* O cualquier valor con alpha < 1 */
- }
+    background: @background;
+    background-color: rgba(33, 33, 54, 0.85); /* O cualquier valor con alpha < 1 */
+}
 
 /*FIN # ${ MODIFICADO POR DIEGO}  */
 
 .modules-center {
-  background-color: rgba(0,0,0,0.5);
-  padding: 0 15px;
-	margin: 3px 0;
-  border-radius: 15px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 0 15px;
+    margin: 3px 0;
+    border-radius: 15px;
 }
 
 #battery,
@@ -43,24 +43,30 @@ window#waybar {
 #tray,
 #window,
 #workspaces,
-#clock {
-  padding: 0 10px;
+#mpris,               /* <-- Añadido MPRIS aquí */
+#custom-Lil_bro {     /* <-- Añadido custom/Lil_bro aquí */
+    padding: 0 10px;
 }
+
+#clock {
+    padding: 0 10px;
+}
+
 #pulseaudio {
-  padding-top: 5px;
+    padding-top: 5px;
 }
 
 #pulseaudio.muted {
-  color: @color6;
-  padding-top: 0;
+    color: @color6;
+    padding-top: 0;
 }
 
-#clock{
-  color: @color4;
+#clock {
+    color: @color4;
 }
 
 #custom-love {
-	color: @color5;
+    color: @color5;
 }
 
 #battery {
@@ -83,10 +89,55 @@ window#waybar {
     animation-direction: alternate;
 }
 
-
 @keyframes blink {
     to {
         background-color: @foreground;
         color: @background;
     }
 }
+
+label:focus {
+    background-color: #000000;
+}
+
+/* --- NUEVOS ESTILOS PARA MPRIS Y CUSTOM/LIL_BRO --- */
+/* Make sure there are no stray characters or unclosed comments directly above this line. */
+
+#mpris {
+    color: @color7; /* Un color que contraste bien, @color7 es común para texto */
+    background-color: rgba(0,0,0,0.5); /* Fondo semitransparente como otros módulos */
+    border-radius: 10px; /* Bordes redondeados */
+    margin-right: 5px; /* Margen a la derecha para separarlo de otros módulos */
+    padding: 0 12px; /* Padding interno para el texto */
+    /* Puedes añadir más estilos de fuente si quieres que sea diferente al * global */
+    /* font-weight: bold; */
+}
+
+#mpris.paused {
+    color: @color6; /* Color diferente cuando está pausado */
+    font-style: italic; /* Texto en cursiva cuando está pausado */
+}
+
+#custom-Lil_bro {
+    color: @color1; /* Color que ya tenías */
+    font-weight: bold; /* Negrita */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Sombra de texto para un efecto de brillo sutil */
+    margin-left: 10px; /* Margen a la izquierda */
+    /* Puedes añadir más estilos si lo deseas */
+}
+
+/* --- Estilos para los contenedores de módulos (opcional, si quieres que se parezcan a Zenities) --- */
+/* Si quieres que tus módulos de los lados tengan un fondo y bordes redondeados como Zenities */
+/*
+.modules-left {
+    margin: 10px 0 0 10px;
+    background-color: @background;
+    border-radius: 40px;
+}
+
+.modules-right {
+    margin: 10px 10px 0 0;
+    background-color: @background;
+    border-radius: 40px;
+}
+*/
