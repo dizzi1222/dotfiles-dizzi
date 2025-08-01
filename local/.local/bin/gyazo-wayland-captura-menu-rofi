@@ -14,7 +14,7 @@ option=$(printf "📷 Captura Completa\n🔲 Seleccionar Área" | rofi -dmenu -p
 # === Captura de pantalla ===
 if [[ "$option" == *Completa* ]]; then
   # Añadir un delay de 1.5 segundos (puedes ajustar este valor)
-  sleep 0.5
+  sleep 1
   grim "$IMG_PATH"
 elif [[ "$option" == *Área* ]]; then
   grim -g "$(slurp)" "$IMG_PATH"

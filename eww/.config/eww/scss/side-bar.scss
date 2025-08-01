@@ -53,8 +53,9 @@
 .song-cover-art-vert {
 	background-size: cover;	
 	background-position: center;
-	min-height: 25px;
-	min-width: 12px;
+ /* ANTES: min-height: 25px; min-width: 12px; */
+    min-height: 48px; /* <-- Cambia a un valor más grande */
+    min-width: 48px;  /* <-- Cambia a un valor más grande (igual que height) */
 	margin: 8px 0px;
   border-radius: 4px;
 }

@@ -1,6 +1,5 @@
 #!/bin/zsh
 
-
 LENGTH_MICROSECONDS=$(playerctl metadata --format "{{mpris:length}}")
 
 # Calculate the real value in seconds based on the percentage input
@@ -14,4 +13,4 @@ print(real_value)
 " "$LENGTH_MICROSECONDS" "$1")
 
 # Set the player position to the calculated value
-playerctl position "$REALVALUE"
+playerctl position "$REALVALUE", no necesita --player

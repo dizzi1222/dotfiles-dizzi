@@ -4,21 +4,18 @@
     "modules-left": [
         "clock",
         "custom/love",
-        "custom/Lil_bro"
+        "custom/Lil_bro" // <--
     ],
     "modules-center": [
         "hyprland/workspaces"
     ],
     "modules-right": [
-        "mpris",         // <--- Módulo MPRIS ya incluido aquí
+        "custom/mpris",
         "tray",
         "pulseaudio",
         "battery"
     ],
     "reload_style_on_change": true,
-
-    // --- Module Configurations ---
-
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
@@ -33,7 +30,7 @@
             "9": "九",
             "10": "十",
             "urgent": "󰀨",
-            "active": "〇"
+            "active": "〇",
         },
         "persistent-workspaces": {
             "*": [
@@ -43,32 +40,34 @@
             ]
         }
     },
-
     "custom/love": {
         "format": "{} 󰩗 ",
         "exec": "bun ~/dotfiles/polybar/.config/polybar/scripts/love.ts"
     },
-
-    "custom/Lil_bro": {
-        "format": "Lil bro keep cooking!",
-        "tooltip": false
+    "custom/Lil_bro": { // <-- ¡Y aquí lo definimos!
+            "format": "Lil bro keep cooking!", // El texto que quieres mostrar
+            "tooltip": false // Opcional: Para que no muestre un tooltip al pasar el ratón
+            // Puedes añadir estilos CSS si lo deseas, por ejemplo:
+            // "class": "mi-texto-waybar",
+            // Luego, en tu archivo CSS de Waybar, defines:
+            // ".mi-texto-waybar {
+            //     color: #FFD700;
+            //     font-weight: bold;
+            //     margin-left: 10px;
+            // 
     },
-
-    // Si quieres un módulo de clima, este es el del Zenities, pero asegúrate de tener el script.
-    // "custom/weather": {
-    //     "format": "{}",
-    //     "return-type": "json",
-    //     "exec": "~/.config/waybar/scripts/weather.sh",
-    //     "interval": 10,
-    //     "on-click": "firefox https://wttr.in"
-    // },
-
-    // Si quieres el módulo de portapapeles, este es del Zenities.
-    // "custom/clipboard": {
-    //     "format": "",
-    //     "on-click": "cliphist list | rofi -dmenu | cliphist decode | wl-copy",
-    //     "interval": 86400
-    // },
+    "custom/weather": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/waybar/scripts/weather.sh",
+        "interval": 10,
+        "on-click": "firefox https://wttr.in"
+    },
+    "custom/clipboard": {
+        "format": "",
+        "on-click": "cliphist list | rofi -dmenu | cliphist decode | wl-copy",
+        "interval": 86400
+    },
 
     "clock": {
         "format": "{:%H:%M}",
@@ -102,14 +101,10 @@
             "󰁹"
         ]
     },
-
     "pulseaudio": {
         "format": "{volume}% {icon}",
         "format-bluetooth": "󰂰",
-        "format-bluetooth-muted": "󰂰", // Icono para Bluetooth muteado (si usas)
         "format-muted": "<span font='12'></span>",
-        "format-source": "",
-        "format-source-muted": "",
         "format-icons": {
             "headphones": "",
             "bluetooth": "󰥰",
@@ -125,42 +120,31 @@
             ]
         },
         "justify": "center",
-        "on-click": "easyeffects", // Asumiendo que usas easyeffects
+        "on-click": "easyeffects",
         "tooltip-format": "{icon}  {volume}%"
     },
-
     "tray": {
         "icon-size": 14,
         "spacing": 10
     },
 
-    // --- MPRIS Module Configuration (Official Waybar module) ---
-    // Este es el módulo 'mpris' que ya tenías en modules-right
-    "mpris": {
-        "format": "♪ {title} - {artist}",
-        "format-paused": " Pausado: {title}", // Ícono de pausa para cuando está pausado
-        "player-icons": {
-            // Puedes añadir iconos específicos para reproductores si conoces sus nombres (playerctl -l)
-            // Ejemplo: "spotify": "",
-            // Ejemplo: "ncspot": "󰋹",
-            "default": "🎜" // Un icono predeterminado para cualquier otro reproductor
-        },
-        "max-length": 40, // Limita la longitud del texto
-        "tooltip": true, // Muestra el título completo al pasar el ratón
-        "on-click": "playerctl play-pause", // Clic para reproducir/pausar
-        "on-scroll-up": "playerctl next", // Scroll hacia arriba para siguiente canción
-        "on-scroll-down": "playerctl previous" // Scroll hacia abajo para canción anterior
-    }
-    // Si usaras el custom/media de Zenities (con script), iría aquí y tendrías que incluirlo arriba:
-    // "custom/media": {
-    //   "format": "{icon} {}",
-    //   "return-type": "json",
-    //   "max-length": 40,
-    //   "format-icons": {
-    //     "spotify": "",
-    //     "default": "🎜"
-    //   },
-    //   "escape": true,
-    //   "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null"
-    // }
+    // --- MPRIS Module Configuration ---
+
+   "custom/mpris": {
+    "format": "{}",
+    "tooltip": true,
+    "return-type": "json",
+    "exec": "~/.config/waybar/scripts/mpris-cover.sh",
+    "on-click": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
+    "interval": 1,
+    "format-icons": {
+      "Playing": "▶",
+      "Paused": "⏸"
+    },
+    "format-paused": "{icon_cover} {status} {title}",
+    "format-playing": "{icon_cover} {status} {title}",
+    "format-stopped": "No hay música reproduciéndose"
+}
 }

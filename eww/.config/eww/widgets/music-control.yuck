@@ -29,11 +29,11 @@
            :space-evenly "true"
            :spacing "24"
         (button :class "prev-widget"
-                :onclick "playerctl --player=ncspot previous" "")
+                :onclick "playerctl previous" "")
         (button :class "pause-widget"
-                :onclick "playerctl --player=ncspot play-pause" "")
+                :onclick "playerctl play-pause" "")
         (button :class "next-widget"
-                :onclick "playerctl --player=ncspot next" ""))))))
+                :onclick "playerctl next" ""))))))
 
 (defwindow music-window
   :monitor 0
