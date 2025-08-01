@@ -1,6 +1,5 @@
 
 # Ignorar caches y archivos temporales
-.cache/
 *.log
 *.pid
 *.bak
