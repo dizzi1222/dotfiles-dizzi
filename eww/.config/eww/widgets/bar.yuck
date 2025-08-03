@@ -12,12 +12,11 @@
           :orientation "horizontal"
           :space-evenly "false"
           :halign "center"
-                :spacing "10"
       (box :class "song-cover-art"
           :vexpand "false"
           :hexpand "false"
           :width 80 ; <-- agrega esta línea para el ancho (por ejemplo, 25px)
-          :height 1 ; <-- agrega esta línea para el alto (por ejemplo, 18px)
+          :height 40 ; <-- agrega esta línea para el alto (por ejemplo, 18px)
           :style "background-image: url('${current-music-cover}'); background-size: contain; /* o 'cover' si prefieres que la imagen siempre se vea completa */
              background-position: center; border-radius: 10%; background-repeat: no-repeat;")
       (box :class "parentbox"
@@ -36,15 +35,29 @@
                   :duration "300ms"
           (box  :class "music-control"
                 :space-evenly "true"
-                :spacing "21"
-            (button :class "prev"
-                    :onclick "playerctl --ignore-player=firefox,chromium previous" "")
-            (button :class "pause"
-                    :onclick "playerctl --ignore-player=firefox,chromium play-pause" "")
-            (button :class "next"
-                    :onclick "playerctl --ignore-player=firefox,chromium next" "")))))))
-
-
+                :spacing "16"
+:halign "center" ;; Asegura que el box se centre
+      :vexpand "true"  ;; Permite que el box se expanda verticalmente
+      :hexpand "true"  ;; Permite que el box se expanda horizontalmente
+      :padding "5px 0"
+      (button :class "prev"
+              :onclick "playerctl --ignore-player=firefox,chromium previous"
+              :font "JetBrainsMono NL" ;; Sube a 40 o incluso 50
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30 ;; Una altura razonable para el botón
+              "")
+      (button :class "pause"
+              :onclick "playerctl --ignore-player=firefox,chromium play-pause"
+              :font "JetBrainsMono NL"
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30
+              "")
+      (button :class "next"
+              :onclick "playerctl --ignore-player=firefox,chromium next"
+              :font "JetBrainsMono NL"
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30
+                        "")))))))
 ;; button test ;;
 
 
@@ -63,7 +76,7 @@
         (box  :class "powermenu"
               :orientation "horizontal"
               :space-evenly "true"
-              :spacing 3
+              :spacing 24
           (button :class "shutdown"
                   :tooltip "Power Off"
                   :onclick "shutdown now" "")
@@ -86,9 +99,9 @@
             :onhoverlost "${eww} update calendar=false"
             :cursor "pointer"
   (box  :class "clock"
-        :spacing "20"
         :orientation "horizontal"
         :space-evenly false
+              :font "Font Awesome 6 Free Solid 30"
         clock
             (revealer :transition "slideleft"
                       :reveal calendar
@@ -103,12 +116,50 @@
          :space-evenly false
          :class "workspaces"
          :hexpand true
-          :spacing "3"
+        :spacing "5"
       (for workspace in workspaces
         (button :class "workspace ${current_workspace == workspace.id ? "current" : ""}"
                 :onclick "hyprctl dispatch workspace ${workspace.id}"
                 "${current_workspace == workspace.id ? "" : ""}")))))
 
+;; Wifi ;;
+(defwidget wifi []
+  (eventbox :onhover "${eww} update wifi=true"
+            :onhoverlost "${eww} update wifi=false"
+            :cursor "pointer"
+            :tooltip "Connected to ${current-wifi}"
+  (box  :class "wifi"
+        :orientation "horizontal"
+        :space-evenly "false"
+    (button :class "wifi-icon"
+            :onclick "~/.config/eww/scripts/wifi-menu.sh" wifi-strength)
+    (revealer :transition "slideright"
+              :reveal wifi
+              :duration "300ms"
+              (button :onclick "~/.config/eww/scripts/wifi-menu.sh"
+              (label  :class "wifi-label"
+                      :text current-wifi))))))
+
+;; Volume ;;
+(defwidget volume []
+  (eventbox :onhover "${eww} update volume=true"
+            :onhoverlost "${eww} update volume=false"
+            :cursor "pointer"
+    (box  :class "volume"
+          :tooltip "Volume: ${current-volume}%"
+          :orientation "horizontal"
+          :space-evenly "false"
+          :spacing "2"
+      (button :class "volume-icon" volume-icon)
+      (revealer :transition "slideleft"
+                :reveal volume
+                :duration "300ms"
+        (scale :class "volbar"
+               :value current-volume
+               :orientation "horizontal"
+               :max 101
+               :min 0
+               :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 
 ;; Brightness ;;
 (defwidget brightness []
@@ -119,7 +170,7 @@
           :tooltip "Brightness: ${current-brightness}%"
           :orientation "horizontal"
           :space-evenly "false"
-          :spacing "16"
+          :spacing "2"
       (button :class "brightness-icon" "󰖨")
       (revealer :transition "slideleft"
                 :reveal brightness
@@ -131,7 +182,6 @@
                :min 0
                :onchange "brightnessctl s {}%")))))
 
-
 ;; Memory ;;
 (defwidget memory []
 (eventbox :onhover "${eww} update memory=true"
@@ -139,7 +189,6 @@
   (box  :class "memory"
         :orientation "horizontal"
         :space-evenly "false"
-        :spacing "10"
     (circular-progress :value current-memory
                        :class "memorybar"
                        :thickness 4
@@ -177,7 +226,6 @@
         :halign "start"
         :vexpand "false"
         :hexpand "false"
-        :spacing "30"
     (launcher)
     (workspaces)))
 
@@ -191,6 +239,8 @@
         :hexpand "false"
     (memory)
     (brightness)
+    (volume)
+    (wifi)
     (clock)))
 
 ;; Center Group ;;
@@ -213,10 +263,6 @@
     (left)
     (center)
     (right)))
-
-;;;;;;;;;;;;;;;;;;;;
-
-
 
 ;;;;;; Window ;;;;;;
 

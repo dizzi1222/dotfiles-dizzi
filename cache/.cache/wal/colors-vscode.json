@@ -1,14 +1,14 @@
 {
     "editor.tokenColorCustomizations": {
-       "functions":    "#8C3A90", 
-        "keywords":     "#92468B",
-        "numbers":      "#A96196", 
-        "strings":      "#C579B3", 
-        "types":        "#358B9B", 
-        "variables":    "#39A9AF", 
-        "comments":     "#6d5c70"
+       "functions":    "#AB1A11", 
+        "keywords":     "#A32722",
+        "numbers":      "#D71F16", 
+        "strings":      "#D62116", 
+        "types":        "#A95E5B", 
+        "variables":    "#9E807E", 
+        "comments":     "#675555"
     },
     "workbench.colorCustomizations": {
-        "editor.background": "#1a0d1e"
+        "editor.background": "#0c0505"
     }
 }

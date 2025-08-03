@@ -1,0 +1,11 @@
+
+
+👉 2- Copia el EWW de zenities a tu dotfiles *si no existia*
+ git clone https://github.com/hayyaoe/zenities/tree/main
+
+cp -r zenities/.config/eww /home/diego/dotfiles/eww/.config/eww
+
+        ╰─❯ 📌⚠️ Esto lo puedes hacer con el repo eww widget que gustes.
+           |
+           ╰─❯ ⚠️⚠️ TU DIEGO, NO HAGAS ESTO! Ya lo tienes
+           en tus dotfiles & optimizado para ARCH/manjaro !!! ⚠️⚠️
