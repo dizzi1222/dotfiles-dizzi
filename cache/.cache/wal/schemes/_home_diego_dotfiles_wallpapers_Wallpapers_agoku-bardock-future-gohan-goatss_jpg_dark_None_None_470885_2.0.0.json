@@ -1,0 +1,28 @@
+{
+    "checksum": "a2d21374590b9afe1a3a8f39bac7fd8d",
+    "wallpaper": "/home/diego/dotfiles/wallpapers/Wallpapers/agoku-bardock-future-gohan-goatss.jpg",
+    "alpha": "100",
+    "special": {
+        "background": "#100707",
+        "foreground": "#c3c1c1",
+        "cursor": "#c3c1c1"
+    },
+    "colors": {
+        "color0": "#100707",
+        "color1": "#CFA241",
+        "color2": "#355E8B",
+        "color3": "#6D8E92",
+        "color4": "#908F8F",
+        "color5": "#AEADAC",
+        "color6": "#EEE3AF",
+        "color7": "#c3c1c1",
+        "color8": "#695656",
+        "color9": "#CFA241",
+        "color10": "#355E8B",
+        "color11": "#6D8E92",
+        "color12": "#908F8F",
+        "color13": "#AEADAC",
+        "color14": "#EEE3AF",
+        "color15": "#c3c1c1"
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "checksum": "0c00ff2f9ede8bc268ed0135951e65e5",
+    "wallpaper": "/home/diego/dotfiles/wallpapers/Wallpapers/dandadan-seiko-4k.webp",
+    "alpha": "100",
+    "special": {
+        "background": "#150d1e",
+        "foreground": "#c4c2c6",
+        "cursor": "#c4c2c6"
+    },
+    "colors": {
+        "color0": "#150d1e",
+        "color1": "#B8755B",
+        "color2": "#C37C5D",
+        "color3": "#C17D62",
+        "color4": "#CA8C6A",
+        "color5": "#D7A36B",
+        "color6": "#D3A96C",
+        "color7": "#c4c2c6",
+        "color8": "#655c70",
+        "color9": "#B8755B",
+        "color10": "#C37C5D",
+        "color11": "#C17D62",
+        "color12": "#CA8C6A",
+        "color13": "#D7A36B",
+        "color14": "#D3A96C",
+        "color15": "#c4c2c6"
+    }
+}

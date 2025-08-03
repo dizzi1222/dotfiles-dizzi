@@ -1,0 +1,28 @@
+{
+    "checksum": "62be2157fc1c6a15e8fb4e34dbfa049d",
+    "wallpaper": "/home/diego/dotfiles/wallpapers/Wallpapers/124.jpg",
+    "alpha": "100",
+    "special": {
+        "background": "#150f09",
+        "foreground": "#c4c3c1",
+        "cursor": "#c4c3c1"
+    },
+    "colors": {
+        "color0": "#150f09",
+        "color1": "#6E6C72",
+        "color2": "#7C7A83",
+        "color3": "#817E85",
+        "color4": "#8D8C92",
+        "color5": "#AAA9AF",
+        "color6": "#BCBCC4",
+        "color7": "#c4c3c1",
+        "color8": "#6c6358",
+        "color9": "#6E6C72",
+        "color10": "#7C7A83",
+        "color11": "#817E85",
+        "color12": "#8D8C92",
+        "color13": "#AAA9AF",
+        "color14": "#BCBCC4",
+        "color15": "#c4c3c1"
+    }
+}

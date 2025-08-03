@@ -100,12 +100,13 @@ window#waybar {
 /* Make sure there are no stray characters or unclosed comments directly above this line. */
 
 #custom-mpris {
-    color: @color1;
-    background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0,0,0,0.4);
+  padding: 0 10px;
+	margin: 3px 0;
+  border-radius: 15px;
+    color: @color6;
     font-weight: bold;
-    border-radius: 10px;
     margin-right: 5px;
-    padding: 0 8px;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Antes estaba en 0.2 */
 }
 

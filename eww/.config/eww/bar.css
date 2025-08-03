@@ -1,0 +1,84 @@
+/* Importa las variables de color de pywal */
+@import "~/.cache/wal/colors.scss"; // ¡Deja esta línea, es crucial!
+
+.main-bar {
+  // Antes: background-color: rgba(26, 27, 38, 0.5) !important;
+  // Ahora: usa la variable $background y añade la transparencia con rgba
+  background-color: rgba($background, 0.5) !important;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+.launcher {
+  font-size: 1.2rem;
+  // Antes: color: #c0caf5; /* $foreground sustituido por valor fijo */
+  // Ahora: usa la variable $foreground
+  color: $foreground;
+  padding: 0 12px 0 8px;
+  border-radius: 8px;
+  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.launcher:hover {
+  // Antes: background-color: rgba(40, 42, 54, 0.95); /* sustituye mix($background, $foreground, 95%) con valor aproximado */
+  // Ahora: Si Eww soporta `mix`, úsalo. Si no, tendrás que aproximarlo manualmente o buscar una función SCSS equivalente que Eww sí soporte.
+    // O una forma más sencilla es usar la misma variable $background y jugar con la opacidad o un color ligeramente diferente de pywal.
+    // Por ejemplo, para un hover un poco más claro que el fondo:
+    // background-color: rgba($background, 0.95); // (o un color un poco más claro si pywal te da una variable para ello)
+    // O si quieres un color de acento al pasar el ratón:
+    background-color: rgba($color6, 0.5); // Ejemplo: usar color6 con 50% de opacidad
+}
+
+.clock {
+  // Antes: color: #7aa2f7; /* $color6 fijo */
+  // Ahora: usa la variable $color6
+  color: $color6;
+  padding: 0 4px;
+}
+
+.right {
+  // Antes: color: #1a1b26; /* $background fijo */
+  // Ahora: usa la variable $background
+  color: $background;
+  font-size: 1.1rem;
+  border-radius: 50px;
+}
+
+// ... y así sucesivamente para todos los colores que quieras que Pywal controle.
+// busca todos los comentarios `/* $variable_name fijo */` o `/* sustituye mix(...)`
+// y reemplaza el valor fijo por la variable SCSS correspondiente.
+
+.workspace {
+  // Antes: color: #bb9af7; /* $color3 fijo */
+  color: $color3;
+  border-radius: 1rem;
+  margin: 0 0.25rem;
+  padding: 0 0.1rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.workspace.current {
+  // Antes: color: #f7768e; /* $color2 fijo */
+  color: $color2;
+}
+
+.workspace:hover {
+  // Esto es tricky. `mix` no siempre lo soporta el preprocesador de Eww.
+  // Antes: color: rgba(192, 202, 245, 0.7); /* mix($foreground, $color2, 70%) aproximado */
+  // Si quieres que se mezcle, tendrías que ver si Eww soporta funciones SCSS avanzadas.
+  // Si no, tendrías que elegir una variable de Pywal que te guste para el hover o definir un RGBA manual basado en el $foreground o $color2.
+    color: rgba($foreground, 0.7); // Una alternativa simple
+}
+
+.volbar trough highlight {
+  // Antes: background-color: rgba(245, 183, 177, 0.9); /* mix($color5, $foreground, 90%) aproximado */
+  background-color: rgba($color5, 0.9);
+  border-radius: 5px;
+}
+
+// Y repite este proceso para `brightnessbar trough highlight` usando `$color6`,
+// `volume-icon` usando `rgba($color5, 0.9)`,
+// `brightness-icon` usando `rgba($color6, 0.9)`,
+// `wifi-icon` usando `rgba($color1, 0.9)` (asumo $color1 por el rgba(247, 118, 142, 0.9)),
+// `battery-label, .memory-label` usando `rgba($color3, 0.9)`, etc.
+// También el `cal:selected` y `cal.indeterminate` deberían usar `$color9` (si pywal genera esa variable).

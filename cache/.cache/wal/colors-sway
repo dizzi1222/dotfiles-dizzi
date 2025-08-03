@@ -1,0 +1,21 @@
+set $wallpaper /home/diego/dotfiles/wallpapers/Wallpapers/dandadan-momo-4k.webp
+
+set $background #1a0d1e
+set $foreground #c5c2c6
+
+set $color0 #1a0d1e
+set $color1 #8C3A90
+set $color2 #92468B
+set $color3 #A96196
+set $color4 #C579B3
+set $color5 #358B9B
+set $color6 #39A9AF
+set $color7 #c5c2c6
+set $color8 #6d5c70
+set $color9 #8C3A90
+set $color10 #92468B
+set $color11 #A96196
+set $color12 #C579B3
+set $color13 #358B9B
+set $color14 #39A9AF
+set $color15 #c5c2c6

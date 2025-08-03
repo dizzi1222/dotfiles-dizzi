@@ -1,0 +1,28 @@
+{
+    "checksum": "6ae0e2fe1c2a5253a2f32d8e89f94f25",
+    "wallpaper": "/home/diego/dotfiles/wallpapers/Wallpapers/dandadan-momo-4k.webp",
+    "alpha": "100",
+    "special": {
+        "background": "#1a0d1e",
+        "foreground": "#c5c2c6",
+        "cursor": "#c5c2c6"
+    },
+    "colors": {
+        "color0": "#1a0d1e",
+        "color1": "#8C3A90",
+        "color2": "#92468B",
+        "color3": "#A96196",
+        "color4": "#C579B3",
+        "color5": "#358B9B",
+        "color6": "#39A9AF",
+        "color7": "#c5c2c6",
+        "color8": "#6d5c70",
+        "color9": "#8C3A90",
+        "color10": "#92468B",
+        "color11": "#A96196",
+        "color12": "#C579B3",
+        "color13": "#358B9B",
+        "color14": "#39A9AF",
+        "color15": "#c5c2c6"
+    }
+}

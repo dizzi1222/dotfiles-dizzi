@@ -12,7 +12,14 @@
           :orientation "horizontal"
           :space-evenly "false"
           :halign "center"
-          (box :class "song-cover-art" :vexpand "false" :hexpand "false" :style "background-image: url('${current-music-cover}');")
+                :spacing "10"
+      (box :class "song-cover-art"
+          :vexpand "false"
+          :hexpand "false"
+          :width 80 ; <-- agrega esta línea para el ancho (por ejemplo, 25px)
+          :height 1 ; <-- agrega esta línea para el alto (por ejemplo, 18px)
+          :style "background-image: url('${current-music-cover}'); background-size: contain; /* o 'cover' si prefieres que la imagen siempre se vea completa */
+             background-position: center; border-radius: 10%; background-repeat: no-repeat;")
       (box :class "parentbox"
             :orientation "vertical"
         (label  :text {music != "" ? "${music}" : ""}
@@ -29,13 +36,13 @@
                   :duration "300ms"
           (box  :class "music-control"
                 :space-evenly "true"
-                :spacing "16"
+                :spacing "21"
             (button :class "prev"
-                    :onclick "playerctl --player=ncspot previous" "")
+                    :onclick "playerctl --ignore-player=firefox,chromium previous" "")
             (button :class "pause"
-                    :onclick "playerctl --player=ncspot play-pause" "")
+                    :onclick "playerctl --ignore-player=firefox,chromium play-pause" "")
             (button :class "next"
-                    :onclick "playerctl --player=ncspot next" "")))))))
+                    :onclick "playerctl --ignore-player=firefox,chromium next" "")))))))
 
 
 ;; button test ;;
@@ -56,7 +63,7 @@
         (box  :class "powermenu"
               :orientation "horizontal"
               :space-evenly "true"
-              :spacing 24
+              :spacing 3
           (button :class "shutdown"
                   :tooltip "Power Off"
                   :onclick "shutdown now" "")
@@ -79,6 +86,7 @@
             :onhoverlost "${eww} update calendar=false"
             :cursor "pointer"
   (box  :class "clock"
+        :spacing "20"
         :orientation "horizontal"
         :space-evenly false
         clock
@@ -95,49 +103,12 @@
          :space-evenly false
          :class "workspaces"
          :hexpand true
+          :spacing "3"
       (for workspace in workspaces
         (button :class "workspace ${current_workspace == workspace.id ? "current" : ""}"
                 :onclick "hyprctl dispatch workspace ${workspace.id}"
                 "${current_workspace == workspace.id ? "" : ""}")))))
 
-;; Wifi ;;
-(defwidget wifi []
-  (eventbox :onhover "${eww} update wifi=true"
-            :onhoverlost "${eww} update wifi=false"
-            :cursor "pointer"
-            :tooltip "Connected to ${current-wifi}"
-  (box  :class "wifi"
-        :orientation "horizontal"
-        :space-evenly "false"
-    (button :class "wifi-icon"
-            :onclick "~/.config/eww/scripts/wifi-menu.sh" wifi-strength)
-    (revealer :transition "slideright"
-              :reveal wifi
-              :duration "300ms"
-              (button :onclick "~/.config/eww/scripts/wifi-menu.sh"
-              (label  :class "wifi-label"
-                      :text current-wifi))))))
-
-;; Volume ;;
-(defwidget volume []
-  (eventbox :onhover "${eww} update volume=true"
-            :onhoverlost "${eww} update volume=false"
-            :cursor "pointer"
-    (box  :class "volume"
-          :tooltip "Volume: ${current-volume}%"
-          :orientation "horizontal"
-          :space-evenly "false"
-          :spacing "2"
-      (button :class "volume-icon" volume-icon)
-      (revealer :transition "slideleft"
-                :reveal volume
-                :duration "300ms"
-        (scale :class "volbar"
-               :value current-volume
-               :orientation "horizontal"
-               :max 101
-               :min 0
-               :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 
 ;; Brightness ;;
 (defwidget brightness []
@@ -148,8 +119,7 @@
           :tooltip "Brightness: ${current-brightness}%"
           :orientation "horizontal"
           :space-evenly "false"
-          :spacing "2"
-          :visible adjustable-brightness
+          :spacing "16"
       (button :class "brightness-icon" "󰖨")
       (revealer :transition "slideleft"
                 :reveal brightness
@@ -162,28 +132,6 @@
                :onchange "brightnessctl s {}%")))))
 
 
-;; Battery ;;
-(defwidget battery []
-(eventbox :onhover "${eww} update battery=true"
-          :onhoverlost "${eww} update battery=false"
-  (box  :class "battery"
-        :orientation "horizontal"
-        :space-evenly "false"
-        :visible has-battery
-    (circular-progress :value current-battery
-                       :class "batterybar"
-                       :thickness 4
-      (button :class "battery-icon"
-              :tooltip time-left
-              ""))
-      (revealer :transition "slideleft"
-                :reveal battery
-                :duration "300ms"
-        (label  :class "battery-label"
-                :tooltip time-left
-                :text "${current-battery}%")))))
-
-
 ;; Memory ;;
 (defwidget memory []
 (eventbox :onhover "${eww} update memory=true"
@@ -191,6 +139,7 @@
   (box  :class "memory"
         :orientation "horizontal"
         :space-evenly "false"
+        :spacing "10"
     (circular-progress :value current-memory
                        :class "memorybar"
                        :thickness 4
@@ -228,6 +177,7 @@
         :halign "start"
         :vexpand "false"
         :hexpand "false"
+        :spacing "30"
     (launcher)
     (workspaces)))
 
@@ -240,10 +190,7 @@
         :vexpand "false"
         :hexpand "false"
     (memory)
-    (battery)
     (brightness)
-    (volume)
-    (wifi)
     (clock)))
 
 ;; Center Group ;;
@@ -261,7 +208,8 @@
   (box  :class "main-bar"
         :orientation "horizontal"
         :vexpand "false"
-        :hexpand "false"
+        :hexpand "false"       
+        :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
     (left)
     (center)
     (right)))
@@ -275,11 +223,12 @@
 ;; bar ;;
 (defwindow bar
           :monitor '[1, 0]'
-          :geometry (geometry :x "10px"
-                              :y "10px"
-                              :width "99%"
-                              :height "20px"
+          :geometry (geometry :x "0px"
+                              :y "0px"
+                              :width "100%"
+                              :height "40px"
                               :anchor "top center")
+                              :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
           :stacking "bg"
           :exclusive "true"
           :focusable "false"

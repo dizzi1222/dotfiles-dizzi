@@ -45,7 +45,7 @@
         "exec": "bun ~/dotfiles/polybar/.config/polybar/scripts/love.ts"
     },
     "custom/Lil_bro": { // <-- ¡Y aquí lo definimos!
-            "format": "Lil bro keep cooking!", // El texto que quieres mostrar
+            "format": "Lil bro keep cooking! ♥ 󰩗 ", // El texto que quieres mostrar
             "tooltip": false // Opcional: Para que no muestre un tooltip al pasar el ratón
             // Puedes añadir estilos CSS si lo deseas, por ejemplo:
             // "class": "mi-texto-waybar",
@@ -130,21 +130,22 @@
 
     // --- MPRIS Module Configuration ---
 
-   "custom/mpris": {
-    "format": "{}",
+  "custom/mpris": {
+    "format": "{text}",
     "tooltip": true,
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/mpris-cover.sh",
-    "on-click": "playerctl play-pause",
-    "on-scroll-up": "playerctl next",
-    "on-scroll-down": "playerctl previous",
+    "on-click": "playerctl --ignore-player=firefox,chromium play-pause",
+    "on-scroll-up": "playerctl --ignore-player=firefox,chromium next",
+    "on-scroll-down": "playerctl --ignore-player=firefox,chromium previous",
     "interval": 1,
     "format-icons": {
-      "Playing": "▶",
-      "Paused": "⏸"
+        "Playing": "▶",
+        "Paused": "⏸",
+        "Stopped": "♫"
     },
     "format-paused": "{icon_cover} {status} {title}",
     "format-playing": "{icon_cover} {status} {title}",
-    "format-stopped": "No hay música reproduciéndose"
-}
+    "format-stopped": "{icon} No hay música reproduciéndose"
+  }
 }
