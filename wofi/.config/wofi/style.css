@@ -23,7 +23,8 @@ window#wofi-window .inner-box .list-item {
     padding: 5px; /* Relleno dentro de cada elemento */
     border: 1px solid rgba(255, 255, 255, 0.6); /* Borde sutil */
     border-radius: 4px; /* Bordes ligeramente redondeados */
-    background-color: transparent; /* Un fondo sutil para el elemento */
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo negro con 80% de opacidad */
+    opacity: 0.9; /* 80% de opacidad para toda la ventana, incluyendo texto */
 }
 /* Estilo para cada elemento individual de la lista (el contenido de texto) */
 #entry {

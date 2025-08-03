@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Kew
+Comment=Mi lanzador personalizado para Kew
+Exec=ghostty -e /usr/local/bin/kew
+Icon=/home/diego/dotfiles/local/.local/share/icons/kew-icon.jpg
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true
