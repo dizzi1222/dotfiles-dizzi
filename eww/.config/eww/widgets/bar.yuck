@@ -76,7 +76,7 @@
         (box  :class "powermenu"
               :orientation "horizontal"
               :space-evenly "true"
-              :spacing 24
+              :spacing 12
           (button :class "shutdown"
                   :tooltip "Power Off"
                   :onclick "shutdown now" "")

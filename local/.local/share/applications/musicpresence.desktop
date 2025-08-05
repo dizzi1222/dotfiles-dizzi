@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Musicpresence
+Comment=Mi lanzador personalizado para Musicpresence
+Exec=kitty -e /home/diego/musicpresence/musicpresence-2.3.2-linux-x86_64/usr/bin/musicpresence
+Icon=/home/diego/dotfiles/local/.local/share/icons/musicpresence-tray-dark.png
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

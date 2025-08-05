@@ -167,12 +167,12 @@ source $ZSH/oh-my-zsh.sh
 
 # ls - 🖼️ Ver imágenes en la terminal
 alias ls='exa --icons --color=always'
+# Sugerencia y autocompleta en gris [Control+E]
+source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 #Búsqueda interactiva: Cuando presionas Tab para autocompletar un comando, argumento o archivo [tab o ArrowUp o ArrowDown]
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
-# Sugerencia y autocompleta en gris [Control+E]
-source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 # Consejo: No lo pongas antes de otros plugins como fzf-tab o autosuggestions, ya que puede interferir con ellos.
 
 # /////////////////////////////////////////////////////////////////////////////
