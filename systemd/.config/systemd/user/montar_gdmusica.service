@@ -1,0 +1,9 @@
+[Unit]
+Description=Montar Google Drive al iniciar sesi\C3\B3n
+
+[Service]
+ExecStart=/home/diego/montar_gdmusica.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target

@@ -244,3 +244,7 @@ fi
 
 export PATH=/home/diego/musicpresence/musicpresence-2.3.2-linux-x86_64/usr/bin:$PATH
 export PATH=$HOME/cmus/bin:$PATH
+
+# Gemini AI instalacion:
+# Añade el directorio global de npm al PATH. NPM_GLOBAL
+export PATH=~/.npm-global/bin:$PATH

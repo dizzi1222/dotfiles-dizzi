@@ -120,7 +120,7 @@
             ]
         },
         "justify": "center",
-        "on-click": "easyeffects",
+        "on-click": "pavucontrol",
         "tooltip-format": "{icon}  {volume}%"
     },
     "tray": {

@@ -1,0 +1,11 @@
+
+[Unit]
+Description=Montar Google Drive al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gdrive.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
+

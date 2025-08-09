@@ -1,0 +1,9 @@
+[Unit]
+Description=Gemini CLI Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/gemini
+
+[Install]
+WantedBy=default.target

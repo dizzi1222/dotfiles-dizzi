@@ -8,6 +8,7 @@
             :cursor "pointer"
     (box  :orientation "vertical"
           :space-evenly "false"
+          :spacing "4"
       (button :class "power-vert"
               :onclick "~/.config/eww/scripts/app-launcher.sh" "󰣇")
       (revealer :transition "slideup"
@@ -56,6 +57,7 @@
     (box  :class "music-vert"
           :orientation "vertical"
           :space-evenly "false"
+          :spacing "4"
           :halign "center"
                   (revealer :transition "slideup"
                   :reveal music-control
@@ -64,12 +66,30 @@
                 :orientation "vertical"
                 :space-evenly "true"
                 :spacing "8"
+
+      :vexpand "true"  ;; Permite que el box se expanda verticalmente
+      :hexpand "true"  ;; Permite que el box se expanda horizontalmente
+      :padding "5px 0"
             (button :class "prev"
-                    :onclick "playerctl --player=ncspot previous" "")
+              :onclick "playerctl --ignore-player=firefox,chromium previous"
+              :font "JetBrainsMono NL" ;; Sube a 40 o incluso 50
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30 ;; Una altura razonable para el botón
+              "")
             (button :class "pause"
-                    :onclick "playerctl --player=ncspot play-pause" "")
+              :onclick "playerctl --ignore-player=firefox,chromium play-pause"
+              :font "JetBrainsMono NL"
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30
+              "")
             (button :class "next"
-                    :onclick "playerctl --player=ncspot next" "")))
+              :onclick "playerctl --ignore-player=firefox,chromium next"
+              :font "JetBrainsMono NL"
+              :width 10  ;; Un ancho razonable para el botón
+              :height 30
+                        "")))
+
+
       (box :class "parentbox-vert"
             :orientation "horizontal"
         (label  :text {music != "" ? "${music}" : ""}
@@ -135,7 +155,22 @@
     (box :class "clock-vert"
          :orientation "vertical"
          :space-evenly false
-         hour minute)))
+     (label :text hour)
+     (label :text minute)
+
+ ;; Separador
+      (box :class "separator"
+           :height 2
+           :width "1px")
+      
+(revealer :transition "slideup"
+          :reveal calendar
+          :duration "300ms"
+(button :class "calendar"
+                :onclick "~/.config/eww/scripts/calendar-popup.sh"
+(label :text calendar-short
+                       :angle 90)
+                )))))
 
 ;; Wifi ;;
 (defwidget wifi-vert []
@@ -190,7 +225,9 @@
                :max 101
                :min 0
                :onchange "pactl set-sink-volume $(pactl get-default-sink) {}%"))
-      (button :class "volume-icon-vert" volume-icon))))
+      (button :class "volume-icon-vert"
+              :onclick "/usr/bin/easyeffects &"
+              (label :text volume-icon)))))
 
 ;; Idle Toggle ;;
 (defwidget toggle-idle []
@@ -211,8 +248,6 @@
        :halign "start"
        :vexpand "false"
        :hexpand "false"
-       (toggle-idle)
-       (wifi-vert)
        (volume-vert)
        (brightness-vert))))
 
@@ -226,8 +261,7 @@
        :halign "start"
        :vexpand "false"
        :hexpand "false"
-       (memory-vert)
-       (battery-vert))))
+       (memory-vert))))
 
 ;; Time Group ;;
 (defwidget time-vert []
@@ -285,6 +319,16 @@
        (mid)
        (bottom)))
 
+;; Calendar Widget ;;
+(defwidget cal []
+	(box :class "cal-box" 
+		 :orientation "vertical"
+	(box :class "cal-inner-box"
+	(calendar :class "cal" 
+			  :day calendar-day 
+			  :month calendar-month 
+			  :year calendar-year))))
+
 ;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;; Window ;;;;;;
@@ -292,13 +336,22 @@
 ;; bar ;;
 (defwindow side-bar
   :monitor '[1, 0]'
-  :geometry (geometry :x "0.5%"
-                      :y "0.5%"
+  :geometry (geometry :x "0%"
+                      :y "0%"
                       :width "0%"
-                      :height "98%"
+                      :height "100%"
                       :anchor "left center")
+                      :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
   :stacking "bg"
   :exclusive "true"
   :focusable "false"
   (side-bar))
 
+(defwindow calendar
+          :monitor '[1, 0]'
+          :geometry (geometry :x "10px"
+                              :y "5px"
+                              :width "270px"
+                              :height "60px"
+                              :anchor "bottom left")
+          (cal))

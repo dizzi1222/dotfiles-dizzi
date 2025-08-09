@@ -1,7 +1,8 @@
 .side-bar {
-  background-color: $background;
+  background-color: fade-out(mix($background, $foreground, 95%), 0.4); // 0.2 es el 20% de transparencia
   padding: 4px;
-  border-radius: 12px;
+  border-radius: 1px; // o usa 12px 
+  font-family: "JetBrainsMono NL";
 }
 
 /* Workspaces */
@@ -95,7 +96,17 @@
 /* Clock & Battery */
 .clock-vert {
   color: $color6;
-  padding: 0px 5px;
+  padding: 0px 0px;
+}
+
+.calendar{
+  padding: 0px 1px;
+  margin: 2px 0px;
+}
+
+.separator {
+  background-color: fade-out(mix($background, $foreground, 10%), 0.4); // 0.2 es el 20% de transparencia
+  opacity: 0.9;
 }
 
 .batterybar-vert,

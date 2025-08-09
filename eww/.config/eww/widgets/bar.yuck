@@ -16,7 +16,7 @@
           :vexpand "false"
           :hexpand "false"
           :width 80 ; <-- agrega esta línea para el ancho (por ejemplo, 25px)
-          :height 40 ; <-- agrega esta línea para el alto (por ejemplo, 18px)
+          :height 30 ; <-- agrega esta línea para el alto (por ejemplo, 18px)
           :style "background-image: url('${current-music-cover}'); background-size: contain; /* o 'cover' si prefieres que la imagen siempre se vea completa */
              background-position: center; border-radius: 10%; background-repeat: no-repeat;")
       (box :class "parentbox"
@@ -122,24 +122,6 @@
                 :onclick "hyprctl dispatch workspace ${workspace.id}"
                 "${current_workspace == workspace.id ? "" : ""}")))))
 
-;; Wifi ;;
-(defwidget wifi []
-  (eventbox :onhover "${eww} update wifi=true"
-            :onhoverlost "${eww} update wifi=false"
-            :cursor "pointer"
-            :tooltip "Connected to ${current-wifi}"
-  (box  :class "wifi"
-        :orientation "horizontal"
-        :space-evenly "false"
-    (button :class "wifi-icon"
-            :onclick "~/.config/eww/scripts/wifi-menu.sh" wifi-strength)
-    (revealer :transition "slideright"
-              :reveal wifi
-              :duration "300ms"
-              (button :onclick "~/.config/eww/scripts/wifi-menu.sh"
-              (label  :class "wifi-label"
-                      :text current-wifi))))))
-
 ;; Volume ;;
 (defwidget volume []
   (eventbox :onhover "${eww} update volume=true"
@@ -150,7 +132,12 @@
           :orientation "horizontal"
           :space-evenly "false"
           :spacing "2"
-      (button :class "volume-icon" volume-icon)
+        (button :class "volume-icon"
+                :onclick "/usr/bin/easyeffects &"
+                (label :text volume-icon))
+
+      ;;o bien podrias usar  "/usr/bin/pavucontrol &" ;;
+
       (revealer :transition "slideleft"
                 :reveal volume
                 :duration "300ms"
@@ -240,7 +227,6 @@
     (memory)
     (brightness)
     (volume)
-    (wifi)
     (clock)))
 
 ;; Center Group ;;

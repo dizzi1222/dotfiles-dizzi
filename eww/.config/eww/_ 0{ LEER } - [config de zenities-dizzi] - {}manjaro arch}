@@ -1,0 +1,34 @@
+ ⚙️👉 1- Montar/desmontar el Widget personal
+
+# para cerrar todo:
+eww close-all
+
+# para abrir el widget en cuestion
+eww open bar # o usa directamente sin hacer cd ni ./eww
+
+# para refrescar los estilos de wal/colors auto
+eww reload 
+
+#  /wal/colors.scss usa los colores de los fondos:
+# dotfiles/wallpapers/Wallpapers
+
+ ---------------------------
+////////////////////////
+---------------------------
+
+👉 2- Copia el EWW de zenities a tu dotfiles *si no existia*
+ git clone https://github.com/hayyaoe/zenities/tree/main
+
+cp -r zenities/.config/eww /home/diego/dotfiles/eww/.config/eww
+
+        ╰─❯ ⚠️ Esto lo puedes hacer con el repo eww widget que gustes.
+         ╰─❯Procura siempre crear backup
+            |
+            ╰─❯ 📌⚠️⚠️ TU DIEGO, NO HAGAS ESTO! Ya lo tienes
+            en tus dotfiles & optimizado para ARCH/manjaro !!! ⚠️⚠️
+               
+👉📌 3- TRUCAZO DE EWW, HOW WORKS WORKSPACES:
+~ ¿Como funciona los workspaces?
+
+- Con zenities-eww el truco es que aparecen los puntos 🔸 y la forma de diamtante ♦️ mientras..
+TENGAS ABIERTO VENTANAS DISPERSADAS EN VENTANAS!
