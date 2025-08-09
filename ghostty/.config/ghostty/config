@@ -116,9 +116,9 @@ mouse-hide-while-typing = true
 ### KEYBINDINGSS ###
 ####################
 # cerrar tab
-keybind = ctrl+w=close_surface
+keybind = ctrl+;=close_surface
 # cerrar windows
-keybind = ctrl+shift+w=close_tab
+keybind = ctrl+shift+q=close_tab
 #Dividir pantalla
 #Para  horizontal (nueva ventana a la derecha):
 keybind = ctrl+shift+enter=new_split:right
