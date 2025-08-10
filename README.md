@@ -8,6 +8,7 @@ Refer to the [documentation](https://lazyvim.github.io/installation) to get star
 
 # Wallpapers
 Wallpapers for desktop
+https://github.com/dylanaraps/wal
 
 # Fastfetch 
 
@@ -19,10 +20,7 @@ Welcome to my fastfetch config presets repo :3
 In this repo, I collect my config files that I designed for my [Arch Linux](https://archlinux.org/) [Hyprland](https://github.com/hyprwm/Hyprland) rice. 
 Feel free to copy files and modify them or clone the complete repository.
 
-<p align="center">
-  <img src="./screenshots/floating-mode.png" style="width: 100%;">
-</p>
-
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4e5c4c97-a852-49a9-9718-acecfa6bfd00" />
 ## Usage
 
 Clone the repository into ``~/.local/share``
