@@ -1,4 +1,4 @@
-https://i.gyazo.com/e9e69b2b54cd87e8e7eb7f601e791f10.png
+https:<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a" />
 
 # 💤 LazyVim
 
