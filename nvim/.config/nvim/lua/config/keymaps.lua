@@ -17,8 +17,16 @@ keymap.set("n", "<C-[>", ":tabprevious<CR>", { noremap = true, silent = true })
 -- Cambiar a pestaña siguiente con ]b
 keymap.set("n", "<C-]>", ":tabnext<CR>", { noremap = true, silent = true })
 
--- Activar backspace+Control - MODO INSERCION COMO EN VSCODE!!!
+-- Activar backspace+Control - MODO INSERCION COMO EN VSCODE!!! = Ctrl W
 vim.api.nvim_set_keymap("i", "<C-BS>", "<C-W>", { noremap = true, silent = true })
+
+-- Mapeo para Ctrl + backspace a Ctrl + W en el modo de línea de comandos (la : )
+-- Mapeo que usa una función para asegurar que funciona en la línea de comandos
+vim.keymap.set("c", "<C-BS>", function()
+  -- Cierra cualquier ventana de completado y luego ejecuta el comando Ctrl-W
+  -- El comando \b borra una palabra hacia atrás
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-W>", true, true, true), "n", true)
+end, { noremap = true, silent = true })
 
 -- Cerrar pestaña
 

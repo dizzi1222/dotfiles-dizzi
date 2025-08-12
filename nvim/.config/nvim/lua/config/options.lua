@@ -43,13 +43,13 @@ opt.undofile = true
 --
 -- Define un directorio para guardar los archivos de historial
 -- Esto evita que se creen archivos .un~ en cada proyecto
-local undodir = os.getenv("HOME") .. "/.config/nvim/undodir"
-opt.undodir = undodir
-
--- Crear el directorio si no existe
-if vim.fn.isdirectory(undodir) == 0 then
-  vim.fn.mkdir(undodir, "p")
-end
+-- local undodir = os.getenv("HOME") .. "/.config/nvim/undodir"
+-- opt.undodir = undodir
+--
+-- -- Crear el directorio si no existe
+-- if vim.fn.isdirectory(undodir) == 0 then
+--   vim.fn.mkdir(undodir, "p")
+-- end
 
 -- FIN ;; Modificado por diego ;;
 

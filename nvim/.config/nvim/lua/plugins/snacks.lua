@@ -1,21 +1,3 @@
--- Autocomando para mostrar el progreso del LSP
--- Este bloque no se modifica, ya que está bien definido.
--- **NOTA: Se ha comentado este bloque para evitar conflictos visuales con las notificaciones de Snacks.nvim.**
--- vim.api.nvim_create_autocmd("LspProgress", {
---   ---@param ev {data: {client_id: integer, params: lsp.ProgressParams}}
---   callback = function(ev)
---     local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
---     vim.notify(vim.lsp.status(), "info", {
---       id = "lsp_progress",
---       title = "LSP Progress",
---       opts = function(notif)
---         notif.icon = ev.data.params.value.kind == "end" and " "
---           or spinner[math.floor(vim.uv.hrtime() / (1e6 * 80)) % #spinner + 1]
---       end,
---     })
---   end,
--- })
-
 return {
   "folke/snacks.nvim",
   priority = 1000,
@@ -443,14 +425,54 @@ return {
       enabled = true,
       sections = {
         { section = "header" },
-        { section = "startup", pane = 1 }, -- Ahora en el panel de la izquierda
-        { section = "keys", gap = 1, padding = 1, pane = 1 }, -- También a la izquierda
+        { section = "startup", pane = 1 },
+        { section = "keys", gap = 1, padding = 1, pane = 1 },
         {
+          pane = 2,
           section = "terminal",
           cmd = "pokemon-colorscripts -rn 'vaporeon,rayquaza,darkrai,lucario,gardevoir,lopunny,garchomp,blaziken,charmander,totodile,metagross' --no-title; sleep 0.3",
-          height = 25,
+          -- Se ha reducido la altura para evitar solapamiento
+          height = 15,
           padding = 1,
-          pane = 2, -- Esto lo mueve al panel de la derecha
+        },
+        {
+          pane = 2,
+          section = "terminal",
+          cmd = "gh notify -s -a -n5",
+          height = 5,
+          padding = 1,
+          title = "Notifications",
+          icon = " ",
+          key = "n",
+        },
+        {
+          pane = 2,
+          section = "terminal",
+          cmd = "gh issue list -L 3",
+          height = 7,
+          padding = 1,
+          title = "Open Issues",
+          icon = " ",
+          key = "i",
+        },
+        {
+          pane = 2,
+          section = "terminal",
+          cmd = "gh pr list -L 3",
+          height = 7,
+          padding = 1,
+          title = "Open PRs",
+          icon = " ",
+          key = "P",
+        },
+        {
+          pane = 2,
+          section = "terminal",
+          cmd = "git --no-pager diff --stat -B -M -C",
+          height = 10,
+          padding = 1,
+          title = "Git Status",
+          icon = " ",
         },
       },
     },
