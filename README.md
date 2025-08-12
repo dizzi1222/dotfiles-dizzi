@@ -2,6 +2,7 @@
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a" />
 
 # 💤 LazyVim
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/60c80cc3-98d7-4af0-a5bd-8842a9c8c80d" />
 
 A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
 Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
