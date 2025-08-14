@@ -1,3 +1,4 @@
+
 # ESTO HACE QUE neofetch cargue primero
 # si prefieres puedes quitarlo para cargar ANTES el prompt instant.
       typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
@@ -5,22 +6,6 @@
       
 # /////////////////////////////////////////////////////////////////////////////
 
-# Manjaro specific Zsh configuration. Keep these near the top.
-# Use powerline
-USE_POWERLINE="true"
-
-# Has weird character width
-HAS_WIDECHARS="false"
-
-# Source manjaro-zsh-configuration
-if [[ -e /usr/share/zsh/manjaro-zsh-config ]]; then
-  source /usr/share/zsh/manjaro-zsh-config
-fi
-
-# Use manjaro zsh prompt
-if [[ -e /usr/share/zsh/manjaro-zsh-prompt ]]; then
-  source /usr/share/zsh/manjaro-zsh-prompt
-fi
 
 export PATH="$HOME/.local/bin:$PATH"
 # /////////////////////////////////////////////////////////////////////////////
@@ -124,8 +109,16 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+# Correcto:
+plugins=(
+  git
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+  zsh-completions
+  zsh-history-substring-search
+)
 
+# Esta línea debe estar después de 'plugins=()'
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -173,7 +166,7 @@ source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 #Búsqueda interactiva: Cuando presionas Tab para autocompletar un comando, argumento o archivo [tab o ArrowUp o ArrowDown]
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
-# Consejo: No lo pongas antes de otros plugins como fzf-tab o autosuggestions, ya que puede interferir con ellos.
+# Consejo: No lo pongas antes de otros plugins como autosuggestions, por conflictos, ya que puede interferir con ellos.
 
 # /////////////////////////////////////////////////////////////////////////////
 # ---------------------------------------------------------------------------------------------

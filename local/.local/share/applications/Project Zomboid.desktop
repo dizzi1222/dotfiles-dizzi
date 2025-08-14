@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Project Zomboid
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/108600
+Icon=steam
+Terminal=false
+Type=Application
+Categories=Game;
