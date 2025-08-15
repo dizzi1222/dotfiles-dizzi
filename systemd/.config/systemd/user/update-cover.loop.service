@@ -1,0 +1,9 @@
+[Unit]
+Description=Arrancar update-cover.loop.service Imagenen/cover de VLC.org.flatpak, etc
+
+[Service]
+ExecStart=/home/diego/dotfiles/eww/.config/eww/scripts/update-cover-loop.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
