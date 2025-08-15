@@ -124,7 +124,7 @@
   "custom/updates": {
     "format": "{}",
     "interval": 60,
-    "exec": "~/.config/waybar/scripts/checkupdate.sh",
+    "exec": "~/.config/waybar/scripts/myupdates.sh",
     "return-type": "json",
     "exec-if": "exit 0",
   },

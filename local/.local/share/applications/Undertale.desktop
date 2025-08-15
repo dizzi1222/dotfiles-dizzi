@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Undertale
+Comment=Play this game on Steam
+Exec=steam steam://rungameid/391540
+Icon=/home/diego/local/.local/share/icons/Undertale-icon.png
+Terminal=false
+Type=Application
+Categories=Game;

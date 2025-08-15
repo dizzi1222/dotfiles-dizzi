@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Eww Music Cover Loop
+Exec=/home/diego/.config/eww/scripts/update-cover-loop.sh
+X-GNOME-Autostart-enabled=true
+

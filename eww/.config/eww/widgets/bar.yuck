@@ -245,7 +245,7 @@
         :orientation "horizontal"
         :vexpand "false"
         :hexpand "false"       
-        :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
+        :style "border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
     (left)
     (center)
     (right)))
@@ -260,7 +260,7 @@
                               :width "100%"
                               :height "40px"
                               :anchor "top center")
-                              :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
+                              :style "border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
           :stacking "bg"
           :exclusive "true"
           :focusable "false"

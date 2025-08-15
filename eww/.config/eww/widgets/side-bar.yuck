@@ -341,13 +341,13 @@
                       :width "0%"
                       :height "100%"
                       :anchor "left center")
-                      :style "background-color: @color1; border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
+                      :style "border-radius: 1px; padding: 3px; font-family: 'JetBrainsMono NL';" 
   :stacking "bg"
   :exclusive "true"
   :focusable "false"
   (side-bar))
 
-(defwindow calendar
+(defwindow sidebar-calendar
           :monitor '[1, 0]'
           :geometry (geometry :x "10px"
                               :y "5px"

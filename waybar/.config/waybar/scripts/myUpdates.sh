@@ -1,24 +1,36 @@
 #!/bin/bash
+
 format() {
-    if [ "$1" -eq 0 ]; then
-        echo '-'
-    else
-        echo "$1"
-    fi
+  if [ "$1" -eq 0 ]; then
+    echo '-'
+  else
+    echo "$1"
+  fi
 }
 
-if ! updates_arch="$(checkupdates | wc -l)"; then
-    updates_arch=0
-fi
+# Conteo de actualizaciones
+updates_arch=$(checkupdates 2>/dev/null | tee /tmp/arch_updates.txt | wc -l)
+updates_aur=$(yay -Qum 2>/dev/null | tee /tmp/aur_updates.txt | wc -l)
+updates_total=$((updates_arch + updates_aur))
 
-if ! updates_aur="$(yay -Qum 2>/dev/null | wc -l)"; then
-    updates_aur=0
-fi
-
-updates="$((updates_arch + updates_aur))"
-
-if [ "$updates" -gt 0 ]; then
-    echo " ($(format $updates_arch)/$(format $updates_aur))"
+# Icono y color según updates
+if [ "$updates_total" -gt 0 ]; then
+  icon=""
+  color="#FF5555"
 else
-    echo
-fia
+  icon=""
+
+  color="#50FA7B"
+fi
+
+# Listas de paquetes para tooltip
+arch_list=$(cat /tmp/arch_updates.txt | tr '\n' ', ' | sed 's/, $//')
+aur_list=$(cat /tmp/aur_updates.txt | tr '\n' ', ' | sed 's/, $//')
+
+# Tooltip seguro para JSON
+tooltip="Arch ($updates_arch): $arch_list | AUR ($updates_aur): $aur_list"
+tooltip_escaped=$(python3 -c "import json,sys; print(json.dumps('$tooltip'))")
+
+# Salida JSON para Waybar
+#
+echo "{\"text\":\"$icon   $updates_total\",\"tooltip\":$tooltip_escaped,\"class\":\"custom-updates\",\"color\":\"$color\"}"

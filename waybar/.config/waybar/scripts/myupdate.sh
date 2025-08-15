@@ -9,14 +9,12 @@ IFS=$'\n'$'\r'
 updatesli=($($pkgmgr -Qu))
 text=${#updatesli[@]}
 icon=""
-[ $text -eq 0 ] && icon="" || icon="📦"
+[ $text -eq 0 ] && icon="" || icon=""
 
-for i in ${updatesli[@]}
-do
+for i in ${updatesli[@]}; do
   tooltip+="$i\n"
 done
 
-cat << EOF
+cat <<EOF
 { "text":"$icon", "tooltip":"UPDATES:  $text"}  
 EOF
-

@@ -13,7 +13,8 @@
         "custom/mpris",
         "tray",
         "pulseaudio",
-        "battery"
+        "battery",
+        "custom/updates"   // <-- agregar aquí
     ],
     "reload_style_on_change": true,
     "hyprland/workspaces": {
@@ -100,6 +101,11 @@
             "󰂂",
             "󰁹"
         ]
+    },
+    "custom/updates": {
+    "return-type": "json",
+    "exec": "~/.config/waybar/scripts/myUpdates.sh",
+    "interval": 60
     },
     "pulseaudio": {
         "format": "{volume}% {icon}",

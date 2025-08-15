@@ -105,6 +105,8 @@ cursor-style = block
 # cursor-style = underline    # Línea baja
 # cursor-style = bar # Barra vertical
 cursor-style-blink = false
+# mover puntero del mouse, Alt+Click
+cursor-click-to-move
 shell-integration-features = no-cursor
 
 
