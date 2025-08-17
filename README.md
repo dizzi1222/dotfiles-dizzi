@@ -243,7 +243,7 @@ sudo localectl set-x11-keymap en
 echo ">> Script finalizado. Reinicia para aplicar cambios."
 
 # 📌TOTALMENTe OPCIONAL [intel UHD 600 drivers]
-Para instalarlo en mi patata.. 🥔💻🧨
+## Para instalarlo en mi patata.. 🥔💻🧨
 ```
 sudo pacman -S vulkan-headers vulkan-icd-loader
 ```
