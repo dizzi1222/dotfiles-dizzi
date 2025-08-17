@@ -48,10 +48,23 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 ```
 
 #!/bin/bash
-# ────────────────────────────────────────────────
+# ────────────────────────────────────────────
 # Guia/Script de reparación y post-instalación Arch Linux si archinstall falla
 ─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
-# ────────────────────────────────────────
+# ────────────────────────────────────────────
+### How set Network - Poner internet
+[https://www.youtube.com/watch?v=x2euFpcv7hw&t=426s
+](https://www.youtube.com/watch?v=x2euFpcv7hw&t=426s)
+─────────────
+<img width="401" height="84" alt="image" src="https://github.com/user-attachments/assets/ea9630b6-84a9-4709-a7b7-b3dff93b6de8" />
+─────────────
+
+### How install dualboot - Instalar particion
+[https://www.youtube.com/watch?v=tPYCd4w65-0&t=180s
+](https://www.youtube.com/watch?v=tPYCd4w65-0&t=180s)
+─────────────
+<img width="523" height="136" alt="image" src="https://github.com/user-attachments/assets/721c7cad-31d9-4a93-af7a-fac83ea057e7" />
+
 
 ## Paso 0: Arreglar GRUB si el sistema no arranca
 
