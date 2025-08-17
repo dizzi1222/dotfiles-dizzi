@@ -53,7 +53,7 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 #─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
 # ───────────────────────────────────────────────────────────────
 
-# Paso 0: Arreglar GRUB si el sistema no arranca
+## Paso 0: Arreglar GRUB si el sistema no arranca
 
  ─❯ Al haber formateado el boot efi, y elegido tu particion para linux, asumo que ya sabes identificar tu sda.. mira el video coño.
 ```
@@ -64,7 +64,7 @@ arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bo
 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-# Paso 1: Configurar entorno gráfico
+## Paso 1: Configurar entorno gráfico
 echo ">> Paso 1: Instalando y habilitando GDM + Hyprland..."
 ```
 sudo pacman -S --needed gdm hyprland
@@ -72,7 +72,7 @@ sudo systemctl enable gdm
 sudo systemctl start gdm
 ```
 
-# Paso 2: Arreglar permisos de usuario
+## Paso 2: Arreglar permisos de usuario
 echo ">> Paso 2: Arreglando permisos de usuario..."
 ```
 sudo chown -R diego:diego /home/diego
@@ -85,7 +85,7 @@ sudo useradd -m -g users -G wheel,audio,video,storage,power -s /bin/zsh diego
 ```
  sudo passwd diego
 ```
-# 🌐💻Paso 3: Conectarse a internet
+## 🌐💻Paso 3: Conectarse a internet
 echo ">> Paso 3: Instalando NetworkManager y Bluetooth..."
 ```
 sudo pacman -S --needed networkmanager bluez bluez-utils blueman
@@ -97,10 +97,10 @@ sudo systemctl enable bluetooth.service
 sudo systemctl start bluetooth.service
 ```
 
-#  🌍💻Paso 4: Instalar programas y clonar repositorios
+##  🌍💻Paso 4: Instalar programas y clonar repositorios
 echo ">> Paso 4: Clona tus repositorios [dotifles] o instala programas adicionales..."
 
-# ⌛Paso 5: Corregir zona horaria
+## ⌛Paso 5: Corregir zona horaria
 echo ">> Paso 5: Configurando zona horaria..."
 ```
 sudo timedatectl set-ntp true
@@ -108,14 +108,14 @@ sudo timedatectl set-timezone 'America/Santo_Domingo'
 timedatectl status
 ```
 
-# Paso 6 [Opcional]: Configurar Huion Tablet
+## Paso 6 [Opcional]: Configurar Huion Tablet
 echo ">> Paso 6: Instalando Huion Tablet (opcional)..."
 ```
 yay -S huiontablet
 ```
 
-# 🔠Paso 7: Corregir fuentes del sistema
-# ~ instala [700MB] fuentes de letras globales:
+## 🔠Paso 7: Corregir fuentes del sistema
+## ~ instala [700MB] fuentes de letras globales:
 echo ">> Paso 7: Instalando fuentes NerdFont y Noto..."
 ```
 sudo pacman -S --needed \
@@ -138,7 +138,7 @@ sudo pacman -S --needed noto-fonts-cjk \
 fc-cache -fv
 ```
 
-# Paso 8: Instalar Gruv theme icons para nwg-look✅
+## Paso 8: Instalar Gruv theme icons para nwg-look✅
 Me gustra mas Dracula🧛🏻 theme, pero gruv icons es god🦥💤
 echo ">> Paso 8: Instalando iconos Gruv..."
 
@@ -151,7 +151,7 @@ cp -rv Gruvbox-Plus-Dark ~/.local/share/icons
 git pull
 ```
 
-# 🚨Paso 9: Cambiar idioma del sistema a ingles+español 1️⃣st
+## 🚨Paso 9: Cambiar idioma del sistema a ingles+español 1️⃣st
 echo ">> Paso 9: Configurando idioma español..."
 
 Editar locales [/etc/locale.gen]:
@@ -160,7 +160,7 @@ sudo sed -i 's/^#es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen
 sudo sed -i 's/^#es_US.UTF-8 UTF-8/es_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 ```
-# O manualmente:
+## O manualmente:
 ```
 sudo nvim /etc/locale.gen
 
@@ -170,7 +170,7 @@ es_ES.UTF-8 UTF-8
 es_US.UTF-8 UTF-8
 en_EN.UTF-8 UTF-8
 ```
-# ─❯ 🚨Regenerar locales:
+## ─❯ 🚨Regenerar locales:
 ```
 sudo locale-gen
 ```
@@ -178,12 +178,12 @@ sudo locale-gen
 ////////////////////////
 ---------------------------
 
-# Paso 10: Definir idioma por defecto en conf [etc/local.conf]:
+## Paso 10: Definir idioma por defecto en conf [etc/local.conf]:
 ```
 echo "LANG=es_ES.UTF-8" | sudo tee /etc/locale.conf
 echo "LC_COLLATE=C" | sudo tee -a /etc/locale.conf
 ```
-# O manualmente:
+## O manualmente:
 ```
 sudo nvim /etc/locale.conf
 1- ~> {Y Agregas}:
@@ -197,7 +197,7 @@ LC_COLLATE=C
 ## 📌 Para cambiar el lenguaje en un app en especifico.. [del idioma default] a ingles [idioma favorito de devs]...
 Algunas aplicaciones como eww van a requerer que exportes, porque muchas de sus funciones, estan pensadas en inglés..
 
-# Forzar salida consistente en inglés
+## Forzar salida consistente en inglés
 ```
 export LC_ALL=C
 export LANG=C
@@ -206,7 +206,7 @@ export LANG=C
 ////////////////////////
 ---------------------------
 
-# 📌Forzar [idioma default].. en apps específicas (ejemplo: rofi)  ya que rofi hace lo contrario, no respeta tu config y la remplaza...
+## 📌Forzar [idioma default].. en apps específicas (ejemplo: rofi)  ya que rofi hace lo contrario, no respeta tu config y la remplaza...
 ```
 LANG="es_ES.UTF-8" LC_COLLATE=C LC_ALL=es_ES.UTF-8 rofi
 ```
@@ -217,13 +217,13 @@ rofimoji no es compatible con todo esto ya que NO ES TEXTO.
 ////////////////////////
 ---------------------------
 
-# 📌 Paso 11: [Opcional] Cambiar teclado a EN
+## 📌 Paso 11: [Opcional] Cambiar teclado a EN
 echo ">> Paso 10: Configurando teclado..."
 # Temporal (solo sesión actual)
 ```
 setxkbmap en
 ```
-# Permanente (Xorg)
+## Permanente (Xorg)
 ```
 sudo mkdir -p /etc/X11/xorg.conf.d
 sudo tee /etc/X11/xorg.conf.d/00-keyboard.conf > /dev/null <<EOF
@@ -236,7 +236,7 @@ EndSection
 EOF
 ```
 
-# Permanente (Wayland / systemd)
+## Permanente (Wayland / systemd)
 ```
 sudo localectl set-x11-keymap en
 ```
