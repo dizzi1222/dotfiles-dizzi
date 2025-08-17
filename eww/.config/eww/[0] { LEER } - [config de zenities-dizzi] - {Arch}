@@ -1,3 +1,6 @@
+👉📦 0- Instala las 2 dependencias Principales [el 90% de los scripts de zenities];
+sudo pacman -S jq socat  
+
  ⚙️👉 1- Montar/desmontar el Widget personal
 
 # para cerrar todo:

@@ -19,7 +19,6 @@
 (defpoll music :interval "0.5s" "playerctl metadata --format '{{ title }}' || true")
 (defpoll artist :interval "0.5s" "playerctl metadata --format '{{ artist }}' || true")
 (defpoll current-music-cover :interval "0.5s" "playerctl metadata --format {{mpris:artUrl}}")
-
 ;;;;; Defpolls ;;;;;
 (defpoll hour :interval "10s" "date '+%H'")
 (defpoll minute :interval "10s" "date '+%M'")

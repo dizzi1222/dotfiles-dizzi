@@ -168,7 +168,7 @@
           :reveal calendar
           :duration "300ms"
 (button :class "calendar"
-                :onclick "~/.config/eww/scripts/calendar-popup.sh"
+                :onclick "~/.config/eww/scripts/calendar-popup2.sh"
 (label :text calendar-short
                        :angle 90)
                 )))))
@@ -329,7 +329,6 @@
 			  :day calendar-day 
 			  :month calendar-month 
 			  :year calendar-year))))
-
 ;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;; Window ;;;;;;
@@ -348,7 +347,7 @@
   :focusable "false"
   (side-bar))
 
-(defwindow calendar
+(defwindow side-calendar
           :monitor '[1, 0]'
           :geometry (geometry :x "10px"
                               :y "5px"
