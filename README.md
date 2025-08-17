@@ -48,10 +48,10 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 ```
 
 #!/bin/bash
-# ───────────────────────────────────────────────────────────────
+# ──────────────────────────────────────
 # Guia/Script de reparación y post-instalación Arch Linux si archinstall falla
-#─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
-# ───────────────────────────────────────────────────────────────
+─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
+# ──────────────────────────────────────
 
 ## Paso 0: Arreglar GRUB si el sistema no arranca
 
