@@ -81,7 +81,7 @@ Si el usuario no existe o permisos incompletos:
 ```
 sudo useradd -m -g users -G wheel,audio,video,storage,power -s /bin/zsh diego
 ```
-# Para cambiar de password:
+## Para cambiar de password:
 ```
  sudo passwd diego
 ```
@@ -129,7 +129,7 @@ sudo pacman -S --needed \
   ttf-font-awesome
 ```
 
-# 🍜🇨🇳Opcional caracteres CJK - China, Japon etc..
+## 🍜🇨🇳Opcional caracteres CJK - China, Japon etc..
 ```
 sudo pacman -S --needed noto-fonts-cjk \
   adobe-source-han-sans-otc-fonts \
