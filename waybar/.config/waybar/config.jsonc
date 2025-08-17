@@ -124,7 +124,7 @@
   "custom/updates": {
     "format": "{}",
     "interval": 60,
-    "exec": "~/.config/waybar/scripts/myupdates.sh",
+    "exec": "~/.config/waybar/scripts/myUpdates.sh",
     "return-type": "json",
     "exec-if": "exit 0",
   },
@@ -220,7 +220,7 @@
     "scroll-step": 5,
     "justify": "center",
     "on-click": "amixer sset Master toggle",
-    "on-click-right": "easyeffects",
+    "on-click-right": "pavucontrol",
     "tooltip-format": "{volume}%  {icon}",
     "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
     "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"

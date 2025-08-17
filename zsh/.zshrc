@@ -230,7 +230,7 @@ alias history='fc -l 1 > /tmp/history && cat /tmp/history'
 # === Tus otros aliases y configuraciones ===
 
 
-alias vlc='flatpak run org.videolan.VLC'
+# alias vlc='flatpak run org.videolan.VLC'
 
 # Shell Integration para Ghostty
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then

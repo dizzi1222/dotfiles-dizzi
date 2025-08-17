@@ -141,9 +141,9 @@
     "tooltip": true,
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/mpris-cover.sh",
-    "on-click": "playerctl --ignore-player=firefox,chromium play-pause",
-    "on-scroll-up": "playerctl --ignore-player=firefox,chromium next",
-    "on-scroll-down": "playerctl --ignore-player=firefox,chromium previous",
+    "on-click": "playerctl --ignore-player=firefox,google-chrome-stable,chromium play-pause",
+    "on-scroll-up": "playerctl --ignore-player=firefox,google-chrome-stable,chromium next",
+    "on-scroll-down": "playerctl --ignore-player=firefox,google-chrome-stable,chromium previous",
     "interval": 1,
     "format-icons": {
         "Playing": "▶",

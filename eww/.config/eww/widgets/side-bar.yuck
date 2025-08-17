@@ -155,6 +155,7 @@
     (box :class "clock-vert"
          :orientation "vertical"
          :space-evenly false
+        :spacing 3 ;; <<-- Añade esta línea
      (label :text hour)
      (label :text minute)
 
@@ -347,7 +348,7 @@
   :focusable "false"
   (side-bar))
 
-(defwindow sidebar-calendar
+(defwindow calendar
           :monitor '[1, 0]'
           :geometry (geometry :x "10px"
                               :y "5px"

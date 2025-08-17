@@ -89,19 +89,20 @@
           (button :class "exit"
                   :tooltip "Exit"
                   :onclick "killall Hyprland" "")
-          (button :class "suspend"
-                  :tooltip "Suspend"
-                  :onclick "systemctl suspend" ""))))))
+        (button :class "suspend"
+                :tooltip "Suspend"
+                :onclick "systemctl suspend" ""))))))
 
 ;; Clock ;;
 (defwidget clock []
-  (eventbox :onhover "${eww} update calendar=true"
-            :onhoverlost "${eww} update calendar=false"
-            :cursor "pointer"
-  (box  :class "clock"
-        :orientation "horizontal"
-        :space-evenly false
-              :font "Font Awesome 6 Free Solid 30"
+(eventbox :onhover "${eww} update calendar=true"
+          :onhoverlost "${eww} update calendar=false"
+          :cursor "pointer"
+(box  :class "clock"
+      :orientation "horizontal"
+      :space-evenly false
+      :spacing 4 ;; <<-- Añade esta línea
+      :font "Font Awesome 6 Free Solid 30"
         clock
             (revealer :transition "slideleft"
                       :reveal calendar

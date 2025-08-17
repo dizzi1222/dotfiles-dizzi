@@ -1,7 +1,7 @@
 @import "base"
 
 configuration {
-		modi:                "combi,filebrowser";
+		modi:                "combi,drun,run,window,filebrowser";
 		combi-modi:          "drun,window";
 		display-combi:       " SEARCH";
 		display-filebrowser: " FILES";

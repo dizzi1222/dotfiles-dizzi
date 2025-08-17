@@ -1,3 +1,7 @@
+# Forzar salida consistente en inglés
+export LC_ALL=C
+export LANG=C
+
 # Get the current position of the song in seconds
 POSITION=$(playerctl position)
 LENGTH_MICROSECONDS=$(playerctl metadata --format "{{mpris:length}}")

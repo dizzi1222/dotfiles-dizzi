@@ -1,27 +1,27 @@
-
 @import url("/home/diego/.cache/wal/colors-waybar.css");
 
 * {
-    border: none;
-    font-size: 13px;
-    font-family: "JetBrainsMono NL";
-		color: @foreground;
-    min-height: 23px;
+  border: none;
+  font-size: 13px;
+  font-family: "JetBrainsMono NL";
+  color: @foreground;
+  min-height: 23px;
 }
 
 /* # ${ MODIFICADO POR DIEGO}  */
 
 window#waybar {
   background: @background;
-  background-color: rgba(33, 33, 54, 0.85); /* O cualquier valor con alpha < 1 */
- }
+  background-color: rgba(33, 33, 54, 0.85);
+  /* O cualquier valor con alpha < 1 */
+}
 
 /*FIN # ${ MODIFICADO POR DIEGO}  */
 
 .modules-center {
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 0 15px;
-	margin: 3px 0;
+  margin: 3px 40px;
   border-radius: 15px;
 }
 
@@ -44,13 +44,17 @@ window#waybar {
 #tray,
 #window,
 #workspaces,
-#custom-mpris,              /* <-- Añadido MPRIS aquí */
-#custom-Lil_bro {    /* <-- Añadido custom/Lil_bro aquí */
-   padding: 0 10px;
+#custom-mpris,
+/* <-- Añadido MPRIS aquí */
+#custom-Lil_bro {
+  /* <-- Añadido custom/Lil_bro aquí */
+  padding: 0 10px;
 }
+
 #clock {
   padding: 0 10px;
 }
+
 #pulseaudio {
   padding-top: 5px;
 }
@@ -60,76 +64,78 @@ window#waybar {
   padding-top: 0;
 }
 
-#clock{
+#clock {
   color: @color4;
 }
 
 #custom-love {
-	color: @color5;
+  color: @color5;
 }
 
 #battery {
-    background-color: transparent;
-    color: @foreground;
+  background-color: transparent;
+  color: @foreground;
 }
 
 #battery.warning:not(.charging) {
-    background-color: @color4;
-    color: @background;
+  background-color: @color4;
+  color: @background;
 }
 
 #battery.critical:not(.charging) {
-    background-color: @color3;
-    color: @background;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+  background-color: @color3;
+  color: @background;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
 #custom-updates {
-    background-color: rgba(0,0,0,0.4);
-    padding: 0 10px;
-    margin: 3px 0;
-    border-radius: 15px;
-    color: @color6;
-    font-weight: bold;
-    margin-right: 20px; /* empuja el módulo hacia la izquierda */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  /* background-color: rgba(0, 0, 0, 0.4); */
+  /* padding: 0 10px; */
+  margin: 3px 0;
+  /* border-radius: 15px; */
+  color: @foreground;
+  font-weight: bold;
+  margin-right: 10px;
+  /* empuja el módulo hacia la izquierda */
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
 @keyframes blink {
-    to {
-        background-color: @foreground;
-        color: @background;
-    }
+  to {
+    background-color: @foreground;
+    color: @background;
+  }
 }
 
 /* --- NUEVOS ESTILOS PARA MPRIS Y CUSTOM/LIL_BRO --- */
 /* Make sure there are no stray characters or unclosed comments directly above this line. */
 
 #custom-mpris {
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   padding: 0 10px;
-	margin: 3px 0;
+  margin: 3px 0;
   border-radius: 15px;
-    color: @color6;
-    font-weight: bold;
-    margin-right: 5px;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Antes estaba en 0.2 */
+  color: @color6;
+  font-weight: bold;
+  margin-right: 5px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  /* Antes estaba en 0.2 */
 }
 
 #custom-mpris.paused {
-    color: @color6;
-    font-style: italic;
+  color: @color6;
+  font-style: italic;
 }
 
 #custom-Lil_bro {
-    color: @color1;
-    font-weight: bold;
-    /* Reducimos la opacidad de la sombra para bajar el brillo */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Antes estaba en 0.2 */
-    margin-left: 10px;
+  color: @color1;
+  font-weight: bold;
+  /* Reducimos la opacidad de la sombra para bajar el brillo */
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  /* Antes estaba en 0.2 */
+  margin-left: 10px;
 }
-

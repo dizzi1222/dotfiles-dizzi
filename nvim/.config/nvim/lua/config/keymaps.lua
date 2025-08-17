@@ -52,3 +52,6 @@ end, { noremap = true, silent = true })
 --
 --     Ctrl + W + O > cierra tod@s las ventanas divididas/o Explorer
 --   	Ctrl + W + > S > split dividir {mas lento que space}
+
+-- Mapea la tecla 'p' en modo visual para pegar sin copiar lo que reemplazas!!!
+vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })

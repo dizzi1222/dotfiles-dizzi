@@ -2,7 +2,7 @@
 require("config.lazy")
 require("config.keymaps")
 
--- Autosave nativo sin plugins,Pero usando autommands
+-- Autosave nativo sin plugins,Pero empeze a usar autommands - NO FUNCIONA EN WINDOWS
 vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "BufLeave", "FocusLost" }, {
   callback = function()
     if vim.bo.modified and vim.bo.buftype == "" then
