@@ -1,7 +1,6 @@
-<img width="1366" height="114" alt="image" src="https://github.com/user-attachments/assets/eabcfb02-982f-4885-a75a-d30f84cebc01" />
-
 # 💤 🔮 🗿 In Love 💜 With Arch Hypr My✨Inspiration 🔮 🔥 🚀 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a" />
+<img width="1366" height="114" alt="image" src="https://github.com/user-attachments/assets/eabcfb02-982f-4885-a75a-d30f84cebc01" />
 
 ## 💤 LazyVim 🦥
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/60c80cc3-98d7-4af0-a5bd-8842a9c8c80d" />
