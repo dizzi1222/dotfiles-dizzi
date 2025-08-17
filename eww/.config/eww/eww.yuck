@@ -1,4 +1,6 @@
 ;;;;; Variables ;;;;;;
+
+
 (deflisten workspaces :initial "[]" "sh ~/.config/eww/scripts/get-workspaces.sh")
 (defvar power-vert false)
 (deflisten current_workspace :initial "1" "sh ~/.config/eww/scripts/get-active-workspace.sh")
@@ -14,10 +16,9 @@
 ;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;; Deflistens ;;;;;
-(deflisten music :initial "" "playerctl --follow metadata --format '{{ title }}' || true")
-(deflisten artist :initial "" "playerctl --follow metadata --format '{{ artist }}' || true")
-(deflisten current-music-cover :initial "" "playerctl --follow metadata --format {{mpris:artUrl}}")
-;;;;;;;;;;;;;;;;;;;;;;
+(defpoll music :interval "0.5s" "playerctl metadata --format '{{ title }}' || true")
+(defpoll artist :interval "0.5s" "playerctl metadata --format '{{ artist }}' || true")
+(defpoll current-music-cover :interval "0.5s" "playerctl metadata --format {{mpris:artUrl}}")
 
 ;;;;; Defpolls ;;;;;
 (defpoll hour :interval "10s" "date '+%H'")
@@ -38,6 +39,9 @@
 (defpoll current-disk-detail :interval "1m" :initial "0" "~/.config/eww/scripts/get-disk-detail.sh")
 (defpoll current-memory-detail :interval "10s" :initial "0" "~/.config/eww/scripts/get-memory-detail.sh")
 (defpoll current-music-seek :interval "1s" "~/.config/eww/scripts/get-music-seek.sh")
+;;;;;;;;;;;;;;;;;;;;;; modificado MPRIS cover, information olayerctl
+(defpoll mpris-cover :interval "1s" "~/.config/eww/scripts/mpris-cover.sh")
+(defpoll update-cover-loop :interval "1s" "~/update-cover-loop.sh")
 (defpoll current-wifi :interval "5s" "~/.config/eww/scripts/get-network.sh")
 (defpoll current-bluetooth :interval "5s" "~/.config/eww/scripts/get-bluetooth.sh")
 (defpoll bluetooth-status :interval "5s" "~/.config/eww/scripts/get-bluetooth-status.sh")
