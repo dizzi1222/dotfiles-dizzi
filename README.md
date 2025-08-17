@@ -1,17 +1,17 @@
 # 💤 🔮 🗿 In Love 💜 With Arch Hypr My✨Inspiration 🔮 🔥 🚀 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a" />
 
-# 💤 LazyVim 🦥
+## 💤 LazyVim 🦥
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/60c80cc3-98d7-4af0-a5bd-8842a9c8c80d" />
 
 A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
 Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
 
-# Wallpapers
+## Wallpapers
 Wallpapers for desktop
 https://github.com/dylanaraps/wal
 
-# Fastfetch 
+## Fastfetch 
 
 <h3 align="left">
 Welcome to my fastfetch config presets repo :3
@@ -23,7 +23,7 @@ Feel free to copy files and modify them or clone the complete repository.
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4e5c4c97-a852-49a9-9718-acecfa6bfd00" />
 
-# Usage
+Usage
 
 Clone the repository into ``~/.local/share``
 
@@ -219,7 +219,7 @@ rofimoji no es compatible con todo esto ya que NO ES TEXTO.
 
 ## 📌 Paso 11: [Opcional] Cambiar teclado a EN
 echo ">> Paso 10: Configurando teclado..."
-# Temporal (solo sesión actual)
+## Temporal (solo sesión actual)
 ```
 setxkbmap en
 ```
