@@ -47,15 +47,14 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 ```
 
 #!/bin/bash
-# ───────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────
 # Guia/Script de reparación y post-instalación Arch Linux si archinstall falla
-#─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
-# ───────────────────────────────────────────────────────────────
+# ─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
+# ─────────────────────────────────────────
 
-### Paso 0: Arreglar GRUB si el sistema no arranca
+# Paso 0: Arreglar GRUB si el sistema no arranca
 
-#  ─❯ Al haber formateado el boot efi, y elegido tu particion
-# ~> para linux, asumo que ya sabes identificar tu sda.. mira el video coño.
+##  ─❯ Al haber formateado el boot efi, y elegido tu particion para linux, asumo que ya sabes identificar tu sda.. mira el video coño.
 ```
 echo ">> Paso 0: Reparando GRUB..."
 mount /dev/sda4 /mnt
@@ -72,7 +71,7 @@ sudo systemctl enable gdm
 sudo systemctl start gdm
 ```
 
-### Paso 2: Arreglar permisos de usuario
+# Paso 2: Arreglar permisos de usuario
 echo ">> Paso 2: Arreglando permisos de usuario..."
 ```
 sudo chown -R diego:diego /home/diego
@@ -114,7 +113,7 @@ echo ">> Paso 6: Instalando Huion Tablet (opcional)..."
 yay -S huiontablet
 ```
 
-### 🔠Paso 7: Corregir fuentes del sistema
+# 🔠Paso 7: Corregir fuentes del sistema
 # ~ instala [700MB] fuentes de letras globales:
 echo ">> Paso 7: Instalando fuentes NerdFont y Noto..."
 ```
@@ -151,7 +150,7 @@ cp -rv Gruvbox-Plus-Dark ~/.local/share/icons
 git pull
 ```
 
-### 🚨Paso 9: Cambiar idioma del sistema a ingles+español 1️⃣st
+# 🚨Paso 9: Cambiar idioma del sistema a ingles+español 1️⃣st
 echo ">> Paso 9: Configurando idioma español..."
 
 Editar locales [/etc/locale.gen]:
@@ -160,7 +159,7 @@ sudo sed -i 's/^#es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen
 sudo sed -i 's/^#es_US.UTF-8 UTF-8/es_US.UTF-8 UTF-8/' /etc/locale.gen
 sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 ```
-# O manualmente:
+### O manualmente:
 ```
 sudo nvim /etc/locale.gen
 
@@ -178,12 +177,12 @@ sudo locale-gen
 ////////////////////////
 ---------------------------
 
-### Paso 10: Definir idioma por defecto en conf [etc/local.conf]:
+# Paso 10: Definir idioma por defecto en conf [etc/local.conf]:
 ```
 echo "LANG=es_ES.UTF-8" | sudo tee /etc/locale.conf
 echo "LC_COLLATE=C" | sudo tee -a /etc/locale.conf
 ```
-# O manualmente:
+### O manualmente:
 ```
 sudo nvim /etc/locale.conf
 1- ~> {Y Agregas}:
@@ -194,7 +193,7 @@ LC_COLLATE=C
 ////////////////////////
 ---------------------------
 
-## 📌 Para cambiar el lenguaje en un app en especifico.. [del idioma default] a ingles [idioma favorito de devs]...
+# 📌 Para cambiar el lenguaje en un app en especifico.. [del idioma default] a ingles [idioma favorito de devs]...
 Algunas aplicaciones como eww van a requerer que exportes, porque muchas de sus funciones, estan pensadas en inglés..
 
 # Forzar salida consistente en inglés
@@ -217,7 +216,7 @@ rofimoji no es compatible con todo esto ya que NO ES TEXTO.
 ////////////////////////
 ---------------------------
 
-### 📌 Paso 11: [Opcional] Cambiar teclado a EN
+# 📌 Paso 11: [Opcional] Cambiar teclado a EN
 echo ">> Paso 10: Configurando teclado..."
 # Temporal (solo sesión actual)
 ```
@@ -242,7 +241,7 @@ sudo localectl set-x11-keymap en
 ```
 echo ">> Script finalizado. Reinicia para aplicar cambios."
 
-### 📌TOTALMENTe OPCIONAL [intel UHD 600 drivers]
+## 📌TOTALMENTe OPCIONAL [intel UHD 600 drivers]
 Para instalarlo en mi patata.. 🥔💻🧨
 ```
 sudo pacman -S vulkan-headers vulkan-icd-loader
