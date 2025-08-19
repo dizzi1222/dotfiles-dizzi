@@ -27,7 +27,6 @@ Feel free to copy files and modify them or clone the complete repository.
 Usage
 
 Clone the repository into ``~/.local/share``
-
 ```sh
 cd ~/.local/share
 git clone https://github.com/LierB/fastfetch
@@ -60,7 +59,12 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 ](https://www.youtube.com/watch?v=tPYCd4w65-0&t=180s)
 ─────────────
 <img width="523" height="136" alt="image" src="https://github.com/user-attachments/assets/721c7cad-31d9-4a93-af7a-fac83ea057e7" />
+─────────────
 
+## Install ArchLinux With Minimal Configuration [GUIA]
+─────────────
+[https://github.com/ahmad9059/dotfiles#:~:text=1.%20Install%20ArchLinux%20With%20Minimal%20Configuration
+](https://github.com/ahmad9059/dotfiles#:~:text=1.%20Install%20ArchLinux%20With%20Minimal%20Configuration)
 
 #!/bin/bash
 # ────────────────────────────────────────────
