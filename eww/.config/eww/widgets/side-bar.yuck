@@ -71,19 +71,19 @@
       :hexpand "true"  ;; Permite que el box se expanda horizontalmente
       :padding "5px 0"
             (button :class "prev"
-              :onclick "playerctl --ignore-player=firefox,chromium previous"
+              :onclick "playerctl previous"
               :font "JetBrainsMono NL" ;; Sube a 40 o incluso 50
               :width 10  ;; Un ancho razonable para el botón
               :height 30 ;; Una altura razonable para el botón
               "")
             (button :class "pause"
-              :onclick "playerctl --ignore-player=firefox,chromium play-pause"
+              :onclick "playerctl play-pause"
               :font "JetBrainsMono NL"
               :width 10  ;; Un ancho razonable para el botón
               :height 30
               "")
             (button :class "next"
-              :onclick "playerctl --ignore-player=firefox,chromium next"
+              :onclick "playerctl next"
               :font "JetBrainsMono NL"
               :width 10  ;; Un ancho razonable para el botón
               :height 30
