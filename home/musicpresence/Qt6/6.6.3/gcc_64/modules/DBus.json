@@ -1,0 +1,13 @@
+{
+    "name": "DBus",
+    "repository": "qtbase",
+    "version": "6.6.3",
+    "built_with": {
+        "compiler_id": "GNU",
+        "compiler_target": "",
+        "compiler_version": "10.3.1",
+        "cross_compiled": false,
+        "target_system": "Linux",
+        "architecture": "x86_64"
+    }
+}

@@ -1,0 +1,9 @@
+[submodule "home/gruvbox-plus-icon-pack"]
+	path = home/home/gruvbox-plus-icon-pack
+	url = https://github.com/SylEleuth/gruvbox-plus-icon-pack
+[submodule "home/eww"]
+	path = home/home/eww
+	url = https://github.com/elkowar/eww
+[submodule "fastfetch/.local/share/fastfetch"]
+    path = fastfetch/.local/share/fastfetch
+    url = https://github.com/LierB/fastfetch

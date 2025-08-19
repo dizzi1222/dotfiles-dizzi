@@ -1,0 +1,68 @@
+2025-08-14 06:07:52,102 - aqt.main - INFO - installer 139961928977344 aqtinstall(aqt) v3.3.0 on Python 3.13.5 [CPython GCC 15.1.1 20250425]
+2025-08-14 06:07:52,104 - aqt.helper - DEBUG - helper 139961928977344 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/Updates.xml.sha256
+2025-08-14 06:07:54,987 - aqt.helper - DEBUG - helper 140402695203776 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.addons.qtwebsockets.gcc_64/6.6.3-0-202403191846qtwebsockets-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z.sha256
+2025-08-14 06:07:55,424 - aqt.helper - DEBUG - helper 139811603803072 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z.sha256
+2025-08-14 06:07:55,718 - aqt.helper - DEBUG - helper 140695917202368 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtwayland-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z.sha256
+2025-08-14 06:07:55,731 - aqt.helper - INFO - helper 140402695203776 Downloading qtwebsockets...
+2025-08-14 06:07:55,731 - aqt.installer - DEBUG - installer 140402695203776 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.addons.qtwebsockets.gcc_64/6.6.3-0-202403191846qtwebsockets-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:55,770 - aqt.helper - DEBUG - helper 140615407311808 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846icu-linux-Rhel7.2-x64.7z.sha256
+2025-08-14 06:07:56,103 - aqt.helper - INFO - helper 139811603803072 Downloading qtbase...
+2025-08-14 06:07:56,104 - aqt.installer - DEBUG - installer 139811603803072 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:56,531 - aqt.helper - INFO - helper 140615407311808 Downloading icu...
+2025-08-14 06:07:56,534 - aqt.helper - INFO - helper 140695917202368 Downloading qtwayland...
+2025-08-14 06:07:56,538 - aqt.helper - DEBUG - helper 140402695203776 Asked to redirect(302) to: https://qt.mirror.constant.com/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.addons.qtwebsockets.gcc_64/6.6.3-0-202403191846qtwebsockets-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:56,538 - aqt.helper - INFO - helper 140402695203776 Redirected: qt.mirror.constant.com
+2025-08-14 06:07:56,536 - aqt.installer - DEBUG - installer 140695917202368 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtwayland-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:56,532 - aqt.installer - DEBUG - installer 140615407311808 Download URL: https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846icu-linux-Rhel7.2-x64.7z
+2025-08-14 06:07:56,881 - aqt.helper - DEBUG - helper 139811603803072 Asked to redirect(302) to: https://qt.mirror.constant.com/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:56,882 - aqt.helper - INFO - helper 139811603803072 Redirected: qt.mirror.constant.com
+2025-08-14 06:07:57,296 - aqt.helper - DEBUG - helper 140695917202368 Asked to redirect(302) to: https://qt.mirror.constant.com/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846qtwayland-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z
+2025-08-14 06:07:57,308 - aqt.helper - INFO - helper 140695917202368 Redirected: qt.mirror.constant.com
+2025-08-14 06:07:57,326 - aqt.helper - DEBUG - helper 140615407311808 Asked to redirect(302) to: https://qt.mirror.constant.com/online/qtsdkrepository/linux_x64/desktop/qt6_663/qt.qt6.663.gcc_64/6.6.3-0-202403191846icu-linux-Rhel7.2-x64.7z
+2025-08-14 06:07:57,326 - aqt.helper - INFO - helper 140615407311808 Redirected: qt.mirror.constant.com
+2025-08-14 06:07:57,306 - aqt.installer - INFO - installer 140402695203776 Finished installation of qtwebsockets-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z in 2.36941731
+2025-08-14 06:07:58,405 - aqt.installer - INFO - installer 140695917202368 Finished installation of qtwayland-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z in 2.69528513
+2025-08-14 06:08:15,246 - aqt.installer - INFO - installer 139811603803072 Finished installation of qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z in 19.83071473
+2025-08-14 06:08:15,757 - aqt.installer - INFO - installer 140615407311808 Finished installation of icu-linux-Rhel7.2-x64.7z in 19.99575767
+2025-08-14 06:08:16,123 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/bin/qmake
+2025-08-14 06:08:16,130 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Network.pc
+2025-08-14 06:08:16,131 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6WebSockets.pc
+2025-08-14 06:08:16,131 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Widgets.pc
+2025-08-14 06:08:16,132 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Platform.pc
+2025-08-14 06:08:16,132 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Test.pc
+2025-08-14 06:08:16,132 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6DBus.pc
+2025-08-14 06:08:16,133 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6OpenGL.pc
+2025-08-14 06:08:16,133 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6OpenGLWidgets.pc
+2025-08-14 06:08:16,133 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6PrintSupport.pc
+2025-08-14 06:08:16,134 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Gui.pc
+2025-08-14 06:08:16,134 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Xml.pc
+2025-08-14 06:08:16,134 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Concurrent.pc
+2025-08-14 06:08:16,135 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6WaylandClient.pc
+2025-08-14 06:08:16,135 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Core.pc
+2025-08-14 06:08:16,135 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/pkgconfig/Qt6Sql.pc
+2025-08-14 06:08:16,137 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Core.prl
+2025-08-14 06:08:16,137 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6PrintSupport.prl
+2025-08-14 06:08:16,137 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6EglFsKmsSupport.prl
+2025-08-14 06:08:16,138 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6XcbQpa.prl
+2025-08-14 06:08:16,138 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Test.prl
+2025-08-14 06:08:16,138 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Sql.prl
+2025-08-14 06:08:16,139 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6KmsSupport.prl
+2025-08-14 06:08:16,139 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6WlShellIntegration.prl
+2025-08-14 06:08:16,139 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6InputSupport.prl
+2025-08-14 06:08:16,140 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6OpenGL.prl
+2025-08-14 06:08:16,140 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Widgets.prl
+2025-08-14 06:08:16,140 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6WaylandEglClientHwIntegration.prl
+2025-08-14 06:08:16,141 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6EglFSDeviceIntegration.prl
+2025-08-14 06:08:16,141 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6DeviceDiscoverySupport.prl
+2025-08-14 06:08:16,141 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6WaylandClient.prl
+2025-08-14 06:08:16,142 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Network.prl
+2025-08-14 06:08:16,142 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Gui.prl
+2025-08-14 06:08:16,142 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6ExampleIcons.prl
+2025-08-14 06:08:16,143 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6DBus.prl
+2025-08-14 06:08:16,143 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6FbSupport.prl
+2025-08-14 06:08:16,143 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Xml.prl
+2025-08-14 06:08:16,144 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6WebSockets.prl
+2025-08-14 06:08:16,144 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6Concurrent.prl
+2025-08-14 06:08:16,144 - aqt.updater - INFO - updater 139961928977344 Patching /home/diego/musicpresence/Qt6/6.6.3/gcc_64/lib/libQt6OpenGLWidgets.prl
+2025-08-14 06:08:16,145 - aqt.main - INFO - installer 139961928977344 Finished installation
+2025-08-14 06:08:16,145 - aqt.main - INFO - installer 139961928977344 Time elapsed: 24.04262157 second

@@ -1,0 +1,20 @@
+[
+    {
+        "classes": [
+            {
+                "className": "QWaylandEglWindow",
+                "object": true,
+                "qualifiedClassName": "QtWaylandClient::QWaylandEglWindow",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "fullyQualifiedName": "QtWaylandClient::QWaylandWindow",
+                        "name": "QWaylandWindow"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "qwaylandeglwindow_p.h",
+        "outputRevision": 68
+    }
+]
