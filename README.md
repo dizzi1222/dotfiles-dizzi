@@ -66,6 +66,7 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 [https://github.com/ahmad9059/dotfiles#:~:text=1.%20Install%20ArchLinux%20With%20Minimal%20Configuration
 ](https://github.com/ahmad9059/dotfiles#:~:text=1.%20Install%20ArchLinux%20With%20Minimal%20Configuration)
 
+
 #!/bin/bash
 # ────────────────────────────────────────────
 # Guia/Script de reparación y post-instalación Arch Linux si archinstall falla
