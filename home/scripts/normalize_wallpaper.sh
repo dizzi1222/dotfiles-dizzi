@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the target directory
-DIRECTORY=~/zenities/wallpapers/  # Change this to your target directory
+DIRECTORY=~/Wallpapers/wallpapers/ # Change this to your target directory
 
 # Ensure the directory exists
 DIRECTORY=$(eval echo "$DIRECTORY")
@@ -11,7 +11,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 # Convert and skip existing previews
-shopt -s nullglob  # Prevent errors if no matching files
+shopt -s nullglob # Prevent errors if no matching files
 for file in "$DIRECTORY"/*.{png,jpeg,jpg}; do
   if [ -f "$file" ]; then
     # Get the base name of the file without extension
@@ -45,4 +45,3 @@ for file in "$DIRECTORY"/*.{png,jpeg,jpg}; do
 done
 
 echo "Processing completed."
-
