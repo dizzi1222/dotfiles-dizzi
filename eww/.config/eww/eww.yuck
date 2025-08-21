@@ -1,6 +1,4 @@
 ;;;;; Variables ;;;;;;
-
-
 (deflisten workspaces :initial "[]" "sh ~/.config/eww/scripts/get-workspaces.sh")
 (defvar power-vert false)
 (deflisten current_workspace :initial "1" "sh ~/.config/eww/scripts/get-active-workspace.sh")
