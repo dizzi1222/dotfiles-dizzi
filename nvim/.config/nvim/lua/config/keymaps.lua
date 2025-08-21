@@ -38,7 +38,7 @@ end, { noremap = true, silent = true })
 -- # MUCHOS DE ESTOS COMANDOS EQUIVALEN A:
 --  [ + b > cambiar pestaña prev {osea tabear}
 --  ] + b > cambiar pestaña next {osea tabear}
---
+--  space + b + b = la unica forma de ctrl tab
 
 -- # y otros que NO MODIFIQUE COMO:
 -- Ctrl + V > Grabar Tecla - Util para averiguar la tecla [Record key] {Similar a cat -v}
@@ -55,3 +55,14 @@ end, { noremap = true, silent = true })
 
 -- Mapea la tecla 'p' en modo visual para pegar sin copiar lo que reemplazas!!!
 vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
+
+-- Cambiar de tema con Telescope colorscheme = Space + C + T                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/colorscheme.lua
+-- Cambiar a Pywal color de fondo = Space + P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/pywal-nvim.lua
+-- Cambiar a Pywal color de fondo = Space + P+W                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/pywal-nvim.lua
+-- Cambiar a Pywal color de fondo = Soace + C + T escribe Pywal, gruv o el tema que gustes.                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/colorscheme.lua
+-- Usar minty para generar colorschemes? idk activa Huefy = Space + M + H                   # ubicado: en ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/minty.luau
+-- Usar minty para generar colorschemes? idk activa Shades = Space + M + S                  # ubicado: en ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/minty.luau
+-- Usar minty para generar colorschemes? idk = Space + M + H                  # ubicado: en ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/minty.luau
+
+-- CAMBIAR color con Teclado = C+P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins.lua
+-- CAMBAIR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua

@@ -35,8 +35,7 @@
     "on-click": "~/.config/rofi/scripts/powermenu.sh"
   },
   "clock": {
-"format": "{:%a %d %b %I:%M:%S %p}"
-
+    "format": "{:%a %d %b %I:%M:%S %p}",
     "interval": 1,
     "tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
     "calendar-weeks-pos": "right",
@@ -248,7 +247,7 @@
   },
   "pulseaudio/slider": {
     "min": 0,
-    "max": 140,
+    "max": 200,
     "orientation": "horizontal"
   },
   "custom/hotspot": {
@@ -326,10 +325,10 @@
     "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped <U+F001>",
     "interval": 2,
     "consume-icons": {
-      "on": "<U+F0C4> " 
+      "on": "<U+F0C4> "
     },
     "random-icons": {
-      "off": "<span color=\"#f53c3c\"><U+F074></span> ", 
+      "off": "<span color=\"#f53c3c\"><U+F074></span> ",
       "on": "<U+F074> "
     },
     "repeat-icons": {
