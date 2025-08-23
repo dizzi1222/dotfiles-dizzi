@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Directorio que contiene los fondos de pantalla
+WALL_DIR="$HOME/wallpapers/wallpapers/"
+
+# El script se ejecuta desde la ubicación del fondo
+cd "$WALL_DIR" || exit
+
+# Obtén la imagen seleccionada del menú de Rofi
+SELECTED_WALL=$(for a in *.jpg *.png *.gif *.webp; do echo -en "$a\0icon\x1f$a\n"; done | rofi -dmenu -p " " -theme ~/.config/rofi/config-wallpaper.rasi)
+
+# Si se seleccionó una imagen, ejecuta el proceso de cambio
+if [ -n "$SELECTED_WALL" ]; then
+
+  # Notificación inicial
+  notify-send "🎨 Changing Theme" "Applying new wallpaper and updating colors..."
+
+  # 1. Cambiar el fondo con swww
+  swww img "$SELECTED_WALL" --transition-type='center' --transition-fps="60" --transition-step=1
+
+  # 2. Generar la paleta de colores con Pywal
+  wal -i "$SELECTED_WALL"
+
+  # 3. Pequeño retraso para que Waybar pueda leer los nuevos colores
+  sleep 0.2
+
+  # 4. Reiniciar Waybar para aplicar la nueva paleta
+  pkill waybar
+  sleep 0.2                           # Dale un respiro al sistema
+  waybar -c ~/.config/waybar/config & # Le especificas la configuración
+  # Notificación final
+  notify-send "✅ Wallpaper aplicado" "Colores y temas actualizados correctamente"
+fi

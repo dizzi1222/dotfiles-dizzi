@@ -1,11 +1,11 @@
 @import "base"
 
 configuration {
-		modi:                "combi,drun,run,window,filebrowser";
-		combi-modi:          "drun,window";
-		display-combi:       " SEARCH";
-		display-filebrowser: " FILES";
-		display-calc:        "󰪚 CALCULATOR";
-		display-drun:        " ";
-		display-window:      "󰶮 ";
+    modi: "combi,drun,run,window,filebrowser";
+    combi-modi: "drun,window";
+    display-combi: " SEARCH";
+    display-filebrowser: " FILES";
+    display-calc: "󰪚 CALCULATOR";
+    display-drun: " ";
+    display-window: "󰶮 ";
 }

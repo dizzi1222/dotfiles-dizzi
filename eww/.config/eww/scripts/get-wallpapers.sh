@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRECTORY=~/zenities/wallpapers/
+DIRECTORY=~/wallpapers/
 DIRECTORY=$(eval echo $DIRECTORY)
 
 if [ -d "$DIRECTORY" ]; then

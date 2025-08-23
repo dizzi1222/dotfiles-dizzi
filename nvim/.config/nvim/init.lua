@@ -2,7 +2,7 @@
 require("config.lazy")
 require("config.keymaps")
 
---.. al finar Empeze a probar otro autosave XD de mc-gap
+--.. al finar Empeze a probar otro autosave XD de ookuva
 
 -- Autosave nativo sin plugins,Pero empeze a usar autommands - NO FUNCIONA EN WINDOWS
 -- vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "BufLeave", "FocusLost" }, {
@@ -12,3 +12,7 @@ require("config.keymaps")
 --     end
 --   end,
 -- })
+
+-- después de lazy.nvim, al final de init.lua
+
+require("lsp-progress").setup()

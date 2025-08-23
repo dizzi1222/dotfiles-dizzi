@@ -15,7 +15,7 @@ if [ -f "$WALLPAPER_DIR/$SELECTED_WALLPAPER.jpg" ]; then
   sed -i -e "s|path = .*|path = \$HOME/wallpapers/$SELECTED_WALLPAPER.jpg|" "$TARGET_FILE2"
 
   # Call the separate script to reload pywal, eww, and hyprpaper
-  ~/dotfiles-dizzi/eww/.config/eww/scripts/update-color.sh "$SELECTED_WALLPAPER"
+  ~/.config/eww/scripts/update-color.sh "$SELECTED_WALLPAPER"
 else
   echo "Wallpaper not found: $SELECTED_WALLPAPER"
 fi

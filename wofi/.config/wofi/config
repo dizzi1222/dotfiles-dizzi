@@ -1,14 +1,10 @@
 term=alacritty
-location=top
-yoffset=250
-width=23%
-lines=4
-
-prompt=find the zen
-show=drun
+location=center
+width=30%
+prompt= CLIPBOARD
+show=none
 insensitive=true
 allow_images=false
-hide_scroll=true
+hide_scroll=false
 
-aways_parse_args=true
-show_all=true
+

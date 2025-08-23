@@ -1,7 +1,7 @@
 .side-bar {
   background-color: fade-out(mix($background, $foreground, 95%), 0.4); // 0.2 es el 20% de transparencia
   padding: 4px;
-  border-radius: 1px; // o usa 12px 
+  border-radius: 12px; // o usa 12px 
   font-family: "JetBrainsMono NL";
 }
 

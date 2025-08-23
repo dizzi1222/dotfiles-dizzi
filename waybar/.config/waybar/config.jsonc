@@ -247,7 +247,7 @@
   },
   "pulseaudio/slider": {
     "min": 0,
-    "max": 200,
+    "max": 140,
     "orientation": "horizontal"
   },
   "custom/hotspot": {

@@ -2,58 +2,79 @@
 
 * {
   /* font-family: monospace, 'Courier New', Courier; */
-  font-size: 18px;    
+  font-size: 18px;
   font-family: "JetBrainsMono NL";
-  color: @color1;
+  color: @color3;
   font-weight: 800;
 
 }
 
 window {
   width: 200px;
-  background-color: rgba(50, 50, 50, 0.7);
+  background-color: rgba(50, 50, 50, 0.9);
   border-radius: 12px;
   padding: 0 0 8px 0;
+  border: 2px solid rgb(55, 55, 55);
+  ;
+  /* <-- aquí cambias el color del borde al morado */
 }
 
 
 /* Estilo para cada elemento individual de la lista */
 window#wofi-window .inner-box .list-item {
-    margin: 5px; /* Margen de 5px alrededor de cada elemento */
-    padding: 5px; /* Relleno dentro de cada elemento */
-    border: 1px solid rgba(255, 255, 255, 0.6); /* Borde sutil */
-    border-radius: 4px; /* Bordes ligeramente redondeados */
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo negro con 80% de opacidad */
-    opacity: 0.9; /* 80% de opacidad para toda la ventana, incluyendo texto */
+  margin: 5px;
+  /* Margen de 5px alrededor de cada elemento */
+  padding: 5px;
+  /* Relleno dentro de cada elemento */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  /* Borde sutil */
+  border-radius: 4px;
+  /* Bordes ligeramente redondeados */
+  background-color: rgba(0, 0, 0, 0.8);
+  /* Fondo negro con 80% de opacidad */
+  opacity: 0.9;
+  /* 80% de opacidad para toda la ventana, incluyendo texto */
 }
+
 /* Estilo para cada elemento individual de la lista (el contenido de texto) */
 #entry {
-    background-color: transparent; /* Por defecto transparente */
-    margin: 5px;
-    padding: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil para separar elementos */
-    box-sizing: border-box;
+  /* background-color: transparent; */
+  /* Por defecto transparente */
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid @color3;
+  /* Borde sutil para separar elementos */
+  box-sizing: border-box;
 }
+
 #entry:selected {
-    background-color: transparent; /* Por defecto transparente */
-    background-color: rgba(20, 20, 20, 0.6);
-    /* Borde del elemento seleccionado - CAMBIADO A UN MORADO MÁS CLARO/VISUAL */
-    border: 1px solid @color1; /* Un morado ligeramente distinto para el seleccionado */
+  /* background-color: transparent; */
+  /* Por defecto transparente */
+  background-color: @color3;
+  border-radius: 6px;
+  /* Borde del elemento seleccionado - CAMBIADO A UN MORADO MÁS CLARO/VISUAL */
+  border: 2px solid @color3;
+  /* #ac8fb1; */
+  /* Un morado ligeramente distinto para el seleccionado */
 }
+
 /* Estilo para el elemento seleccionado (opcional, pero mejora la UX) */
 window#wofi-window .inner-box .list-item:selected {
-    background-color: #4c566a; /* Color de fondo cuando está seleccionado */
-    color: #eceff4; /* Color de texto cuando está seleccionado */
-    border: 1px solid #88c0d0; /* Borde más prominente al seleccionar */
+  background-color: #4c566a;
+  /* Color de fondo cuando está seleccionado */
+  color: #eceff4;
+  /* Color de texto cuando está seleccionado */
+  border: 1px solid #88c0d0;
+  /* Borde más prominente al seleccionar */
 }
 
 /* Puedes ajustar también el prompt, la entrada de texto, etc. */
 window#wofi-window .input {
-    margin: 5px;
-    padding: 5px;
-    background-color: #2e3440;
-    border-radius: 4px;
-    border: 1px solid #5e81ac;
+  margin: 5px;
+  padding: 5px;
+  background-color: #2e3440;
+  border-radius: 4px;
+  border: 1px solid #5e81ac;
 }
 
 #input {
@@ -76,16 +97,6 @@ window#wofi-window .input {
   color: white;
 }
 
-#entry {
-  background-color: transparent;
+#expander-box {
+  /* background-color: transparent; */
 }
-
-#entry:selected {
-  background-color: @color1;
-  border-radius: 6px;
-}
-
-#expander-box{
-  background-color: transparent;
-}
-

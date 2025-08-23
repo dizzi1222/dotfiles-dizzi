@@ -5,7 +5,7 @@ return {
     config = function()
       -- Guardamos tu colorscheme original
       local original_colorscheme = vim.g.colors_name or "default"
-      local wal_active = false -- Pywal inicia activado
+      local wal_active = true -- Pywal inicia activado = true /o false
       -- # ESTO DE TERMINA SI ARRANCA FALSE O TU TEMA
       -- # CON SPACE + PW o SPACE + P = Alternas entre Pywal / colorscheme
 
