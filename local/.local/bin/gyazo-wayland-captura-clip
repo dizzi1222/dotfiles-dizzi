@@ -25,7 +25,7 @@ link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
 if [ -n "$link" ]; then
   echo -n "$link" | wl-copy --primary # copia también el link como texto por si acaso
   xdg-open "$link" &
-  notify-send "✅ Imagen copiada y subida" "$link"
+  notify-send "Screnshoot Saved" "$link" --icon="$IMG_PATH"
 else
   notify-send "❌ Error al subir a Gyazo"
 fi

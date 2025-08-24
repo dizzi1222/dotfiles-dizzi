@@ -13,7 +13,7 @@
                                   :width 300;
                                   :height 200;
                                   :orientation "vertical"
-                                  :style "background-image: url('../../../wallpapers/preview-${wallpaper}.jpg');")))))))
+                                  :style "background-image: url('../../../../wallpapers/preview-${wallpaper}.jpg');")))))))
 
 (defwidget win []
   (box :class "window"

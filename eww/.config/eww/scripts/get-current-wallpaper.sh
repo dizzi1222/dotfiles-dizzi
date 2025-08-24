@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# File path to the hyprpaper.conf
 CONFIG_FILE=~/.config/hypr/hyprpaper.conf
 
-# Extract the wallpaper number using awk and grep
-wallpaper=$(awk -F'/' '{print $NF}' "$CONFIG_FILE" | grep -oP '\d+' | head -n 1)
+# Extraer solo el nombre del archivo sin extensión
+wallpaper=$(grep 'wallpaper =' "$CONFIG_FILE" | awk -F'/' '{print $NF}' | sed -E 's/\.[a-zA-Z0-9]+$//')
 
-# Output the wallpaper number
 echo "$wallpaper"
-
