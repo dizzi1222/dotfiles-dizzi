@@ -17,7 +17,7 @@ if [[ "$option" == *Completa* ]]; then
   sleep 1
   grim "$IMG_PATH"
 elif [[ "$option" == *Área* ]]; then
-  grim -g "$(slurp)" "$IMG_PATH"
+  hyprshot -m region -o "$IMG_PATH"
 else
   notify-send -i dialog-error "❌ Opción inválida"
   exit 1
@@ -38,8 +38,8 @@ if ping -c 1 -W 1 gyazo.com &>/dev/null; then
     echo -n "$link" | wl-copy --primary
     xdg-open "$link" &
     notify-send "Screenshot Saved" "$link" --icon="$IMG_PATH"
-  else
-    notify-send -i dialog-error "❌ Error al subir a Gyazo"
+    # else
+    # notify-send -i dialog-error "❌ Error al subir a Gyazo"
   fi
 else
   # Sin Internet: solo guardar y notificar
