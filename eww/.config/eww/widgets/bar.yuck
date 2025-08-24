@@ -145,7 +145,7 @@
         (scale :class "volbar"
                :value current-volume
                :orientation "horizontal"
-               :max 101
+               :max 200
                :min 0
                :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 

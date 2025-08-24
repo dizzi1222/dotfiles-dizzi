@@ -12,10 +12,10 @@ local keymap = vim.keymap
 keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
 
 -- Cambiar a pestaña anterior con [b
-keymap.set("n", "<C-[>", ":tabprevious<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-[>", ":bprev<CR>", { noremap = true, silent = true })
 
 -- Cambiar a pestaña siguiente con ]b
-keymap.set("n", "<C-]>", ":tabnext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-]>", ":bnext<CR>", { noremap = true, silent = true })
 
 -- Activar backspace+Control - MODO INSERCION COMO EN VSCODE!!! = Ctrl W
 vim.api.nvim_set_keymap("i", "<C-BS>", "<C-W>", { noremap = true, silent = true })

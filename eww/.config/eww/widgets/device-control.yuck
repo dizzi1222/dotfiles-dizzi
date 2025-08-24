@@ -22,7 +22,7 @@
         (scale :class "volume-control-bar"
                :value current-volume
                :orientation "horizontal"
-               :max 101
+               :max 200
                :min 0
                :onchange "pactl set-sink-volume $(pactl get-default-sink) {}%")))
 
@@ -143,7 +143,7 @@
                       :width "10%"
                       :height "0%"
                       :anchor "top right")
-  :stacking "bg"
+  :stacking "overlay"
   :exclusive "false"
   :focusable "false"
   (controls))

@@ -97,7 +97,7 @@
                       :width "10%"
                       :height "0%"
                       :anchor "top right")
-  :stacking "bg"
+  :stacking "overlay"
   :exclusive "false"
   :focusable "false"
   (resources))
