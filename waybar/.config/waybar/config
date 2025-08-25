@@ -126,7 +126,7 @@
             ]
         },
         "justify": "center",
-        "on-click": "pavucontrol",
+        "on-click": "~/scripts/pavucontrol.sh",
         "tooltip-format": "{icon}  {volume}%"
     },
     "tray": {

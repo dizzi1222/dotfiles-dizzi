@@ -223,11 +223,11 @@
                :flipped true
                :value current-volume
                :orientation "vertical"
-               :max 101
+               :max 151
                :min 0
                :onchange "pactl set-sink-volume $(pactl get-default-sink) {}%"))
       (button :class "volume-icon-vert"
-              :onclick "/usr/bin/easyeffects &"
+              :onclick "~/.config/eww/scripts/easyeffects.sh"
               (label :text volume-icon)))))
 
 ;; Idle Toggle ;;

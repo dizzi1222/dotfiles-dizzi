@@ -134,7 +134,7 @@
           :space-evenly "false"
           :spacing "2"
         (button :class "volume-icon"
-                :onclick "/usr/bin/easyeffects &"
+                :onclick "~/.config/eww/scripts/easyeffects.sh"
                 (label :text volume-icon))
 
       ;;o bien podrias usar  "/usr/bin/pavucontrol &" ;;
@@ -145,7 +145,7 @@
         (scale :class "volbar"
                :value current-volume
                :orientation "horizontal"
-               :max 200
+               :max 151
                :min 0
                :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%")))))
 

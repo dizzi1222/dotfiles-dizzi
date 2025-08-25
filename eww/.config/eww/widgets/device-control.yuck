@@ -14,7 +14,7 @@
         :orientation "horizontal"
         :space-evenly "false"
     (button :class "volume-icon-control"
-            :onclick "~/.config/eww/scripts/pavucontrol.sh" volume-icon))))
+            :onclick "~/.config/eww/scripts/easyeffects.sh" volume-icon))))
 
 ;; Volume Bar ;;
 (defwidget volume-control-bar []
@@ -22,7 +22,7 @@
         (scale :class "volume-control-bar"
                :value current-volume
                :orientation "horizontal"
-               :max 200
+               :max 201
                :min 0
                :onchange "pactl set-sink-volume $(pactl get-default-sink) {}%")))
 
