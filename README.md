@@ -267,8 +267,11 @@ echo ">> Script finalizado. Reinicia para aplicar cambios."
 sudo pacman -S vulkan-headers vulkan-icd-loader
 ```
 
+
 ## 💤 Debian Vs Arch 🦥
 [Aquí está el enlace a mis dotfiles para Arch, Debian y WSL](https://github.com/dizzi1222/dotfiles-wsl-dizzi/blob/main/README.md)
+<img width="1020" height="600" alt="8b85d9ca2b82c8355e78ec55cc0eed37" src="https://github.com/user-attachments/assets/39a8d975-cd82-4b68-9954-e1e1f784563f" />
+<img width="686" height="386" alt="image" src="https://github.com/user-attachments/assets/93d24187-4345-4082-a965-128175b4c145" />
 
 # 🌄🦥🗿 EL INICIO DE UN VIAJE POR EL COSMOS.. 🤓🚀🌌
 
