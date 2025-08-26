@@ -49,8 +49,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # Tema original: 
 # ZSH_THEME="robbyrussell"
 
-# Mi tema preferido
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# Mi tema preferido de ZSH # pero entra en conflcito con ohmypsoh shell
+# ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # /////////////////////////////////////////////////////////////////////////////
 # ---------------------------------------------------------------------------------------------
@@ -248,3 +248,6 @@ export PATH=$HOME/cmus/bin:$PATH
 # Gemini AI instalacion:
 # Añade el directorio global de npm al PATH. NPM_GLOBAL
 export PATH=~/.npm-global/bin:$PATH
+# HABILITAR OH MY POSH [trae mas temas]
+# https://ohmyposh.dev/docs/themes
+eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json')"
