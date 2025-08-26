@@ -68,7 +68,7 @@ fastfetch --colors-block-range-start 9 --colors-block-width 3
 
 
 #!/bin/bash
-# ───────────────────────────────────
+# ===============
 # Guia/Script de reparación y post-instalación Arch Linux si archinstall falla
 ─❯  Incluye: GRUB, entorno gráfico, permisos, internet, programas, idioma, teclado y más.
 # ───────────────────────────────────
