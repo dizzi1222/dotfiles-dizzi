@@ -1,7 +1,7 @@
 # 💤 🔮 🗿 In Love 💜 With Arch Hypr My✨Inspiration 🔮 🔥 🚀 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a" />
 <img width="1366" height="114" alt="image" src="https://github.com/user-attachments/assets/eabcfb02-982f-4885-a75a-d30f84cebc01" />
-
+k
 ## 💤 LazyVim 🦥
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/60c80cc3-98d7-4af0-a5bd-8842a9c8c80d" />
 
@@ -270,12 +270,14 @@ sudo pacman -S vulkan-headers vulkan-icd-loader
 
 ## 💤 Debian Vs Arch 🦥
 [Aquí está el enlace a mis dotfiles para Arch, Debian y WSL](https://github.com/dizzi1222/dotfiles-wsl-dizzi/blob/main/README.md)
+
 <img width="500" height="294" alt="8b85d9ca2b82c8355e78ec55cc0eed37" src="https://github.com/user-attachments/assets/39a8d975-cd82-4b68-9954-e1e1f784563f" />
 <img width="500" height="198" alt="f8819b64cfec36b8bc574f055aeacbe8" src="https://github.com/user-attachments/assets/ac37b985-489d-4801-a8ce-1fde7ef7446d" />
 
 
 [https://youtu.be/H7RQYREJO98
 ](https://youtu.be/H7RQYREJO98)
+
 <img width="500" height="173" alt="8fb0bcb2e75583bab55753f549eb38a6" src="https://github.com/user-attachments/assets/df6ecb56-d359-474d-8be1-bf68c48172ff" />
 
 
