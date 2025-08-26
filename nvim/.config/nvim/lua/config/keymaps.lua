@@ -6,8 +6,6 @@ keymap.set("i", "jj", "<ESC>")
 keymap.set("n", "<ESC>", ":noh<CR>")
 vim.keymap.set("v", "<A-S-f>", vim.lsp.buf.format)
 
-local keymap = vim.keymap
-
 -- Mapear Ctrl+T para abrir una nueva pestaña con buffer vacío
 keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
 
@@ -39,6 +37,10 @@ end, { noremap = true, silent = true })
 --  [ + b > cambiar pestaña prev {osea tabear}
 --  ] + b > cambiar pestaña next {osea tabear}
 --  space + b + b = la unica forma de ctrl tab
+--
+--    |
+-- 	  ╰─❯ CTrl + [] > cabra a buffer prev!!
+--        [lomejor] Ctrl + ] > cambiar a buffer sigueinte [ctrl tab!! en buffer]
 
 -- # y otros que NO MODIFIQUE COMO:
 -- Ctrl + V > Grabar Tecla - Util para averiguar la tecla [Record key] {Similar a cat -v}
@@ -50,6 +52,9 @@ end, { noremap = true, silent = true })
 -- 	  ╰─❯  Ctrl + W + J > Cambiar ventana {abajo}
 -- 	  ╰─❯  Ctrl + W + H > Cambiar ventana {izquierda,
 --
+--    |
+-- 	  ╰─❯  Ctrl + H [lo mejor] > Cambiar entre ventana [ctrl tab!!! en ventana],
+
 --     Ctrl + W + O > cierra tod@s las ventanas divididas/o Explorer
 --   	Ctrl + W + > S > split dividir {mas lento que space}
 
@@ -66,3 +71,108 @@ vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
 
 -- CAMBIAR color con Teclado = C+P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins.lua
 -- CAMBAIR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua
+
+-- INSERT MODE (Gentleman config)
+-- =============================
+keymap.set("i", "<C-b>", "<C-o>de") -- Ctrl+b: borrar hasta fin de palabra
+keymap.set("i", "<C-c>", [[<C-\><C-n>]]) -- Ctrl+c escape
+vim.api.nvim_set_keymap("i", "<A-j>", "<Nop>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("i", "<A-k>", "<Nop>", { noremap = true, silent = true })
+
+-- =============================
+-- NORMAL MODE (Gentleman config)
+-- =============================
+keymap.set("n", "<C-s>", ":lua SaveFile()<CR>") -- guardar con función
+
+-- =============================
+-- VISUAL MODE (Gentleman config)
+-- =============================
+keymap.set("v", "<C-c>", [[<C-\><C-n>]]) -- escape
+vim.api.nvim_set_keymap("x", "<A-j>", "<Nop>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "<A-k>", "<Nop>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "J", "<Nop>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "K", "<Nop>", { noremap = true, silent = true })
+
+-- =============================
+-- LEADER KEYS (Gentleman config)
+-- =============================
+keymap.set("n", "<leader>uk", "<cmd>Screenkey<CR>")
+keymap.set("n", "<leader>bq", '<Esc>:%bdelete|edit #|normal`"<CR>', { desc = "Delete other buffers" })
+keymap.set("n", "<leader>md", function()
+  vim.cmd("delmarks!")
+  vim.cmd("delmarks A-Z0-9")
+  vim.notify("All marks deleted")
+end, { desc = "Delete all marks" })
+
+-- =============================
+-- TMUX NAVIGATION (Gentleman config)
+-- =============================
+local nvim_tmux_nav = require("nvim-tmux-navigation")
+keymap.set("n", "<C-h>", nvim_tmux_nav.NvimTmuxNavigateLeft)
+keymap.set("n", "<C-j>", nvim_tmux_nav.NvimTmuxNavigateDown)
+keymap.set("n", "<C-k>", nvim_tmux_nav.NvimTmuxNavigateUp)
+keymap.set("n", "<C-l>", nvim_tmux_nav.NvimTmuxNavigateRight)
+keymap.set("n", "<C-\\>", nvim_tmux_nav.NvimTmuxNavigateLastActive)
+keymap.set("n", "<C-Space>", nvim_tmux_nav.NvimTmuxNavigateNext)
+
+-- =============================
+-- OBSIDIAN (Gentleman config)
+-- =============================
+keymap.set("n", "<leader>oc", "<cmd>ObsidianCheck<CR>")
+keymap.set("n", "<leader>ot", "<cmd>ObsidianTemplate<CR>")
+keymap.set("n", "<leader>oo", "<cmd>Obsidian Open<CR>")
+keymap.set("n", "<leader>ob", "<cmd>ObsidianBacklinks<CR>")
+keymap.set("n", "<leader>ol", "<cmd>ObsidianLinks<CR>")
+keymap.set("n", "<leader>on", "<cmd>ObsidianNew<CR>")
+keymap.set("n", "<leader>os", "<cmd>ObsidianSearch<CR>")
+keymap.set("n", "<leader>oq", "<cmd>ObsidianQuickSwitch<CR>")
+
+-- =============================
+-- OIL (Gentleman config)
+-- =============================
+keymap.set("n", "-", "<CMD>Oil<CR>")
+
+-- =============================
+-- FUNCIONES (Gentleman config)
+-- =============================
+function SaveFile()
+  if vim.fn.empty(vim.fn.expand("%:t")) == 1 then
+    vim.notify("No file to save", vim.log.levels.WARN)
+    return
+  end
+  local filename = vim.fn.expand("%:t")
+  local ok, err = pcall(function()
+    vim.cmd("silent! write")
+  end)
+  if ok then
+    vim.notify(filename .. " Saved!")
+  else
+    vim.notify("Error: " .. err, vim.log.levels.ERROR)
+  end
+end
+
+-- =============================
+-- KEYMAPS GENTLEMAN / CLAUDE (SEPARADO)
+-- =============================
+local has_claude, claude = pcall(require, "claude-code")
+if has_claude then
+  -- Visual: completar selección con Claude
+  vim.keymap.set("v", "<leader>ac", function()
+    claude.complete_selection()
+  end, { desc = "Claude: completar selección" })
+
+  -- Normal: abrir panel de Claude
+  vim.keymap.set("n", "<leader>aa", function()
+    claude.open_panel()
+  end, { desc = "Claude: abrir panel" })
+
+  -- Optional: enviar línea actual a Claude y obtener respuesta
+  vim.keymap.set("n", "<leader>al", function()
+    claude.complete_line()
+  end, { desc = "Claude: completar línea actual" })
+
+  -- Optional: cerrar panel de Claude
+  vim.keymap.set("n", "<leader>ax", function()
+    claude.close_panel()
+  end, { desc = "Claude: cerrar panel" })
+end

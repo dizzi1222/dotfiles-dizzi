@@ -1,11 +1,26 @@
+-- # Primero, arreglar PATH para binarios globales
+vim.env.PATH = os.getenv("HOME") .. "/.npm-global/bin:" .. vim.env.PATH
+
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
 require("config.keymaps")
+
+-- # PARA HACER FUNCIONAR GENTLEMAN AIS
+require("config.nodejs").setup({ silent = true })
 
 -- [MUY OPCIONAL] LSP Progress - NO RECOMIENDO DESACTIVARLO, eso tiene que ver con tu PC y CPU que sea tan lento.. por sobrecargar la config
 -- Aparte LSP progress solo se jecuta al modificar cosas de NVIM...
 -- vim.lsp.handlers["$/progress"] = function() end -- si quieres desactivar LSP PROGRESS:
 
+-- Configuracion del cursor - smear
+require("smear_cursor").setup({
+  cursor_color = "#49A3EC",
+  stiffness = 0.3,
+  trailing_stiffness = 0.1,
+  trailing_exponent = 5,
+  hide_target_hack = true,
+  gamma = 1,
+})
 -- [OOKUVA AUTOSAVE ES MUCHO MEJOR UBICADO EN: lua/plugins/auto-save.lua]
 -- al finar Empeze a probar otro autosave XD de ookuva
 -- por cierto,hay que veces que ookuva se bugea o si sales muy rapido no guardara un carajo
@@ -19,3 +34,6 @@ require("config.keymaps")
 --     end
 --   end,
 -- })
+-- bootstrap lazy.nvim, LazyVim and your plugins
+vim.opt.timeoutlen = 1000
+vim.opt.ttimeoutlen = 0
