@@ -272,7 +272,6 @@ sudo pacman -S vulkan-headers vulkan-icd-loader
 [Aquí está el enlace a mis dotfiles para Arch, Debian y WSL](https://github.com/dizzi1222/dotfiles-wsl-dizzi/blob/main/README.md)
 
 <img width="337" height="198" alt="8b85d9ca2b82c8355e78ec55cc0eed37" src="https://github.com/user-attachments/assets/39a8d975-cd82-4b68-9954-e1e1f784563f" />
-
 <img width="500" height="198" alt="f8819b64cfec36b8bc574f055aeacbe8" src="https://github.com/user-attachments/assets/ac37b985-489d-4801-a8ce-1fde7ef7446d" />
 
 
