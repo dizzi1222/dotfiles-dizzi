@@ -6,8 +6,21 @@ keymap.set("i", "jj", "<ESC>")
 keymap.set("n", "<ESC>", ":noh<CR>")
 vim.keymap.set("v", "<A-S-f>", vim.lsp.buf.format)
 
--- Mapear Ctrl+T para abrir una nueva pestaña con buffer vacío
-keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
+-- Mapear Ctrl+T para abrir una nueva pestaña - lo mismo que space + m + n
+-- keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
+local keymap = vim.keymap
+
+keymap.set("n", "<C-t>", function()
+  local dir = vim.fn.expand("%:p:h") -- ruta del buffer actual
+  if dir == "" then
+    dir = vim.loop.cwd() -- fallback si no hay archivo
+  end
+  local name = vim.fn.input("Nombre del archivo: ")
+  if name ~= "" then
+    -- abre un buffer normal en la carpeta actual con el nombre indicado
+    vim.cmd("tabnew " .. dir .. "/" .. name)
+  end
+end, { noremap = true, silent = true })
 
 -- Cambiar a pestaña anterior con [b
 keymap.set("n", "<C-[>", ":bprev<CR>", { noremap = true, silent = true })
@@ -32,6 +45,20 @@ keymap.set("n", "<C-q>", function()
   -- Cierra el buffer actual sin preguntar, forzando el cierre
   vim.cmd("bdelete!")
 end, { noremap = true, silent = true })
+
+-- Crear nuevo archivo desde treesitter - arbol de archivo - lo mismo que Control + Ts
+vim.keymap.set("n", "<leader>an", function()
+  -- obtener la carpeta actual del buffer
+  local dir = vim.fn.expand("%:p:h")
+  if dir == "" then
+    dir = vim.loop.cwd()
+  end -- fallback si no hay archivo
+  -- pedir el nombre del archivo
+  local name = vim.fn.input("Nombre del archivo: ")
+  if name ~= "" then
+    vim.cmd("e " .. dir .. "/" .. name) -- abrir nuevo archivo en esa carpeta
+  end
+end, { desc = "Nuevo archivo en ruta actual" })
 
 -- # MUCHOS DE ESTOS COMANDOS EQUIVALEN A:
 --  [ + b > cambiar pestaña prev {osea tabear}

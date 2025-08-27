@@ -1,5 +1,7 @@
 
-gtk-titlebar = false
+gtk-titlebar = true 
+
+window-decoration = true
 
 
 # para abrir links usa Ctrl + Click
@@ -143,7 +145,7 @@ keybind = alt+left=goto_split:left
 keybind = alt+right=goto_split:right
 keybind = alt+up=goto_split:up
 keybind = alt+down=goto_split:down
-
+# Mapeo de Ctrl+C para copiar y Ctrl+V para pegar
 
 # Navegar entre splits por orden de creación
 keybind = ctrl+tab=goto_split:next

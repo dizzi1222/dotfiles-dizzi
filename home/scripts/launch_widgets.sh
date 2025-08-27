@@ -10,7 +10,7 @@ done
 
 if $all_open; then
   eww close $WINDOW_NAME
+  eww close music-window custom-calendar resource-monitor device-control
 else
   eww open-many $WINDOW_NAME
 fi
-

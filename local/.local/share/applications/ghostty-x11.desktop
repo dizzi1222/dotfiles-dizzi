@@ -1,0 +1,9 @@
+
+[Desktop Entry]
+Name=Ghostty (X11)
+Comment=Ghostty forzado en X11 con titlebar
+Exec=/home/diego/.local/bin/ghostty-x11
+Icon=ghostty
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;

@@ -6,6 +6,7 @@ bindkey '^W' backward-kill-word
 
 # Borra la palabra anterior (Ctrl+Backspace)
 bindkey '^?' backward-kill-word
+
 # ESTO HACE QUE neofetch cargue primero
 # si prefieres puedes quitarlo para cargar ANTES el prompt instant.
       typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
