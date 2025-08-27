@@ -31,7 +31,7 @@ return {
       ["<CR>"] = "actions.select",
       ["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open in vertical split" },
       ["<C-v>"] = { "actions.select", opts = { horizontal = true }, desc = "Open in horizontal split" },
-      ["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open in new tab" },
+      -- ["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open in new tab" },
       ["<C-p>"] = "actions.preview",
       ["<C-c>"] = "actions.close",
       ["<C-r>"] = "actions.refresh",

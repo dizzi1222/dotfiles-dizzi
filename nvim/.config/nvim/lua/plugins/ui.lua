@@ -239,8 +239,7 @@ return {
             cmd = "pokemon-colorscripts -rn 'vaporeon,rayquaza,darkrai,lucario,gardevoir,lopunny,garchomp,blaziken,charmander,totodile,metagross' --no-title; sleep 0.3",
             height = 19,
             padding = 1,
-            indent = 20, -- <--- mayor número lo mueve más a la derecha
-            x = 100, -- Mueve el panel 5 líneas hacia abajo
+            indent = 13, -- <--- mayor número lo mueve más a la derecha
           },
 
           -- Columna 1: Keymaps, Recent Files, Projects

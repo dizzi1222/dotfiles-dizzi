@@ -6,11 +6,60 @@ keymap.set("i", "jj", "<ESC>")
 keymap.set("n", "<ESC>", ":noh<CR>")
 vim.keymap.set("v", "<A-S-f>", vim.lsp.buf.format)
 
--- Mapear Ctrl+T para abrir una nueva pestaña - lo mismo que space + m + n
--- keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
-local keymap = vim.keymap
+-- 🗣️ ATAJOS DE IA y OIL/snack_picker_list tree EXPLORER QUE DEBES SABER:
+-- 🐐 1- ATAJO IMPORTANTE: - {minus -} [oil ~ requiere oil]-
+-- te lleva al directorio en el que te encuentras [GOZZZZ]
+-- 🐐 2- ATAJO IMPORTANTE: Space+E  [snack ~ requiere: fd fd-find]
+-- 🐐 3- ATAJO IMPORTANTE: Space+N  [notifaciones - como :mes pero mejor para depurar codigo!! ]
+-- 🐐 4- accept Copilot/Tabnine = "<C-Tab>", -- acepta sugerencia
+-- 🐐 5- abrir menu IA panel {claude api} = Space + A -- tambien puedesc crear un new file
+-- keymap = {
+--   accept = "<C-Tab>", -- acepta sugerencia
+--   next = "<C-]>",
+--   prev = "<C-[>",
+--   dismiss = "<C-",
 
-keymap.set("n", "<C-t>", function()
+-- 🗣️ ATAJOS OIL tree EXLORER:
+-- Keymaps in oil buffer. Can be any value that `vim.keymap.set` accepts OR a table of keymap
+-- keymaps =
+--   {
+--     ["g?"] = "actions.show_help",
+--     ["<CR>"] = "actions.select",
+--     ["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open in vertical split" },
+--     ["<C-v>"] = { "actions.select", opts = { horizontal = true }, desc = "Open in horizontal split" },
+-- ESTE NO LO RECOMIENDO, lo quite.     -- ["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open in new tab" },
+--     ["<C-p>"] = "actions.preview",
+--     ["<C-c>"] = "actions.close",
+--     ["<C-r>"] = "actions.refresh",
+--     ["-"] = "actions.parent",
+--     ["_"] = "actions.open_cwd",
+--     ["`"] = "actions.cd",
+--     ["~"] = { "actions.cd", opts = { scope = "tab" }, desc = ":tcd to the current oil directory" },
+--     ["gs"] = "actions.change_sort",
+--     ["gx"] = "actions.open_external",
+--     ["g."] = "actions.toggle_hidden",
+--     ["g\\"] = "actions.toggle_trash",
+--     -- Quick quit
+--     ["q"] = "actions.close",
+--   },
+-- similar al EXPLORER snack_picker_list
+
+-- Mapear Ctrl+T y Space+A+N para {add new file} abrir una nueva pestaña - lo mismo que space + m + n
+
+-- Crear nuevo archivo desde treesitter - arbol de archivo - lo mismo que Control + Ts
+vim.keymap.set("n", "<leader>an", function()
+  local dir = vim.fn.expand("%:p:h") -- ruta del buffer actual
+  if dir == "" then
+    dir = vim.loop.cwd() -- fallback si no hay archivo
+  end
+  local name = vim.fn.input("Nombre del archivo: ")
+  if name ~= "" then
+    vim.cmd("tabnew " .. dir .. "/" .. name)
+  end
+end, { noremap = true, silent = true, desc = "Nuevo archivo [add new file]" })
+
+-- keymap.set("n", "<C-t>", ":tabnew<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-t>", function()
   local dir = vim.fn.expand("%:p:h") -- ruta del buffer actual
   if dir == "" then
     dir = vim.loop.cwd() -- fallback si no hay archivo
@@ -43,22 +92,9 @@ end, { noremap = true, silent = true })
 
 keymap.set("n", "<C-q>", function()
   -- Cierra el buffer actual sin preguntar, forzando el cierre
+  -- para cerrar ventanas molestas usa: :q! o :q
   vim.cmd("bdelete!")
 end, { noremap = true, silent = true })
-
--- Crear nuevo archivo desde treesitter - arbol de archivo - lo mismo que Control + Ts
-vim.keymap.set("n", "<leader>an", function()
-  -- obtener la carpeta actual del buffer
-  local dir = vim.fn.expand("%:p:h")
-  if dir == "" then
-    dir = vim.loop.cwd()
-  end -- fallback si no hay archivo
-  -- pedir el nombre del archivo
-  local name = vim.fn.input("Nombre del archivo: ")
-  if name ~= "" then
-    vim.cmd("e " .. dir .. "/" .. name) -- abrir nuevo archivo en esa carpeta
-  end
-end, { desc = "Nuevo archivo en ruta actual" })
 
 -- # MUCHOS DE ESTOS COMANDOS EQUIVALEN A:
 --  [ + b > cambiar pestaña prev {osea tabear}

@@ -2,8 +2,16 @@ return {
   "zbirenbaum/copilot.lua",
   optional = true,
   opts = function()
-    require("copilot.api").status = require("copilot.status")
-    require("copilot.api").filetypes = {
+    require("copilot").setup({
+      suggestion = {
+        auto_trigger = true,
+        keymap = {
+          accept = "<C-Tab>", -- acepta sugerencia
+          next = "<C-]>",
+          prev = "<C-[>",
+          dismiss = "<C-",
+        },
+      },
       filetypes = {
         yaml = false,
         markdown = false,
@@ -13,8 +21,12 @@ return {
         hgcommit = false,
         svn = false,
         cvs = false,
-        ["."] = false,
+        -- poner true para filetypes donde quieras AI
+        lua = true,
+        python = true,
+        javascript = true,
+        typescript = true,
       },
-    }
+    })
   end,
 }

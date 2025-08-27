@@ -19,6 +19,10 @@ return {
     "CopilotC-Nvim/CopilotChat.nvim",
     enabled = true,
   },
+  {
+    "codota/tabnine-nvim",
+    enabled = true,
+  },
   "folke/snacks.nvim",
   enabled = false,
   {
