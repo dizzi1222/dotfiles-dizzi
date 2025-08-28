@@ -28,3 +28,6 @@
 [submodule "home/input-remapper"]
 	path = home/input-remapper
 	url = https://github.com/sezanzeb/input-remapper.git
+[submodule "nvim/.config/nvim/pack/github/start/copilot.vim"]
+	path = nvim/.config/nvim/pack/github/start/copilot.vim
+	url = https://github.com/github/copilot.vim.git
