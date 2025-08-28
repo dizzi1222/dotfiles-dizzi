@@ -1,3 +1,19 @@
+-- 🐐🗣️🔥️✍️  NO REQUIERE API. [lo usa gil] Pero no me gusta tanto como copilot, o supermaven como IAS gratuitas para sugerencias]
+--
+-- PARA QUE FUNCIONE DEBES DE ELIMINAR CMP.lua
+--
+-- PARA ACTIVAR CIERTAS IAS NECESITAS MODIFICAR CIERTOS ARCHIVOS
+--
+-- Entre ellos:
+--   - plugins/init.lua
+--   - plugins/disabled.lua
+--   - .config/lazy.lua
+-- Y LOS RESPECTOS ARCHIVOS DE CONFIGURACION dE IA [copilot, claude-code.lua etc]
+--   - .config/nvim/lua/plugins/copilot.lua [opcional usa copilot-chat.lua]
+--   - .config/nvim/lua/plugins/supermaven.lua {etc..}
+--
+-- OBVIAMENTE REVISA LOS KEYMAPS: config/keymaps.lua--
+--
 return {
   -- // Esta extension es la que da problemas al usar Ctrl+O, pero da sugerencias AI
   "codota/tabnine-nvim",

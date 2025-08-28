@@ -1,3 +1,14 @@
+-- 💸💳💰REQUIERE API. USA : claude auth o consigue tu key en https://claude.ai
+--
+-- PARA QUE FUNCIONE DEBES DE ELIMINAR CMP.lua
+--
+-- PARA ACTIVAR CIERTAS IAS NECESITAS MODIFICAR CIERTOS ARCHIVOS
+-- Entre ellos:
+--   - plugins/init.lua
+--   - plugins/disabled.lua
+--   - .config/lazy.lua
+-- Y LOS RESPECTOS ARCHIVOS DE CONFIGURACION dE IA [copilot, claude-code.lua etc]
+--   - .config/nvim/lua/ia.lua
 return {
   "greggh/claude-code.nvim",
   dependencies = {

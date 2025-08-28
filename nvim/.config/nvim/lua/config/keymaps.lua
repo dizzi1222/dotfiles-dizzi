@@ -1,3 +1,10 @@
+-- PARA Configurar IAS, revisa:
+-- config/lazy.lua
+-- plugins/disabled
+-- OBVIAMENTE REVISA LOS KEYMAPS: config/keymaps.lua
+--
+-- KEYMAPS DE CHAT por IA FUNCIONAN AL SELECCIONAR TEXTO [v]
+--
 vim.g.mapleader = " "
 
 local keymap = vim.keymap
@@ -9,10 +16,13 @@ vim.keymap.set("v", "<A-S-f>", vim.lsp.buf.format)
 -- 🗣️ ATAJOS DE IA y OIL/snack_picker_list tree EXPLORER QUE DEBES SABER:
 -- 🐐 1- ATAJO IMPORTANTE: - {minus -} [oil ~ requiere oil]-
 -- te lleva al directorio en el que te encuentras [GOZZZZ]
--- 🐐 2- ATAJO IMPORTANTE: Space+E  [snack ~ requiere: fd fd-find]
+-- 🐐 1.5 - ATAJO IMPORTANTE: Space E [mayus] \ o usa: Space + Shift + E [Abre oil flotante] ) \ AL SELECCIONAR TEXTO [v]-
+-- 🐐 2- ATAJO IMPORTANTE: Space+e [minus] [snack ~ requiere: fd fd-find]
 -- 🐐 3- ATAJO IMPORTANTE: Space+N  [notifaciones - como :mes pero mejor para depurar codigo!! ]
--- 🐐 4- accept Copilot/Tabnine = "<C-Tab>", -- acepta sugerencia
--- 🐐 5- abrir menu IA panel {claude api} = Space + A -- tambien puedesc crear un new file
+-- 🐐 4- ATAJO IMPORTANTE: Space+M ejecutar el markdown render ej Space + M+R
+-- 🐐 5- accept Copilot/Tabnine etc = "<Tab>", -- acepta sugerencia
+--       dismisss Copilot/Tabnine = "<C-c> o con ESC", -- cancela sugerencia
+-- 🐐 6- abrir menu IA panel {claude api} = Space + A -- tambien puedesc crear un new file
 -- keymap = {
 --   accept = "<C-Tab>", -- acepta sugerencia
 --   next = "<C-]>",
@@ -135,6 +145,23 @@ vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
 -- CAMBIAR color con Teclado = C+P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins.lua
 -- CAMBAIR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua
 
+-- =============================
+-- -- Solo en Arhcivos.MD | MARKDown (Gentleman config) - {no funciona bien}
+-- =============================
+-- KEYMAPS CORRECTOS:
+keymap.set("n", "<leader>mr", function()
+  require("render-markdown").toggle()
+end, { desc = "Toggle Markdown Render" })
+
+keymap.set("n", "<leader>me", function()
+  require("render-markdown").enable()
+end, { desc = "Enable Markdown Render" })
+
+keymap.set("n", "<leader>md", function()
+  require("render-markdown").disable()
+end, { desc = "Disable Markdown Render" })
+
+-- =============================
 -- INSERT MODE (Gentleman config)
 -- =============================
 keymap.set("i", "<C-b>", "<C-o>de") -- Ctrl+b: borrar hasta fin de palabra
@@ -215,7 +242,7 @@ function SaveFile()
 end
 
 -- =============================
--- KEYMAPS GENTLEMAN / CLAUDE (SEPARADO)
+-- KEYMAPS GENTLEMAN / CLAUDE (SEPARADO) \ AL SELECCIONAR TEXTO [v]
 -- =============================
 local has_claude, claude = pcall(require, "claude-code")
 if has_claude then

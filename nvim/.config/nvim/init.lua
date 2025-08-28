@@ -1,3 +1,10 @@
+-- PARA Configurar IAS, revisa:
+-- config/lazy.lua
+-- plugins/disabled
+-- OBVIAMENTE REVISA LOS KEYMAPS: config/keymaps.lua
+--
+-- KEYMAPS DE CHAT por IA FUNCIONAN AL SELECCIONAR TEXTO [v]
+--
 -- # Primero, arreglar PATH para binarios globales
 vim.env.PATH = os.getenv("HOME") .. "/.npm-global/bin:" .. vim.env.PATH
 

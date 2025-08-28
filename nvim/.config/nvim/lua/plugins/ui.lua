@@ -57,7 +57,11 @@ return {
     event = "VeryLazy",
     opts = {
       preset = "classic",
-      win = { border = "single" },
+      win = {
+        border = "single",
+        width = 130,
+        col = vim.o.columns, -- <--- lo empuja hasta la derecha
+      },
     },
   },
 
@@ -232,7 +236,7 @@ return {
         sections = {
           { section = "header" },
 
-          -- Pokémon a la derecha (terminal)
+          -- Pokémon alternativaa pokemon/square github a la derecha (terminal)
           {
             pane = 2,
             section = "terminal",
@@ -316,6 +320,7 @@ return {
         preset = {
           -- movi intencionalmente el ASCI hacia la derecha +indent de pokemon para centrarlo y quedo perfect!
           header = [[
+
                       ░░░░░░      ░░░░░░                        
                     ░░░░░░░░░░  ░░░░░░░░░░                      
                   ░░░░░░░░░░░░░░░░░░░░░░░░░░                    
