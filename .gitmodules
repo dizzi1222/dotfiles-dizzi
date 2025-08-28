@@ -1,0 +1,30 @@
+[submodule "espanso"]
+	path = espanso/.config/espanso/match
+	url = https://gist.github.com/34d57244d9620281584a7436e8afdb34.git
+[submodule "fastfetch/.local/share/fastfetch"]
+	path = fastfetch/.local/share/fastfetch
+	url = https://github.com/LierB/fastfetch.git
+[submodule "alacritty/.config/alacritty/themes"]
+	path = alacritty/.config/alacritty/themes
+	url = https://github.com/alacritty/alacritty-theme.git
+[submodule "tmux/.config/tmux/plugins/tpm"]
+	path = tmux/.config/tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
+[submodule "spicetify/.config/spicetify/Themes"]
+	path = spicetify/.config/spicetify/Themes
+	url = https://github.com/spicetify/spicetify-themes.git
+[submodule "yazi/.config/yazi/flavors/gruvbox-dark.yazi"]
+	path = yazi/.config/yazi/flavors/gruvbox-dark.yazi
+	url = https://github.com/ghaerdi/gruvbox-dark.yazi
+[submodule "zsh/.zsh/fzf-tab"]
+	path = zsh/.zsh/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab.git
+[submodule "zsh/.zsh/zsh-autocomplete"]
+	path = zsh/.zsh/zsh-autocomplete
+	url = https://github.com/lincheney/fzf-tab-completion.git
+[submodule "home/eww"]
+	path = home/eww
+	url = https://github.com/elkowar/eww.git
+[submodule "home/input-remapper"]
+	path = home/input-remapper
+	url = https://github.com/sezanzeb/input-remapper.git
