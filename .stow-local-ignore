@@ -5,6 +5,8 @@ nixconf
 \.gitignore
 \.gitmodules
 
+
+^eww/eww$
 ^/README.*
 ^/LICENSE.*
 ^/COPYING
