@@ -22,12 +22,9 @@
 [submodule "zsh/.zsh/zsh-autocomplete"]
 	path = zsh/.zsh/zsh-autocomplete
 	url = https://github.com/lincheney/fzf-tab-completion.git
-[submodule "home/eww"]
-	path = home/eww
-	url = https://github.com/elkowar/eww.git
-[submodule "home/input-remapper"]
-	path = home/input-remapper
-	url = https://github.com/sezanzeb/input-remapper.git
-[submodule "nvim/.config/nvim/pack/github/start/copilot.vim"]
-	path = nvim/.config/nvim/pack/github/start/copilot.vim
-	url = https://github.com/github/copilot.vim.git
+[submodule "home/gruvbox-plus-icon-pack"]
+	path = home/gruvbox-plus-icon-pack
+	url = https://github.com/SylEleuth/gruvbox-plus-icon-pack
+[submodule "home/Colloid-gtk-theme"]
+	path = home/Colloid-gtk-theme
+	url = https://github.com/vinceliuice/Colloid-gtk-theme.git
