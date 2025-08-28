@@ -1,0 +1,36 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 29,
+                "origin_hash": "16449b01c96d206924e4566166d681f8"
+            },
+            {
+                "type": 1,
+                "code": 32,
+                "origin_hash": "16449b01c96d206924e4566166d681f8"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_DELETE",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 97,
+                "origin_hash": "16449b01c96d206924e4566166d681f8"
+            },
+            {
+                "type": 1,
+                "code": 32,
+                "origin_hash": "16449b01c96d206924e4566166d681f8"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_DELETE",
+        "mapping_type": "key_macro"
+    }
+]
