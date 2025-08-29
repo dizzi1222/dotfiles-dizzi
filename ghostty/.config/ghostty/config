@@ -1,4 +1,14 @@
 
+
+# en hyprland $terminal = ghostty #o pones kitty god
+# kitty uso sin pywal, o fondo mas apagado | ghostty con pywal full transparente
+# recuerda con: 
+# ctrl tab tabeas, 
+# ctrl+shift enter para dividir ventanas,
+# y ctrl ;ñ para cerrarlas
+#
+# Pywal: detecta fondo transparente 🗿🦥 
+# --------------------------------|
 gtk-titlebar = true 
 
 window-decoration = true
@@ -64,7 +74,7 @@ font-size = 10
 # background-opacity = 0.8
 #
 # palette = 0=#101211
-# palette = 1=#89defa
+# palette = 1=#82a6b2
 # palette = 2=#FFF1AA
 # # lo cambie por crema: #FFF1AA
 #

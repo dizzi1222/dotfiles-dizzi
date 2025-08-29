@@ -12,7 +12,8 @@ local keymap = vim.keymap
 keymap.set("i", "jj", "<ESC>")
 keymap.set("n", "<ESC>", ":noh<CR>")
 vim.keymap.set("v", "<A-S-f>", vim.lsp.buf.format)
-
+--💫 PARA OBTENER INFORMACION DE UN BUFFER Y SUS MAPEOS: UTILIZA:[2 puntos] :lua print(vim.inspect(vim.api.nvim_buf_get_keymap(0, "i")))
+--
 -- 🗣️ ATAJOS DE IA y OIL/snack_picker_list tree EXPLORER QUE DEBES SABER:
 -- 🐐 1- ATAJO IMPORTANTE: - {minus -} [oil ~ requiere oil]-
 -- te lleva al directorio en el que te encuentras [GOZZZZ]
@@ -90,7 +91,7 @@ keymap.set("n", "<C-]>", ":bnext<CR>", { noremap = true, silent = true })
 -- Activar backspace+Control - MODO INSERCION COMO EN VSCODE!!! = Ctrl W
 vim.api.nvim_set_keymap("i", "<C-BS>", "<C-W>", { noremap = true, silent = true })
 
--- Mapeo para Ctrl + backspace a Ctrl + W en el modo de línea de comandos (la : )
+-- 🚨📌🗿🔥Mapeo para Ctrl + backspace a Ctrl + W en el modo de línea de comandos (la : )🚨📌🗿🔥
 -- Mapeo que usa una función para asegurar que funciona en la línea de comandos
 vim.keymap.set("c", "<C-BS>", function()
   -- Cierra cualquier ventana de completado y luego ejecuta el comando Ctrl-W
@@ -98,7 +99,70 @@ vim.keymap.set("c", "<C-BS>", function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-W>", true, true, true), "n", true)
 end, { noremap = true, silent = true })
 
--- Cerrar pestaña
+-- ---------------------------------------------------|-
+--👹📌🗿🔥Mismo mapeo pero para el modo de inserción en buffers normales👹📌🗿🔥
+-- Función mejorada para borrar palabras en buffers de snacks
+local function delete_previous_word()
+  -- Obtener posición actual
+  local pos = vim.api.nvim_win_get_cursor(0)
+  local row, col = pos[1], pos[2]
+  local line = vim.api.nvim_get_current_line()
+
+  -- Encontrar el inicio de la palabra anterior
+  local word_start = col
+  while word_start > 0 and line:sub(word_start, word_start):match("%s") do
+    word_start = word_start - 1
+  end
+
+  while word_start > 0 and not line:sub(word_start, word_start):match("%s") do
+    word_start = word_start - 1
+  end
+
+  -- Ajustar índices (Lua es 1-indexed, Neovim API es 0-indexed)
+  word_start = word_start + 1
+
+  -- Borrar la palabra
+  if word_start <= col then
+    vim.api.nvim_buf_set_text(0, row - 1, word_start - 1, row - 1, col, { "" })
+    vim.api.nvim_win_set_cursor(0, { row, word_start - 1 })
+  end
+end
+
+-- Aplicar a TODOS los tipos de buffers de snacks
+local snack_filetypes = {
+  "snacks_picker_input",
+  "snacks_picker_list",
+  "snacks_picker_recent",
+  "snacks_picker_files",
+  "snacks_picker_smart",
+}
+
+for _, ft in ipairs(snack_filetypes) do
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = ft,
+    callback = function()
+      -- Habilitar modifiable temporalmente
+      vim.bo.modifiable = true
+
+      -- Mapear Ctrl+Backspace y Ctrl+H
+      vim.keymap.set("i", "<C-BS>", delete_previous_word, {
+        buffer = true,
+        noremap = true,
+        silent = true,
+        desc = "Borrar palabra anterior",
+      })
+
+      vim.keymap.set("i", "<C-H>", delete_previous_word, {
+        buffer = true,
+        noremap = true,
+        silent = true,
+        desc = "Borrar palabra anterior",
+      })
+    end,
+  })
+end
+
+--🛑 🗿 Cerrar pestaña
 
 keymap.set("n", "<C-q>", function()
   -- Cierra el buffer actual sin preguntar, forzando el cierre
@@ -124,6 +188,7 @@ end, { noremap = true, silent = true })
 -- 	  ╰─❯ Ctrl + W + W > cambiar ventana {osea tabear}
 -- 	  ╰─❯  Ctrl + W + J > Cambiar ventana {abajo}
 -- 	  ╰─❯  Ctrl + W + H > Cambiar ventana {izquierda,
+-- 	  ╰─❯  Ctrl + Space [lo mejor] > Cambiar entre TODAS las ventana [shift tab!!! en ventana],
 --
 --    |
 -- 	  ╰─❯  Ctrl + H [lo mejor] > Cambiar entre ventana [ctrl tab!!! en ventana],
@@ -143,7 +208,7 @@ vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
 -- Usar minty para generar colorschemes? idk = Space + M + H                  # ubicado: en ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/minty.luau
 
 -- CAMBIAR color con Teclado = C+P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins.lua
--- CAMBAIR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua
+-- CAMBIAR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua
 
 -- =============================
 -- -- Solo en Arhcivos.MD | MARKDown (Gentleman config) - {no funciona bien}
