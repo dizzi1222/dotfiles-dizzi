@@ -119,6 +119,22 @@ mouse-hide-while-typing = true
 ####################
 ### KEYBINDINGSS ###
 ####################
+# --- Copiar y Pegar ---
+# # ⚠️ Limitaciones Actuales de Ghostty ⚠️
+# No tiene detección automática de selección
+# Por eso uso shift + C para cancelar por ahora
+#
+# Usa los nombres EXACTOS de las acciones de +list-actions
+#
+# --- Configuración para Copiar/Interrumpir ---
+# Ctrl+C para copiar cuando hay selección (comportamiento por defecto)
+keybind = ctrl+c=copy_to_clipboard
+
+# Ctrl+Shift+C para enviar SIGINT (interrumpir proceso)
+keybind = ctrl+shift+c=text:\x03
+
+keybind = ctrl+v=paste_from_clipboard
+
 # cerrar tab
 keybind = ctrl+;=close_surface
 # cerrar windows
