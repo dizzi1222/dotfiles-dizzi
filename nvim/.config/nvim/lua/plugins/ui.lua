@@ -241,7 +241,7 @@ return {
             pane = 2,
             section = "terminal",
             cmd = "pokemon-colorscripts -rn 'vaporeon,rayquaza,darkrai,lucario,gardevoir,lopunny,garchomp,blaziken,charmander,totodile,metagross' --no-title; sleep 0.3",
-            height = 18,
+            height = 20,
             padding = 1,
             indent = 13, -- <--- mayor número lo mueve más a la derecha
           },
@@ -285,7 +285,7 @@ return {
                   vim.fn.jobstart("gh issue list --web", { detach = true })
                 end,
                 icon = " ",
-                height = 2,
+                height = 1,
               },
               {
                 icon = " ",
@@ -295,7 +295,7 @@ return {
                 action = function()
                   vim.fn.jobstart("gh pr list --web", { detach = true })
                 end,
-                height = 2,
+                height = 1,
               },
               {
                 icon = " ",

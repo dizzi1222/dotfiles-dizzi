@@ -166,8 +166,6 @@ source $ZSH/oh-my-zsh.sh
 # ACA ESTAN IMPORTADOS LOS PLUGINS
 # ACA ESTAN IMPORTADOS LOS PLUGINS
 
-# ls - 🖼️ Ver imágenes en la terminal
-alias ls='exa --icons --color=always'
 # Sugerencia y autocompleta en gris [Control+E]
 source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
@@ -232,6 +230,10 @@ rm -f /tmp/history
 # o 'history 0' que también debería funcionar para obtener todo el historial.
 # 'fc -l 1' es a menudo más robusto para obtener todo el historial sin límites.
 alias history='fc -l 1 > /tmp/history && cat /tmp/history'
+
+# ls - 🖼️ Ver imágenes en la terminal
+alias ls='exa --icons --color=always'
+alias notepad="gedit --new-window &"
 
 # === Tus otros aliases y configuraciones ===
 
