@@ -6,7 +6,28 @@
 -- KEYMAPS DE CHAT por IA FUNCIONAN AL SELECCIONAR TEXTO [v]
 --
 -- # Primero, arreglar PATH para binarios globales
-vim.env.PATH = os.getenv("HOME") .. "/.npm-global/bin:" .. vim.env.PATH
+--  🚨⚠ LO DE ABAJO ME JODE LA CONFIG DE WINDWOS!! Y TENGO PROBLEMA CON NODE POR AHORA: ENTER e ignorar 🚨⚠
+--  -- Para linux:
+-- vim.env.PATH = os.getenv("HOME") .. "/.npm-global/bin:" .. vim.env.PATH
+
+-- Esto sirve solo en Windows
+-- Node.js provider
+-- vim.g.node_host_prog = "C:\\Users\\Diego.DESKTOP-0CQHRL5\\AppData\\Roaming\\npm\\node_modules\\neovim\\bin\\cli.js"
+-- vim.env.PATH = "C:\\Users\\Diego.DESKTOP-0CQHRL5\\scoop\\apps\\nodejs-lts\\22.18.0;" .. vim.env.PATH
+
+-- 🚨⚠ Detect OS - Funciona en Windows, Linux {en resumen lo de arriba} 🚨⚠
+local is_windows = vim.fn.has("win32") == 1
+local is_unix = vim.fn.has("unix") == 1
+
+if is_windows then
+  -- Configuración Windows
+  vim.g.node_host_prog = "C:\\Users\\Diego.DESKTOP-0CQHRL5\\AppData\\Roaming\\npm\\node_modules\\neovim\\bin\\cli.js"
+  vim.env.PATH = "C:\\Users\\Diego.DESKTOP-0CQHRL5\\scoop\\apps\\nodejs-lts\\22.18.0;" .. vim.env.PATH
+elseif is_unix then
+  -- Configuración Linux/macOS
+  vim.g.node_host_prog = vim.fn.exepath("node") -- toma el node del PATH
+  vim.env.PATH = os.getenv("HOME") .. "/.npm-global/bin:" .. vim.env.PATH
+end
 
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")

@@ -19,23 +19,23 @@
 -- Define prompts for Copilot
 -- This table contains various prompts that can be used to interact with Copilot.
 local prompts = {
-  Explain = "Please explain how the following code works.", -- Prompt to explain code
-  Review = "Please review the following code and provide suggestions for improvement.", -- Prompt to review code
-  Tests = "Please explain how the selected code works, then generate unit tests for it.", -- Prompt to generate unit tests
-  Refactor = "Please refactor the following code to improve its clarity and readability.", -- Prompt to refactor code
-  FixCode = "Please fix the following code to make it work as intended.", -- Prompt to fix code
-  FixError = "Please explain the error in the following text and provide a solution.", -- Prompt to fix errors
-  BetterNamings = "Please provide better names for the following variables and functions.", -- Prompt to suggest better names
-  Documentation = "Please provide documentation for the following code.", -- Prompt to generate documentation
-  JsDocs = "Please provide JsDocs for the following code.", -- Prompt to generate JsDocs
-  DocumentationForGithub = "Please provide documentation for the following code ready for GitHub using markdown.", -- Prompt to generate GitHub documentation
-  CreateAPost = "Please provide documentation for the following code to post it in social media, like Linkedin, it has be deep, well explained and easy to understand. Also do it in a fun and engaging way.", -- Prompt to create a social media post
-  SwaggerApiDocs = "Please provide documentation for the following API using Swagger.", -- Prompt to generate Swagger API docs
-  SwaggerJsDocs = "Please write JSDoc for the following API using Swagger.", -- Prompt to generate Swagger JsDocs
-  Summarize = "Please summarize the following text.", -- Prompt to summarize text
-  Spelling = "Please correct any grammar and spelling errors in the following text.", -- Prompt to correct spelling and grammar
-  Wording = "Please improve the grammar and wording of the following text.", -- Prompt to improve wording
-  Concise = "Please rewrite the following text to make it more concise.", -- Prompt to make text concise
+  Explain = "Por favor explica cómo funciona el siguiente código.", -- Solicitud para explicar el código                                                                                                       -- Prompt to improve wording
+  Review = "Por favor revisa el siguiente código y proporciona sugerencias para mejorarlo.", -- Solicitud para revisar el código
+  Tests = "Por favor explica cómo funciona el código seleccionado y luego genera pruebas unitarias para él.", -- Solicitud para generar pruebas unitarias
+  Refactor = "Por favor refactoriza el siguiente código para mejorar su claridad y legibilidad.", -- Solicitud para refactorizar el código
+  FixCode = "Por favor corrige el siguiente código para que funcione como se espera.", -- Solicitud para corregir el código
+  FixError = "Por favor explica el error en el siguiente texto y proporciona una solución.", -- Solicitud para corregir errores
+  BetterNamings = "Por favor proporciona mejores nombres para las siguientes variables y funciones.", -- Solicitud para sugerir mejores nombres
+  Documentation = "Por favor proporciona documentación para el siguiente código.", -- Solicitud para generar documentación
+  JsDocs = "Por favor proporciona JsDocs para el siguiente código.", -- Solicitud para generar JsDocs
+  DocumentationForGithub = "Por favor proporciona documentación para el siguiente código lista para GitHub usando markdown.", -- Solicitud para generar documentación para GitHub
+  CreateAPost = "Por favor proporciona documentación para el siguiente código para publicarlo en redes sociales, como Linkedin. Debe ser profunda, bien explicada y fácil de entender. Hazlo también de manera divertida y atractiva.", -- Solicitud para crear una publicación en redes sociales
+  SwaggerApiDocs = "Por favor proporciona documentación para la siguiente API usando Swagger.", -- Solicitud para generar documentación Swagger
+  SwaggerJsDocs = "Por favor escribe JSDoc para la siguiente API usando Swagger.", -- Solicitud para generar Swagger JsDocs
+  Summarize = "Por favor resume el siguiente texto.", -- Solicitud para resumir texto
+  Spelling = "Por favor corrige cualquier error gramatical y de ortografía en el siguiente texto.", -- Solicitud para corregir ortografía y gramática
+  Wording = "Por favor mejora la gramática y redacción del siguiente texto.", -- Solicitud para mejorar redacción
+  Concise = "Por favor, reescribe el siguiente texto para que sea más conciso.", -- Solicitud para hacer el texto más conciso                                                                                                                                 -- Solicitud para hacer el texto más conciso
 }
 
 -- Plugin configuration
@@ -53,7 +53,11 @@ return {
       answer_header = "󱗞  The Gentleman 󱗞  ",
       auto_insert_mode = true,
       window = {
-        layout = "horizontal",
+        layout = "vertical", -- [opcional de dizzi] Cambiar a "horizontal" si prefieres la ventana horizontal
+        position = "left", -- [opcional de dizzi] Agregar esta línea para que aparezca a la izquierda
+        width = 0.4, -- [opcional de dizzi]
+        border = "rounded", -- [opcional de dizzi]
+        relative = "editor", -- [opcional de dizzi]
       },
       mappings = {
         complete = {

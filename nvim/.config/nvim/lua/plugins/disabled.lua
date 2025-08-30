@@ -46,7 +46,7 @@ return {
   },
   {
     "olimorris/codecompanion.nvim",
-    enabled = false,
+    enabled = true,
   },
   {
     "tris203/precognition.nvim",

@@ -1,5 +1,5 @@
 -- 🐐🗣️🔥️✍️ NO REQUIERE API: Opencode alternativa a copilot chat, o incluso puede interactuar con copilot chat
---
+-- 🚨🚨INESTABLE!!! NO FUNCIONA BIEN.🚨🚨--
 -- PARA QUE FUNCIONE DEBES DE ELIMINAR CMP.lua
 --
 -- PARA ACTIVAR CIERTAS IAS NECESITAS MODIFICAR CIERTOS ARCHIVOS
