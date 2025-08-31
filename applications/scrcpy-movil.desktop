@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Scrcpy | Movil control
+Comment=Mi lanzador personalizado para Scrcp
+Exec=kitty -e /usr/bin/scrcpy
+Icon=/home/diego/dotfiles/local/.local/share/icons/screenshot-scrcpy.jpg
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

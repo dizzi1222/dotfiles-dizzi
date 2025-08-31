@@ -1,0 +1,16 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Notepad
+GenericName=Text Editor
+Icon=gedit
+# Esto es lo más importante: ejecuta el comando 'gedit' que está en tu PATH
+Exec=gedit %U
+Terminal=false
+StartupNotify=true
+MimeType=text/plain;
+Categories=Utility;TextEditor;
+Keywords=Text;Editor;Notepad;gedit;
+# Esta línea ayuda a que no se duplique el lanzador
+StartupWMClass=gedit

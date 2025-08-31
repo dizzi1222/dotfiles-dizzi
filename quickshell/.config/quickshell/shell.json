@@ -1,0 +1,13 @@
+{
+  "general": {
+    "wallpapersDir": "~/wallpapers"
+  },
+  "services": {
+    "wallpaper": true,
+    "clipboard": false,
+    "autostart": false
+  },
+  "hyprland": {
+    "injectKeybinds": true
+  }
+}

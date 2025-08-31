@@ -233,8 +233,25 @@ alias history='fc -l 1 > /tmp/history && cat /tmp/history'
 
 # ls - 🖼️ Ver imágenes en la terminal
 alias ls='exa --icons --color=always'
-alias notepad="gedit --new-window &"
+# notepad estilo Windows
+notepad() {
+  if [ $# -eq 0 ]; then
+    gedit --new-window >/dev/null 2>&1 &
+  else
+    gedit --new-window "$@" >/dev/null 2>&1 &
+  fi
+  disown
+}
 
+# explorer estilo Windows
+explorer() {
+  if [ $# -eq 0 ]; then
+    nautilus --new-window >/dev/null 2>&1 &
+  else
+    nautilus --new-window "$@" >/dev/null 2>&1 &
+  fi
+  disown
+}
 # === Tus otros aliases y configuraciones ===
 
 
