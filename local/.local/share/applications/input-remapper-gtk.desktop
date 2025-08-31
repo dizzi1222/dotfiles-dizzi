@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Input Remapper  GTK [pide pass]
+Comment=Remap keyboard and mouse inputs
+Exec=kitty input-remapper-gtk
+Terminal=false
+Icon=input-remapper
+Categories=System;Utility;Settings;
