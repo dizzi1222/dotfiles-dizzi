@@ -19,12 +19,14 @@
 -- Define prompts for Copilot
 -- This table contains various prompts that can be used to interact with Copilot.
 local prompts = {
+  Commit = "Por favor genera un mensaje de commit para el siguiente código. Escribe un mensaje de commit para el cambio, siguiendo la convención de Commitizen. Manténlo simple...", -- Solicitud para generar un mensaje de commit
   Explain = "Por favor explica cómo funciona el siguiente código.", -- Solicitud para explicar el código                                                                                                       -- Prompt to improve wording
   Review = "Por favor revisa el siguiente código y proporciona sugerencias para mejorarlo.", -- Solicitud para revisar el código
   Tests = "Por favor explica cómo funciona el código seleccionado y luego genera pruebas unitarias para él.", -- Solicitud para generar pruebas unitarias
   Refactor = "Por favor refactoriza el siguiente código para mejorar su claridad y legibilidad.", -- Solicitud para refactorizar el código
   FixCode = "Por favor corrige el siguiente código para que funcione como se espera.", -- Solicitud para corregir el código
   FixError = "Por favor explica el error en el siguiente texto y proporciona una solución.", -- Solicitud para corregir errores
+  Optimize = "OPTIMIZA el siguiente código para mejorar claridad y legibilidad", -- Solicitud para optimizar el código
   BetterNamings = "Por favor proporciona mejores nombres para las siguientes variables y funciones.", -- Solicitud para sugerir mejores nombres
   Documentation = "Por favor proporciona documentación para el siguiente código.", -- Solicitud para generar documentación
   JsDocs = "Por favor proporciona JsDocs para el siguiente código.", -- Solicitud para generar JsDocs
