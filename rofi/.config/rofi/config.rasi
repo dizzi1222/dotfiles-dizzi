@@ -9,3 +9,5 @@ configuration {
     display-drun: " ";
     display-window: "󰶮 ";
 }
+
+@theme "/usr/share/rofi/themes/fullscreen-preview.rasi"
