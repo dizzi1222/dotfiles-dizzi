@@ -1,8 +1,0 @@
-{
-  "screenshot": {
-    "command": "grim -g \"$slurp\" - | swappy -f -"
-  },
-  "clipboard": {
-    "command": "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
-  }
-}

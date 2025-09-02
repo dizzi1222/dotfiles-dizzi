@@ -1610,11 +1610,13 @@ columnview > header > button, treeview.view > header > button, window.print tree
   line-height: 100%;
   border-left: 1px solid alpha(currentColor,0.12);
   border-bottom: 1px solid alpha(currentColor,0.12);
+  border-top: none;
+  border-right: none;
   background-clip: padding-box;
 }
 
 columnview > header > button:first-child, treeview.view > header > button:first-child, window.print treeview.dialog-action-box > header > button:first-child {
-  border-left-width: 0;
+  border-left: none;
 }
 
 columnview > header > button > box, treeview.view > header > button > box, window.print treeview.dialog-action-box > header > button > box {
@@ -2780,6 +2782,23 @@ toolbarview > .bottom-bar headerbar.default-decoration > windowhandle > box, hea
   padding: 3px;
 }
 
+toolbarview > .top-bar headerbar windowcontrols > button.minimize:backdrop > image,
+toolbarview > .bottom-bar headerbar windowcontrols > button.minimize:backdrop > image, headerbar.flat windowcontrols > button.minimize:backdrop > image, window.shortcuts headerbar.titlebar windowcontrols > button.minimize:backdrop > image, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.minimize:backdrop > image, window.print headerbar.titlebar windowcontrols > button.minimize:backdrop > image, window.pagesetup headerbar.titlebar windowcontrols > button.minimize:backdrop > image, window.aboutdialog headerbar.titlebar windowcontrols > button.minimize:backdrop > image, window.colorchooser headerbar.titlebar windowcontrols > button.minimize:backdrop > image, window.appchooser headerbar.titlebar windowcontrols > button.minimize:backdrop > image, toolbarview > .top-bar headerbar windowcontrols > button.maximize:backdrop > image,
+toolbarview > .bottom-bar headerbar windowcontrols > button.maximize:backdrop > image, headerbar.flat windowcontrols > button.maximize:backdrop > image, window.shortcuts headerbar.titlebar windowcontrols > button.maximize:backdrop > image, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.maximize:backdrop > image, window.print headerbar.titlebar windowcontrols > button.maximize:backdrop > image, window.pagesetup headerbar.titlebar windowcontrols > button.maximize:backdrop > image, window.aboutdialog headerbar.titlebar windowcontrols > button.maximize:backdrop > image, window.colorchooser headerbar.titlebar windowcontrols > button.maximize:backdrop > image, window.appchooser headerbar.titlebar windowcontrols > button.maximize:backdrop > image, toolbarview > .top-bar headerbar windowcontrols > button.close:backdrop > image,
+toolbarview > .bottom-bar headerbar windowcontrols > button.close:backdrop > image, headerbar.flat windowcontrols > button.close:backdrop > image, window.shortcuts headerbar.titlebar windowcontrols > button.close:backdrop > image, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.close:backdrop > image, window.print headerbar.titlebar windowcontrols > button.close:backdrop > image, window.pagesetup headerbar.titlebar windowcontrols > button.close:backdrop > image, window.aboutdialog headerbar.titlebar windowcontrols > button.close:backdrop > image, window.colorchooser headerbar.titlebar windowcontrols > button.close:backdrop > image, window.appchooser headerbar.titlebar windowcontrols > button.close:backdrop > image {
+  background-color: alpha(@window_fg_color,0.3);
+}
+
+toolbarview > .top-bar headerbar windowcontrols > button.minimize:backdrop:hover,
+toolbarview > .bottom-bar headerbar windowcontrols > button.minimize:backdrop:hover, headerbar.flat windowcontrols > button.minimize:backdrop:hover, window.shortcuts headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.minimize:backdrop:hover, window.print headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, window.pagesetup headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, window.aboutdialog headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, window.colorchooser headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, window.appchooser headerbar.titlebar windowcontrols > button.minimize:backdrop:hover, toolbarview > .top-bar headerbar windowcontrols > button.minimize:backdrop:active,
+toolbarview > .bottom-bar headerbar windowcontrols > button.minimize:backdrop:active, headerbar.flat windowcontrols > button.minimize:backdrop:active, window.shortcuts headerbar.titlebar windowcontrols > button.minimize:backdrop:active, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.minimize:backdrop:active, window.print headerbar.titlebar windowcontrols > button.minimize:backdrop:active, window.pagesetup headerbar.titlebar windowcontrols > button.minimize:backdrop:active, window.aboutdialog headerbar.titlebar windowcontrols > button.minimize:backdrop:active, window.colorchooser headerbar.titlebar windowcontrols > button.minimize:backdrop:active, window.appchooser headerbar.titlebar windowcontrols > button.minimize:backdrop:active, toolbarview > .top-bar headerbar windowcontrols > button.maximize:backdrop:hover,
+toolbarview > .bottom-bar headerbar windowcontrols > button.maximize:backdrop:hover, headerbar.flat windowcontrols > button.maximize:backdrop:hover, window.shortcuts headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.maximize:backdrop:hover, window.print headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, window.pagesetup headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, window.aboutdialog headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, window.colorchooser headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, window.appchooser headerbar.titlebar windowcontrols > button.maximize:backdrop:hover, toolbarview > .top-bar headerbar windowcontrols > button.maximize:backdrop:active,
+toolbarview > .bottom-bar headerbar windowcontrols > button.maximize:backdrop:active, headerbar.flat windowcontrols > button.maximize:backdrop:active, window.shortcuts headerbar.titlebar windowcontrols > button.maximize:backdrop:active, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.maximize:backdrop:active, window.print headerbar.titlebar windowcontrols > button.maximize:backdrop:active, window.pagesetup headerbar.titlebar windowcontrols > button.maximize:backdrop:active, window.aboutdialog headerbar.titlebar windowcontrols > button.maximize:backdrop:active, window.colorchooser headerbar.titlebar windowcontrols > button.maximize:backdrop:active, window.appchooser headerbar.titlebar windowcontrols > button.maximize:backdrop:active, toolbarview > .top-bar headerbar windowcontrols > button.close:backdrop:hover,
+toolbarview > .bottom-bar headerbar windowcontrols > button.close:backdrop:hover, headerbar.flat windowcontrols > button.close:backdrop:hover, window.shortcuts headerbar.titlebar windowcontrols > button.close:backdrop:hover, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.close:backdrop:hover, window.print headerbar.titlebar windowcontrols > button.close:backdrop:hover, window.pagesetup headerbar.titlebar windowcontrols > button.close:backdrop:hover, window.aboutdialog headerbar.titlebar windowcontrols > button.close:backdrop:hover, window.colorchooser headerbar.titlebar windowcontrols > button.close:backdrop:hover, window.appchooser headerbar.titlebar windowcontrols > button.close:backdrop:hover, toolbarview > .top-bar headerbar windowcontrols > button.close:backdrop:active,
+toolbarview > .bottom-bar headerbar windowcontrols > button.close:backdrop:active, headerbar.flat windowcontrols > button.close:backdrop:active, window.shortcuts headerbar.titlebar windowcontrols > button.close:backdrop:active, adaptive-preview headerbar.adaptive-mode-flat windowcontrols > button.close:backdrop:active, window.print headerbar.titlebar windowcontrols > button.close:backdrop:active, window.pagesetup headerbar.titlebar windowcontrols > button.close:backdrop:active, window.aboutdialog headerbar.titlebar windowcontrols > button.close:backdrop:active, window.colorchooser headerbar.titlebar windowcontrols > button.close:backdrop:active, window.appchooser headerbar.titlebar windowcontrols > button.close:backdrop:active {
+  color: alpha(@window_fg_color,0.45);
+}
+
 .maximized toolbarview > .top-bar headerbar, toolbarview > .top-bar .maximized headerbar,
 .maximized toolbarview > .bottom-bar headerbar,
 toolbarview > .bottom-bar .maximized headerbar, .maximized headerbar.flat, .maximized window.shortcuts headerbar.titlebar, window.shortcuts .maximized headerbar.titlebar, .maximized adaptive-preview headerbar.adaptive-mode-flat, adaptive-preview .maximized headerbar.adaptive-mode-flat, .maximized window.print headerbar.titlebar, window.print .maximized headerbar.titlebar, .maximized window.pagesetup headerbar.titlebar, window.pagesetup .maximized headerbar.titlebar, .maximized window.aboutdialog headerbar.titlebar, window.aboutdialog .maximized headerbar.titlebar, .maximized window.colorchooser headerbar.titlebar, window.colorchooser .maximized headerbar.titlebar, .maximized window.appchooser headerbar.titlebar, window.appchooser .maximized headerbar.titlebar, .fullscreen toolbarview > .top-bar headerbar, toolbarview > .top-bar .fullscreen headerbar,
@@ -3020,6 +3039,10 @@ label:disabled {
   filter: opacity(0.45);
 }
 
+.dimmed, dialog.shortcuts .shortcut-row .title-box > .subtitle {
+  opacity: 0.55;
+}
+
 .dim-label, scale > value, progressbar > text, row.expander image.expander-row-arrow, row.property > box.header > box.title > .title, row.expander.property box > list > row > box.header > box.title > .title, row label.subtitle, spinbutton > text > placeholder,
 entry > text > placeholder, headerbar .subtitle,
 windowtitle .subtitle, label.separator {
@@ -3047,42 +3070,40 @@ windowtitle .subtitle, label.separator {
  **********************/
 .title-1 {
   font-weight: 800;
-  font-size: 20pt;
+  font-size: 181%;
 }
 
 .title-2 {
   font-weight: 800;
-  font-size: 15pt;
+  font-size: 136%;
 }
 
 .title-3 {
   font-weight: 700;
-  font-size: 15pt;
+  font-size: 136%;
 }
 
 .title-4 {
   font-weight: 700;
-  font-size: 13pt;
+  font-size: 118%;
 }
 
 .heading, row.button .title, listview > header {
   font-weight: 700;
-  font-size: 11pt;
 }
 
 .body {
   font-weight: 400;
-  font-size: 11pt;
 }
 
 .caption-heading {
   font-weight: 700;
-  font-size: 9pt;
+  font-size: 82%;
 }
 
-.caption {
+.caption, dialog.shortcuts .shortcut-row .title-box > .subtitle {
   font-weight: 400;
-  font-size: 9pt;
+  font-size: 82%;
 }
 
 .monospace {
@@ -3686,23 +3707,57 @@ row.entry:disabled text {
   opacity: 0.45;
 }
 
-row.entry:disabled .dim-label, row.entry:disabled scale > value, row.entry:disabled progressbar > text, row.entry:disabled row.expander image.expander-row-arrow, row.expander row.entry:disabled image.expander-row-arrow, row.entry:disabled spinbutton > text > placeholder,
+row.entry:disabled .dimmed, row.entry:disabled dialog.shortcuts .shortcut-row .title-box > .subtitle, dialog.shortcuts .shortcut-row row.entry:disabled .title-box > .subtitle, row.entry:disabled .dim-label, row.entry:disabled scale > value, row.entry:disabled progressbar > text, row.entry:disabled row.expander image.expander-row-arrow, row.expander row.entry:disabled image.expander-row-arrow, row.entry:disabled spinbutton > text > placeholder,
 row.entry:disabled entry > text > placeholder, row.entry:disabled label.separator, row.entry:disabled row.property > box.header > box.title > .title, row.entry:disabled row.expander.property box > list > row > box.header > box.title > .title, row.expander.property row.entry:disabled box > list > row > box.header > box.title > .title, row.entry:disabled .subtitle {
   opacity: 1;
 }
 
-row.entry .edit-icon, row.entry .indicator {
-  min-width: 22px;
-  min-height: 22px;
-  padding: 6px;
+row.entry > box.header {
+  border-spacing: 0;
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
-row.entry .edit-icon:disabled {
+row.entry > box.header > .editable-area {
+  padding: 0 6px;
+}
+
+row.entry > box.header > .editable-area > .edit-icon, row.entry > box.header > .editable-area > .indicator {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 5px;
+}
+
+row.entry > box.header > .editable-area > .edit-icon:dir(ltr), row.entry > box.header > .editable-area > .indicator:dir(ltr), row.entry > box.header > .editable-area > .apply-button:dir(ltr) {
+  margin-left: 6px;
+}
+
+row.entry > box.header > .editable-area > .edit-icon:dir(rtl), row.entry > box.header > .editable-area > .indicator:dir(rtl), row.entry > box.header > .editable-area > .apply-button:dir(rtl) {
+  margin-right: 6px;
+}
+
+row.entry > box.header > .editable-area > .edit-icon:disabled {
   opacity: 0.3;
 }
 
-row.entry .indicator {
+row.entry > box.header > .editable-area > .indicator {
   opacity: 0.3;
+}
+
+row.entry > box.header > .prefixes:dir(ltr) {
+  margin-left: 6px;
+}
+
+row.entry > box.header > .prefixes:dir(rtl) {
+  margin-right: 6px;
+}
+
+row.entry > box.header > .suffixes:dir(ltr) {
+  margin-right: 6px;
+}
+
+row.entry > box.header > .suffixes:dir(rtl) {
+  margin-left: 6px;
 }
 
 row.entry.monospace {
@@ -4035,6 +4090,10 @@ row.button > box {
   margin-right: 12px;
   border-spacing: 6px;
   min-height: 48px;
+}
+
+row.button > box > .icon:disabled {
+  filter: Opacity(0.45);
 }
 
 row.button.suggested-action {
@@ -5846,6 +5905,39 @@ window.shortcuts searchbar {
   background: none;
 }
 
+dialog.shortcuts preferencespage > scrolledwindow > viewport > clamp > box {
+  border-spacing: 18px;
+}
+
+dialog.shortcuts preferencespage > scrolledwindow > viewport > clamp > box preferencesgroup + preferencesgroup box.header {
+  margin-top: 6px;
+}
+
+dialog.shortcuts .shortcut-row {
+  padding: 9px 12px;
+  min-height: 36px;
+}
+
+dialog.shortcuts .shortcut-row .title-box {
+  border-spacing: 3px;
+}
+
+shortcut-label, shortcut-label > box {
+  border-spacing: 6px;
+}
+
+shortcut-label .keycap {
+  background: alpha(currentColor,0.1);
+  box-shadow: inset 0 -2px alpha(currentColor,0.12);
+  border-radius: 6px;
+  padding: 6px;
+  min-width: 20px;
+}
+
+shortcut-label > .dimmed, dialog.shortcuts .shortcut-row shortcut-label.title-box > .subtitle {
+  padding: 6px 0;
+}
+
 .sidebar-pane {
   background-color: @sidebar_bg_color;
   color: @sidebar_fg_color;
@@ -6650,21 +6742,20 @@ magnifier {
  * AdwToggleGroup *
  ******************/
 toggle-group {
-  ---group-padding: 3px;
   background: alpha(currentColor,0.05);
-  border-radius: 6px;
-  padding: var(---group-padding);
+  border-radius: 9px;
+  padding: 3px;
 }
 
 toggle-group:disabled {
-  background-color: color-mix(in srgb, alpha(currentColor,0.05) var(--disabled-opacity), transparent);
+  background-color: color-mix(in srgb, alpha(currentColor,0.05) 45%, transparent);
 }
 
 toggle-group > toggle {
-  border-radius: calc(6px - var(---group-padding));
+  border-radius: 6px;
   font-weight: bold;
   min-width: 34px;
-  min-height: calc(34px - var(---group-padding) * 2);
+  min-height: 28px;
 }
 
 toggle-group > toggle.image-button > image:disabled {
@@ -6672,9 +6763,9 @@ toggle-group > toggle.image-button > image:disabled {
 }
 
 toggle-group > toggle.text-button {
-  min-width: calc(18px + var(---group-padding) * 2);
-  padding-left: calc(11px - var(---group-padding));
-  padding-right: calc(11px - var(---group-padding));
+  min-width: 12px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 toggle-group > toggle.text-button > label:disabled {
@@ -6682,9 +6773,9 @@ toggle-group > toggle.text-button > label:disabled {
 }
 
 toggle-group > toggle.image-text-button {
-  min-width: calc(10px + var(---group-padding) * 2);
-  padding-left: calc(11px - var(---group-padding));
-  padding-right: calc(11px - var(---group-padding));
+  min-width: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 toggle-group > toggle.image-text-button > buttoncontent > box > label {
@@ -6717,13 +6808,13 @@ toggle-group > toggle:active, toggle-group > toggle.keyboard-activating {
 }
 
 toggle-group > toggle:checked {
-  background-color: var(--active-toggle-bg-color);
-  color: var(--active-toggle-fg-color);
-  box-shadow: 0 1px 3px 1px RGB(0 0 6/7%), 0 2px 6px 2px RGB(0 0 6/3%);
+  background-color: alpha(currentColor,0.1);
+  color: @card_fg_color;
+  box-shadow: none;
 }
 
 toggle-group > toggle:checked:disabled {
-  background-color: color-mix(in srgb, var(--active-toggle-bg-color) var(--disabled-opacity), transparent);
+  background-color: alpha(currentColor,0.07);
   box-shadow: none;
 }
 
@@ -6733,15 +6824,7 @@ toggle-group.osd, .osd toggle-group {
 }
 
 toggle-group.osd:not(.flat) > toggle:checked, .osd toggle-group:not(.flat) > toggle:checked {
-  --accent-bg-color: rgb(0 0 0 / 75%);
-  --accent-fg-color: white;
-  --standalone-color-oklab: Min(l, 0.5) a b;
-  --accent-color: oklab(from var(--accent-bg-color) var(--standalone-color-oklab));
-  --destructive-color: oklab(from var(--destructive-bg-color) var(--standalone-color-oklab));
-  --success-color: oklab(from var(--success-bg-color) var(--standalone-color-oklab));
-  --warning-color: oklab(from var(--warning-bg-color) var(--standalone-color-oklab));
-  --error-color: oklab(from var(--error-bg-color) var(--standalone-color-oklab));
-  box-shadow: 0 1px 3px 1px RGB(0 0 6/7%), 0 2px 6px 2px RGB(0 0 6/3%);
+  box-shadow: none;
 }
 
 toggle-group.osd:not(.flat) > toggle:checked, .osd toggle-group:not(.flat) > toggle:checked {
@@ -6757,7 +6840,16 @@ toggle-group.osd:not(.flat) > toggle:checked:focus:focus-visible, .osd toggle-gr
 }
 
 toggle-group.osd:not(.flat) > toggle:checked:focus:focus-visible, .osd toggle-group:not(.flat) > toggle:checked:focus:focus-visible {
-  outline-color: color-mix(in srgb, RGB(255 255 255/75%) 0.45, transparent);
+  outline-color: color-mix(in srgb, #ffffff 25%, transparent);
+}
+
+toggle-group.osd:not(.flat) > toggle:checked, toggle-group.osd:not(.flat) > toggle:checked:hover, toggle-group.osd:not(.flat) > toggle:checked:active, toggle-group.osd:not(.flat) > toggle:checked.keyboard-activating, .osd toggle-group:not(.flat) > toggle:checked, .osd toggle-group:not(.flat) > toggle:checked:hover, .osd toggle-group:not(.flat) > toggle:checked:active, .osd toggle-group:not(.flat) > toggle:checked.keyboard-activating {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+toggle-group.osd:not(.flat) > toggle:checked:checked, .osd toggle-group:not(.flat) > toggle:checked:checked {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
 }
 
 toggle-group.osd:not(.flat) > toggle:checked:disabled, .osd toggle-group:not(.flat) > toggle:checked:disabled {
@@ -6765,7 +6857,7 @@ toggle-group.osd:not(.flat) > toggle:checked:disabled, .osd toggle-group:not(.fl
 }
 
 toggle-group.vertical > toggle:not(.text-button):not(.image-text-button) {
-  min-width: calc(34px - var(---group-padding) * 2);
+  min-width: 28px;
 }
 
 toggle-group > separator {
@@ -6773,11 +6865,11 @@ toggle-group > separator {
 }
 
 toggle-group > separator.horizontal {
-  margin: calc(6px - var(---group-padding)) 1px;
+  margin: 3px 1px;
 }
 
 toggle-group > separator.vertical {
-  margin: 1px calc(6px - var(---group-padding));
+  margin: 1px 3px;
 }
 
 toggle-group > separator.hidden {
@@ -6785,7 +6877,7 @@ toggle-group > separator.hidden {
 }
 
 toggle-group > separator:disabled {
-  filter: Opacity(var(--disabled-opacity));
+  filter: Opacity(0.45);
 }
 
 toggle-group.round {
@@ -6793,27 +6885,31 @@ toggle-group.round {
 }
 
 toggle-group.round toggle {
-  border-radius: calc(17px - var(---group-padding));
+  border-radius: 14px;
 }
 
 toggle-group.round toggle.text-button, toggle-group.round toggle.image-text-button {
-  padding-left: calc(15px - var(---group-padding));
-  padding-right: calc(15px - var(---group-padding));
+  padding-left: 9px;
+  padding-right: 9px;
 }
 
 toggle-group.round separator.horizontal {
-  margin: calc(9px - var(---group-padding)) 1px;
+  margin: 6px 1px;
 }
 
 toggle-group.round separator.vertical {
-  margin: 1px calc(9px - var(---group-padding));
+  margin: 1px 6px;
 }
 
 toggle-group.flat {
-  ---group-padding: 0px;
   background: none;
   color: inherit;
   box-shadow: none;
+  padding: 0;
+}
+
+toggle-group.flat > toggle {
+  min-height: 34px;
 }
 
 toggle-group.flat > toggle {
@@ -6826,6 +6922,18 @@ toggle-group.flat > toggle:focus:focus-visible {
   outline-color: alpha(@accent_color,0.45);
   outline-width: 2px;
   outline-offset: -2px;
+}
+
+toggle-group.flat > toggle.text-button {
+  min-width: 18px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+toggle-group.flat > toggle.image-text-button {
+  min-width: 16px;
+  padding-left: 11px;
+  padding-right: 11px;
 }
 
 toggle-group.flat > toggle:checked {
@@ -6927,13 +7035,13 @@ toolbarview > .bottom-bar .collapse-spacing .toolbar {
  ****************/
 searchbar > revealer > box {
   padding: 6px 6px 7px 6px;
-  background-color: @headerbar_backdrop_color;
-  color: @headerbar_fg_color;
+  background-color: @window_bg_color;
+  color: @window_fg_color;
   box-shadow: inset 0 -1px alpha(@headerbar_border_color,0.12);
 }
 
 searchbar > revealer > box:backdrop {
-  background-color: @headerbar_bg_color;
+  background-color: @view_bg_color;
   transition: background-color 200ms ease-out;
 }
 
@@ -6989,8 +7097,8 @@ toolbarview > .bottom-bar .collapse-spacing searchbar > revealer > box, window.a
  * GtkActionBar *
  ****************/
 actionbar > revealer > box {
-  background-color: @headerbar_backdrop_color;
-  color: @headerbar_fg_color;
+  background-color: @window_bg_color;
+  color: @window_fg_color;
   box-shadow: inset 0 1px alpha(@headerbar_border_color,0.12);
   padding: 7px 6px 6px 6px;
 }
@@ -7000,7 +7108,7 @@ actionbar > revealer > box, actionbar > revealer > box > box.start, actionbar > 
 }
 
 actionbar > revealer > box:backdrop {
-  background-color: @headerbar_bg_color;
+  background-color: @view_bg_color;
   transition: background-color 200ms ease-out;
 }
 
@@ -7058,6 +7166,11 @@ banner > revealer > widget:backdrop > label, banner > revealer > widget:backdrop
 /******************
  * AdwToolbarView *
  ******************/
+toolbarview > .top-bar button.pill,
+toolbarview > .bottom-bar button.pill {
+  padding: 5px 24px;
+}
+
 toolbarview > .top-bar .collapse-spacing,
 toolbarview > .bottom-bar .collapse-spacing {
   padding-top: 0;
@@ -7070,13 +7183,45 @@ toolbarview > .bottom-bar .collapse-spacing headerbar {
   padding-bottom: 3px;
 }
 
-toolbarview.undershoot-top scrolledwindow > undershoot.top {
+toolbarview > .top-bar.raised,
+toolbarview > .bottom-bar.raised {
+  background-color: @headerbar_backdrop_color;
+  color: @headerbar_fg_color;
+}
+
+toolbarview > .top-bar.raised:backdrop,
+toolbarview > .bottom-bar.raised:backdrop {
+  background-color: @headerbar_bg_color;
+  transition: background-color 200ms ease-out;
+}
+
+toolbarview > .top-bar.raised:backdrop > windowhandle,
+toolbarview > .bottom-bar.raised:backdrop > windowhandle {
+  filter: opacity(0.5);
+  transition: filter 200ms ease-out;
+}
+
+toolbarview > .top-bar.raised searchbar > revealer > box, toolbarview > .top-bar.raised actionbar > revealer > box,
+toolbarview > .bottom-bar.raised searchbar > revealer > box,
+toolbarview > .bottom-bar.raised actionbar > revealer > box {
+  background-color: @headerbar_backdrop_color;
+  color: @headerbar_fg_color;
   box-shadow: none;
+}
+
+toolbarview > .top-bar.raised searchbar > revealer > box:backdrop, toolbarview > .top-bar.raised actionbar > revealer > box:backdrop,
+toolbarview > .bottom-bar.raised searchbar > revealer > box:backdrop,
+toolbarview > .bottom-bar.raised actionbar > revealer > box:backdrop {
+  background-color: @headerbar_bg_color;
+}
+
+toolbarview.undershoot-top scrolledwindow > undershoot.top {
+  box-shadow: inset 0 1px alpha(currentColor,0.12);
   background: linear-gradient(to bottom, alpha(@shade_color,0.75), transparent 6px);
 }
 
 toolbarview.undershoot-bottom scrolledwindow > undershoot.bottom {
-  box-shadow: none;
+  box-shadow: inset 0 -1px alpha(currentColor,0.12);
   background: linear-gradient(to top, alpha(@shade_color,0.75), transparent 6px);
 }
 
@@ -7090,59 +7235,75 @@ window.devel dialog toolbarview > .top-bar {
   background-repeat: unset;
 }
 
-toolbarview > .top-bar,
-toolbarview > .bottom-bar {
-  background-color: @headerbar_backdrop_color;
-  color: @headerbar_fg_color;
-}
-
-toolbarview > .top-bar:backdrop,
-toolbarview > .bottom-bar:backdrop {
-  background-color: @headerbar_bg_color;
-  transition: background-color 200ms ease-out;
-}
-
-toolbarview > .top-bar:backdrop > windowhandle,
-toolbarview > .bottom-bar:backdrop > windowhandle {
-  filter: opacity(0.5);
-  transition: filter 200ms ease-out;
-}
-
-toolbarview > .top-bar button.pill,
-toolbarview > .bottom-bar button.pill {
-  padding: 5px 24px;
-}
-
-toolbarview > .top-bar {
+toolbarview > .top-bar.raised {
   box-shadow: 0 1px alpha(currentColor,0.12);
 }
 
-toolbarview > .top-bar.border {
+toolbarview > .top-bar.raised.border {
   box-shadow: 0 1px alpha(currentColor,0.12);
 }
 
-toolbarview > .bottom-bar {
+toolbarview > .bottom-bar.raised {
   box-shadow: 0 -1px alpha(currentColor,0.12);
 }
 
-toolbarview > .bottom-bar.border {
+toolbarview > .bottom-bar.raised.border {
   box-shadow: 0 -1px alpha(currentColor,0.12);
 }
 
-.sidebar-pane toolbarview > .top-bar,
-.sidebar-pane toolbarview > .bottom-bar, .content-pane toolbarview > .top-bar,
-.content-pane toolbarview > .bottom-bar, .about toolbarview > .top-bar,
-.about toolbarview > .bottom-bar {
+toolbarview columnview > header > button, toolbarview window.print treeview.dialog-action-box > header > button, window.print toolbarview treeview.dialog-action-box > header > button, toolbarview treeview.view > header > button {
+  border-bottom: none;
+  border-color: transparent;
+  border-image: linear-gradient(to bottom, @window_bg_color 20%, alpha(currentColor,0.12) 20%, alpha(currentColor,0.12) 80%, @window_bg_color 80%) 0 0 0 1/0 0 0 1px stretch;
+}
+
+toolbarview columnview > header > button:first-child, toolbarview window.print treeview.dialog-action-box > header > button:first-child, window.print toolbarview treeview.dialog-action-box > header > button:first-child, toolbarview treeview.view > header > button:first-child {
+  border-image: none;
+}
+
+.sidebar-pane toolbarview > .top-bar.raised,
+.sidebar-pane toolbarview > .bottom-bar.raised, .content-pane toolbarview > .top-bar.raised,
+.content-pane toolbarview > .bottom-bar.raised, .about toolbarview > .top-bar.raised,
+.about toolbarview > .bottom-bar.raised {
   box-shadow: none;
 }
 
-.sidebar-pane toolbarview > .top-bar, .sidebar-pane toolbarview > .top-bar:backdrop,
-.sidebar-pane toolbarview > .bottom-bar,
-.sidebar-pane toolbarview > .bottom-bar:backdrop, .content-pane toolbarview > .top-bar, .content-pane toolbarview > .top-bar:backdrop,
-.content-pane toolbarview > .bottom-bar,
-.content-pane toolbarview > .bottom-bar:backdrop, .about toolbarview > .top-bar, .about toolbarview > .top-bar:backdrop,
-.about toolbarview > .bottom-bar,
-.about toolbarview > .bottom-bar:backdrop {
+.sidebar-pane toolbarview > .top-bar.raised, .sidebar-pane toolbarview > .top-bar.raised:backdrop,
+.sidebar-pane toolbarview > .bottom-bar.raised,
+.sidebar-pane toolbarview > .bottom-bar.raised:backdrop, .content-pane toolbarview > .top-bar.raised, .content-pane toolbarview > .top-bar.raised:backdrop,
+.content-pane toolbarview > .bottom-bar.raised,
+.content-pane toolbarview > .bottom-bar.raised:backdrop, .about toolbarview > .top-bar.raised, .about toolbarview > .top-bar.raised:backdrop,
+.about toolbarview > .bottom-bar.raised,
+.about toolbarview > .bottom-bar.raised:backdrop {
+  color: inherit;
+  background-color: transparent;
+}
+
+.sidebar-pane toolbarview > .top-bar.raised searchbar > revealer > box, .sidebar-pane toolbarview > .top-bar.raised actionbar > revealer > box,
+.sidebar-pane toolbarview > .bottom-bar.raised searchbar > revealer > box,
+.sidebar-pane toolbarview > .bottom-bar.raised actionbar > revealer > box {
+  background-color: transparent;
+  color: @sidebar_fg_color;
+  box-shadow: inset 0 1px alpha(currentColor,0.1);
+}
+
+.sidebar-pane toolbarview > .top-bar.raised searchbar > revealer > box:backdrop, .sidebar-pane toolbarview > .top-bar.raised actionbar > revealer > box:backdrop,
+.sidebar-pane toolbarview > .bottom-bar.raised searchbar > revealer > box:backdrop,
+.sidebar-pane toolbarview > .bottom-bar.raised actionbar > revealer > box:backdrop {
+  background-color: transparent;
+}
+
+.content-pane toolbarview > .top-bar.raised searchbar > revealer > box, .content-pane toolbarview > .top-bar.raised actionbar > revealer > box,
+.content-pane toolbarview > .bottom-bar.raised searchbar > revealer > box,
+.content-pane toolbarview > .bottom-bar.raised actionbar > revealer > box {
+  background-color: transparent;
+  color: @window_fg_color;
+  box-shadow: inset 0 1px alpha(currentColor,0.12);
+}
+
+.content-pane toolbarview > .top-bar.raised searchbar > revealer > box:backdrop, .content-pane toolbarview > .top-bar.raised actionbar > revealer > box:backdrop,
+.content-pane toolbarview > .bottom-bar.raised searchbar > revealer > box:backdrop,
+.content-pane toolbarview > .bottom-bar.raised actionbar > revealer > box:backdrop {
   background-color: transparent;
 }
 
@@ -8115,6 +8276,86 @@ preferencesgroup > box .cutout-button {
   background-color: @dialog_bg_color;
 }
 
+preferencesgroup > box button.accent,
+preferencesgroup > box button.accent-button {
+  min-height: 24px;
+  min-width: 24px;
+  padding: 3px;
+  border-radius: 9999px;
+  background: var(--accent-bg-color);
+  outline: none;
+  background-clip: content-box;
+  box-shadow: none;
+}
+
+preferencesgroup > box button.accent:hover,
+preferencesgroup > box button.accent-button:hover {
+  box-shadow: 0 0 0 3px alpha(currentColor,0.07);
+}
+
+preferencesgroup > box button.accent:checked,
+preferencesgroup > box button.accent-button:checked {
+  box-shadow: 0 0 0 3px @accent_color;
+}
+
+preferencesgroup > box button.accent.blue, preferencesgroup > box button.accent.teal, preferencesgroup > box button.accent.green, preferencesgroup > box button.accent.yellow, preferencesgroup > box button.accent.orange, preferencesgroup > box button.accent.red, preferencesgroup > box button.accent.pink, preferencesgroup > box button.accent.purple, preferencesgroup > box button.accent.slate,
+preferencesgroup > box button.accent-button.blue,
+preferencesgroup > box button.accent-button.teal,
+preferencesgroup > box button.accent-button.green,
+preferencesgroup > box button.accent-button.yellow,
+preferencesgroup > box button.accent-button.orange,
+preferencesgroup > box button.accent-button.red,
+preferencesgroup > box button.accent-button.pink,
+preferencesgroup > box button.accent-button.purple,
+preferencesgroup > box button.accent-button.slate {
+  --accent-color: oklab(from var(--accent-bg-color) var(--standalone-color-oklab));
+}
+
+preferencesgroup > box button.accent.blue,
+preferencesgroup > box button.accent-button.blue {
+  --accent-bg-color: var(--accent-blue);
+}
+
+preferencesgroup > box button.accent.teal,
+preferencesgroup > box button.accent-button.teal {
+  --accent-bg-color: var(--accent-teal);
+}
+
+preferencesgroup > box button.accent.green,
+preferencesgroup > box button.accent-button.green {
+  --accent-bg-color: var(--accent-green);
+}
+
+preferencesgroup > box button.accent.yellow,
+preferencesgroup > box button.accent-button.yellow {
+  --accent-bg-color: var(--accent-yellow);
+}
+
+preferencesgroup > box button.accent.orange,
+preferencesgroup > box button.accent-button.orange {
+  --accent-bg-color: var(--accent-orange);
+}
+
+preferencesgroup > box button.accent.red,
+preferencesgroup > box button.accent-button.red {
+  --accent-bg-color: var(--accent-red);
+}
+
+preferencesgroup > box button.accent.pink,
+preferencesgroup > box button.accent-button.pink {
+  --accent-bg-color: var(--accent-pink);
+}
+
+preferencesgroup > box button.accent.purple,
+preferencesgroup > box button.accent-button.purple {
+  --accent-bg-color: var(--accent-purple);
+}
+
+preferencesgroup > box button.accent.slate,
+preferencesgroup > box button.accent-button.slate {
+  --accent-bg-color: var(--accent-slate);
+}
+
 window.org-gnome-TextEditor popover.open-popover > contents {
   padding: 0;
 }
@@ -8141,10 +8382,6 @@ window.org-gnome-TextEditor popover.open-popover > contents {
 
 .nautilus-list-view columnview.view, .nautilus-list-view treeview.view, .nautilus-list-view window.print columnview.dialog-action-box, window.print .nautilus-list-view columnview.dialog-action-box, .nautilus-list-view window.print treeview.dialog-action-box, window.print .nautilus-list-view treeview.dialog-action-box {
   padding: 0;
-}
-
-.nautilus-list-view columnview.view > header > button, .nautilus-list-view treeview.view > header > button, .nautilus-list-view window.print columnview.dialog-action-box > header > button, window.print .nautilus-list-view columnview.dialog-action-box > header > button, .nautilus-list-view window.print treeview.dialog-action-box > header > button, window.print .nautilus-list-view treeview.dialog-action-box > header > button {
-  border-top: 1px solid alpha(currentColor,0.12);
 }
 
 .nautilus-list-view columnview.view > header > button:last-child, .nautilus-list-view treeview.view > header > button:last-child, .nautilus-list-view window.print columnview.dialog-action-box > header > button:last-child, window.print .nautilus-list-view columnview.dialog-action-box > header > button:last-child, .nautilus-list-view window.print treeview.dialog-action-box > header > button:last-child, window.print .nautilus-list-view treeview.dialog-action-box > header > button:last-child {
@@ -8186,9 +8423,9 @@ window.org-gnome-TextEditor popover.open-popover > contents {
 }
 
 #NautilusQueryEditor > menubutton > button.image-button {
-  min-width: 24px;
-  min-height: 24px;
-  padding: -1px;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 3px;
 }
 
 #NautilusPathBar {
