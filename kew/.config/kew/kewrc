@@ -9,7 +9,7 @@ version=3.4.1
 allowNotifications=1
 hideLogo=0
 hideHelp=0
-lastVolume=95
+lastVolume=100
 
 # Cache: Set to 1 to use cache of the music library directory tree for faster startup times.
 cacheLibrary=1
