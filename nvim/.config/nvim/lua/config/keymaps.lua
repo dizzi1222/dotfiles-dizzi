@@ -219,10 +219,10 @@ vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
 
 local function open_gemini(prompt, input_text)
+  local root = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":h")
   vim.cmd("vsplit | vertical resize 50")
-  local cmd = "gemini --prompt-interactive '" .. prompt .. "'"
+  local cmd = "gemini --prompt-interactive '" .. prompt .. "' --include-directories " .. root
   vim.cmd("term " .. cmd)
-
   if input_text and input_text ~= "" then
     vim.defer_fn(function()
       vim.api.nvim_chan_send(vim.b.terminal_job_id, input_text .. "\n")
