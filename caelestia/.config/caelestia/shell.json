@@ -1,5 +1,10 @@
 {
   "paths": {
-    "wallpaperDir": "~/wallpapers/wallpapers"
+    "wallpaperDir": "~/wallpapers"
+  },
+  "services": {
+    "wallpaper": true,
+    "clipboard": false,
+    "autostart": false
   }
 }
