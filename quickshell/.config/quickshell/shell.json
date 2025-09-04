@@ -1,6 +1,6 @@
 {
   "general": {
-    "wallpapersDir": "~/wallpapers"
+    "wallpapersDir": "~/wallpapers/wallpapers"
   },
   "services": {
     "wallpaper": false,

@@ -1,2 +1,6 @@
 # Wallpapers
-Wallpapers for desktop
+
+```
+~ Icons for Hyprlock /Hyprland
+~ Wallpapers for desktop
+```

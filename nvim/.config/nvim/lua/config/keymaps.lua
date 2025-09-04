@@ -209,6 +209,12 @@ vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
 
 -- CAMBIAR color con Teclado = C+P                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins.lua
 -- CAMBIAR color con Mouse + C+V                  # ubicado en: ~/dotfiles-dizzi/nvim/.config/nvim/lua/plugins/color-picker.lua
+-- ABRIR KEYMAPS *otra forma con* = Space + S + K
+-- ABRIR EL DASHBOARD:
+vim.keymap.set("n", "<leader>dd", function()
+  require("snacks").dashboard.open()
+end, { desc = "Abrir dashboard de Snacks" })
+
 -- =============================
 -- KEYMAPS GEMINI AI 🐐🗣️🔥️✍️ NO REQUIERE API
 -- =============================
