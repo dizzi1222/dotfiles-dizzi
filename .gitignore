@@ -187,3 +187,4 @@ themes/.themes/*
 # Si quieres mantener Gruvbox descomenta:
 # !themes/.themes/Gruvbox-Plus-Dark/
 local/.local/share/lutris/runtime/
+*:Zone.Identifier
