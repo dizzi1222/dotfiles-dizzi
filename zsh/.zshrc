@@ -752,6 +752,7 @@ TEMPLATE
 #  💡 AYUDA COMPLETA DE GIT 󰊢  
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+alias limpiar_cache='bash ~/scripts/limpiar_cache.sh'
 alias githelp='bash ~/scripts/git-help.sh'
 alias gitclean='bash ~/scripts/git_clean.sh'
 
