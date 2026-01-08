@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼\n " | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
 case "$CHOICE" in "")
   sh ~/scripts/pavucontrol.sh
@@ -79,6 +79,9 @@ case "$CHOICE" in "")
   # Es el mismo que el fase 2 pero post particion para reparar grub
   # su diego
   kitty -e ~/repair-grub-fase2-HyprInstall-post-Particionar.sh
+  ;;
+" ")
+  kitty -e ~/fix_file_limits.sh
   ;;
 *)
   exit 1
