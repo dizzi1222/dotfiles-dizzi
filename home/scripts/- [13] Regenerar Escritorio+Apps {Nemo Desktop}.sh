@@ -7,6 +7,8 @@
 # 2. Crea symlink de carpeta CustomRP_Icons para Wine
 # 3. Copia archivos .crp SUELTOS al Desktop de Wine (para CustomRP)
 # =================================================================================
+/home/diego/scripts/crear_escritorio-CustomRP.sh
+/home/diego/add-icons-to-desktop.sh
 # Colores para output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -71,7 +73,6 @@ declare -a ROOT_FILES=(
   "net.lutris.firefox-72.desktop"
   "net.lutris.brave-browser-55.desktop"
   # "bottles-dbz--Hades--1761703565.061601.desktop"
-  "Silver Palace.desktop"
   "net.lutris.handbrake-51.desktop"
   # "bottles-dbz--Hollow Knight Silksong--1761704399.656596.desktop"
   # "net.lutris.jdownloader-57.desktop"
@@ -121,7 +122,7 @@ declare -a ROOT_FILES=(
   # "net.lutris.dragon-ball-z-budokai-tenkaichi-3-93.desktop"
   "net.lutris.monitor-del-sistema-94.desktop"
   # "net.lutris.usrbingnome-disks-97.desktop"
-  # "net.lutris.btop-monitor-kill-t-96.desktop"
+  "net.lutris.btop-monitor-kill-t-96.desktop"
   # "net.lutris.calculadora-gnome-95.desktop"
   # "7-Zip File Manager-wine.desktop"
 )
@@ -305,15 +306,6 @@ print_step "Actualizando desktop database..."
 update-desktop-database "$ORIGEN" 2>/dev/null
 update-desktop-database /home/diego/.local/share/applications 2>/dev/null
 print_success "Base de datos actualizada"
-
-# =================================================================================
-# PASO 6: ACTUALIZAR ESCRITORIO Y ICONOS
-# =================================================================================
-
-print_header "PASO 6: ACTUALIZAR ESCRITORIO Y ICONOS"
-
-print_step "Actualizando escritorio y iconos..."
-/home/diego/add-icons-to-desktop.sh
 
 # =================================================================================
 # RESUMEN FINAL
