@@ -26,23 +26,6 @@
             },
             {
                 "type": 1,
-                "code": 18,
-                "origin_hash": "1220d9b6c6a3e13ca139ee4b0aecfedc"
-            }
-        ],
-        "target_uinput": "keyboard",
-        "output_symbol": "KEY_LEFTSHIFT + KEY_PAGEUP + KEY_COPY",
-        "mapping_type": "key_macro"
-    },
-    {
-        "input_combination": [
-            {
-                "type": 1,
-                "code": 29,
-                "origin_hash": "1220d9b6c6a3e13ca139ee4b0aecfedc"
-            },
-            {
-                "type": 1,
                 "code": 42,
                 "origin_hash": "1220d9b6c6a3e13ca139ee4b0aecfedc"
             },
@@ -72,6 +55,28 @@
         ],
         "target_uinput": "keyboard",
         "output_symbol": "KEY_UNDO",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 29,
+                "origin_hash": "d30fb9a3c87654c9091f7bbae6355818"
+            },
+            {
+                "type": 1,
+                "code": 54,
+                "origin_hash": "d30fb9a3c87654c9091f7bbae6355818"
+            },
+            {
+                "type": 1,
+                "code": 18,
+                "origin_hash": "d30fb9a3c87654c9091f7bbae6355818"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTSHIFT + KEY_PAGEUP + KEY_COPY",
         "mapping_type": "key_macro"
     }
 ]

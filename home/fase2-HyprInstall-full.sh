@@ -536,25 +536,73 @@ fi
 # PASO 13: APLICACIONES (SOLO -BIN)
 # ═══════════════════════════════════════════════════════════
 print_step "13/35: Aplicaciones (Solo binarios precompilados)"
-print_installing "Firefox + VLC + OBS + GIMP + Krita + LibreOffice + Kdenlive (Filmora+Handbrake 2x1)"
+print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
 sudo pacman -S --needed --noconfirm \
-  firefox vlc mpv obs-studio \
+  firefox vlc vlc-plugins-all mpv obs-studio \
   gimp inkscape krita \
   libreoffice-fresh filezilla transmission-gtk \
   pavucontrol loupe \
   scrcpy android-file-transfer \
   gvfs gvfs-gphoto2 kio-extras libxfce4ui
 
-print_installing "Kdenlive (Like Filmora) y aparte de editor de video, comprime videos (Ctrl+Enter) & Dependencias (opcional)"
-yay -S kdenlive qt6-imageformats kimageformats recordmydesktop plasma-desktop # El resto son dependencias de Kdenlive
-# pamac install kdenlive
+# ═══════════════════════════════════════════════════════════
+# Kdenlive - Selección interactiva
+# ═══════════════════════════════════════════════════════════
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          🎬 KDENLIVE (EDITOR DE VIDEO) 🎬                ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Opciones disponibles:${NC}"
+echo
+echo -e "${BOLD}${GREEN}1. Solo Kdenlive${NC} (~150MB)"
+echo -e "  ${MAGENTA}•${NC} Editor de video profesional (como Filmora)"
+echo -e "  ${MAGENTA}•${NC} Compresor de video integrado (Ctrl+Enter)"
+echo -e "  ${MAGENTA}•${NC} Sin dependencias extras de KDE"
+echo
+echo -e "${BOLD}${GREEN}2. Kdenlive + Dependencias Completas${NC} (~350MB)"
+echo -e "  ${MAGENTA}•${NC} Kdenlive completo"
+echo -e "  ${MAGENTA}•${NC} qt6-imageformats (mejor soporte de imágenes)"
+echo -e "  ${MAGENTA}•${NC} kimageformats (formatos adicionales)"
+echo -e "  ${MAGENTA}•${NC} recordmydesktop (grabación de pantalla)"
+echo -e "  ${MAGENTA}•${NC} plasma-desktop (integración KDE)"
+echo
+echo -e "${BOLD}${GREEN}3. Ninguno${NC}"
+echo -e "  ${MAGENTA}•${NC} Omitir instalación de Kdenlive"
+echo
+read -p "Seleccionar opción [1=Solo Kdenlive, 2=Con dependencias, 3=Ninguno]: " kdenlive_choice
 
-print_installing "Aplicaciones extra y de Musica, OCIO (solo binarios precompilados)"
+case "$kdenlive_choice" in
+1)
+  print_header "Instalando Kdenlive (Solo)"
+  print_installing "kdenlive"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    kdenlive \
+    2>/dev/null || print_warning "Kdenlive falló"
+  print_success "Kdenlive instalado"
+  ;;
+2)
+  print_header "Instalando Kdenlive + Dependencias"
+  print_installing "kdenlive + qt6-imageformats + kimageformats + recordmydesktop + plasma-desktop"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    kdenlive qt6-imageformats kimageformats recordmydesktop plasma-desktop \
+    2>/dev/null || print_warning "Algunas dependencias de Kdenlive fallaron"
+  print_success "Kdenlive + dependencias instalado"
+  ;;
+*)
+  print_warning "Kdenlive omitido"
+  ;;
+esac
+
+# ═══════════════════════════════════════════════════════════
+# Aplicaciones de música y ocio
+# ═══════════════════════════════════════════════════════════
+print_installing "Aplicaciones extra y de Música/OCIO (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   brave-bin spotify pear-desktop \
   vencord-bin gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
-# Youtube Music cambio de nombre a Pear Desktop
+# Youtube Music cambió de nombre a Pear Desktop
 
 # ═══════════════════════════════════════════════════════════
 # Selección interactiva de editor de código
@@ -632,10 +680,13 @@ case "$editor_choice" in
   ;;
 esac
 
+# ═══════════════════════════════════════════════════════════
+# Extras
+# ═══════════════════════════════════════════════════════════
 print_installing "Extras (SOLO -bin, sin compilar)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   stacer-bin jdownloader2 megasync \
-  appimagelauncher music-presence-bin copyq-git pamac-aur \
+  appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
 print_success "Aplicaciones instaladas (solo binarios)"
@@ -989,16 +1040,23 @@ if [[ ! "$enable_services" =~ ^[Nn]$ ]]; then
     systemctl --user start gemini.service 2>/dev/null || true
   fi
 
-  # Espanso
-  if [[ -f ~/.config/systemd/user/espanso.service ]]; then
-    killall espanso
-    print_package "Habilitando: espanso.service"
-    systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
-    systemctl --user start espanso.service 2>/dev/null || true
-    espanso service register
-    # Start espanso:
-    espanso start
-  fi
+# Espanso
+if [[ -f ~/.config/systemd/user/espanso.service ]]; then
+  killall espanso 2>/dev/null || true
+  print_package "Habilitando: espanso.service"
+  
+  # Registrar servicio si no está registrado
+  espanso service register 2>/dev/null || true
+  
+  # Habilitar e iniciar via systemd (NO usar 'espanso start' directamente)
+  systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
+  systemctl --user start espanso.service 2>/dev/null || true
+  
+  # Esperar 2 segundos para que inicie
+  sleep 2
+  
+  print_success "Espanso iniciado via systemd"
+fi
 
   # Kanata
   if [[ -f ~/.config/systemd/user/kanata.service ]]; then

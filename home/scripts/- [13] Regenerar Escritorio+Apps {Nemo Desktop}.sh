@@ -71,6 +71,7 @@ declare -a ROOT_FILES=(
   "net.lutris.firefox-72.desktop"
   "net.lutris.brave-browser-55.desktop"
   # "bottles-dbz--Hades--1761703565.061601.desktop"
+  "Silver Palace.desktop"
   "net.lutris.handbrake-51.desktop"
   # "bottles-dbz--Hollow Knight Silksong--1761704399.656596.desktop"
   # "net.lutris.jdownloader-57.desktop"
@@ -120,7 +121,7 @@ declare -a ROOT_FILES=(
   # "net.lutris.dragon-ball-z-budokai-tenkaichi-3-93.desktop"
   "net.lutris.monitor-del-sistema-94.desktop"
   # "net.lutris.usrbingnome-disks-97.desktop"
-  "net.lutris.btop-monitor-kill-t-96.desktop"
+  # "net.lutris.btop-monitor-kill-t-96.desktop"
   # "net.lutris.calculadora-gnome-95.desktop"
   # "7-Zip File Manager-wine.desktop"
 )

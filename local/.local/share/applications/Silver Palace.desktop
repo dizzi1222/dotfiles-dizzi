@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Silver Palace
+Exec=env "WINEPREFIX=/home/diego/.wine" wine "C:\\\\users\\\\diego\\\\AppData\\\\Roaming\\\\Microsoft\\\\Windows\\\\Start Menu\\\\Programs\\\\SilverPalaceLauncherGlobal\\\\Silver Palace.lnk"
+Type=Application
+StartupNotify=true
+Comment=Silver Palace
+Path=/home/diego/.wine/drive_c/Program Files/SilverPalaceLauncherGlobal
+Icon=C79D_Launcher.0
+StartupWMClass=launcher.exe
