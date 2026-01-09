@@ -1092,6 +1092,74 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 21.5: BOTTLES SETUP (DESPUÉS DE WINE PREFIX)
+# ═══════════════════════════════════════════════════════════
+print_step "21.5/35: Bottles Gaming Setup (Opcional)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          🍷 BOTTLES GAMING SETUP 🍷                       ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Bottles es una alternativa moderna a Wine prefix tradicional:${NC}"
+echo
+echo -e "${GREEN}Ventajas:${NC}"
+echo -e "  ${MAGENTA}•${NC} GUI intuitiva para gestionar juegos/apps"
+echo -e "  ${MAGENTA}•${NC} Cambio fácil entre Wine-GE y Proton-GE"
+echo -e "  ${MAGENTA}•${NC} Creación automática de .desktop files"
+echo -e "  ${MAGENTA}•${NC} Mejor compatibilidad con juegos modernos"
+echo -e "  ${MAGENTA}•${NC} Gestión de dependencias simplificada"
+echo
+echo -e "${YELLOW}Nota:${NC} La instalación de Bottles compila ~1 hora"
+echo
+read -p "¿Configurar Bottles para gaming? [s/N]: " setup_bottles
+
+if [[ "$setup_bottles" =~ ^[Ss]$ ]]; then
+  print_header "Configurando Bottles"
+  
+  # Verificar si install-bottles.sh existe
+  BOTTLES_SCRIPT_PATHS=(
+    ~/dotfiles-dizzi/home/install-bottles.sh
+    ~/install-bottles.sh
+    ~/Descargas/install-bottles.sh
+  )
+  
+  BOTTLES_SCRIPT=""
+  for path in "${BOTTLES_SCRIPT_PATHS[@]}"; do
+    if [[ -f "$path" ]]; then
+      BOTTLES_SCRIPT="$path"
+      break
+    fi
+  done
+  
+  if [[ -z "$BOTTLES_SCRIPT" ]]; then
+    print_warning "install-bottles.sh no encontrado"
+    print_status "Descargando script desde repositorio..."
+    
+    wget -q https://raw.githubusercontent.com/dizzi1222/dotfiles-dizzi/main/home/install-bottles.sh \
+      -O ~/install-bottles.sh 2>/dev/null || {
+      print_error "Error descargando script"
+      print_info "Instalación manual: yay -S bottles"
+    }
+    
+    BOTTLES_SCRIPT=~/install-bottles.sh
+  fi
+  
+  if [[ -f "$BOTTLES_SCRIPT" ]]; then
+    chmod +x "$BOTTLES_SCRIPT"
+    print_status "Ejecutando configuración de Bottles..."
+    "$BOTTLES_SCRIPT"
+    
+    print_success "Bottles configurado"
+  else
+    print_error "No se pudo ejecutar install-bottles.sh"
+  fi
+  
+else
+  print_warning "Bottles omitido (puedes instalarlo después con: yay -S bottles)"
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 22: SPOTIFY SPICETIFY
 # ═══════════════════════════════════════════════════════════
 print_step "22/35: Spicetify (Opcional)"

@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼\n " | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼\n \n󱄱 󰖳" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
 case "$CHOICE" in "")
   sh ~/scripts/pavucontrol.sh
@@ -82,6 +82,9 @@ case "$CHOICE" in "")
   ;;
 " ")
   kitty -e ~/fix_file_limits.sh
+  ;;
+"󱄱 󰖳")
+  kitty -e ~/install-bottles.sh
   ;;
 *)
   exit 1
