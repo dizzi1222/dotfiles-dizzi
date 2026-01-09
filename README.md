@@ -34,7 +34,7 @@ El Setup Incluye:
 ~ [Rofi] Atajo de Select Wallpaper                 -> [Windows + B]
 ~ [Eww] Atajo de Eww Widgets                       -> [Windows +  H]
 ~ [Rofi] Atajo de Power Off                        -> [Windows + P]
-~ [Rofi] System control [Rofi], que incluye:       -> [Windows + Z] 
+~ [Rofi] System control [Rofi], que incluye:       -> [Windows + Z]
         - (󰊢) Gestion y mantenimiento de repositorios git (gcc)
         - (󰜫) Omarchy Webpack
         - (󰣇) Omarchy AUR Package Install
@@ -45,6 +45,7 @@ El Setup Incluye:
 
 Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 ```
+
 </details>
 
 ## 💤 LazyVim 🦥
@@ -58,12 +59,12 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 <details>
 <summary><i>⌨️ Ver Guía Completa de Atajos de Teclado</i></summary>
 
-
 > ## 🎯 **Domina tu flujo de trabajo con estos atajos esenciales**
 
 ---
 
 ### 📑 Índice Rápido
+
 <div align="left">
 
 - [🎨 Gestión de Fondos y Estética](#-gestión-de-fondos-y-estética)
@@ -76,6 +77,7 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 - [🔒 Sistema y Sesión](#-sistema-y-sesión)
 - [🎮 Caelestia Shell](#-caelestia-shell)
 - [⚡ Atajos Especiales](#-atajos-especiales)
+
 </div>
 
 ---
@@ -84,33 +86,33 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🌄 Wallpapers
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + B` | SWW Wallpaper | Menú de fondos con soporte para GIFs |
-| `Super + Shift + B` | Zenities/Hyprpaper | Selector de wallpapers estático |
-| `Super + Alt + R` | Random Wallpaper | Fondo aleatorio de Caelestia |
+| Atajo               | Acción             | Descripción                          |
+| ------------------- | ------------------ | ------------------------------------ |
+| `Super + B`         | SWW Wallpaper      | Menú de fondos con soporte para GIFs |
+| `Super + Shift + B` | Zenities/Hyprpaper | Selector de wallpapers estático      |
+| `Super + Alt + R`   | Random Wallpaper   | Fondo aleatorio de Caelestia         |
 
 ### 🎭 Activar/Desactivar Servicios
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + W` | Iniciar Caelestia | Lanza el gestor de wallpapers Caelestia |
-| `Super + Shift + Q` | Iniciar Quickshell | Activa el shell alternativo |
-| `Super + D` | Reiniciar Servicios | Mata y reinicia daemons de wallpaper |
-| `Super + Shift + A` | Activar SWW GIFs | Wallpapers animados sobre Hyprpaper |
+| Atajo               | Acción              | Descripción                             |
+| ------------------- | ------------------- | --------------------------------------- |
+| `Super + W`         | Iniciar Caelestia   | Lanza el gestor de wallpapers Caelestia |
+| `Super + Shift + Q` | Iniciar Quickshell  | Activa el shell alternativo             |
+| `Super + D`         | Reiniciar Servicios | Mata y reinicia daemons de wallpaper    |
+| `Super + Shift + A` | Activar SWW GIFs    | Wallpapers animados sobre Hyprpaper     |
 
 ### 🎨 Barras y Widgets
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + H` | Widgets EWW | Abre/cierra widgets de Zenities |
-| `Super + K` | Reiniciar EWW | Mata y recarga EWW |
-| `Super + Shift + W` | Reiniciar Waybar | Recarga la barra superior |
-| `Super + R` | Recargar Sidebar | Actualiza la barra lateral |
-| `Super + Shift + R` | Recargar Bar | Actualiza la barra principal |
-| `Super + A` | Hyprpaper | Activa wallpaper estático |
-| `Shift + Alt + W` | Matar Waybar | Cierra Waybar completamente |
-| `Ctrl + Shift + W` | Iniciar Waybar | Lanza Waybar manualmente |
+| Atajo               | Acción           | Descripción                     |
+| ------------------- | ---------------- | ------------------------------- |
+| `Super + H`         | Widgets EWW      | Abre/cierra widgets de Zenities |
+| `Super + K`         | Reiniciar EWW    | Mata y recarga EWW              |
+| `Super + Shift + W` | Reiniciar Waybar | Recarga la barra superior       |
+| `Super + R`         | Recargar Sidebar | Actualiza la barra lateral      |
+| `Super + Shift + R` | Recargar Bar     | Actualiza la barra principal    |
+| `Super + A`         | Hyprpaper        | Activa wallpaper estático       |
+| `Shift + Alt + W`   | Matar Waybar     | Cierra Waybar completamente     |
+| `Ctrl + Shift + W`  | Iniciar Waybar   | Lanza Waybar manualmente        |
 
 ---
 
@@ -118,56 +120,57 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🎯 Navegación Básica
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + H/J/K/L` | Mover Foco | Navega entre ventanas (vim-style) |
-| `Super + ←/→/↑/↓` | Mover Foco | Navega con flechas |
-| `Alt + Tab` | Ciclar Ventanas | Cambio rápido entre ventanas |
-| `Shift + Tab` | Ciclar Inverso | Ciclo inverso global |
+| Atajo             | Acción          | Descripción                       |
+| ----------------- | --------------- | --------------------------------- |
+| `Super + H/J/K/L` | Mover Foco      | Navega entre ventanas (vim-style) |
+| `Super + ←/→/↑/↓` | Mover Foco      | Navega con flechas                |
+| `Alt + Tab`       | Ciclar Ventanas | Cambio rápido entre ventanas      |
+| `Shift + Tab`     | Ciclar Inverso  | Ciclo inverso global              |
 
 ### 🔄 Manipulación de Ventanas
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Q` | Cerrar Ventana | Cierra la ventana activa |
-| `Alt + F4` | Cerrar Ventana | Atajo tradicional + mata GameScope |
-| `Alt + Q` | Matar GameScope | Cierra juegos en GameScope |
-| `Super + F` | Ventana Pop | Toggle flotante inteligente (PIP) |
-| `Super + Shift + F` | Float + Center | Flotante centrada |
-| `Super + Tab` | Pseudo Fullscreen | Fullscreen sin ocultar barras |
-| `F11` | Fullscreen Real | Pantalla completa total |
-| `Super + F11` | Toggle Fullscreen | Alterna modo pantalla completa |
+| Atajo               | Acción            | Descripción                        |
+| ------------------- | ----------------- | ---------------------------------- |
+| `Super + Q`         | Cerrar Ventana    | Cierra la ventana activa           |
+| `Alt + F4`          | Cerrar Ventana    | Atajo tradicional + mata GameScope |
+| `Alt + Q`           | Matar GameScope   | Cierra juegos en GameScope         |
+| `Super + F`         | Ventana Pop       | Toggle flotante inteligente (PIP)  |
+| `Super + Shift + F` | Float + Center    | Flotante centrada                  |
+| `Super + Tab`       | Pseudo Fullscreen | Tiling/F-sin ocultar barras        |
+| `Super + T`         | Pseudo Fullscreen | Tiling/F-sin ocultar barras        |
+| `F11`               | Fullscreen Real   | Pantalla completa total            |
+| `Super + F11`       | Toggle Fullscreen | Alterna modo pantalla completa     |
 
 ### 📐 Redimensionar Ventanas
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Ctrl + H/L` | Redimensionar H | ±40px horizontal |
-| `Super + Ctrl + J/K` | Redimensionar V | ±40px vertical |
-| `Super + Ctrl + ←/→/↑/↓` | Redimensionar | Con flechas direccionales |
+| Atajo                    | Acción          | Descripción               |
+| ------------------------ | --------------- | ------------------------- |
+| `Super + Ctrl + H/L`     | Redimensionar H | ±40px horizontal          |
+| `Super + Ctrl + J/K`     | Redimensionar V | ±40px vertical            |
+| `Super + Ctrl + ←/→/↑/↓` | Redimensionar   | Con flechas direccionales |
 
 ### 🚚 Mover Ventanas
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Shift + H/J/K/L` | Mover Ventana | Mueve entre tiles |
-| `Super + Shift + ←/→/↑/↓` | Mover con Flechas | Alternativa con flechas |
-| `Alt + H/J/K/L` | Mover Flotante | Mueve ventana flotante |
-| `Super + Alt + Shift + H/J/K/L` | Mover Libre | Movimiento fino (±40px) |
+| Atajo                           | Acción            | Descripción             |
+| ------------------------------- | ----------------- | ----------------------- |
+| `Super + Shift + H/J/K/L`       | Mover Ventana     | Mueve entre tiles       |
+| `Super + Shift + ←/→/↑/↓`       | Mover con Flechas | Alternativa con flechas |
+| `Alt + H/J/K/L`                 | Mover Flotante    | Mueve ventana flotante  |
+| `Super + Alt + Shift + H/J/K/L` | Mover Libre       | Movimiento fino (±40px) |
 
 ### 🔒 Ventanas Especiales
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Shift + L` | Bloquear Grupo | Bloquea grupo de ventanas |
-| `Super + Alt + J` | Toggle Split | Cambia orientación del split |
+| Atajo               | Acción         | Descripción                  |
+| ------------------- | -------------- | ---------------------------- |
+| `Super + Shift + L` | Bloquear Grupo | Bloquea grupo de ventanas    |
+| `Super + Alt + J`   | Toggle Split   | Cambia orientación del split |
 
 ### 🖱️ Control con Mouse
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Click Izq` | Mover Ventana | Arrastra ventana |
-| `Super + Click Der` | Redimensionar | Redimensiona arrastrando |
+| Atajo                | Acción            | Descripción                |
+| -------------------- | ----------------- | -------------------------- |
+| `Super + Click Izq`  | Mover Ventana     | Arrastra ventana           |
+| `Super + Click Der`  | Redimensionar     | Redimensiona arrastrando   |
 | `Super + Scroll ↑/↓` | Cambiar Workspace | Navega espacios de trabajo |
 
 ---
@@ -176,21 +179,21 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🔢 Navegación de Workspaces
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + 1-9/0` | Ir a Workspace | Cambia al espacio de trabajo N |
-| `Super + Shift + 1-9/0` | Mover a Workspace | Envía ventana al workspace N |
-| `Super + S` | Special Workspace | Toggle scratchpad "magic" |
-| `Super + Shift + S` | Enviar a Special | Mueve ventana a scratchpad |
+| Atajo                   | Acción            | Descripción                    |
+| ----------------------- | ----------------- | ------------------------------ |
+| `Super + 1-9/0`         | Ir a Workspace    | Cambia al espacio de trabajo N |
+| `Super + Shift + 1-9/0` | Mover a Workspace | Envía ventana al workspace N   |
+| `Super + S`             | Special Workspace | Toggle scratchpad "magic"      |
+| `Super + Shift + S`     | Enviar a Special  | Mueve ventana a scratchpad     |
 
 ### 🎯 Workspaces Especiales
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + M` | Toggle Music | Workspace especial de música |
+| Atajo               | Acción         | Descripción                       |
+| ------------------- | -------------- | --------------------------------- |
+| `Super + M`         | Toggle Music   | Workspace especial de música      |
 | `Super + Shift + M` | Enviar a Music | Mueve ventana al workspace música |
-| `Super + Alt + B` | System Monitor | Toggle monitor del sistema |
-| `Super + Alt + S` | Show All | Muestra todas las ventanas |
+| `Super + Alt + B`   | System Monitor | Toggle monitor del sistema        |
+| `Super + Alt + S`   | Show All       | Muestra todas las ventanas        |
 
 ---
 
@@ -198,42 +201,42 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 📱 Lanzadores
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Space` | Rofi Combi | Menú combinado de apps |
-| `Super + Ctrl + Space` | Fuzzel | Launcher alternativo minimalista |
-| `Super + L` | Caelestia Launcher | Launcher de Caelestia Shell |
+| Atajo                  | Acción             | Descripción                      |
+| ---------------------- | ------------------ | -------------------------------- |
+| `Super + Space`        | Rofi Combi         | Menú combinado de apps           |
+| `Super + Ctrl + Space` | Fuzzel             | Launcher alternativo minimalista |
+| `Super + L`            | Caelestia Launcher | Launcher de Caelestia Shell      |
 
 ### 🔧 Aplicaciones Frecuentes
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Return` | Terminal | Abre terminal por defecto |
-| `Ctrl + Alt + K` | Kitty | Terminal Kitty |
-| `Ctrl + Alt + T` | Ghostty | Terminal Ghostty |
-| `Super + E` | Explorador | Nautilus (gestor de archivos) |
-| `F1` | Navegador | Firefox |
-| `Super + Backspace` | Music Player | Toggle reproductor (Kew) |
+| Atajo               | Acción       | Descripción                   |
+| ------------------- | ------------ | ----------------------------- |
+| `Super + Return`    | Terminal     | Abre terminal por defecto     |
+| `Ctrl + Alt + K`    | Kitty        | Terminal Kitty                |
+| `Ctrl + Alt + T`    | Ghostty      | Terminal Ghostty              |
+| `Super + E`         | Explorador   | Nautilus (gestor de archivos) |
+| `F1`                | Navegador    | Firefox                       |
+| `Super + Backspace` | Music Player | Toggle reproductor (Kew)      |
 
 ### 📂 Gestores de Archivos
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Alt + M` | Yazi | Explorador de archivos en terminal |
-| `Super + Ctrl + M` | Nvim + FZF | Neovim con selector de archivos |
+| Atajo              | Acción     | Descripción                        |
+| ------------------ | ---------- | ---------------------------------- |
+| `Super + Alt + M`  | Yazi       | Explorador de archivos en terminal |
+| `Super + Ctrl + M` | Nvim + FZF | Neovim con selector de archivos    |
 
 ### 🛠️ Utilidades
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + V` | Clipboard | Historial de portapapeles (Cliphist) |
-| `Super + Shift + V` | CopyQ | Gestor visual de clipboard |
-| `Super + Alt + N` | Limpiar Clipboard | Borra historial de portapapeles |
-| `Super + Period` | Emoji Picker | Selector de emojis (Fuzzel) |
-| `Super + Shift + Period` | Emojis Rofi | Selector con Rofi |
-| `Super + Shift + Period` | Nerd Fonts | Selector de iconos Nerd Font |
-| `Super + Shift + C` | Color Picker | Selector de colores |
-| `Super + Z` | System Control | Menú de control del sistema |
+| Atajo                    | Acción            | Descripción                          |
+| ------------------------ | ----------------- | ------------------------------------ |
+| `Super + V`              | Clipboard         | Historial de portapapeles (Cliphist) |
+| `Super + Shift + V`      | CopyQ             | Gestor visual de clipboard           |
+| `Super + Alt + N`        | Limpiar Clipboard | Borra historial de portapapeles      |
+| `Super + Period`         | Emoji Picker      | Selector de emojis (Fuzzel)          |
+| `Super + Shift + Period` | Emojis Rofi       | Selector con Rofi                    |
+| `Super + Shift + Period` | Nerd Fonts        | Selector de iconos Nerd Font         |
+| `Super + Shift + C`      | Color Picker      | Selector de colores                  |
+| `Super + Z`              | System Control    | Menú de control del sistema          |
 
 ---
 
@@ -241,28 +244,28 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 📷 Screenshots
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Print` | Gyazo Menu | Menú de captura de Gyazo |
-| `Super + Ctrl + C` | Gyazo Región | Captura área con Gyazo |
-| `Super + Print` | Satty Display | Captura completa con Satty |
-| `Shift + Print` | Satty Window | Captura ventana activa |
-| `Ctrl + Print` | Screenshot → Clipboard | Captura completa al portapapeles |
-| `Shift + Print` | Screenshot Freeze | Congela pantalla para región |
+| Atajo              | Acción                 | Descripción                      |
+| ------------------ | ---------------------- | -------------------------------- |
+| `Print`            | Gyazo Menu             | Menú de captura de Gyazo         |
+| `Super + Ctrl + C` | Gyazo Región           | Captura área con Gyazo           |
+| `Super + Print`    | Satty Display          | Captura completa con Satty       |
+| `Shift + Print`    | Satty Window           | Captura ventana activa           |
+| `Ctrl + Print`     | Screenshot → Clipboard | Captura completa al portapapeles |
+| `Shift + Print`    | Screenshot Freeze      | Congela pantalla para región     |
 
 ### 🎬 Grabación
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + Alt + Ctrl + R` | Grabar con Audio | Graba pantalla + sonido |
-| `Super + Shift + Alt + R` | Grabar Región | Graba área seleccionada |
+| Atajo                     | Acción           | Descripción             |
+| ------------------------- | ---------------- | ----------------------- |
+| `Super + Alt + Ctrl + R`  | Grabar con Audio | Graba pantalla + sonido |
+| `Super + Shift + Alt + R` | Grabar Región    | Graba área seleccionada |
 
 ### 🔍 Zoom
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + -` | Reset Zoom | Vuelve a escala 1.0 |
-| `Super + =` | Menú Zoom | Menú interactivo de zoom |
+| Atajo       | Acción     | Descripción              |
+| ----------- | ---------- | ------------------------ |
+| `Super + -` | Reset Zoom | Vuelve a escala 1.0      |
+| `Super + =` | Menú Zoom  | Menú interactivo de zoom |
 
 ---
 
@@ -270,27 +273,27 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🎚️ Control de Volumen
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `XF86AudioRaiseVolume` | Subir Volumen | +5% con notificación |
-| `XF86AudioLowerVolume` | Bajar Volumen | -5% con notificación |
-| `XF86AudioMute` | Mutear | Toggle mute con notificación |
-| `XF86AudioMicMute` | Mutear Micrófono | Toggle mute del mic |
+| Atajo                  | Acción           | Descripción                  |
+| ---------------------- | ---------------- | ---------------------------- |
+| `XF86AudioRaiseVolume` | Subir Volumen    | +5% con notificación         |
+| `XF86AudioLowerVolume` | Bajar Volumen    | -5% con notificación         |
+| `XF86AudioMute`        | Mutear           | Toggle mute con notificación |
+| `XF86AudioMicMute`     | Mutear Micrófono | Toggle mute del mic          |
 
 ### 💡 Brillo de Pantalla
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `XF86MonBrightnessUp` | Aumentar Brillo | +10% con notificación |
-| `XF86MonBrightnessDown` | Reducir Brillo | -10% con notificación |
+| Atajo                   | Acción          | Descripción           |
+| ----------------------- | --------------- | --------------------- |
+| `XF86MonBrightnessUp`   | Aumentar Brillo | +10% con notificación |
+| `XF86MonBrightnessDown` | Reducir Brillo  | -10% con notificación |
 
 ### ⌨️ Retroiluminación de Teclado
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `XF86KbdLightOnOff` | Toggle Luz | Enciende/apaga retroiluminación |
-| `XF86KbdBrightnessUp` | Aumentar Luz | Sube brillo del teclado |
-| `XF86KbdBrightnessDown` | Reducir Luz | Baja brillo del teclado |
+| Atajo                   | Acción       | Descripción                     |
+| ----------------------- | ------------ | ------------------------------- |
+| `XF86KbdLightOnOff`     | Toggle Luz   | Enciende/apaga retroiluminación |
+| `XF86KbdBrightnessUp`   | Aumentar Luz | Sube brillo del teclado         |
+| `XF86KbdBrightnessDown` | Reducir Luz  | Baja brillo del teclado         |
 
 ---
 
@@ -298,21 +301,21 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### ⏯️ Reproducción
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Ctrl + Super + Space` | Play/Pause | Toggle reproducción |
-| `XF86AudioPlay` | Play | Reproduce |
-| `XF86AudioPause` | Pause | Pausa |
-| `XF86AudioStop` | Stop | Detiene reproducción |
+| Atajo                  | Acción     | Descripción          |
+| ---------------------- | ---------- | -------------------- |
+| `Ctrl + Super + Space` | Play/Pause | Toggle reproducción  |
+| `XF86AudioPlay`        | Play       | Reproduce            |
+| `XF86AudioPause`       | Pause      | Pausa                |
+| `XF86AudioStop`        | Stop       | Detiene reproducción |
 
 ### ⏭️ Navegación
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Ctrl + Super + =` | Siguiente | Pista siguiente |
-| `XF86AudioNext` | Siguiente | Tecla de hardware |
-| `Ctrl + Super + -` | Anterior | Pista anterior |
-| `XF86AudioPrev` | Anterior | Tecla de hardware |
+| Atajo              | Acción    | Descripción       |
+| ------------------ | --------- | ----------------- |
+| `Ctrl + Super + =` | Siguiente | Pista siguiente   |
+| `XF86AudioNext`    | Siguiente | Tecla de hardware |
+| `Ctrl + Super + -` | Anterior  | Pista anterior    |
+| `XF86AudioPrev`    | Anterior  | Tecla de hardware |
 
 ---
 
@@ -320,33 +323,33 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🚪 Cerrar Sesión y Apagar
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + P` | Power Menu | Menú de apagado/reinicio |
-| `Super + Shift + Escape` | Cerrar Sesión | Sale de Hyprland |
-| `Super + Alt + Escape` | Bloquear Pantalla | Lock screen |
-| `Super + Escape` | Lock + Notis | Bloquea y muestra notificaciones |
-| `Super + Alt + F4` | Apagar Sistema | Poweroff directo |
-| `Alt + F3` | Reiniciar | Reboot directo |
-| `Super + Ctrl + Q` | Exit Hyprland | Sale del compositor |
+| Atajo                    | Acción            | Descripción                      |
+| ------------------------ | ----------------- | -------------------------------- |
+| `Super + P`              | Power Menu        | Menú de apagado/reinicio         |
+| `Super + Shift + Escape` | Cerrar Sesión     | Sale de Hyprland                 |
+| `Super + Alt + Escape`   | Bloquear Pantalla | Lock screen                      |
+| `Super + Escape`         | Lock + Notis      | Bloquea y muestra notificaciones |
+| `Super + Alt + F4`       | Apagar Sistema    | Poweroff directo                 |
+| `Alt + F3`               | Reiniciar         | Reboot directo                   |
+| `Super + Ctrl + Q`       | Exit Hyprland     | Sale del compositor              |
 
 ### 📊 Monitoreo
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Ctrl + Shift + Esc` | System Monitor | GNOME System Monitor |
-| `Ctrl + Esc` | System Monitor | Alternativa rápida |
-| `Shift + Esc` | System Monitor | Otra alternativa |
-| `Super + Ctrl + Esc` | Btop | Monitor en terminal (Kitty) |
+| Atajo                | Acción         | Descripción                 |
+| -------------------- | -------------- | --------------------------- |
+| `Ctrl + Shift + Esc` | System Monitor | GNOME System Monitor        |
+| `Ctrl + Esc`         | System Monitor | Alternativa rápida          |
+| `Shift + Esc`        | System Monitor | Otra alternativa            |
+| `Super + Ctrl + Esc` | Btop           | Monitor en terminal (Kitty) |
 
 ### 🔔 Notificaciones
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + N` | Toggle Notis | Abre/cierra panel de notificaciones |
-| `Super + Ctrl + N` | Reiniciar Swaync | Recarga daemon de notificaciones |
-| `Super + Shift + N` | Recargar Estilos | Actualiza estilos de Swaync |
-| `Super + Delete` | Limpiar Notis | Borra todas las notificaciones |
+| Atajo               | Acción           | Descripción                         |
+| ------------------- | ---------------- | ----------------------------------- |
+| `Super + N`         | Toggle Notis     | Abre/cierra panel de notificaciones |
+| `Super + Ctrl + N`  | Reiniciar Swaync | Recarga daemon de notificaciones    |
+| `Super + Shift + N` | Recargar Estilos | Actualiza estilos de Swaync         |
+| `Super + Delete`    | Limpiar Notis    | Borra todas las notificaciones      |
 
 ---
 
@@ -354,22 +357,22 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🎨 Funciones Específicas
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Super + L` | Caelestia Launcher | Abre el launcher de Caelestia |
-| `Super + L + >` | Comandos | Modo comando de Caelestia |
-| `Super interrupts` | Cancelar Launcher | Cierra launcher con click/teclas |
+| Atajo              | Acción             | Descripción                      |
+| ------------------ | ------------------ | -------------------------------- |
+| `Super + L`        | Caelestia Launcher | Abre el launcher de Caelestia    |
+| `Super + L + >`    | Comandos           | Modo comando de Caelestia        |
+| `Super interrupts` | Cancelar Launcher  | Cierra launcher con click/teclas |
 
 ### 🎬 Utilidades Integradas
 
-| Comando | Descripción |
-|---------|-------------|
-| `caelestia wallpaper --random` | Wallpaper aleatorio |
-| `caelestia toggle music` | Workspace de música |
-| `caelestia toggle sysmon` | Monitor del sistema |
-| `caelestia screenshot` | Screenshot con Caelestia |
-| `caelestia record` | Grabación de pantalla |
-| `caelestia emoji` | Selector de emojis |
+| Comando                        | Descripción              |
+| ------------------------------ | ------------------------ |
+| `caelestia wallpaper --random` | Wallpaper aleatorio      |
+| `caelestia toggle music`       | Workspace de música      |
+| `caelestia toggle sysmon`      | Monitor del sistema      |
+| `caelestia screenshot`         | Screenshot con Caelestia |
+| `caelestia record`             | Grabación de pantalla    |
+| `caelestia emoji`              | Selector de emojis       |
 
 ---
 
@@ -377,31 +380,31 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 
 ### 🎯 Atajos de Productividad
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
-| `Ctrl + E` | Barra de Direcciones | Enfoca barra en navegador (wtype) |
-| `Ctrl + ;` | Cerrar Split | Cierra terminal dividida (Kitty) |
-| `Super + Shift + Space` | Rofi Combi | Menú combinado |
+| Atajo                   | Acción               | Descripción                       |
+| ----------------------- | -------------------- | --------------------------------- |
+| `Ctrl + E`              | Barra de Direcciones | Enfoca barra en navegador (wtype) |
+| `Ctrl + ;`              | Cerrar Split         | Cierra terminal dividida (Kitty)  |
+| `Super + Shift + Space` | Rofi Combi           | Menú combinado                    |
 
 ### 🧪 Testing y Debug
 
-| Atajo | Acción | Descripción |
-|-------|--------|-------------|
+| Atajo         | Acción            | Descripción            |
+| ------------- | ----------------- | ---------------------- |
 | `Super + F12` | Test Notification | Notificación de prueba |
 
 ---
 
 ## 📋 Tipos de Bindings en Hyprland
 
-| Tipo | Comportamiento | Uso Común |
-|------|----------------|-----------|
-| `bind` | Ejecución única | Abrir apps, cerrar ventanas |
-| `binde` | Se repite al mantener | Redimensionar, ajustar volumen |
-| `bindm` | Binding de mouse | Mover/redimensionar con mouse |
-| `bindr` | Se ejecuta al soltar | Notificaciones al soltar tecla |
-| `bindl` | Funciona con pantalla bloqueada | Control multimedia en lock |
-| `bindn` | No consume el bind | Screenshot compartido con apps |
-| `bindd` | Bind con descripción | Atajos documentados |
+| Tipo    | Comportamiento                  | Uso Común                      |
+| ------- | ------------------------------- | ------------------------------ |
+| `bind`  | Ejecución única                 | Abrir apps, cerrar ventanas    |
+| `binde` | Se repite al mantener           | Redimensionar, ajustar volumen |
+| `bindm` | Binding de mouse                | Mover/redimensionar con mouse  |
+| `bindr` | Se ejecuta al soltar            | Notificaciones al soltar tecla |
+| `bindl` | Funciona con pantalla bloqueada | Control multimedia en lock     |
+| `bindn` | No consume el bind              | Screenshot compartido con apps |
+| `bindd` | Bind con descripción            | Atajos documentados            |
 
 ---
 
@@ -418,6 +421,7 @@ Muchos de estas utilidades son re usadas en Eww Widgets, o Sistem Control [Rofi]
 ### 🔧 Personalización
 
 Para modificar estos atajos, edita:
+
 ```bash
 nvim ~/.config/hypr/hyprland.conf
 # o
@@ -432,13 +436,13 @@ nvim ~/.config/hypr/keybinds.conf
 
 ---
 
-### 🎉 ¡Domina tu Workspace!
+### 🎉 ¡Domina tu Workspace
 
 **Practica estos atajos y mejora tu productividad** ⚡
 
 </details>
 
-*Mi setup personalizado de Arch Linux + Hyprland*
+_Mi setup personalizado de Arch Linux + Hyprland_
 
 </div>
 
@@ -464,17 +468,21 @@ nvim ~/.config/hypr/keybinds.conf
 <summary><b>Ver Screenshots del Sistema</b></summary>
 
 ### Desktop Principal
+
 ![Desktop 1](https://github.com/user-attachments/assets/29ba01b1-da5b-4b39-a612-360d69cb697a)
 
 ### Barra de Estado
+
 ![Waybar](https://github.com/user-attachments/assets/eabcfb02-982f-4885-a75a-d30f84cebc01)
 
 ### 💤 LazyVim
+
 ![LazyVim Setup](https://github.com/user-attachments/assets/60c80cc3-98d7-4af0-a5bd-8842a9c8c80d)
 
-*Mi configuración de [LazyVim](https://github.com/LazyVim/LazyVim) - [Documentación](https://lazyvim.github.io/installation)*
+_Mi configuración de [LazyVim](https://github.com/LazyVim/LazyVim) - [Documentación](https://lazyvim.github.io/installation)_
 
 ### Fastfetch
+
 ![Fastfetch Display](https://github.com/user-attachments/assets/4e5c4c97-a852-49a9-9718-acecfa6bfd00)
 
 </details>
@@ -517,6 +525,7 @@ nvim ~/.config/hypr/keybinds.conf
 ### 2️⃣ Conexión a Internet
 
 #### Vía Ethernet
+
 ```bash
 ping -c 5 archlinux.org
 ```
@@ -589,21 +598,21 @@ archinstall
 
 #### Configuración Recomendada de archinstall (Falla en ⚠️ Dualboot)
 
-| Opción | Valor Recomendado |
-|--------|-------------------|
-| **Idioma** | Español/English |
-| **Disco** | Tu disco (ej: `/dev/sdb`) |
-| **Layout** | Wipe + BTRFS filesystem |
-| **Encryption** | Opcional (contraseña) |
-| **Bootloader** | GRUB |
-| **Hostname** | `archlinux` |
-| **Root password** | Tu contraseña segura |
-| **Usuario** | Crear + agregar a sudoers → **diego** |
-| **Profile** | Minimal |
-| **Drivers gráficos** | Intel/AMD/Nvidia según GPU |
-| **Audio** | PipeWire |
-| **Network** | NetworkManager |
-| **Timezone** | `America/Santo_Domingo` |
+| Opción               | Valor Recomendado                     |
+| -------------------- | ------------------------------------- |
+| **Idioma**           | Español/English                       |
+| **Disco**            | Tu disco (ej: `/dev/sdb`)             |
+| **Layout**           | Wipe + BTRFS filesystem               |
+| **Encryption**       | Opcional (contraseña)                 |
+| **Bootloader**       | GRUB                                  |
+| **Hostname**         | `archlinux`                           |
+| **Root password**    | Tu contraseña segura                  |
+| **Usuario**          | Crear + agregar a sudoers → **diego** |
+| **Profile**          | Minimal                               |
+| **Drivers gráficos** | Intel/AMD/Nvidia según GPU            |
+| **Audio**            | PipeWire                              |
+| **Network**          | NetworkManager                        |
+| **Timezone**         | `America/Santo_Domingo`               |
 
 ```bash
 # Cuando pregunte "Chroot into system?": YES
@@ -626,31 +635,32 @@ reboot
 
 ```bash
 # Recuerda cambiar el formato a Ext-4 ya sea con archinstall (o manual):
-sudo mkfs.ext4 -L arch /dev/sda4 
+sudo mkfs.ext4 -L arch /dev/sda4
 # -L = Label nombre-a-elección
 
 # Opción 1: La segura
 mount /dev/sda4 /mnt              # Partición Linux
-mount --mkdir /dev/sda1 /mnt/boot/efi     # Partición EFI dualboot bootloader 
+mount --mkdir /dev/sda1 /mnt/boot/efi     # Partición EFI dualboot bootloader
 
 # Opcion 2: Si al intentar entrar con chroot falla puedes montar la particion de Linux de esta otra manera
 
-# Primero desmonta la duplicada conflictiva 
+# Primero desmonta la duplicada conflictiva
 umount -R /mnt
 # Luego montala mediante el label configurado (osea arch)
-mount /dev/disk/by-label/arch /mnt     # Particion Linux 
-mount --mkdir /dev/sda1 /mnt/boot/efi     # Partición EFI dualboot bootloader 
+mount /dev/disk/by-label/arch /mnt     # Particion Linux
+mount --mkdir /dev/sda1 /mnt/boot/efi     # Partición EFI dualboot bootloader
 
 ```
 
 ### 🗣️ Paso 0.5: Entrar al chroot y montar grub
+
 ```
 # Esto re importante 🗣️ Lee las particiones y genera el formato correcto [fstab]
 genfstab -U /mnt >> /mnt/etc/fstab
 
 
 
-# TIP: puedes ejecutar 
+# TIP: puedes ejecutar
 # pacstrap /mnt base-devel linux # ... [el resto de paquetes]
 # Realidad: Es más comodo entrar al /mnt:
 
@@ -660,7 +670,7 @@ pacman -S base base-devel linux linux-firmware archlinux-keyring efibootmgr dhcp
 
 systemctl enable NetworkManager
 systemctl enable iwd
-systemctl enable 
+systemctl enable
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 grub-mkconfig -o /boot/grub/grub.cfg
@@ -669,10 +679,11 @@ efibootmgr  # Verificar entrada GRUB
 
 # Recomiendo ejecutar el script [FASE 1] desde chroot en vez de reiniciar, para agilizar.
 ```
+
 > ### 🐎🃏 Paso 1: fase2-HyprInstall-full.sh y HYPER-arch-INSTALL.sh [fase1] 👨‍💻 los mejores scripts para instalar ARCH 🐧🃏
 
 ```
-# Clonar este mismo repositorio 
+# Clonar este mismo repositorio
 git clone https://github.com/dizzi1222/dotfiles-dizzi.git ~/dotfiles-dizzi
 
 # FASE 1: El script post entrar al chroot, asumiendo que ya instalaste base-devel etc
@@ -696,7 +707,7 @@ home/scripts/fase2-HyprInstall-full.sh
 
 Apartir de aquí si enfrentas mas problemas como con el usuario, wlan, el siguiente contenido te guiará, y complementa lo que en teoría ya hace mis 2 script.
 
------------------------------
+---
 
 > 💡 **Tip:** Identifica tu partición correcta con `lsblk` antes de montar
 
@@ -1027,11 +1038,11 @@ fastfetch
 
 ### 🎥 Videos Tutoriales
 
-| Tutorial | Duración | Link |
-|----------|----------|------|
-| Configurar Red + ArchInstall | 16 min | [Ver](https://www.youtube.com/watch?v=x2euFpcv7hw&t=426s) |
-| Dual Boot + Particiones | 8 min | [Ver](https://www.youtube.com/watch?v=tPYCd4w65-0&t=180s) |
-| Debian vs Arch Comparison | Variable | [Ver](https://youtu.be/H7RQYREJO98) |
+| Tutorial                     | Duración | Link                                                      |
+| ---------------------------- | -------- | --------------------------------------------------------- |
+| Configurar Red + ArchInstall | 16 min   | [Ver](https://www.youtube.com/watch?v=x2euFpcv7hw&t=426s) |
+| Dual Boot + Particiones      | 8 min    | [Ver](https://www.youtube.com/watch?v=tPYCd4w65-0&t=180s) |
+| Debian vs Arch Comparison    | Variable | [Ver](https://youtu.be/H7RQYREJO98)                       |
 
 ---
 
