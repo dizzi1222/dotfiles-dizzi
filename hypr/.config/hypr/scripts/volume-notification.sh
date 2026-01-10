@@ -40,13 +40,15 @@ send_notification() {
 
 case "$1" in
 up)
-  pamixer -i 5
+  pamixer --allow-boost -i 5 # Permite superar 100%
+
   VOLUME=$(get_volume)
   MUTED=$(get_mute_status)
   send_notification "$VOLUME" "$MUTED"
   ;;
 down)
-  pamixer -d 5
+  pamixer --allow-boost -d 5 # Mantén la flag para consistencia
+
   VOLUME=$(get_volume)
   MUTED=$(get_mute_status)
   send_notification "$VOLUME" "$MUTED"

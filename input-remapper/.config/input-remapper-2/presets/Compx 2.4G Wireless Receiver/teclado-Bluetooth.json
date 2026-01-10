@@ -31,6 +31,7 @@
         ],
         "target_uinput": "keyboard",
         "output_symbol": "KEY_LEFTSHIFT + KEY_PAGEUP + KEY_COPY",
+        "name": "LEFTCTRL + RIGHTSHIFT + E",
         "mapping_type": "key_macro"
     },
     {
@@ -71,6 +72,7 @@
         ],
         "target_uinput": "keyboard",
         "output_symbol": "KEY_UNDO",
+        "name": "LEFTCTRL + LEFTSHIFT + Z",
         "mapping_type": "key_macro"
     }
 ]

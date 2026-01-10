@@ -2,9 +2,15 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼\n \n󱄱 󰖳" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "\0meta\x1fgit ayuda help comandos\n󰣇\0meta\x1faur instalar paquetes arch\n\0meta\x1fpkg instalar paquetes pacman\n󰜫\0meta\x1fwebapp instalar aplicaciones web\n\0meta\x1faudio mute silenciar volumen\0meta\x1fpulse audio control volumen\n\0meta\x1fred network wifi ethernet & internet\n\0meta\x1fbluetooth bluetuith conexion\n󰂜\0meta\x1fdnd notificaciones do not disturb\n\0meta\x1fgit clean limpiar repositorio\n\0meta\x1flimpiar cache limpieza\n\n\0meta\x1fgame modo juego gaming\n\0meta\x1fpower energia bateria\n\0meta\x1fgyazo captura screenshot menu\n󰩫\0meta\x1fgyazo captura screenshot clipboard\n\0meta\x1fnight noche modo nocturno oscuro\n󰺐\0meta\x1fscrcpy android telefono\n\0meta\x1fwidgets eww lanzar\n\n\0meta\x1fmicrofono mic mute toggle\n 󰬺\0meta\x1fhyprland install fase1 root instalacion arch\n 󰬻\0meta\x1fhyprland install fase2 user instalacion arch\n󰋊󰬼\0meta\x1fgrub reparar repair boot particion\n \0meta\x1ffile repair-reparar limits arreglar fix ulimit fuiles (archivos)\n󱄱 󰖳\0meta\x1fbottles wine windows instalar" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
-case "$CHOICE" in "")
+# Los íconos se muestran, las descripciones son para búsqueda (invisibles con color transparente)
+
+# Extraer solo el ícono (antes del meta tag)
+ICON=$(echo "$CHOICE" | awk -F '\0meta' '{print $1}')
+
+case "$ICON" in
+"")
   sh ~/scripts/pavucontrol.sh
   ;;
 "")
