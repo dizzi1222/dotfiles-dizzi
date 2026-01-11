@@ -2,7 +2,7 @@
 Description=Arrancar update-cover.loop.service Imagenen/cover de VLC.org.flatpak, etc
 
 [Service]
-ExecStart=/home/diego/dotfiles/home/update-cover-loop.sh
+ExecStart=/home/diego/update-cover-loop.sh
 Type=oneshot
 
 [Install]
