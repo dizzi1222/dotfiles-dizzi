@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/gemini
+Type=simple
 
 [Install]
 WantedBy=default.target

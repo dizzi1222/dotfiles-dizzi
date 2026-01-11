@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=XClicker
+Comment=Auto-clicker for X11
+Exec=xclicker
+Icon=input-mouse
+Terminal=false
+Type=Application
+Categories=Utility;Accessibility;
+Keywords=clicker;automation;mouse;

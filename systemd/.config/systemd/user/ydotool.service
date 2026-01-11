@@ -4,6 +4,7 @@ After=default.target
 
 [Service]
 ExecStart=/usr/bin/ydotoold --socket-path=/tmp/.ydotool_socket
+Type=simple
 Restart=always
 RestartSec=3
 
