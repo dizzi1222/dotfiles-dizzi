@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Netflix (Cineby)
+Comment=Open Netflix (Cineby)
+Exec=brave --app="https://www.cineby.gd/"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Netflix_(Cineby).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Netflix_(Cineby)
