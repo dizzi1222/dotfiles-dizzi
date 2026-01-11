@@ -4,6 +4,7 @@ Exec=env "WINEPREFIX=/home/diego/.wine" wine "C:\\\\users\\\\diego\\\\AppData\\\
 Type=Application
 StartupNotify=true
 Comment=Silver Palace
+Hidden=true
 Path=/home/diego/.wine/drive_c/Program Files/SilverPalaceLauncherGlobal
 Icon=C79D_Launcher.0
 StartupWMClass=launcher.exe

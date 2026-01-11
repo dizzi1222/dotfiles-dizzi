@@ -1,50 +1,4 @@
 #!/bin/bash
-# ═══════════════════════════════════════════════════════════
-# PASO 25.5: GRUB (CORREGIDO - Faltaba fi)
-# ═══════════════════════════════════════════════════════════
-print_step "25.5/35: GRUB + Iconos"
-
-echo
-read -p "¿Instalar temas Minecraft para GRUB? [S/n]: " install_minecraft_grub
-
-if [[ ! "$install_minecraft_grub" =~ ^[Nn]$ ]]; then
-  print_header "Instalando Temas Minecraft"
-
-  sudo mkdir -p /boot/grub/themes
-
-  # World Selection
-  if [[ ! -d /boot/grub/themes/minegrub-world-selection ]]; then
-    git clone --depth 1 https://github.com/Lxtharia/minegrub-world-selection.git /tmp/minegrub-ws
-    sudo cp -r /tmp/minegrub-ws/minegrub-world-selection /boot/grub/themes/
-    rm -rf /tmp/minegrub-ws
-    print_success "World Selection instalado"
-  fi
-
-  # Classic
-  if [[ ! -d /boot/grub/themes/minegrub ]]; then
-    git clone --depth 1 https://github.com/Lxtharia/minegrub-theme.git /tmp/minegrub-classic
-    sudo cp -r /tmp/minegrub-classic/minegrub /boot/grub/themes/
-    rm -rf /tmp/minegrub-classic
-    print_success "Classic instalado"
-  fi
-
-  echo
-  read -p "¿Reconfigurar GRUB? [S/n]: " reconfig_grub
-
-  if [[ ! "$reconfig_grub" =~ ^[Nn]$ ]]; then
-    if [[ -L /etc/default/grub ]]; then
-      sudo grub-mkconfig -o /boot/grub/grub.cfg
-      print_success "GRUB reconfigurado"
-    else
-      print_warning "Symlink GRUB no existe"
-    fi
-  fi
-fi # 🔴 ESTE FI FALTABA
-
-print_status "Actualizando cachés..."
-update-desktop-database ~/.local/share/applications 2>/dev/null || true
-gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
-
 # fase2-HyprInstall-full.sh
 # Script OPTIMIZADO SIN COMPILACIONES LARGAS
 # Ejecutar como usuario normal después de archinstall
@@ -210,24 +164,38 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: GRUB config"
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
-
   
-# Para solucionar gnome Keyring en SDDM y GNOME
+  # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
     sudo pacman -S gnome-keyring --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
 
-# Para solucionar Suspender al cerrar la laptop, viceversa
+  # Para reparar problemas con WIFI                                                                                                 
+  if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
+    print_package "Symlink: WIFI reparar problemas"
+    sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
+    sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
+    sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi power_save=0
+    print_status "Recuerda usar:
+    ip link show
+    nmcli device status
+    sudo dmesg | grep iwlwifi"
+
+    # Esto comprueba si hay problemas con el WIFI o las BIOS
+  fi
+
+  # Para solucionar Suspender al cerrar la laptop, viceversa
   if [[ -f ~/dotfiles-dizzi/etc/systemd/logind.conf ]]; then
     print_package "Symlink: Suspender al cerrar la laptop, viceversa"
     sudo ln -sf ~/dotfiles-dizzi/etc/systemd/logind.conf /etc/systemd/logind.conf
     # sudo systemctl restart systemd-logind
     print_status "Recuerda usar:
     sudo systemctl restart systemd-logind   O reiniciar el sistema
-    systemctl status systemd-logind   para ver si se ejecuto
-  "
+    systemctl status systemd-logind   para ver si se ejecuto"
   fi
 
   # Recargar servicios
@@ -406,7 +374,22 @@ fi
     systemctl --user start ydotool.service 2>/dev/null || true
   fi
 
+  # NetworkManager y bluetooth 
+  if [[ -f ~/home/ ]]; then
+    print_package "Habilitando: NetworkManager"
+    systemctl --user enable NetworkManager 
+    systemctl --user start NetworkManager 
+  fi
+
+  # bluetooth
+  if [[ -f ~/home/ ]]; then
+    print_package "Habilitando: bluetooth"
+    systemctl --user enable bluetooth 
+    systemctl --user start bluetooth 
+  fi
+
   print_success "Servicios de usuario habilitados"
+  print_success "bluetooth y Wifi habilitados"
 else
   print_warning "Servicios de usuario omitidos"
 fi
@@ -540,6 +523,8 @@ if command -v spotify &>/dev/null; then
   sudo chown -R $USER:$USER /opt/spotify/ 2>/dev/null || true
   spicetify backup apply 2>/dev/null || true
   curl -fsSL https://raw.githubusercontent.com/spicetify/marketplace/main/resources/install.sh | sh 2>/dev/null || true
+  print_success "Better-Local-Files instalado" || true
+  sh <(curl -s https://raw.githubusercontent.com/Pithaya/spicetify-apps/main/custom-apps/better-local-files/src/install.sh)
   print_success "Spicetify instalado"
 else
   print_warning "Spotify no detectado"

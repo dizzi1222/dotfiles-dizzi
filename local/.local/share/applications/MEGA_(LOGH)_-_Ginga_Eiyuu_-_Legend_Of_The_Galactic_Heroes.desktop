@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=MEGA (LOGH) - Ginga Eiyuu - Legend Of The Galactic Heroes
+Comment=Open MEGA (LOGH) - Ginga Eiyuu - Legend Of The Galactic Heroes
+Exec=brave --app="https://mega.nz/folder/ScJjhQwI#aRDESuk3uJs0x-winZrXeA"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/MEGA_(LOGH)_-_Ginga_Eiyuu_-_Legend_Of_The_Galactic_Heroes.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=MEGA_(LOGH)_-_Ginga_Eiyuu_-_Legend_Of_The_Galactic_Heroes

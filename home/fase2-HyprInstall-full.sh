@@ -685,10 +685,12 @@ esac
 # ═══════════════════════════════════════════════════════════
 print_installing "Extras (SOLO -bin, sin compilar)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  stacer-bin jdownloader2 megasync \
+  stacer-bin zip 7zip rar waydroid transmission-gtk jdownloader2 megasync \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
+print_success "Instalado apps basicas: zip, 7zip, rar, appimagelauncher"
+print_success "Instalado Downloaders: megasync, jdownloader2, pamac-aur [Panel Control], transmission-gtk (Utorrent)"
 print_success "Aplicaciones instaladas (solo binarios)"
 
 # ═══════════════════════════════════════════════════════════
@@ -709,7 +711,7 @@ STREMIO_INSTALLED=false
 if [[ "$install_stremio_aur" =~ ^[Ss]$ ]]; then
   print_header "Instalando Stremio Nativo (~10-15 minutos)"
 
-  if yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake stremio 2>/dev/null; then
+  if yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake stremio stremio-service-bin 2>/dev/null; then
     print_success "Stremio (AUR) instalado"
     STREMIO_INSTALLED=true
   else
@@ -973,24 +975,38 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: GRUB config"
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
-
   
-# Para solucionar gnome Keyring en SDDM y GNOME
+  # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
     sudo pacman -S gnome-keyring --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
 
-# Para solucionar Suspender al cerrar la laptop, viceversa
+  # Para reparar problemas con WIFI                                                                                                 
+  if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
+    print_package "Symlink: WIFI reparar problemas"
+    sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
+    sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
+    sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi power_save=0
+    print_status "Recuerda usar:
+    ip link show
+    nmcli device status
+    sudo dmesg | grep iwlwifi"
+
+    # Esto comprueba si hay problemas con el WIFI o las BIOS
+  fi
+
+  # Para solucionar Suspender al cerrar la laptop, viceversa
   if [[ -f ~/dotfiles-dizzi/etc/systemd/logind.conf ]]; then
     print_package "Symlink: Suspender al cerrar la laptop, viceversa"
     sudo ln -sf ~/dotfiles-dizzi/etc/systemd/logind.conf /etc/systemd/logind.conf
     # sudo systemctl restart systemd-logind
     print_status "Recuerda usar:
     sudo systemctl restart systemd-logind   O reiniciar el sistema
-    systemctl status systemd-logind   para ver si se ejecuto
-  "
+    systemctl status systemd-logind   para ver si se ejecuto"
   fi
 
   # Recargar servicios
@@ -1092,8 +1108,23 @@ fi
     systemctl --user enable ydotool.service 2>/dev/null || print_warning "ydotool.service no encontrado"
     systemctl --user start ydotool.service 2>/dev/null || true
   fi
+  
+  # NetworkManager y bluetooth 
+  if [[ -f ~/home/ ]]; then
+    print_package "Habilitando: NetworkManager"
+    systemctl --user enable NetworkManager 
+    systemctl --user start NetworkManager 
+  fi
+
+  # bluetooth
+  if [[ -f ~/home/ ]]; then
+    print_package "Habilitando: bluetooth"
+    systemctl --user enable bluetooth 
+    systemctl --user start bluetooth 
+  fi
 
   print_success "Servicios de usuario habilitados"
+  print_success "bluetooth y Wifi habilitados"
 else
   print_warning "Servicios de usuario omitidos"
 fi
@@ -1227,6 +1258,8 @@ if command -v spotify &>/dev/null; then
   sudo chown -R $USER:$USER /opt/spotify/ 2>/dev/null || true
   spicetify backup apply 2>/dev/null || true
   curl -fsSL https://raw.githubusercontent.com/spicetify/marketplace/main/resources/install.sh | sh 2>/dev/null || true
+  print_success "Better-Local-Files instalado" || true
+  sh <(curl -s https://raw.githubusercontent.com/Pithaya/spicetify-apps/main/custom-apps/better-local-files/src/install.sh)
   print_success "Spicetify instalado"
 else
   print_warning "Spotify no detectado"
@@ -1652,9 +1685,9 @@ EOL
     echo
   fi
 
-  # ═══════════════════════════════════════════════════════════
-  # FLATPAK CLICKER (CON VERIFICACIÓN MEJORADA)
-  # ═══════════════════════════════════════════════════════════
+  # ══════════════════════════════════════════════════════════════════
+  # FLATPAK CLICKER+Tinytask [BiggerTask] (CON VERIFICACIÓN MEJORADA)
+  # ══════════════════════════════════════════════════════════════════
   if [[ "$install_flatpak" =~ ^[Ss]$ ]]; then
     print_installing "Flatpak Clicker"
 
@@ -1677,6 +1710,8 @@ EOL
       print_status "Instalando desde flathub..."
       if flatpak install -y flathub net.codelogistics.clicker; then
         print_success "Flatpak Clicker instalado"
+        flatpak install -y io.github.taboulet.BiggerTask
+        print_success "Flatpak BiggerTask instalado (Tinytask)"
       else
         print_error "Error instalando Flatpak Clicker"
         print_warning "Intenta manualmente: flatpak install flathub net.codelogistics.clicker"
@@ -1692,13 +1727,12 @@ EOL
     echo -e "${YELLOW}⚠️  Nota:${NC} Requiere permisos de portal Wayland cada vez"
   fi
     # ═══════════════════════════════════════════════════════════
-    # XCLICKER (GUI)
+    # XCLICKER, MAXAUTOCLICKER & atbswp [Tinytask?] (GUI)
     # ═══════════════════════════════════════════════════════════
     if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
       print_installing "Xclicker"
-      sudo pacman -S --needed --noconfirm xclicker
       yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-        xclicker 2>/dev/null || print_warning "Xclicker falló"
+        xclicker maxautoclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
 
       print_success "Xclicker instalado"
     else

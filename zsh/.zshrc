@@ -756,6 +756,9 @@ alias limpiar_cache='bash ~/scripts/limpiar_cache.sh'
 alias githelp='bash ~/scripts/git-help.sh'
 alias gitclean='bash ~/scripts/git_clean.sh'
 
+# ═══════════════════════════════════════════════════════════
+# PYMACRO RECORD (LOCAL CONFIG)
+# ═══════════════════════════════════════════════════════════
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
@@ -778,5 +781,4 @@ export GIT_CLEAN_REPO="$HOME/dotfiles-dizzi"
 export EDITOR="nvim"
 export VISUAL="nvim"
 export GIT_EDITOR="nvim"
-
 

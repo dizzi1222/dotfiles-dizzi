@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Pinterest
+Comment=Open Pinterest
+Exec=brave --app="https://www.pinterest.com/"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Pinterest.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Pinterest
