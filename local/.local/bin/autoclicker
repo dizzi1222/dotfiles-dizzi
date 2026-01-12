@@ -1,0 +1,247 @@
+#!/bin/bash
+# /001   autoclicker -> ../../dotfiles-dizzi/local/.local/bin/autoclicker
+# AutoClicker interactivo con ydotool + gum (FIXED v2)
+
+# ═══════════════════════════════════════════════════════════
+# COLORES Y FORMATO
+# ═══════════════════════════════════════════════════════════
+RESET='\033[0m'
+BOLD='\033[1m'
+DIM='\033[2m'
+CYAN='\033[96m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+RED='\033[91m'
+BLUE='\033[94m'
+MAGENTA='\033[95m'
+
+PIDFILE="/tmp/ydotool-autoclicker.pid"
+
+# ═══════════════════════════════════════════════════════════
+# VERIFICAR DEPENDENCIAS
+# ═══════════════════════════════════════════════════════════
+check_deps() {
+  for cmd in gum ydotool; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo -e "${RED}${BOLD}❌ Error:${RESET} ${YELLOW}$cmd${RESET} no está instalado"
+      [[ "$cmd" == "gum" ]] && echo -e "${DIM}Instala con: ${YELLOW}yay -S gum${RESET}"
+      [[ "$cmd" == "ydotool" ]] && echo -e "${DIM}Instala con: ${YELLOW}sudo pacman -S ydotool${RESET}"
+      return 1
+    fi
+  done
+  return 0
+}
+
+# ═══════════════════════════════════════════════════════════
+# LIMPIAR PIDFILE SI EL PROCESO NO EXISTE
+# ═══════════════════════════════════════════════════════════
+clean_pidfile() {
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    if ! kill -0 "$pid" 2>/dev/null; then
+      rm -f "$PIDFILE"
+      return 1 # PID muerto
+    fi
+    return 0 # PID vivo
+  fi
+  return 1 # No existe PIDFILE
+}
+
+# ═══════════════════════════════════════════════════════════
+# CALCULAR CLICKS POR SEGUNDO (sin bc)
+# ═══════════════════════════════════════════════════════════
+calc_cps() {
+  local interval=$1
+  local cps=$((1000 / interval))
+  echo "$cps"
+}
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIONES DE CONTROL
+# ═══════════════════════════════════════════════════════════
+start_clicking() {
+  local interval="${1:-100}"
+
+  # Limpiar PIDs muertos antes de verificar
+  clean_pidfile
+
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    echo -e "${YELLOW}⚠️  AutoClicker ya está corriendo${RESET} ${DIM}(PID: $pid)${RESET}"
+    gum confirm "¿Detener y reiniciar?" && stop_clicking || exit 0
+  fi
+
+  local cps=$(calc_cps "$interval")
+
+  echo -e "${BLUE}🖱️  Iniciando AutoClicker${RESET}"
+  echo -e "${DIM}   Intervalo: ${YELLOW}${interval}ms${RESET} ${DIM}(~${cps} clicks/seg)${RESET}"
+
+  # Loop en background
+  (
+    while true; do
+      ydotool click 0xC0 2>/dev/null || exit 1 # Sale si ydotool falla
+      sleep "0.$(printf '%03d' $interval)"
+    done
+  ) &
+
+  local pid=$!
+  echo $pid >"$PIDFILE"
+
+  # Verificar que el proceso realmente arrancó
+  sleep 0.2
+  if ! kill -0 "$pid" 2>/dev/null; then
+    rm -f "$PIDFILE"
+    echo -e "${RED}${BOLD}❌ Error:${RESET} No se pudo iniciar el autoclicker"
+    echo -e "${DIM}Verifica que ydotool esté corriendo: ${YELLOW}systemctl --user status ydotool${RESET}"
+    exit 1
+  fi
+
+  echo -e "${GREEN}${BOLD}✅ AutoClicker iniciado${RESET} ${DIM}(PID: $pid)${RESET}"
+  echo -e "${CYAN}   Detener con:${RESET} ${YELLOW}F8${RESET} ${DIM}o${RESET} ${YELLOW}autoclicker stop${RESET}"
+}
+
+stop_clicking() {
+  clean_pidfile
+
+  if [[ ! -f "$PIDFILE" ]]; then
+    echo -e "${YELLOW}⚠️  AutoClicker no está corriendo${RESET}"
+    return 0
+  fi
+
+  local pid=$(cat "$PIDFILE")
+  kill "$pid" 2>/dev/null
+  rm -f "$PIDFILE"
+
+  echo -e "${GREEN}${BOLD}✅ AutoClicker detenido${RESET} ${DIM}(PID: $pid)${RESET}"
+}
+
+status_clicking() {
+  clean_pidfile
+
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    echo -e "${GREEN}${BOLD}✅ AutoClicker corriendo${RESET} ${DIM}(PID: $pid)${RESET}"
+    return 0
+  else
+    echo -e "${YELLOW}⚠️  AutoClicker detenido${RESET}"
+    return 1
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# MENÚ INTERACTIVO
+# ═══════════════════════════════════════════════════════════
+interactive_menu() {
+  echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
+  echo -e "${CYAN}${BOLD}║        🖱️  AUTOCLICKER CON YDOTOOL 🖱️            ║${RESET}"
+  echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════╝${RESET}\n"
+
+  # Verificar estado actual (limpiando PIDs muertos)
+  clean_pidfile
+  local is_running=false
+
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    is_running=true
+    echo -e "${GREEN}${BOLD}Estado:${RESET} ${GREEN}●${RESET} Corriendo ${DIM}(PID: $pid)${RESET}\n"
+  else
+    echo -e "${YELLOW}${BOLD}Estado:${RESET} ${DIM}○${RESET} Detenido\n"
+  fi
+
+  # Menú principal
+  if [[ "$is_running" == true ]]; then
+    local action=$(gum choose \
+      "⏹️  Detener autoclicker" \
+      "🔄 Reiniciar con nueva velocidad" \
+      "❌ Salir" \
+      --header "¿Qué deseas hacer?")
+
+    case "$action" in
+    *Detener*)
+      stop_clicking
+      ;;
+    *Reiniciar*)
+      stop_clicking
+      sleep 0.5
+      select_speed
+      ;;
+    *)
+      exit 0
+      ;;
+    esac
+  else
+    select_speed
+  fi
+}
+
+select_speed() {
+  echo -e "\n${BLUE}${BOLD}Selecciona velocidad:${RESET}\n"
+
+  local speed=$(gum choose \
+    "⚡ Turbo      (50ms  = ~20 clicks/seg)" \
+    "🚀 Rápido     (100ms = ~10 clicks/seg)" \
+    "⏩ Moderado   (200ms = ~5 clicks/seg)" \
+    "▶️  Normal     (500ms = ~2 clicks/seg)" \
+    "🐌 Lento      (1000ms = ~1 click/seg)" \
+    "⚙️  Custom     (especificar manualmente)" \
+    --header "Velocidad de clicks")
+
+  case "$speed" in
+  *Turbo*) start_clicking 50 ;;
+  *Rápido*) start_clicking 100 ;;
+  *Moderado*) start_clicking 200 ;;
+  *Normal*) start_clicking 500 ;;
+  *Lento*) start_clicking 1000 ;;
+  *Custom*)
+    echo -e "\n${MAGENTA}⚙️  Intervalo personalizado${RESET}"
+    local custom=$(gum input \
+      --prompt "Intervalo en milisegundos (ms): " \
+      --placeholder "100" \
+      --value "100")
+
+    if [[ "$custom" =~ ^[0-9]+$ ]]; then
+      start_clicking "$custom"
+    else
+      echo -e "${RED}❌ Valor inválido${RESET}"
+      exit 1
+    fi
+    ;;
+  *)
+    exit 0
+    ;;
+  esac
+}
+
+# ═══════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════
+main() {
+  check_deps || exit 1
+
+  case "${1:-menu}" in
+  start)
+    start_clicking "${2:-100}"
+    ;;
+  stop)
+    stop_clicking
+    ;;
+  status)
+    status_clicking
+    ;;
+  menu)
+    interactive_menu
+    ;;
+  *)
+    echo -e "${RED}${BOLD}Uso:${RESET} $(basename $0) ${YELLOW}{start|stop|status|menu}${RESET} ${DIM}[intervalo_ms]${RESET}"
+    echo
+    echo -e "${CYAN}Ejemplos:${RESET}"
+    echo -e "  ${DIM}$(basename $0)${RESET}              ${DIM}# Menú interactivo${RESET}"
+    echo -e "  ${DIM}$(basename $0) start 100${RESET}   ${DIM}# Iniciar (10 clicks/seg)${RESET}"
+    echo -e "  ${DIM}$(basename $0) stop${RESET}        ${DIM}# Detener${RESET}"
+    echo -e "  ${DIM}$(basename $0) status${RESET}      ${DIM}# Ver estado${RESET}"
+    exit 1
+    ;;
+  esac
+}
+
+main "$@"
