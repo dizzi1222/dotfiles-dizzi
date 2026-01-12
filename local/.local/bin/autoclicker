@@ -76,11 +76,21 @@ start_clicking() {
   echo -e "${BLUE}🖱️  Iniciando AutoClicker${RESET}"
   echo -e "${DIM}   Intervalo: ${YELLOW}${interval}ms${RESET} ${DIM}(~${cps} clicks/seg)${RESET}"
 
-  # Loop en background
+  # Convertir intervalo a segundos para sleep correctamente
+  local sleep_time
+  if [[ $interval -lt 10 ]]; then
+    sleep_time="0.00${interval}"
+  elif [[ $interval -lt 100 ]]; then
+    sleep_time="0.0${interval}"
+  else
+    sleep_time="0.${interval}"
+  fi
+
+  # Loop en background - COMPLETAMENTE SILENCIOSO
   (
     while true; do
       ydotool click 0xC0 2>/dev/null || exit 1 # Sale si ydotool falla
-      sleep "0.$(printf '%03d' $interval)"
+      sleep "$sleep_time"
     done
   ) &
 

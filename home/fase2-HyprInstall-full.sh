@@ -684,8 +684,12 @@ esac
 # Extras
 # ═══════════════════════════════════════════════════════════
 print_installing "Extras (SOLO -bin, sin compilar)"
+print_installing "Las Mejores VPN (No esta Urban)"
+sudo pacman -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \ 
+  proton-vpn-gtk-app  \
+  2>/dev/null || print_warning "Algunos extras fallaron"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  stacer-bin zip 7zip rar waydroid transmission-gtk jdownloader2 megasync \
+  stacer-bin zip 7zip rar waydroid transmission-gtk windscribe-v2-bin jdownloader2 megasync \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 

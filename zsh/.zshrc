@@ -782,3 +782,8 @@ export VISUAL="nvim"
 export GIT_EDITOR="nvim"
 
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+alias ydover="ydotool version"
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+alias ydover="ydotool version"
