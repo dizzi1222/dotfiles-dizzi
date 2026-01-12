@@ -3,8 +3,8 @@ Description=ydotool daemon
 After=default.target
 
 [Service]
-ExecStart=/usr/bin/ydotoold --socket-path=/tmp/.ydotool_socket
 Type=simple
+ExecStart=/usr/bin/ydotoold --socket-path=/tmp/.ydotool_socket --socket-perm=0600
 Restart=always
 RestartSec=3
 

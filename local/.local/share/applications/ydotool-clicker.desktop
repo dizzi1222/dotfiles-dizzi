@@ -1,0 +1,9 @@
+[Desktop Entry]
+#/052 󰍹  ydotool-clicker.desktop
+Name=Ydotool Clicker (Auto) 
+Comment=(Like omarchy build with gum)
+Exec=kitty -e /home/diego/wrapper/autoclicker-menu
+Icon=input-mouse
+Terminal=false
+Type=Application
+Categories=Utility;
