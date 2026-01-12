@@ -9,4 +9,5 @@
   <property name="last-window-maximized" type="bool" value="true"/>
   <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_38_PERCENT"/>
   <property name="last-details-view-column-widths" type="string" value="50,50,193,50,50,204,50,50,389,50,50,89,50,775"/>
+  <property name="last-renamer-dialog-maximized" type="bool" value="true"/>
 </channel>

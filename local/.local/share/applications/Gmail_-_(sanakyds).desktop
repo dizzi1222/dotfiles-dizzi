@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Gmail - (sanakyds)
+Comment=Open Gmail - (sanakyds)
+Exec=brave --app="https://mail.google.com/mail/u/0/#inbox"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Gmail_-_(sanakyds).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Gmail_-_(sanakyds)

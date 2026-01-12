@@ -2,6 +2,7 @@
 Name=XClicker
 Comment=Auto-clicker for X11
 Exec=xclicker
+Hidden=true
 Icon=input-mouse
 Terminal=false
 Type=Application

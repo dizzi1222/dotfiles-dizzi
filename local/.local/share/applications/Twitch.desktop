@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Twitch
+Comment=Open Twitch
+Exec=brave --app="https://www.twitch.tv/"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Twitch.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Twitch

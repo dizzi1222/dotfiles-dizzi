@@ -771,7 +771,6 @@ alias omarchy-pkg-aur-install='bash ~/omarchy-arch-bin/omarchy-pkg-aur-install'
 
 # Config para the clicker de CARGO/rust
 export PATH="$HOME/.cargo/bin:$PATH"
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 # Si quieres cambiar el repo rápidamente sin menú: para darle uso a Windows +Z 󱞣
 export GIT_CLEAN_REPO="$HOME/dotfiles-dizzi"
                                                     
@@ -782,3 +781,4 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export GIT_EDITOR="nvim"
 
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket

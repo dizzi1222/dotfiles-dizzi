@@ -1400,7 +1400,7 @@ echo -e "${BOLD}${YELLOW}╚═════════════════�
 echo
 read -p "¿Instalar PyMacroRecord? [S/n]: " install_pymacro
 read -p "¿Instalar AutoClickers? [S/n]: " install_autoclickers
-read -p "¿Instalar PreMiD (Discord Rich Presence)? [s/N]: " install_premid
+# read -p "¿Instalar PreMiD (Discord Rich Presence)? [s/N]: " install_premid
 
 # ═══════════════════════════════════════════════════════════
 # PYMACRORECORD (CON PERMISOS INTEGRADOS)
@@ -1422,6 +1422,7 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
     ~/Descargas/PyMacroRecord-1.4.2
     ~/"{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2"
     ~/{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2/
+    ~/Linux-Tinytask-Alternativa-PyMacroRecord-Instalacion-1.4.2/
   )
 
   PYMACRO_FOUND=false
@@ -1580,14 +1581,16 @@ if [[ ! "$install_autoclickers" =~ ^[Nn]$ ]]; then
   echo
   echo -e "${CYAN}Selecciona autoclicker(s):${NC}"
   echo -e "${BOLD}${GREEN}1. TheClicker${NC} (Rust, RECOMENDADO)"
-  echo -e "${BOLD}${GREEN}2. ydotool${NC} (Universal)"
-  echo -e "${BOLD}${GREEN}3. Flatpak Clicker${NC} (GUI)"
-  echo -e "${BOLD}${GREEN}4. Xclicker${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}2. ydotool [like Wtype, dtool, xdtool]${NC} (Universal)"
+  echo -e "${BOLD}${GREEN}3. Flatpak Clicker & BiggerTask ${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}4. Xclicker & atbswp [Tinytask?] ${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}5. Clonar Macro-Tool [Tinytask?] ${NC} (GUI)"
   echo
   read -p "¿Instalar TheClicker? [S/n]: " install_theclicker
   read -p "¿Instalar ydotool? [s/N]: " install_ydotool
   read -p "¿Instalar Flatpak Clicker? [s/N]: " install_flatpak
-  read -p "¿Instalar Flatpak Clicker? [s/N]: " install_xclickerAUR
+  read -p "¿Instalar xClicker? (yay) [s/N]: " install_xclickerAUR
+  read -p "¿Instalar Macro-Tool? [s/N]: " install_macrotool
 
   # ═══════════════════════════════════════════════════════════
   # THECLICKER (CON PERMISOS INTEGRADOS)
@@ -1727,17 +1730,78 @@ EOL
     echo -e "${YELLOW}⚠️  Nota:${NC} Requiere permisos de portal Wayland cada vez"
   fi
     # ═══════════════════════════════════════════════════════════
-    # XCLICKER, MAXAUTOCLICKER & atbswp [Tinytask?] (GUI)
+    # XCLICKER, & atbswp [Tinytask?] (GUI)
     # ═══════════════════════════════════════════════════════════
     if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
       print_installing "Xclicker"
       yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-        xclicker maxautoclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
+        xclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
 
       print_success "Xclicker instalado"
     else
       print_warning "Xclicker omitido"
     fi
+
+# ═══════════════════════════════════════════════════════════
+# MACRO-TOOL - INSTALACIÓN SIMPLE Y DIRECTA
+# ═══════════════════════════════════════════════════════════
+if [[ "$install_macrotool" =~ ^[Ss]$ ]]; then
+  print_header "Instalando Macro-Tool"
+
+  # Dependencias del sistema
+  print_installing "Dependencias del sistema"
+  sudo pacman -S --needed --noconfirm python python-pip git tk xdotool wmctrl
+
+  # Directorio de instalación
+  MACROTOOL_DIR=~/.local/share/macro-tool
+  [[ -d "$MACROTOOL_DIR" ]] && rm -rf "$MACROTOOL_DIR"
+
+  # Clonar repositorio
+  print_installing "Clonando Macro-Tool desde GitHub"
+  git clone --depth 1 https://github.com/YatoVoid/Macro-Tool.git "$MACROTOOL_DIR"
+  cd "$MACROTOOL_DIR"
+
+  # Setup automático (crea venv e instala dependencias)
+  print_installing "Configurando entorno virtual"
+  python3 run_macro.py &
+  SETUP_PID=$!
+  sleep 5
+  kill $SETUP_PID 2>/dev/null || pkill -f "python3 run_macro.py"
+
+  # Launcher
+  print_installing "Creando launcher"
+  mkdir -p ~/.local/bin
+  cat >~/.local/bin/macro-tool <<'EOF'
+#!/bin/bash
+cd ~/.local/share/macro-tool
+source venv/bin/activate
+python3 AutoClicker.py
+EOF
+  chmod +x ~/.local/bin/macro-tool
+
+  # Desktop entry
+  mkdir -p ~/.local/share/applications
+  cat >~/.local/share/applications/macro-tool.desktop <<'EOF'
+[Desktop Entry]
+Name=Macro-Tool AutoClicker
+Exec=macro-tool
+Icon=input-mouse
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+
+  update-desktop-database ~/.local/share/applications 2>/dev/null
+
+  print_success "Macro-Tool instalado → Ejecuta: macro-tool"
+  
+  echo
+  echo -e "${CYAN}Ubicación:${NC}"
+  echo -e "  ${YELLOW}~/.local/share/macro-tool/${NC}"
+  echo
+else
+  print_warning "Macro-Tool omitido"
+fi
     echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
 fi
 
@@ -1789,7 +1853,8 @@ echo -e "${GREEN}${BOLD}Herramientas instaladas:${NC}"
 command -v theclicker &>/dev/null && echo -e "  ${GREEN}✓${NC} TheClicker"
 command -v ydotool &>/dev/null && echo -e "  ${GREEN}✓${NC} ydotool"
 flatpak list | grep -q clicker && echo -e "  ${GREEN}✓${NC} Flatpak Clicker"
-command -v premid &>/dev/null && echo -e "  ${GREEN}✓${NC} PreMiD"
+[[ -f ~/.local/bin/macro-tool ]] && echo -e "  ${GREEN}✓${NC} Macro-Tool"
+# command -v premid &>/dev/null && echo -e "  ${GREEN}✓${NC} PreMiD"
 
 echo
 if ! groups | grep -q input; then
