@@ -1,0 +1,35 @@
+#!/bin/bash
+# autoclicker-menu (FIXED)
+# Wrapper que configura el socket correcto y mantiene terminal abierta
+
+# Configurar socket de ydotool
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+
+# Verificar que ydotoold esté corriendo
+if ! systemctl --user is-active --quiet ydotool.service; then
+  echo -e "\033[1;31m❌ Error: ydotool no está corriendo\033[0m"
+  echo
+  echo -e "\033[0;33mIniciando ydotool...\033[0m"
+  systemctl --user start ydotool.service
+  sleep 2
+fi
+
+# Verificar socket
+if [[ ! -S /tmp/.ydotool_socket ]]; then
+  echo -e "\033[1;31m❌ Error: Socket no encontrado\033[0m"
+  echo -e "\033[0;33mEjecuta: ~/fix-ydotool.sh\033[0m"
+  echo
+  echo -e "\033[0;36mPresiona Enter para cerrar...\033[0m"
+  read -r
+  exit 1
+fi
+
+# Ejecutar autoclicker
+~/.local/bin/autoclicker
+
+# Esperar Enter para cerrar
+echo
+echo -e "\033[1;33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\033[1;32m✅ Proceso completado\033[0m"
+echo -e "\033[0;36mPresiona Enter para cerrar...\033[0m"
+read -r
