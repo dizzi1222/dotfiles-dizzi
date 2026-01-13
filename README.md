@@ -487,6 +487,8 @@ _Mi configuración de [LazyVim](https://github.com/LazyVim/LazyVim) - [Documenta
 
 </details>
 
+![historial-root-FIX-initramfs-linux](https://github.com/user-attachments/assets/5f922184-f6b8-4336-baa5-bc422bb85837)
+
 ---
 
 ## 🚀 Instalación Rápida
