@@ -33,7 +33,6 @@ EOF
   echo -e "                       Con args: agrega contexto extra"
   echo -e "                       Ejemplo: ${CYAN}gitquick \"actualizar configs\"${RESET}\n"
 
-  echo -e "  ${GREEN}gitai${RESET}              → Commit con ${YELLOW}IA LOCAL${RESET} (qwen2.5:0.5b)"
   echo -e "                       Usa opencommit (oco) con Ollama"
   echo -e "                       Genera mensaje automático"
   echo -e "                       Te pregunta si pushear\n"

@@ -686,7 +686,7 @@ esac
 print_installing "Extras (SOLO -bin, sin compilar)"
 print_installing "Las Mejores VPN (No esta Urban)"
 sudo pacman -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \ 
-  proton-vpn-gtk-app  \
+proton-vpn-gtk-app \
   2>/dev/null || print_warning "Algunos extras fallaron"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   stacer-bin zip 7zip rar waydroid transmission-gtk windscribe-v2-bin jdownloader2 megasync \
@@ -979,7 +979,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: GRUB config"
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
-  
+
   # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
@@ -987,7 +987,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
 
-  # Para reparar problemas con WIFI                                                                                                 
+  # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
     print_package "Symlink: WIFI reparar problemas"
     sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
@@ -1060,23 +1060,23 @@ if [[ ! "$enable_services" =~ ^[Nn]$ ]]; then
     systemctl --user start gemini.service 2>/dev/null || true
   fi
 
-# Espanso
-if [[ -f ~/.config/systemd/user/espanso.service ]]; then
-  killall espanso 2>/dev/null || true
-  print_package "Habilitando: espanso.service"
-  
-  # Registrar servicio si no está registrado
-  espanso service register 2>/dev/null || true
-  
-  # Habilitar e iniciar via systemd (NO usar 'espanso start' directamente)
-  systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
-  systemctl --user start espanso.service 2>/dev/null || true
-  
-  # Esperar 2 segundos para que inicie
-  sleep 2
-  
-  print_success "Espanso iniciado via systemd"
-fi
+  # Espanso
+  if [[ -f ~/.config/systemd/user/espanso.service ]]; then
+    killall espanso 2>/dev/null || true
+    print_package "Habilitando: espanso.service"
+
+    # Registrar servicio si no está registrado
+    espanso service register 2>/dev/null || true
+
+    # Habilitar e iniciar via systemd (NO usar 'espanso start' directamente)
+    systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
+    systemctl --user start espanso.service 2>/dev/null || true
+
+    # Esperar 2 segundos para que inicie
+    sleep 2
+
+    print_success "Espanso iniciado via systemd"
+  fi
 
   # Kanata
   if [[ -f ~/.config/systemd/user/kanata.service ]]; then
@@ -1112,19 +1112,19 @@ fi
     systemctl --user enable ydotool.service 2>/dev/null || print_warning "ydotool.service no encontrado"
     systemctl --user start ydotool.service 2>/dev/null || true
   fi
-  
-  # NetworkManager y bluetooth 
+
+  # NetworkManager y bluetooth
   if [[ -f ~/home/ ]]; then
     print_package "Habilitando: NetworkManager"
-    systemctl --user enable NetworkManager 
-    systemctl --user start NetworkManager 
+    systemctl --user enable NetworkManager
+    systemctl --user start NetworkManager
   fi
 
   # bluetooth
   if [[ -f ~/home/ ]]; then
     print_package "Habilitando: bluetooth"
-    systemctl --user enable bluetooth 
-    systemctl --user start bluetooth 
+    systemctl --user enable bluetooth
+    systemctl --user start bluetooth
   fi
 
   print_success "Servicios de usuario habilitados"
@@ -1209,14 +1209,14 @@ read -p "¿Configurar Bottles para gaming? [s/N]: " setup_bottles
 
 if [[ "$setup_bottles" =~ ^[Ss]$ ]]; then
   print_header "Configurando Bottles"
-  
+
   # Verificar si install-bottles.sh existe
   BOTTLES_SCRIPT_PATHS=(
     ~/dotfiles-dizzi/home/install-bottles.sh
     ~/install-bottles.sh
     ~/Descargas/install-bottles.sh
   )
-  
+
   BOTTLES_SCRIPT=""
   for path in "${BOTTLES_SCRIPT_PATHS[@]}"; do
     if [[ -f "$path" ]]; then
@@ -1224,30 +1224,30 @@ if [[ "$setup_bottles" =~ ^[Ss]$ ]]; then
       break
     fi
   done
-  
+
   if [[ -z "$BOTTLES_SCRIPT" ]]; then
     print_warning "install-bottles.sh no encontrado"
     print_status "Descargando script desde repositorio..."
-    
+
     wget -q https://raw.githubusercontent.com/dizzi1222/dotfiles-dizzi/main/home/install-bottles.sh \
       -O ~/install-bottles.sh 2>/dev/null || {
       print_error "Error descargando script"
       print_info "Instalación manual: yay -S bottles"
     }
-    
+
     BOTTLES_SCRIPT=~/install-bottles.sh
   fi
-  
+
   if [[ -f "$BOTTLES_SCRIPT" ]]; then
     chmod +x "$BOTTLES_SCRIPT"
     print_status "Ejecutando configuración de Bottles..."
     "$BOTTLES_SCRIPT"
-    
+
     print_success "Bottles configurado"
   else
     print_error "No se pudo ejecutar install-bottles.sh"
   fi
-  
+
 else
   print_warning "Bottles omitido (puedes instalarlo después con: yay -S bottles)"
 fi
@@ -1419,14 +1419,14 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
     zlib libjpeg-turbo libtiff libwebp openjpeg2 \
     python-setuptools python-wheel python-pillow
 
-  # Buscar PyMacroRecord
+  # Buscar PyMacroRecord (CORREGIDO)
   PYMACRO_PATHS=(
-    ~/dotfiles-dizzi/home/PyMacroRecord-1.4.2
-    ~/dotfiles-dizzi/PyMacroRecord-1.4.2
+    ~/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.2
+    ~/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.1
+    ~/LinuxPyMacroRecord/PyMacroRecord-1.4.2
+    ~/LinuxPyMacroRecord/PyMacroRecord-1.4.1
     ~/Descargas/PyMacroRecord-1.4.2
-    ~/"{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2"
-    ~/{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2/
-    ~/Linux-Tinytask-Alternativa-PyMacroRecord-Instalacion-1.4.2/
+    ~/Descargas/PyMacroRecord-1.4.1
   )
 
   PYMACRO_FOUND=false
@@ -1445,7 +1445,9 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
     print_warning "PyMacroRecord no encontrado"
     echo
     echo -e "${CYAN}Descarga desde:${NC} ${YELLOW}https://www.pymacrorecord.com/download${NC}"
-    echo -e "${CYAN}Extrae el ZIP en:${NC} ${YELLOW}~/Descargas/${NC}"
+    echo -e "${CYAN}O tienes las carpetas en:${NC}"
+    echo "  • ~/LinuxPyMacroRecord/PyMacroRecord-1.4.2"
+    echo "  • ~/LinuxPyMacroRecord/PyMacroRecord-1.4.1"
     echo
     read -p "Introduce ruta completa (o Enter para omitir): " custom_path
 
@@ -1458,13 +1460,20 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
   if [[ "$PYMACRO_FOUND" == true ]]; then
     print_installing "Configurando PyMacroRecord"
 
-    # Copiar a ubicación definitiva
+    # CRÍTICO: Copiar SOLO la carpeta de PyMacroRecord, NO todo ~
     mkdir -p ~/.local/share
-    rm -rf ~/.local/share/pymacro
+
+    # Eliminar instalación anterior
+    if [[ -d ~/.local/share/pymacro ]]; then
+      print_status "Eliminando instalación anterior..."
+      rm -rf ~/.local/share/pymacro
+    fi
+
+    # Copiar CORRECTAMENTE
     cp -r "$PYMACRO_PATH" ~/.local/share/pymacro
     cd ~/.local/share/pymacro
 
-    # Eliminar venv viejo
+    # Eliminar venv viejo si existe
     if [[ -d venv ]]; then
       print_status "Eliminando venv antiguo..."
       rm -rf venv
@@ -1492,35 +1501,63 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
 
     deactivate
 
-    # ═══════════════════════════════════════════════════════════
-    # CONFIGURAR PERMISOS (CRÍTICO)
-    # ═══════════════════════════════════════════════════════════
+    # Configurar permisos
     setup_input_permissions "PyMacroRecord"
 
-    # Crear launcher mejorado con verificación
-    print_installing "Creando launcher"
+    # Crear launcher con XWayland wrapper
+    print_installing "Creando launcher XWayland"
     mkdir -p ~/.local/bin
+
     cat >~/.local/bin/pymacrorecord <<'EOL'
 #!/bin/bash
-# Launcher de PyMacroRecord con verificación de permisos
+# Wrapper DEFINITIVO para PyMacroRecord en Hyprland/Wayland
 
-# Verificar permisos básicos
-if [[ ! -r /dev/uinput ]]; then
-  echo "⚠️  Advertencia: Sin permisos para /dev/uinput"
-  echo "   Ejecutando con sudo..."
-  cd ~/.local/share/pymacro
-  source venv/bin/activate
-  cd src
-  sudo python main.py
-  exit $?
+PYMACRO_DIR=~/.local/share/pymacro
+
+# Verificar instalación
+if [[ ! -d "$PYMACRO_DIR" ]]; then
+    echo "❌ PyMacroRecord no encontrado en $PYMACRO_DIR"
+    exit 1
 fi
 
-# Todo OK, ejecutar normalmente
-cd ~/.local/share/pymacro
+# Encontrar display de XWayland
+find_xwayland_display() {
+    local display=$(ps aux | grep -i xwayland | grep -oE ':[0-9]+' | head -1)
+    if [[ -z "$display" ]]; then
+        display=$(ls /tmp/.X11-unix/ 2>/dev/null | grep -oE 'X[0-9]+' | head -1 | sed 's/X/:/')
+    fi
+    if [[ -z "$display" ]]; then
+        display=":0"
+    fi
+    echo "$display"
+}
+
+XWAYLAND_DISPLAY=$(find_xwayland_display)
+
+# Configurar variables de entorno para XWayland
+export DISPLAY="$XWAYLAND_DISPLAY"
+export GDK_BACKEND=x11
+export QT_QPA_PLATFORM=xcb
+export XAUTHORITY="$HOME/.Xauthority"
+
+# Verificar conexión a XWayland
+xhost +si:localuser:$USER 2>/dev/null
+
+# Activar entorno virtual
+cd "$PYMACRO_DIR"
+
+if [[ ! -d "venv" ]]; then
+    echo "❌ Entorno virtual no encontrado"
+    exit 1
+fi
+
 source venv/bin/activate
+
+# Ejecutar PyMacroRecord en XWayland
 cd src
-python main.py
+exec python main.py
 EOL
+
     chmod +x ~/.local/bin/pymacrorecord
 
     # Desktop file
@@ -1537,16 +1574,10 @@ Categories=Utility;Accessibility;
 Keywords=macro;automation;record;tinytask;
 EOL
 
-# Crear launcher mejorado con XWayland
-print_installing "Creando launcher XWayland"
-mkdir -p ~/.local/bin
-cp ~/wrapper/pymacrorecord-wrapper.sh ~/.local/bin/pymacrorecord
-chmod +x ~/.local/bin/pymacrorecord
-
     # Actualizar base de datos
     update-desktop-database ~/.local/share/applications 2>/dev/null || true
 
-    print_success "PyMacroRecord instalado con permisos configurados"
+    print_success "PyMacroRecord instalado con wrapper XWayland"
 
     # Verificar si necesita cerrar sesión
     if ! groups | grep -q input; then
@@ -1554,12 +1585,9 @@ chmod +x ~/.local/bin/pymacrorecord
       echo -e "${RED}${BOLD}⚠️  IMPORTANTE:${NC} ${YELLOW}Debes cerrar sesión y volver a entrar${NC}"
       echo -e "   (para aplicar permisos del grupo 'input')"
       echo
-    else
-      echo
-      echo -e "${GREEN}✓ Permisos aplicados, puedes usar PyMacroRecord ahora${NC}"
-      echo
     fi
 
+    echo
     echo -e "${GREEN}${BOLD}✨ GUÍA DE USO - PYMACRORECORD ✨${NC}"
     echo
     echo -e "${CYAN}Ejecutar:${NC}"
@@ -1570,12 +1598,6 @@ chmod +x ~/.local/bin/pymacrorecord
     echo -e "  ${RED}●${NC} ${RED}Botón ROJO${NC} → Grabar"
     echo -e "  ${YELLOW}■${NC} ${YELLOW}Botón NEGRO${NC} → Detener grabación"
     echo -e "  ${GREEN}▶${NC} ${GREEN}Botón VERDE${NC} → Reproducir"
-    echo -e "  ${YELLOW}F3${NC} → Detener reproducción"
-    echo
-    echo -e "${CYAN}Atajos:${NC}"
-    echo -e "  ${YELLOW}Ctrl+S${NC} - Guardar macro (.pmr)"
-    echo -e "  ${YELLOW}Ctrl+L${NC} - Cargar macro"
-    echo -e "  ${YELLOW}Ctrl+N${NC} - Nueva (limpiar)"
     echo
   else
     print_error "PyMacroRecord no instalado"
@@ -1739,59 +1761,59 @@ EOL
     echo
     echo -e "${YELLOW}⚠️  Nota:${NC} Requiere permisos de portal Wayland cada vez"
   fi
-    # ═══════════════════════════════════════════════════════════
-    # XCLICKER, & atbswp [Tinytask?] (GUI)
-    # ═══════════════════════════════════════════════════════════
-    if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
-      print_installing "Xclicker"
-      yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-        xclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
+  # ═══════════════════════════════════════════════════════════
+  # XCLICKER, & atbswp [Tinytask?] (GUI)
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
+    print_installing "Xclicker"
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      xclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
 
-      print_success "Xclicker instalado"
-    else
-      print_warning "Xclicker omitido"
-    fi
+    print_success "Xclicker instalado"
+  else
+    print_warning "Xclicker omitido"
+  fi
 
-# ═══════════════════════════════════════════════════════════
-# MACRO-TOOL - INSTALACIÓN SIMPLE Y DIRECTA
-# ═══════════════════════════════════════════════════════════
-if [[ "$install_macrotool" =~ ^[Ss]$ ]]; then
-  print_header "Instalando Macro-Tool"
+  # ═══════════════════════════════════════════════════════════
+  # MACRO-TOOL - INSTALACIÓN SIMPLE Y DIRECTA
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$install_macrotool" =~ ^[Ss]$ ]]; then
+    print_header "Instalando Macro-Tool"
 
-  # Dependencias del sistema
-  print_installing "Dependencias del sistema"
-  sudo pacman -S --needed --noconfirm python python-pip git tk xdotool wmctrl
+    # Dependencias del sistema
+    print_installing "Dependencias del sistema"
+    sudo pacman -S --needed --noconfirm python python-pip git tk xdotool wmctrl
 
-  # Directorio de instalación
-  MACROTOOL_DIR=~/.local/share/macro-tool
-  [[ -d "$MACROTOOL_DIR" ]] && rm -rf "$MACROTOOL_DIR"
+    # Directorio de instalación
+    MACROTOOL_DIR=~/.local/share/macro-tool
+    [[ -d "$MACROTOOL_DIR" ]] && rm -rf "$MACROTOOL_DIR"
 
-  # Clonar repositorio
-  print_installing "Clonando Macro-Tool desde GitHub"
-  git clone --depth 1 https://github.com/YatoVoid/Macro-Tool.git "$MACROTOOL_DIR"
-  cd "$MACROTOOL_DIR"
+    # Clonar repositorio
+    print_installing "Clonando Macro-Tool desde GitHub"
+    git clone --depth 1 https://github.com/YatoVoid/Macro-Tool.git "$MACROTOOL_DIR"
+    cd "$MACROTOOL_DIR"
 
-  # Setup automático (crea venv e instala dependencias)
-  print_installing "Configurando entorno virtual"
-  python3 run_macro.py &
-  SETUP_PID=$!
-  sleep 5
-  kill $SETUP_PID 2>/dev/null || pkill -f "python3 run_macro.py"
+    # Setup automático (crea venv e instala dependencias)
+    print_installing "Configurando entorno virtual"
+    python3 run_macro.py &
+    SETUP_PID=$!
+    sleep 5
+    kill $SETUP_PID 2>/dev/null || pkill -f "python3 run_macro.py"
 
-  # Launcher
-  print_installing "Creando launcher"
-  mkdir -p ~/.local/bin
-  cat >~/.local/bin/macro-tool <<'EOF'
+    # Launcher
+    print_installing "Creando launcher"
+    mkdir -p ~/.local/bin
+    cat >~/.local/bin/macro-tool <<'EOF'
 #!/bin/bash
 cd ~/.local/share/macro-tool
 source venv/bin/activate
 python3 AutoClicker.py
 EOF
-  chmod +x ~/.local/bin/macro-tool
+    chmod +x ~/.local/bin/macro-tool
 
-  # Desktop entry
-  mkdir -p ~/.local/share/applications
-  cat >~/.local/share/applications/macro-tool.desktop <<'EOF'
+    # Desktop entry
+    mkdir -p ~/.local/share/applications
+    cat >~/.local/share/applications/macro-tool.desktop <<'EOF'
 [Desktop Entry]
 Name=Macro-Tool AutoClicker
 Exec=macro-tool
@@ -1801,18 +1823,18 @@ Type=Application
 Categories=Utility;
 EOF
 
-  update-desktop-database ~/.local/share/applications 2>/dev/null
+    update-desktop-database ~/.local/share/applications 2>/dev/null
 
-  print_success "Macro-Tool instalado → Ejecuta: macro-tool"
-  
-  echo
-  echo -e "${CYAN}Ubicación:${NC}"
-  echo -e "  ${YELLOW}~/.local/share/macro-tool/${NC}"
-  echo
-else
-  print_warning "Macro-Tool omitido"
-fi
-    echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
+    print_success "Macro-Tool instalado → Ejecuta: macro-tool"
+
+    echo
+    echo -e "${CYAN}Ubicación:${NC}"
+    echo -e "  ${YELLOW}~/.local/share/macro-tool/${NC}"
+    echo
+  else
+    print_warning "Macro-Tool omitido"
+  fi
+  echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
 fi
 
 # ═════════════════════════════════════════════════════════════
@@ -1959,7 +1981,6 @@ fi # 🔴 ESTE FI FALTABA
 print_status "Actualizando cachés..."
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
 gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
-
 
 # ═══════════════════════════════════════════════════════════
 # PASO 26: PYTHON-PYWAL

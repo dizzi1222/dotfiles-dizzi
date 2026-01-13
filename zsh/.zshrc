@@ -489,32 +489,7 @@ gitquick() {
 }
 
 # Versión 2: Commit con AI LOCAL (sin cloud models)
-gitai() {
-  # Verificar que existe qwen2.5:0.5b (modelo local)
-  if ! ollama list | grep -q "qwen2.5:0.5b"; then
-    echo "❌ Modelo local no encontrado. Descargando qwen2.5:0.5b..."
-    ollama pull qwen2.5:0.5b
-  fi
-
-  # Configurar temporalmente para usar modelo local
-  local current_model=$(oco config get OCO_MODEL 2>/dev/null || echo "")
-
-  # Si está usando un modelo cloud, cambiar temporalmente a local
-  if [[ "$current_model" == *"cloud"* ]]; then
-    echo "⚠️ Detectado modelo cloud, cambiando temporalmente a qwen2.5:0.5b"
-    oco config set OCO_MODEL=qwen2.5:0.5b
-  fi
-
-  git add . && oco
-
-  # Preguntar si pushear
-  echo -n "¿Pushear cambios? (y/n): "
-  read push_answer
-  if [[ "$push_answer" == "y" || "$push_answer" == "Y" ]]; then
-    git push
-    echo "✅ Cambios pusheados"
-  fi
-}
+# aicommit()
 
 # Versión 3: Función interactiva (mensaje personalizado)
 gitc() {
@@ -703,7 +678,7 @@ gitflow() {
       fi
       ;;
     3)
-      gitai
+      aicommit
       ;;
     4)
       gitconv
@@ -781,9 +756,8 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export GIT_EDITOR="nvim"
 
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
-alias ydover="ydotool version"
+# ═══════════════════════════════════════════════════════════
+# Alias para la herramienta de MACROS de LINUX
+# ═══════════════════════════════════════════════════════════
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 alias ydover="ydotool version"
