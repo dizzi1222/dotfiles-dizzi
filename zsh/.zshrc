@@ -761,3 +761,18 @@ export GIT_EDITOR="nvim"
 # ═══════════════════════════════════════════════════════════
 alias ydover="ydotool version"
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+
+# ═══════════════════════════════════════════════════════════
+# GNOME Keyring (protegido contra errores de glob)
+# ═══════════════════════════════════════════════════════════
+if [[ -d /run/user/$(id -u)/keyring ]]; then
+  # Control socket
+  _keyring_control=$(find /run/user/$(id -u)/keyring* -name control 2>/dev/null | head -1)
+  [[ -n "$_keyring_control" ]] && export GNOME_KEYRING_CONTROL="$_keyring_control"
+  
+  # SSH socket
+  _keyring_ssh=$(find /run/user/$(id -u)/keyring* -name ssh 2>/dev/null | head -1)
+  [[ -n "$_keyring_ssh" ]] && export SSH_AUTH_SOCK="$_keyring_ssh"
+  
+  unset _keyring_control _keyring_ssh
+fi
