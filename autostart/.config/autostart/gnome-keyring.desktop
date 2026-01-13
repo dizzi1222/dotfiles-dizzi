@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=GNOME Keyring (Secrets)
+Exec=/usr/bin/gnome-keyring-daemon --start --components=secrets
+OnlyShowIn=Hyprland;GNOME;KDE;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

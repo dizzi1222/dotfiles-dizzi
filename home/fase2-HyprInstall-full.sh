@@ -273,9 +273,10 @@ sudo pacman -S --needed --noconfirm \
   yazi stow ranger imagemagick \
   inotify-tools acpi power-profiles-daemon cpupower \
   gparted partitionmanager udiskie \
-  tig git-filter-repo man-db fastfetch networkmanager-dmenu gedit hyprsunset rsync gnome-system-monitor
+  tig git-filter-repo man-db fastfetch bluetui impala networkmanager-dmenu gedit hyprsunset rsync gnome-system-monitor
 
 print_installing "Utilidades extra AUR (pokemon-colorscripts, cava, zoxide)"
+print_installing "Interfaces: bluetui, impala. Para gestionar el Bluetooth y Wifi [mismos devs]"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   pokemon-colorscripts cmatrix cava zoxide thefuck \
   2>/dev/null || print_warning "Algunas utilidades AUR fallaron"
@@ -821,6 +822,10 @@ sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx \
   docker docker-compose rust \
   llvm clang patchelf git github-cli tgpt
+
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  claude-code gemini-cli-git
+print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 sudo systemctl enable docker
 sudo usermod -aG docker $USER

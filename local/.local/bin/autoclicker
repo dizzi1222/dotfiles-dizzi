@@ -187,21 +187,29 @@ interactive_menu() {
 select_speed() {
   echo -e "\n${BLUE}${BOLD}Selecciona velocidad:${RESET}\n"
 
+  # local speed=$(gum choose \
+  #   "⚡ Turbo      (50ms  = ~20 clicks/seg)" \
+  #   "🚀 Rápido     (100ms = ~10 clicks/seg)" \
+  #   "⏩ Moderado   (200ms = ~5 clicks/seg)" \
+  #   "▶️  Normal     (500ms = ~2 clicks/seg)" \
+  #   "🐌 Lento      (1000ms = ~1 click/seg)" \
+  #   "⚙️  Custom     (especificar manualmente)" \
+  #   --header "Velocidad de clicks")
   local speed=$(gum choose \
-    "⚡ Turbo      (50ms  = ~20 clicks/seg)" \
-    "🚀 Rápido     (100ms = ~10 clicks/seg)" \
-    "⏩ Moderado   (200ms = ~5 clicks/seg)" \
-    "▶️  Normal     (500ms = ~2 clicks/seg)" \
-    "🐌 Lento      (1000ms = ~1 click/seg)" \
+    "⚡ Turbo      (1ms  = ~20 clicks/seg)" \
+    "🚀 Rápido     (20ms = ~10 clicks/seg)" \
+    "⏩ Moderado   (50ms = ~5 clicks/seg)" \
+    "▶️  Normal     (100ms = ~2 clicks/seg)" \
+    "🐌 Lento      (200ms = ~1 click/seg)" \
     "⚙️  Custom     (especificar manualmente)" \
     --header "Velocidad de clicks")
 
   case "$speed" in
-  *Turbo*) start_clicking 50 ;;
-  *Rápido*) start_clicking 100 ;;
-  *Moderado*) start_clicking 200 ;;
-  *Normal*) start_clicking 500 ;;
-  *Lento*) start_clicking 1000 ;;
+  *Turbo*) start_clicking 1 ;;
+  *Rápido*) start_clicking 20 ;;
+  *Moderado*) start_clicking 50 ;;
+  *Normal*) start_clicking 100 ;;
+  *Lento*) start_clicking 200 ;;
   *Custom*)
     echo -e "\n${MAGENTA}⚙️  Intervalo personalizado${RESET}"
     local custom=$(gum input \

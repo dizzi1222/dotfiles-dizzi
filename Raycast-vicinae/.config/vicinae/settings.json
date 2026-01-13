@@ -24,5 +24,13 @@
    "favorites": [
       "clipboard:history"
    ],
-   "providers": {}
+   "providers": {
+      "applications": {
+         "entrypoints": {
+            "net.lutris.neovim-124": {
+               "enabled": false
+            }
+         }
+      }
+   }
 }

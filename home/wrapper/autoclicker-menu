@@ -1,11 +1,53 @@
 #!/bin/bash
-# autoclicker-menu (FIXED)
-# Wrapper que configura el socket correcto y mantiene terminal abierta
+# autoclicker-menu (ULTRA-FIXED v2)
+# Wrapper que LIMPIA el estado antes de mostrar el menú
 
 # Configurar socket de ydotool
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 
-# Verificar que ydotoold esté corriendo
+# ═══════════════════════════════════════════════════════════
+# LIMPIAR ESTADO ANTES DE MOSTRAR MENÚ
+# ═══════════════════════════════════════════════════════════
+PIDFILE="/tmp/ydotool-autoclicker.pid"
+
+# Función para limpiar PIDs zombies
+clean_zombie_pids() {
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    
+    # Verificar si el proceso realmente existe
+    if ! kill -0 "$pid" 2>/dev/null; then
+      # PID muerto → limpiar
+      rm -f "$PIDFILE"
+      echo "🧹 Limpiando PID zombie ($pid)"
+      return 1
+    fi
+    
+    # PID vivo → mostrar estado
+    echo "⚠️  AutoClicker detectado corriendo (PID: $pid)"
+    echo "   Detenlo primero con F8 o:"
+    echo "   ~/.local/bin/autoclicker stop"
+    echo
+    read -p "¿Detener ahora y continuar? [S/n]: " confirm
+    
+    if [[ ! "$confirm" =~ ^[Nn]$ ]]; then
+      # Matar el proceso
+      pkill -P "$pid" 2>/dev/null
+      kill -TERM "$pid" 2>/dev/null
+      sleep 0.2
+      kill -9 "$pid" 2>/dev/null
+      rm -f "$PIDFILE"
+      echo "✅ AutoClicker detenido"
+      sleep 1
+    else
+      exit 0
+    fi
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# VERIFICAR YDOTOOL
+# ═══════════════════════════════════════════════════════════
 if ! systemctl --user is-active --quiet ydotool.service; then
   echo -e "\033[1;31m❌ Error: ydotool no está corriendo\033[0m"
   echo
@@ -14,20 +56,24 @@ if ! systemctl --user is-active --quiet ydotool.service; then
   sleep 2
 fi
 
-# Verificar socket
 if [[ ! -S /tmp/.ydotool_socket ]]; then
   echo -e "\033[1;31m❌ Error: Socket no encontrado\033[0m"
-  echo -e "\033[0;33mEjecuta: ~/fix-ydotool.sh\033[0m"
+  echo -e "\033[0;33mEjecuta: bash ~/fix-ydotool.sh\033[0m"
   echo
   echo -e "\033[0;36mPresiona Enter para cerrar...\033[0m"
   read -r
   exit 1
 fi
 
-# Ejecutar autoclicker
-~/.local/bin/autoclicker
+# ═══════════════════════════════════════════════════════════
+# LIMPIAR ESTADO Y EJECUTAR
+# ═══════════════════════════════════════════════════════════
+clean_zombie_pids
 
-# Esperar Enter para cerrar
+# Ejecutar autoclicker con menú interactivo
+~/.local/bin/autoclicker menu
+
+# Esperar Enter para cerrar (solo si terminó normalmente)
 echo
 echo -e "\033[1;33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "\033[1;32m✅ Proceso completado\033[0m"

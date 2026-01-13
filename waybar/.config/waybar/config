@@ -134,7 +134,7 @@
 		"format-disabled": "󰂲",
 		"format-connected": "",
 		"tooltip-format": "Devices connected: {num_connections}",
-		"on-click": "blueman-manager",
+    "on-click": "$TERMINAL --class=com.ghaerdi.Bluetui -e bluetui",
     "on-click-right": "blueman-manager"
 	},
   "temperature": {
@@ -225,7 +225,7 @@
         "tooltip-format": "{ipaddr}",
         "tooltip-format-wifi": "{essid} ({signalStrength}%)  | {ipaddr}",
         "tooltip-format-ethernet": "{ifname} 🖧 | {ipaddr}",
-        "on-click": "networkmanager_dmenu",
+        "on-click": "kitty --class=com.ghaerdi.Impala -e impala",
         "on-click-right": "kitty nmtui" // ¡CORREGIDO para abrir en Kitty!
     },
 

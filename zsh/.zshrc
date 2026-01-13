@@ -759,5 +759,5 @@ export GIT_EDITOR="nvim"
 # ═══════════════════════════════════════════════════════════
 # Alias para la herramienta de MACROS de LINUX
 # ═══════════════════════════════════════════════════════════
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 alias ydover="ydotool version"
+export YDOTOOL_SOCKET=/tmp/.ydotool_socket
