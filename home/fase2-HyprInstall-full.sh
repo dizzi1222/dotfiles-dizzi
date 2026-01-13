@@ -1013,6 +1013,25 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     systemctl status systemd-logind   para ver si se ejecuto"
   fi
 
+  # Para solucionar initramfs-linux [/etc/mkinitcpio.conf] Tambien puedes consultar el historial root para guiarte con:
+  if [[ -f ~/dotfiles-dizzi/etc/mkinitcpio.conf ]]; then
+    print_package "Symlink: FIX initramfs-linux"
+    sudo ln -sf ~/dotfiles-dizzi/etc/mkinitcpio.conf /etc/mkinitcpio.conf
+    cat ~/dotfiles-dizzi/historial-root-FIX-initramfs-linux.txt
+    print_status "Tambien puedes consultar el historial ARRIBA root para guiarte. Por si vuelve a dar ese pantallazo azul con el 🐧  
+    [Y Recuerda Usar:
+    nano /etc/mkinitcpio.conf
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd
+    sudo mkinitcpio -P -v]
+
+     󰁃 ¿Diferencias entre usar udev y systemd?
+        󱞩 - systemd: resulta en una .img: 8.6/16mb
+          - udev: resulta en una .img: 206mb
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd"
+  fi
+
   # Recargar servicios
   print_status "Recargando udev y polkit..."
   sudo udevadm control --reload-rules

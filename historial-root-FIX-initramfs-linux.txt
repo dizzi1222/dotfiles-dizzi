@@ -1,0 +1,500 @@
+
+9	 chmood +x home/instalador-hyprland-resiliente.sh 
+10	 chmod +x home/instalador-hyprland-resiliente.sh 
+11	 home/instalador-hyprland-resiliente.sh 
+12	 home/instalador-hyprland-resiliente.sh 
+13	 home/instalador-hyprland-resiliente.sh 
+14	 git pull origin main
+15	 git status
+16	 git pull
+17	 git status
+18	 rm -rf home/instalador-hyprland-resiliente.sh 
+19	 git pull
+20	 git status
+21	 home/instalador-hyprland-resiliente.sh 
+22	 chmod +x home/instalador-hyprland-resiliente.sh 
+23	 home/instalador-hyprland-resiliente.sh 
+24	 home/instalador-hyprland-resiliente.sh ..
+25	 home/instalador-hyprland-resiliente.sh 
+26	 home/instalador-hyprland-resiliente.sh 
+27	 home/instalador-hyprland-resiliente.sh 
+28	 ls
+29	 rm -rf home/instalador-hyprland-resiliente.sh 
+30	 git pull
+31	 git status
+32	 chmod +x home/instalador-hyprland-resiliente.sh 
+33	 home/instalador-hyprland-resiliente.sh 
+34	 rm -rf home/instalador-hyprland-resiliente.sh 
+35	 git pull
+36	 chmod +x home/instalador-hyprland-resiliente.sh 
+37	 home/instalador-hyprland-resiliente.sh 
+38	 home/instalador-hyprland-resiliente.sh 
+39	 home/instalador-hyprland-resiliente.sh 
+40	 cat home/instalador-hyprland-resiliente.sh 
+41	 cat home/instalador-hyprland-resiliente.sh 
+42	 home/instalador-hyprland-resiliente.sh 
+43	 rm -rf home/instalador-hyprland-resiliente.sh 
+44	 git pull
+45	 chmod +x home/instalador-hyprland-resiliente.sh 
+46	 home/instalador-hyprland-resiliente.sh 
+47	 home/instalador-hyprland-resiliente.sh 
+48	 home/instalador-hyprland-resiliente.sh 
+49	 # esto devolvio el script que creaste ... fallo tanto el chroot  como eso
+50	 #home/instalador-hyprland-resiliente.sh 
+51	 home/scripts/HYPER-arch-INSTALL.sh 
+52	 rm -rf home/scripts/HYPER-arch-INSTALL.sh 
+53	 rm -rf home/instalador-hyprland-resiliente.sh 
+54	 git pull
+55	 git status
+56	 chmod +x home
+57	 home/instalador-hyprland-resiliente.sh 
+58	 chmod + xhome/instalador-hyprland-resiliente.sh 
+59	 chmod +x home/instalador-hyprland-r
+60	 home/instalador-hyprland-resiliente.sh 
+61	 chmod + home/scripts/HYPER-arch-INSTALL.sh 
+62	 home/scripts/HYPER-arch-INSTALL.sh 
+63	 sudoers
+64	 visudo
+65	 reboot
+66	 sudo reboot
+67	 reboot
+68	 reboot
+69	 reboot
+70	 exit
+71	 efibootmgr
+72	 grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+73	 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+74	 grub-mkconfig -o /boot/grub/grub.cfg
+75	 efibootmgr
+76	 exit
+77	 ls
+78	 ping -c 5 google.com
+79	 home/scripts/HYPER-arch-INSTALL.sh 
+80	 cd home
+81	 ls
+82	 cd ..
+83	 ls
+84	 cd dotfiles-dizzi/
+85	 ls
+86	 cd ~
+87	 ls
+88	 cd ..
+89	 cd home
+90	 ls
+91	 cd diego
+92	 ls
+93	 cd ..
+94	  cd ..
+95	 passwd diego
+96	 cd dotfiles-dizzi/
+97	 home/scripts/HYPER-arch-INSTALL.sh 
+98	 passwd diego
+99	 passwd diego
+100	 home/instalador-hyprland-resiliente.sh 
+101	 ls
+102	 exit
+103	 reboot
+104	 ls
+105	 cd ..
+106	 ls
+107	 cd dotfiles-dizzi/
+108	 ls
+109	 rm -rf home/scripts/HYPER-arch-INSTALL.sh 
+110	 git pull
+111	 git status
+112	 rm -rf home/instalador-hyprland-resiliente.sh 
+113	 git pull
+114	 git status
+115	 home/scripts/HYPER-arch-INSTALL.sh 
+116	 exit
+117	 sudo chown -R diego;diego /home/diego
+118	 sudo passwd diego
+119	 exit
+120	 sudo EDITOR=nano visudo
+121	 visudo
+122	 sudo pacman -S vim
+123	 visudo
+124	 sudo pacman -S visudo
+125	 sudo EDITOR=nano visudo
+126	 groups
+127	 groups diego
+128	 passwd diego
+129	 exit
+130	 groups
+131	 groups diego
+132	 sudo visudo
+133	 sudo EDITOR=nano visudo
+134	 groups diego
+135	 groups wheel
+136	 sudo usermod -aG wheel diego
+137	 sudo whoami
+138	 exit
+139	 sudo userdel diego
+140	 groups diego
+141	 sudo useradd -m -g users -G wheel,audio,video,storage,power -s /bin/zsh diego
+142	 sudo pacman -S zsh
+143	 sudo pacman -Sy
+144	 sudo userdel -r diego
+145	 sudo userdel -rf diego
+146	 sudo useradd -m -g users -G wheel,audio,video,storage,power -s /bin/bash diego
+147	 sudo pacman -S zsj
+148	 sudo pacman -S zsh
+149	 ping -c 5 google.com
+150	 sudo useradd -m -g users -G wheel,audio,video,storage,power -s /bin/bash diego
+151	 sudo passwd diego
+152	 sudo passwd diego
+153	 exit
+154	 ls
+155	 cd ..
+156	 ls
+157	 mv dotfiles-dizzi/ home/diego/
+158	 exit
+159	 pacman -Sy
+160	 ls
+161	 ls -a
+162	 cd ..
+163	 ls
+164	 cd home/diego/dotfiles-dizzi/
+165	 ls
+166	 git pull
+167	 pacman -S zsh
+168	 exit
+169	 vim /etc/pacman.d/mirrorlist
+170	 exit
+171	 cd ..
+172	 cd home/diego/dotfiles-dizzi/
+173	 git pull
+174	 git status
+175	 clear
+176	 git pull
+177	 cd ..
+178	 exit
+179	 cd ..
+180	 cd home/diego/dotfiles-dizzi/
+181	 git pull
+182	 git status
+183	 git pull -r
+184	 git restore home/scripts/fase2-HyprInstall-full.sh 
+185	 git pull -r
+186	 ls
+187	 git status
+188	 git branch
+189	 cat home/scripts/HYPER-arch-INSTALL.sh 
+190	 vim home/scripts/HYPER-arch-INSTALL.sh 
+191	 clear
+192	 ls
+193	 cd ..
+194	 cd ..
+195	 ls
+196	 cd diego/
+197	 ls
+198	 mv * .
+199	 mv . ~/
+200	 mv . ../
+201	 cd dotfiles-dizzi/ ../
+202	 mv dotfiles-dizzi/ ../
+203	 ls
+204	 mv scripts/ ../
+205	 ls
+206	 ls
+207	 ls
+208	 cd ..
+209	 ls
+210	 mv scripts/ ../
+211	 mv dotfiles-dizzi/ ../
+212	 ls
+213	 cd ..
+214	 sudo userdel diego
+215	 groups diego
+216	 ls
+217	 ls -l home
+218	 sudo userdel diego -rf
+219	 rm -rf home/diego/
+220	 cd dotfiles-dizzi/
+221	 sudo pacman -S base
+222	 sudo pacman -S linux
+223	 sudo pacman -S linux-firmware
+224	 sudo pacman -Ss linux-key
+225	 sudo pacman -S linux-keyring
+226	 sudo pacman -S archlinux-keyring
+227	 sudo pacman -S linux-keyring
+228	 git pull
+229	 git status
+230	 ls
+231	 home/scripts/HYPER-arch-INSTALL.sh 
+232	 ls
+233	 cd ..
+234	 ls
+235	 ls -l scripts/
+236	 cd dotfiles-dizzi/
+237	 ls -l home/scripts/fase2-HyprInstall-full.sh 
+238	 groups diego
+239	 groups 
+240	 zsh
+241	 exit
+242	 ls -a
+243	 cd ..
+244	 ls
+245	 cd home/diego/dotfiles-dizzi/
+246	 git pull
+247	 git status
+248	 git restore home/scripts/fase2-HyprInstall-full-fixed.sh home/
+249	 git pull
+250	 git restore home
+251	 git pull
+252	 history
+253	 git pull
+254	 git status
+255	 git restore home/scripts/fase2-HyprInstall-full-fixed.sh home/
+256	 git restore home/scripts/fase2-HyprInstall-full.sh
+257	 git pull
+258	 git status
+259	 git pull
+260	 git restore home/scripts/fase2-HyprInstall-full.sh
+261	 git restore home/scripts/fase2-HyprInstall-full-fixed.sh home/
+262	 git pull
+263	 git pull
+264	 git status
+265	 git restore home/scripts/fase2-HyprInstall-full-fixed.sh 
+266	 git restore home/scripts/fase2-HyprInstall-full.sh
+267	 git status
+268	 git pull
+269	 git status
+270	 git pull
+271	 git status
+272	 git restore home/
+273	 git status
+274	 git pull
+275	 git status
+276	 exit
+277	 cd ..
+278	 cd home/diego/dotfiles-dizzi/
+279	 git status
+280	 git restore .
+281	 git pull origin main
+282	 git status
+283	 git status
+284	 home/scripts/fase2-HyprInstall-full.sh
+285	 chmod +x home/scripts/fase2-HyprInstall-full.sh
+286	 home/scripts/fase2-HyprInstall-full.sh
+287	 git status
+288	 git pull
+289	 git status
+290	 git restore .
+291	 git pull
+292	 git status
+293	 home/scripts/fase2-HyprInstall-full.sh
+294	 git status
+295	 cat home/scripts/fase2-HyprInstall-full.sh
+296	 clear
+297	 chmod +x home/scripts/fase2-HyprInstall-full.sh
+298	 home/scripts/fase2-HyprInstall-full.sh
+299	 git statu
+300	 git status
+301	 sudo pacman -Ql
+302	 git pull
+303	 git status
+304	 git restore .
+305	 git pull
+306	 git status
+307	 chmod +x home/scripts/fase2-HyprInstall-full.sh
+308	 home/scripts/fase2-HyprInstall-full.sh
+309	 git status
+310	 git status
+311	 git pull
+312	 rm -rf home/scripts/fase2-HyprInstall-full-fixed.sh 
+313	 git restore .
+314	 git pull
+315	 git status
+316	 git pull
+317	 git status
+318	 git restore .
+319	 git pull
+320	 git status
+321	 git pull
+322	 git restore .
+323	 git pull
+324	 git pull
+325	 exit
+326	 ls
+327	 cd home/diego/
+328	 ls
+329	 ls
+330	 cd dotfiles-dizzi/home
+331	 ls
+332	 chmod +x repair-grub-fase2-HyprInstall.sh 
+333	 bash repair-grub-fase2-HyprInstall.sh 
+334	 sudo bash repair-grub-fase2-HyprInstall.sh 
+335	 bash repair-grub-fase2-HyprInstall.sh 
+336	 su - diego
+337	 lsblk
+338	 history
+339	 exit
+340	 groups
+341	 groups diego
+342	 su - diego
+343	 su - diego
+344	 ls
+345	 cd home
+346	 ls
+347	 cd diego
+348	 ls
+349	 su diego
+350	 sudo pacman -Syu
+351	 sudo pacman -Syu
+352	 sudo pacman -S --needed linux linux-firmware systemd base
+353	 sudo pacman -S --overwrite '*' linux linux-firmware systemd base
+354	 mkinitcpio -P
+355	 vim
+356	 mkinitcpio -P
+357	 nano /home/diego/dotfiles-dizzi/home/fase2-HyprInstall-full.sh 
+358	 vim /home/diego/dotfiles-dizzi/home/fase2-HyprInstall-full.sh 
+359	 mkinitcpio -P
+360	 grub-mkconfig -o /boot/grub/grub.cfg 
+361	 efibootmgr 
+362	 cat /etc/fstab
+363	 exit
+364	 exit
+365	 pacman -Q systemd
+366	 pacman -S --overwrite '*' systemd
+367	 pacman -S --overwrite '*' base base-devel
+368	 ldd /usr/lib/systemd/systemd
+369	 ldd /usr/lib/systemd/system
+370	 cat /etc/mkinitcpio.conf | grep HOOKS
+371	 mkinitcpio -P -v
+372	 cat /etc/mkinitcpio.conf | grep HOOKS
+373	 ls -lh /boot/initramfs-linux.img 
+374	 ls -lh /boot/vmlinuz-linux 
+375	 nano /etc/default/grub
+376	 vim /etc/default/grub
+377	 grub-mkconfig -o /boot/grub/grub.cfg 
+378	 grub-mkconfig -o /boot/grub/grub.cfg /boot/grub/grub.cfg 
+379	 grub-mkconfig -o /boot/grub/grub.cfg 
+380	 grep "loglevel=7" /boot/grub/grub.cfg 
+381	 cat /etc/fstab 
+382	 vim /etc/default/grubg
+383	 vim /etc/default/grub 
+384	 grub-mkconfig -o /boot/grub/grub.cfg
+385	 exit
+386	 pacman -S --overwrite '*' glibc systemd
+387	  exit
+388	 ls -l home/diego/
+389	 pacman -Rdd systemd systemd-libs systemd-sysvcompat 
+390	 pacman -S systemd systemd-libs systemd-sysvcompat lib
+391	 file /usr/lib/systemd/systemd
+392	 ldd /usr/lib/systemd/systemd
+393	 ls -a /usr/lib/systemd/systemd
+394	 ls -l /usr/lib/systemd/systemd
+395	 ll -l /usr/lib/systemd/system
+396	 ls -la /sbin/init
+397	 ls -la /bin/init
+398	 ls -la /usr/sbin/init
+399	 mkinitcpio -P
+400	 ls -lh /boot/initramfs-linux.imgini
+401	 nano /etc/default/grub 
+402	 ls -l home/diego/dotfiles-dizzi/systemd/
+403	 cd home/diego/dotfiles-dizzi/systemd/
+404	 ls
+405	 ls -a
+406	 cd .config/systemd/
+407	 ls
+408	 ls -l user/
+409	 grub-mkconfig -o /boot/grub/grub.cfg 
+410	 exit 
+411	 nvim home/diego/dotfiles-dizzi/etc/default/grub tm
+412	 mkdir -p /tmp/initramfs
+413	 zcat /boot/initramfs-linux.img | cpio -idmv
+414	 pacman -S cpio
+415	 zcat /boot/initramfs-linux.img | cpio -idmv
+416	 ls -la /tmp/initramfs/
+417	 ls -la /boot/initramfs-linux.img 
+418	 nvim /etc/mkinitcpio.conf
+419	 nvim
+420	 ls -la /boot/initramfs-linux.img 
+421	 ls -la /boot/initramfs-linux.img 
+422	 ls -la /tmp/initramfs/
+423	 zcat /boot/initramfs-linux.img | cpio -idmv
+424	 pacman -S cpio
+425	 nvim /etc/mkinitcpio.conf
+426	 nvim /etc/default/grub 
+427	 cat /etc/default/grub 
+428	 grub-mkconfig -o /boot/grub/grub.cfg 
+429	 pacman -Ql systemd | grep "\.so"
+430	 pacman -S --overwrite '*' glibc
+431	 ls -la /lib64/ld-linux-x86-64.so.2
+432	 pacman -S busybox
+433	 nvim /etc/mkinitcpio.conf
+434	 ls -la /lib64/ld-linux-x86-64.so.2
+435	 pacman -S busybox
+436	 mkinitcpio -P -v
+437	 exit
+438	 pacman -Syu
+439	 yay -Syu
+440	 exit
+441	 ls
+442	 systemctl enable iwd
+443	 systemctl enable 
+444	 systemctl enable systemd
+445	 grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+446	 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+447	 grub-mkconfig -o /boot/grub/grub.cfg
+448	 efibootmgrd
+449	 nvim /etc/default/grub 
+450	 nano /etc/mkinitcpio.conf
+451	 nano /etc/mkinitcpio.conf
+452	 sudo pacman -S busybox
+453	 mkinitcpio -P -v
+454	 nano /etc/mkinitcpio.conf
+455	 reboot
+456	 exit
+457	 nvim /etc/mkinitcpio.conf
+458	 mkinitcpio -P -v
+459	 pacman -S --overwrite '*' systemd systemd-libs systemd-sysvcompat busybox mkinitcpio linux
+460	 rm -rf /boot/initramfs-*.img
+461	 ls -h /boot/initramfs-linux.img
+462	 file /boot/initramfs-linux.img
+463	 sudo pacman -S zstd zcat xzcat
+464	 mkinitcpio -P -v
+465	 zstd -d < /boot/initramfs-linux.img | cpio -idmv
+466	 zcat -d < /boot/initramfs-linux.img | cpio -idmv
+467	 gzip -d < /boot/initramfs-linux.img | cpio -idmv
+468	 xzcat -d < /boot/initramfs-linux.img | cpio -idmv
+469	 cpio -idmv < /boot/initramfs-linux.img
+470	 file /boot/initramfs-linux.img
+471	 ls -h /boot/initramfs-linux.img
+472	 ls -lh /boot/initramfs-linux.img
+473	 nvim /etc/default/grub 
+474	 grub-mkconfig -o /boot/grub/grub.cfg
+475	 nvim /etc/mkinitcpio.conf
+476	 9mkinitcpio -P -v 2>&1 | tee /tmp/mkinitcpio.log
+477	 mkinitcpio -P -v 2>&1 | tee /tmp/mkinitcpio.log
+478	 ls -lh /boot/initramfs-linux.img
+479	 file /boot/initramfs-linux.img
+480	 ls -l /tmp/mkinitcpio.log
+481	 cp /tmp/mkinitcpio.log home/diego/dotfiles-dizzi/home/mkinitcpio-udev.log
+482	 nvim /etc/mkinitcpio.conf
+483	 nvim /etc/default/grub
+484	 mkinitcpio -P -v 2>&1 | tee /tmp/mkinitcpio.log
+485	 ls -l /tmp/mkinitcpio.log
+486	 ls -lh /tmp/mkinitcpio.log
+487	 ls -lh /boot/initramfs-linux.img
+488	 file /boot/initramfs-linux.img
+489	 cp /tmp/mkinitcpio.log home/diego/dotfiles-dizzi/home/mkinitcpio-systemd.log
+490	 su diego
+491	 cd home/diego/dotfiles-dizzi/
+492	 git push -u origin main
+493	 nvim /etc/mkinitcpio.conf
+494	 mkinitcpio -P -v 2>&1 | tee /tmp/mkinitcpio.log
+495	 ls -lh /boot/initramfs-linux.img
+496	 file /boot/initramfs-linux.img
+497	 grub-mkconfig -o /boot/grub/grub.cfg
+498	 exit
+499	 grub-mkconfig  -o /boot/grub/grub.cfg
+500	 ls -lh /boot/initramfs-linux.img 
+501	 nvim /etc/mkinitcpio.conf
+502	 mkinitcpio -P -v
+503	 nvim ~/.zshrc
+504	 nvim /home/diego/.zshrc
+505	 history
+506	 nvim /tmp/history
+507	 nvim /home/diego/.zshrc
