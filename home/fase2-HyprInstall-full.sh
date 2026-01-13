@@ -1537,6 +1537,12 @@ Categories=Utility;Accessibility;
 Keywords=macro;automation;record;tinytask;
 EOL
 
+# Crear launcher mejorado con XWayland
+print_installing "Creando launcher XWayland"
+mkdir -p ~/.local/bin
+cp ~/wrapper/pymacrorecord-wrapper.sh ~/.local/bin/pymacrorecord
+chmod +x ~/.local/bin/pymacrorecord
+
     # Actualizar base de datos
     update-desktop-database ~/.local/share/applications 2>/dev/null || true
 
