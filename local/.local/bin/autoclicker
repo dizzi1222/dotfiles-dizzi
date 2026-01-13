@@ -1,6 +1,6 @@
 #!/bin/bash
-# /001   autoclicker -> ../../dotfiles-dizzi/local/.local/bin/autoclicker
-# AutoClicker interactivo con ydotool + gum (FIXED v2)
+# /001   autoclicker -> ../../dotfiles-dizzi/local/.local/bin/autoclicker
+# AutoClicker definitivo con ydotool + gum (FIXED v4 - ULTRA ESTABLE)
 
 # ═══════════════════════════════════════════════════════════
 # COLORES Y FORMATO
@@ -76,33 +76,27 @@ start_clicking() {
   echo -e "${BLUE}🖱️  Iniciando AutoClicker${RESET}"
   echo -e "${DIM}   Intervalo: ${YELLOW}${interval}ms${RESET} ${DIM}(~${cps} clicks/seg)${RESET}"
 
-  # Convertir intervalo a segundos para sleep correctamente
-  local sleep_time
-  if [[ $interval -lt 10 ]]; then
-    sleep_time="0.00${interval}"
-  elif [[ $interval -lt 100 ]]; then
-    sleep_time="0.0${interval}"
-  else
-    sleep_time="0.${interval}"
-  fi
-
-  # Loop en background - COMPLETAMENTE SILENCIOSO
+  # Loop en background - INFINITO Y SILENCIOSO
   (
+    # Trap para limpieza limpia
+    trap 'exit 0' SIGTERM SIGINT SIGHUP
+    
+    # Loop infinito que NUNCA se detiene
     while true; do
-      ydotool click 0xC0 2>/dev/null || exit 1 # Sale si ydotool falla
-      sleep "$sleep_time"
+      ydotool click 0xC0 &>/dev/null
+      sleep "0.${interval}"
     done
   ) &
 
   local pid=$!
   echo $pid >"$PIDFILE"
 
-  # Verificar que el proceso realmente arrancó
+  # Verificar que arrancó
   sleep 0.2
   if ! kill -0 "$pid" 2>/dev/null; then
     rm -f "$PIDFILE"
     echo -e "${RED}${BOLD}❌ Error:${RESET} No se pudo iniciar el autoclicker"
-    echo -e "${DIM}Verifica que ydotool esté corriendo: ${YELLOW}systemctl --user status ydotool${RESET}"
+    echo -e "${DIM}Verifica: ${YELLOW}systemctl --user status ydotool${RESET}"
     exit 1
   fi
 
@@ -119,7 +113,13 @@ stop_clicking() {
   fi
 
   local pid=$(cat "$PIDFILE")
-  kill "$pid" 2>/dev/null
+  
+  # Matar proceso y sus hijos
+  pkill -P "$pid" 2>/dev/null
+  kill -TERM "$pid" 2>/dev/null
+  sleep 0.1
+  kill -9 "$pid" 2>/dev/null
+  
   rm -f "$PIDFILE"
 
   echo -e "${GREEN}${BOLD}✅ AutoClicker detenido${RESET} ${DIM}(PID: $pid)${RESET}"

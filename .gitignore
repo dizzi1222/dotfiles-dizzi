@@ -188,3 +188,17 @@ themes/.themes/*
 # !themes/.themes/Gruvbox-Plus-Dark/
 local/.local/share/lutris/runtime/
 *:Zone.Identifier
+
+# ═══════════════════════════════════════════════════════════
+# PYTHON - VENV Y REQUIREMENTS (MUY PESADOS)
+# ═══════════════════════════════════════════════════════════
+**/venv/
+**/.venv/
+**/.venvs/
+**/.virtualenvs/
+**/.virtualenv/
+**/.virtualenvs/
+**/.virtualenv/
+home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.2/venv/
+home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.1/venv/
+
