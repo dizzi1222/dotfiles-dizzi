@@ -1,5 +1,5 @@
 #!/bin/bash
-# /001   autoclicker -> ../../dotfiles-dizzi/local/.local/bin/autoclicker
+# /001   autoclicker -> ../../dotfiles-dizzi/local/.local/bin/autoclicker
 # AutoClicker definitivo con ydotool + gum (FIXED v4 - ULTRA ESTABLE)
 
 # ═══════════════════════════════════════════════════════════
@@ -80,7 +80,7 @@ start_clicking() {
   (
     # Trap para limpieza limpia
     trap 'exit 0' SIGTERM SIGINT SIGHUP
-    
+
     # Loop infinito que NUNCA se detiene
     while true; do
       ydotool click 0xC0 &>/dev/null
@@ -113,13 +113,13 @@ stop_clicking() {
   fi
 
   local pid=$(cat "$PIDFILE")
-  
+
   # Matar proceso y sus hijos
   pkill -P "$pid" 2>/dev/null
   kill -TERM "$pid" 2>/dev/null
   sleep 0.1
   kill -9 "$pid" 2>/dev/null
-  
+
   rm -f "$PIDFILE"
 
   echo -e "${GREEN}${BOLD}✅ AutoClicker detenido${RESET} ${DIM}(PID: $pid)${RESET}"
@@ -207,7 +207,7 @@ select_speed() {
     local custom=$(gum input \
       --prompt "Intervalo en milisegundos (ms): " \
       --placeholder "100" \
-      --value "100")
+      --value "")
 
     if [[ "$custom" =~ ^[0-9]+$ ]]; then
       start_clicking "$custom"
