@@ -4,7 +4,10 @@ GRUB_DEFAULT=saved
 GRUB_TIMEOUT=3
 GRUB_DISTRIBUTOR="Arch"
 GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"
-GRUB_CMDLINE_LINUX="zswap.enabled=0 rootfstype=ext4"
+#GRUB_CMDLINE_LINUX_DEFAULT="loglevel=7 debug ignore_loglevel"
+#GRUB_CMDLINE_LINUX="zswap.enabled=0 rootfstype=ext4"
+GRUB_CMDLINE_LINUX="init=/usr/lib/systemd/systemd"
+# GRUB_CMDLINE_LINUX=""
 
 # Preload both GPT and MBR modules so that they are not missed
 GRUB_PRELOAD_MODULES="part_gpt part_msdos"
