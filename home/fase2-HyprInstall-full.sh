@@ -2756,8 +2756,8 @@ echo
 echo -e "${CYAN}Opciones para acceder a Ollama:${NC}"
 echo -e "  ${MAGENTA}1.${NC} Open-WebUI (interfaz completa + historial)"
 echo -e "  ${MAGENTA}2.${NC} Omitir (usar solo CLI de Ollama)"
-echo -e "  ${MAGENTA}BTW.${NC} La realidad es que open-webui es más FACIL de instalar en DOCKER-desktop HUB"
-echo -e "  ${MAGENTA}BUSCALO COMO:${NC} openeuler/open-webui"
+echo -e "  ${MAGENTA}BTW.${NC} La realidad es que open-webui es más FACIL de instalar en DOCKER-desktop EXTENSIONS [No HUB]"
+echo -e "  ${MAGENTA}BUSCALO COMO:${NC} rw4lll/openwebui-docker-extension"
 echo
 read -p "¿Instalar Open-WebUI? [S/n]: " install_webui
 
