@@ -1409,6 +1409,7 @@ echo
 echo -e "${CYAN}Opciones de Docker:${NC}"
 echo -e "  ${MAGENTA}1.${NC} (OMITIR) Docker CLI (ya instalado - suficiente)"
 echo -e "  ${MAGENTA}2.${NC} Docker Desktop (binarios estáticos+GUI - recomendado si necesitas GUI)"
+echo -e "  ${MAGENTA}BTW.${NC} La realidad es que docker-compose entraba en conflicto con docker-desktop"
 echo
 read -p "Selecciona [1=(OMITIR) CLI solamente, 2=Agregar Desktop]: " docker_choice
 
@@ -2755,6 +2756,8 @@ echo
 echo -e "${CYAN}Opciones para acceder a Ollama:${NC}"
 echo -e "  ${MAGENTA}1.${NC} Open-WebUI (interfaz completa + historial)"
 echo -e "  ${MAGENTA}2.${NC} Omitir (usar solo CLI de Ollama)"
+echo -e "  ${MAGENTA}BTW.${NC} La realidad es que open-webui es más FACIL de instalar en DOCKER-desktop HUB"
+echo -e "  ${MAGENTA}BUSCALO COMO:${NC} openeuler/open-webui"
 echo
 read -p "¿Instalar Open-WebUI? [S/n]: " install_webui
 
