@@ -59,6 +59,9 @@ while true; do
   5)
     echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo...${RESET}"
     rm -rf ~/.cache/*
+    flatpak uninstall --unused
+    rm -rf ~/.var/app/*/cache/*
+    sudo journalctl --vacuum-size=50M
     notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   6)
