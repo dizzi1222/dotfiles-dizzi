@@ -1365,7 +1365,7 @@ print_step "14/35: Herramientas de Desarrollo"
 print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx \
-  docker docker-compose docker-desktop rust \
+  docker docker-desktop rust \
   llvm clang patchelf git github-cli tgpt
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
@@ -1407,12 +1407,12 @@ fi
 # ═══════════════════════════════════════════════════════════
 echo
 echo -e "${CYAN}Opciones de Docker:${NC}"
-echo -e "  ${MAGENTA}1.${NC} Docker Desktop (binarios estáticos+GUI - recomendado si necesitas GUI)"
-echo -e "  ${MAGENTA}2.${NC} (OMITIR) Docker CLI (ya instalado - suficiente)"
+echo -e "  ${MAGENTA}1.${NC} (OMITIR) Docker CLI (ya instalado - suficiente)"
+echo -e "  ${MAGENTA}2.${NC} Docker Desktop (binarios estáticos+GUI - recomendado si necesitas GUI)"
 echo
 read -p "Selecciona [1=(OMITIR) CLI solamente, 2=Agregar Desktop]: " docker_choice
 
-if [[ "$docker_choice" == "1" ]]; then
+if [[ "$docker_choice" == "2" ]]; then
   print_header "Instalando Docker Desktop (Binarios Estáticos)"
   
   # Crear directorio temporal
@@ -1493,7 +1493,7 @@ DOCKERSVC
   cd ~
   rm -rf "$DOCKER_TEMP"
   
-elif [[ "$docker_choice" == "2" ]]; then
+elif [[ "$docker_choice" == "1" ]]; then
   print_success "Usando Docker CLI (suficiente para la mayoría)"
 else
   print_warning "Docker Desktop omitido"
