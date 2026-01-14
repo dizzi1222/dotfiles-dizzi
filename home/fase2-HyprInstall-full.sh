@@ -690,13 +690,558 @@ sudo pacman -S --needed --noconfirm --answerdiff=None --answerclean=None --remov
 proton-vpn-gtk-app \
   2>/dev/null || print_warning "Algunos extras fallaron"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  stacer-bin zip 7zip rar waydroid transmission-gtk windscribe-v2-bin jdownloader2 megasync \
+  stacer-bin zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
 print_success "Instalado apps basicas: zip, 7zip, rar, appimagelauncher"
 print_success "Instalado Downloaders: megasync, jdownloader2, pamac-aur [Panel Control], transmission-gtk (Utorrent)"
 print_success "Aplicaciones instaladas (solo binarios)"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 13.2: WAYDROID + MAGISTV + ALTERNATIVAS TV (CORREGIDO)
+# ═══════════════════════════════════════════════════════════
+# INSERTAR DESPUÉS DE "PASO 13: APLICACIONES" Y ANTES DE "PASO 13.5: STREMIO"
+# ═══════════════════════════════════════════════════════════
+
+print_step "13.2/35: Waydroid + MagisTV + Alternativas TV"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║        📱 WAYDROID + MAGISTV + ALTERNATIVAS TV 📱       ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Waydroid permite ejecutar Android en Linux (Wayland native).${NC}"
+echo -e "${CYAN}Se incluye MagisTV con firma ya configurada.{{NC}"
+echo
+echo -e "${BOLD}${GREEN}Requisitos:{{NC}"
+echo -e "  ${MAGENTA}•{{NC} 5GB+ de espacio libre"
+echo -e "  ${MAGENTA}•{{NC} CPU con soporte para virtualización (KVM)"
+echo -e "  ${MAGENTA}•{{NC} RAM: 4GB+ recomendado"
+echo
+read -p "¿Instalar Waydroid + MagisTV? [S/n]: " install_waydroid
+
+if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Waydroid + MagisTV"
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 1: Instalar Waydroid
+  # ═══════════════════════════════════════════════════════════
+  print_installing "Waydroid + Dependencias"
+  sudo pacman -S --needed --noconfirm \
+    waydroid python-pip git lzip
+
+  # Habilitar KVM
+  print_status "Habilitando KVM..."
+  sudo usermod -aG kvm $USER
+  print_package "Usuario agregado al grupo 'kvm'"
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 2: Inicializar con GApps
+  # ═══════════════════════════════════════════════════════════
+  print_header "Inicializando Waydroid con Google Apps (~1.2GB)"
+  print_warning "IMPORTANTE: NO CANCELES LA DESCARGA"
+  echo
+  echo -e "${CYAN}Esto descargará:{{NC}"
+  echo -e "  ${MAGENTA}•{{NC} Sistema Android 13"
+  echo -e "  ${MAGENTA}•{{NC} Google Apps (Play Store, Gmail, etc.)"
+  echo -e "  ${MAGENTA}•{{NC} Duración estimada: 10-20 minutos"
+  echo
+  read -p "Presiona Enter para iniciar (esto es IRREVERSIBLE)..."
+
+  sudo waydroid init -s GAPPS -f
+
+  if [[ $? -ne 0 ]]; then
+    print_error "Error inicializando Waydroid"
+    print_warning "Prueba: sudo rm -rf /var/lib/waydroid && sudo waydroid init -s GAPPS -f"
+  else
+    print_success "Waydroid inicializado"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 3: Iniciar Waydroid por primera vez
+  # ═══════════════════════════════════════════════════════════
+  print_header "Iniciando servicios de Waydroid"
+
+  print_status "Iniciando contenedor..."
+  sudo systemctl start waydroid-container
+  sleep 10
+
+  print_status "Iniciando sesión..."
+  waydroid session start
+  sleep 5
+
+  # Verificar estado
+  WAYDROID_STATUS=$(waydroid status 2>&1)
+  if echo "$WAYDROID_STATUS" | grep -q "Container:.*RUNNING"; then
+    print_success "Waydroid corriendo correctamente"
+  else
+    print_error "Error: Waydroid no se inició correctamente"
+    print_warning "Estado: $WAYDROID_STATUS"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 4: Instalar libhoudini (ARM Translation) - CLAVE
+  # ═══════════════════════════════════════════════════════════
+  print_header "Instalando libhoudini (ARM Translation) - CRUCIAL"
+
+  echo
+  echo -e "${BOLD}${CYAN}¿Por qué necesitas libhoudini?{{NC}"
+  echo -e "  ${MAGENTA}•{{NC} La mayoría de apps Android (incluida MagisTV) son ARM"
+  echo -e "  ${MAGENTA}•{{NC} Tu PC es x86_64 (Intel/AMD)"
+  echo -e "  ${MAGENTA}•{{NC} libhoudini traduce ARM → x86_64"
+  echo -e "  ${MAGENTA}•{{NC} Sin esto: error 'App not compatible'"
+  echo -e "  ${MAGENTA}•{{NC} Para más detalles ver: https://github.com/waydroid/waydroid/wiki/Installing-libhoudini O consulta la imagen abajo"
+  # O en heredoc
+cat <<"EOF"
+Instrucciones en: 
+https://raw.githubusercontent.com/casualsnek/waydroid_script/main/assets/img/README/image-20230430013148814.png
+EOF
+  echo -e "  ${MAGENTA}•{{NC} La imagen muestra otras dependencias aparte que te pueden servir. Y seleciona android 13 90% de ocasiones."
+  echo
+  read -p "¿Instalar libhoudini? [S/n]: " install_libhoudini
+
+  if [[ ! "$install_libhoudini" =~ ^[Nn]$ ]]; then
+    print_installing "waydroid_script (necesario para libhoudini)"
+
+    # Clonar y configurar script
+    if [[ ! -d ~/waydroid_script ]]; then
+      cd ~
+      git clone https://github.com/casualsnek/waydroid_script.git
+      cd waydroid_script
+    else
+      cd ~/waydroid_script
+      git pull
+    fi
+
+    # Setup Python venv
+    python -m venv venv
+    source venv/bin/activate
+    pip install -q -r requirements.txt 2>/dev/null
+
+    print_status "Instalando libhoudini (esto toma 5-10 minutos)..."
+    echo
+    echo -e "${CYAN}Sigue estos pasos en el menú interactivo:{{NC}"
+    echo -e "  ${MAGENTA}1.{{NC} Versión: {{${YELLOW}Android 13${NC}"
+    echo -e "  ${MAGENTA}2.{{NC} Acción: {{${YELLOW}Install{{NC}"
+    echo -e "  ${MAGENTA}3.{{NC} Marca {{${YELLOW}libhoudini{{NC} con ESPACIO"
+    echo -e "  ${MAGENTA}4.{{NC} Presiona ENTER"
+    echo
+
+    # Ejecutar script interactivo
+    sudo venv/bin/python main.py
+
+    deactivate
+
+    # Reiniciar Waydroid
+    print_status "Reiniciando Waydroid..."
+    waydroid session stop
+    sudo systemctl restart waydroid-container
+    sleep 10
+    waydroid session start
+
+    print_success "libhoudini instalado y Waydroid reiniciado"
+    print_warning "IMPORTANTE: Cierra sesión y vuelve a entrar para KVM"
+  else
+    print_warning "libhoudini omitido (MagisTV PROBABLEMENTE NO FUNCIONARÁ)"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 5: Certificación de Google Play (OPCIONAL pero recomendado)
+  # ═══════════════════════════════════════════════════════════
+  print_header "Certificación de Google Play (Opcional)"
+
+  echo
+  echo -e "${BOLD}${CYAN}¿Por qué certificar?{{NC}"
+  echo -e "  ${MAGENTA}•{{NC} Acceder a Play Store premium"
+  echo -e "  ${MAGENTA}•{{NC} Instalar apps que requieren certificación"
+  echo -e "  {{${MAGENTA}•{{NC} NO es necesario para MagisTV (ya tiene firma)"
+  echo
+  read -p "¿Obtener Android ID para certificación? [s/N]: " get_device_id
+
+  if [[ "$get_device_id" =~ ^[Ss]$ ]]; then
+    echo
+    echo -e "${YELLOW}Opción A (Automática - Recomendada):{{NC}"
+    echo -e "  cd ~/waydroid_script"
+    echo -e "  source venv/bin/activate"
+    echo -e "  sudo venv/bin/python main.py"
+    echo -e "  → {{${CYAN}Get Google Device ID to Get Certified{{NC}"
+    echo
+    echo -e "${YELLOW}Opción B (Manual):{{NC}"
+    echo -e "  waydroid show-full-ui"
+    echo -e "  Settings → About phone → Copia Android ID"
+    echo
+    read -p "¿Usar automática (A) o manual (B)? [A/b]: " id_method
+
+    if [[ ! "$id_method" =~ ^[Bb]$ ]]; then
+      print_status "Abriendo herramienta automática..."
+      cd ~/waydroid_script 2>/dev/null && {
+        source venv/bin/activate 2>/dev/null
+        echo -e "${CYAN}Selecciona la opción de Device ID{{NC}"
+        sudo venv/bin/python main.py
+        deactivate
+      } || print_warning "waydroid_script no encontrado, usa método B"
+    else
+      print_status "Abriendo interfaz Android..."
+      waydroid show-full-ui &
+      sleep 3
+    fi
+
+    echo
+    echo -e "${BOLD}${YELLOW}PASOS PARA CERTIFICAR:{{NC}"
+    echo -e "  {{${MAGENTA}1.{{NC} Obtén el Android ID (arriba)"
+    echo -e "  {{${MAGENTA}2.{{NC} Abre: {{${CYAN}https://www.google.com/android/uncertified/{{NC}"
+    echo -e "  {{${MAGENTA}3.{{NC} Pega el ID"
+    echo -e "  {{${MAGENTA}4.{{NC} Registra"
+    echo -e "  {{${RED}5.{{NC} {{${RED}ESPERA 10-20 MINUTOS{{NC} (a veces 1-2 horas)"
+    echo -e "  {{${MAGENTA}6.{{NC} Verifica: Play Store → Tu perfil → Play Protection"
+    echo -e "  {{${MAGENTA}7.{{NC} Debe decir: {{${GREEN}Device is certified{{NC}"
+    echo
+
+    read -p "¿Ya certificaste? [s/N]: " certified
+
+    if [[ "$certified" =~ ^[Ss]$ ]]; then
+      print_success "Dispositivo certificado"
+    else
+      print_warning "Certificación pendiente (espera 20+ minutos)"
+    fi
+  else
+    print_warning "Certificación omitida (no es necesaria para MagisTV)"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 6: Instalar MagisTV
+  # ═══════════════════════════════════════════════════════════
+  print_header "Instalando MagisTV"
+
+  echo
+  echo -e "${CYAN}MagisTV viene con firma ya configurada.{{NC}"
+  echo -e "${CYAN}Se instala directamente sin necesidad de setup adicional.{{NC}"
+  echo
+  read -p "¿Instalar MagisTV ahora? [S/n]: " install_magistv_app
+
+  if [[ ! "$install_magistv_app" =~ ^[Nn]$ ]]; then
+    MAGISTV_APK=""
+
+    # Buscar APK en múltiples ubicaciones
+    if [[ -f ~/Descargas/MAGIS*.apk ]]; then
+      MAGISTV_APK=$(ls ~/Descargas/MAGIS*.apk 2>/dev/null | head -1)
+    elif [[ -f ~/MAGIS*.apk ]]; then
+      MAGISTV_APK=$(ls ~/MAGIS*.apk 2>/dev/null | head -1)
+    fi
+
+    if [[ -z "$MAGISTV_APK" ]]; then
+      print_warning "APK de MagisTV no encontrado"
+      echo
+      echo -e "${CYAN}Descargalo desde:{{NC}"
+      echo -e "  {{${YELLOW}linktr.ee/MagisReddit{{NC}"
+      echo -e "  (Selecciona versión Android)"
+      echo
+      echo -e "${CYAN}Guarda como:{{NC}"
+      echo -e "  {{${YELLOW}~/Descargas/MAGIS_6.4.2.apk{{NC}"
+      echo
+      read -p "Presiona Enter cuando tengas el APK..."
+
+      if [[ -f ~/Descargas/MAGIS*.apk ]]; then
+        MAGISTV_APK=$(ls ~/Descargas/MAGIS*.apk | head -1)
+      fi
+    fi
+
+    if [[ -n "$MAGISTV_APK" && -f "$MAGISTV_APK" ]]; then
+      print_installing "Instalando $MAGISTV_APK"
+
+      if waydroid app install "$MAGISTV_APK" 2>&1 | tee /tmp/magistv_install.log; then
+        print_success "MagisTV instalado"
+
+        # Obtener package name automáticamente
+        MAGISTV_PACKAGE=$(waydroid app list 2>/dev/null | grep -iE "magis|iptv" | grep -v "google" | awk '{print $1}' | head -1)
+
+        if [[ -z "$MAGISTV_PACKAGE" ]]; then
+          # Fallback: obtener del instalador
+          MAGISTV_PACKAGE=$(grep -oE "com\.gsetech\.[a-zA-Z0-9._]*" /tmp/magistv_install.log | head -1)
+        fi
+
+        if [[ -n "$MAGISTV_PACKAGE" ]]; then
+          print_success "Package detectado: $MAGISTV_PACKAGE"
+
+          # Crear launcher .desktop
+          mkdir -p ~/.local/share/applications
+          cat >~/.local/share/applications/magistv.desktop <<EOF
+[Desktop Entry]
+Name=MagisTV
+Comment=IPTV Application
+Exec=waydroid app launch $MAGISTV_PACKAGE
+Icon=media-video-player
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;
+Keywords=iptv;tv;streaming;
+StartupNotify=true
+EOF
+
+          update-desktop-database ~/.local/share/applications 2>/dev/null
+
+          print_success "MagisTV disponible en launcher"
+          print_status "Ejecuta: waydroid app launch $MAGISTV_PACKAGE"
+        else
+          print_warning "No se detectó automáticamente el package"
+          print_status "Obtén manualmente: waydroid app list | grep -i magis"
+        fi
+      else
+        print_error "Error instalando MagisTV"
+        print_status "Verifica: libhoudini está instalado? ¿El APK es correcto?"
+        print_warning "Error log guardado en: /tmp/magistv_install.log"
+      fi
+    else
+      print_error "APK de MagisTV no encontrado y no se descargó"
+    fi
+  else
+    print_warning "MagisTV no instalado"
+    print_status "Puedes instalarlo después: waydroid app install ~/Descargas/MAGIS.apk"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # PASO 7: Magisk Root (OPCIONAL)
+  # ═══════════════════════════════════════════════════════════
+  print_step "13.2.1/35: Magisk Root (Opcional)"
+
+  echo
+  read -p "¿Instalar Magisk para root en Waydroid? [s/N]: " install_magisk
+
+  if [[ "$install_magisk" =~ ^[Ss]$ ]]; then
+    print_header "Instalando Magisk"
+
+    if [[ -d ~/waydroid_script ]]; then
+      cd ~/waydroid_script
+      source venv/bin/activate 2>/dev/null
+      echo -e "${CYAN}Selecciona en el menú: Install → magisk{{NC}"
+      sudo venv/bin/python main.py
+      deactivate
+      cd ~
+
+      waydroid session stop
+      sudo systemctl restart waydroid-container
+      sleep 10
+      waydroid session start
+
+      print_success "Magisk instalado"
+    else
+      print_error "waydroid_script no encontrado"
+      print_status "Instala libhoudini primero (paso 4)"
+    fi
+  else
+    print_warning "Magisk omitido"
+  fi
+
+  print_success "Waydroid + MagisTV configurado"
+
+else
+  print_warning "Waydroid omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 13.3: ALTERNATIVAS TV (YUKI-IPTV, HYPNOTIX)
+# ═══════════════════════════════════════════════════════════
+print_step "13.3/35: Alternativas TV en Desktop"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          📺 ALTERNATIVAS TV PARA DESKTOP 📺             ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):{{NC}"
+echo
+echo -e "${BOLD}${GREEN}1. Yuki-IPTV{{NC}"
+echo -e "  {{${MAGENTA}•{{NC} Cliente IPTV con M3U support"
+echo -e "  {{${MAGENTA}•{{NC} Interfaz GTK moderna"
+echo -e "  {{${MAGENTA}•{{NC} Recomendado si tienes lista M3U"
+echo
+echo -e "${BOLD}${GREEN}2. Hypnotix{{NC}"
+echo -e "  {{${MAGENTA}•{{NC} Reproductor IPTV avanzado"
+echo -e "  {{${MAGENTA}•{{NC} Compatible con XTREAM codes"
+echo -e "  {{${MAGENTA}•{{NC} Requiere configuración de servidor"
+echo
+echo -e "${YELLOW}⚠️  IMPORTANTE - SEGURIDAD CON VPN:{{NC}"
+echo -e "  {{${RED}•{{NC} {{${RED}NUNCA usar IPTV sin VPN{{NC}"
+echo -e "  {{${RED}•{{NC} {{${RED}Se expone tu IP real al servidor IPTV{{NC}"
+echo -e "  {{${RED}•{{NC} {{${RED}Algunos proveedores bloquean sin VPN{{NC}"
+echo -e "  {{${GREEN}•{{NC} {{${GREEN}RECOMENDACIÓN: Activa VPN ANTES de usar{{NC}"
+echo
+read -p "¿Instalar Yuki-IPTV? [s/N]: " install_yuki
+read -p "¿Instalar Hypnotix? [s/N]: " install_hypnotix
+read -p "¿Necesitas ayuda con VPN? [s/N]: " setup_vpn
+
+# Yuki-IPTV
+if [[ "$install_yuki" =~ ^[Ss]$ ]]; then
+  print_installing "Yuki-IPTV"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    yuki-iptv 2>/dev/null || print_warning "Yuki-IPTV falló"
+
+  if command -v yuki-iptv &>/dev/null; then
+    print_success "Yuki-IPTV instalado"
+    print_status "Uso: yuki-iptv (o busca en launcher)"
+    print_status "Configura tu lista M3U en: Settings → Playlists"
+  else
+    print_warning "Error instalando Yuki-IPTV"
+  fi
+fi
+
+# Hypnotix
+if [[ "$install_hypnotix" =~ ^[Ss]$ ]]; then
+  print_installing "Hypnotix"
+  sudo pacman -S --needed --noconfirm hypnotix 2>/dev/null || {
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      hypnotix 2>/dev/null || print_warning "Hypnotix falló"
+  }
+
+  if command -v hypnotix &>/dev/null; then
+    print_success "Hypnotix instalado"
+    print_status "Uso: hypnotix (o busca en launcher)"
+    print_status "Configura servidor: File → Settings → XTREAM URL"
+  else
+    print_warning "Error instalando Hypnotix"
+  fi
+fi
+
+# VPN Setup
+if [[ "$setup_vpn" =~ ^[Ss]$ ]]; then
+  print_header "Configuración de VPN"
+
+  echo
+  echo -e "${CYAN}¿Cuál es tu proveedor VPN?{{NC}"
+  echo -e "  {{${MAGENTA}1.{{NC} ProtonVPN (Recomendado + Gratuito)"
+  echo -e "  {{${MAGENTA}2.{{NC} Windscribe"
+  echo -e "  {{${MAGENTA}3.{{NC} Otro / No instalar"
+  echo
+  read -p "Selecciona [1-3]: " vpn_choice
+
+  case "$vpn_choice" in
+  1)
+    print_installing "ProtonVPN"
+    sudo pacman -S --needed --noconfirm proton-vpn-gtk-app
+
+    # Script de conveniencia
+    mkdir -p ~/.local/bin
+    cat >~/.local/bin/yuki-with-vpn.sh <<'EOL'
+#!/bin/bash
+echo "🔒 Conectando a ProtonVPN..."
+proton-vpn-gtk-app --connect rapid &
+sleep 5
+echo "▶️  Iniciando Yuki-IPTV..."
+yuki-iptv
+EOF
+    chmod +x ~/.local/bin/yuki-with-vpn.sh
+
+    print_success "ProtonVPN instalado"
+    print_status "Usa: yuki-with-vpn.sh para conectar automáticamente"
+    print_status "O abre ProtonVPN manualmente antes de Yuki"
+    ;;
+  2)
+    print_installing "Windscribe"
+    yay -S --needed --noconfirm windscribe-v2-bin 2>/dev/null || print_warning "Windscribe falló"
+    ;;
+  *)
+    print_warning "VPN no configurada"
+    echo -e "${YELLOW}Recuerda: SIEMPRE usa VPN antes de IPTV{{NC}"
+    ;;
+  esac
+fi
+
+print_success "Alternativas TV configuradas"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 13.4: ANDROID EMULATOR (SDK AVD - ÚLTIMO RECURSO)
+# ═══════════════════════════════════════════════════════════
+print_step "13.4/35: Android Emulator (SDK AVD - Último Recurso)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗{{NC}"
+echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖           ║{{NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝{{NC}"
+echo
+echo -e "${YELLOW}⚠️  NOTA:{{NC} Usa {{${RED}SOLO si Waydroid no funciona{{NC}"
+echo
+echo -e "${CYAN}Características:{{NC}"
+echo -e "  {{${MAGENTA}•{{NC} {{${RED}Mucho más lento{{NC} que Waydroid (~5-10x)"
+echo -e "  {{${MAGENTA}•{{NC} {{${RED}Más pesado{{NC} (consume más RAM/CPU)"
+echo -e "  {{${MAGENTA}•{{NC} {{${GREEN}Mejor compatibilidad{{NC} en algunos casos raros"
+echo
+read -p "¿Instalar Android Emulator (SDK)? [s/N]: " install_android_studio
+
+if [[ "$install_android_studio" =~ ^[Ss]$ ]]; then
+  print_header "Instalando Android Studio + Emulator"
+
+  print_installing "Android Studio (esto toma tiempo)"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    android-studio 2>/dev/null || print_warning "Android Studio falló"
+
+  if [[ -d /opt/android-studio ]]; then
+    print_success "Android Studio instalado en /opt/android-studio"
+
+    echo
+    echo -e "${CYAN}Pasos para usar:{{NC}"
+    echo -e "  {{${MAGENTA}1.{{NC} Ejecuta: {{${YELLOW}/opt/android-studio/bin/studio.sh{{NC}"
+    echo -e "  {{${MAGENTA}2.{{NC} Selecciona: {{${YELLOW}AVD Manager{{NC}"
+    echo -e "  {{${MAGENTA}3.{{NC} Crea: {{${YELLOW}Pixel 2{{NC} (recomendado)"
+    echo -e "  {{${MAGENTA}4.{{NC} Lanza y espera ({{${RED}LENTO{{NC})"
+    echo -e "  {{${MAGENTA}5.{{NC} Instala MagisTV desde APK"
+    echo
+
+    print_warning "{{${RED}Esto es MUCHO MÁS LENTO que Waydroid{{NC}"
+    print_status "Solo usa si Waydroid falla"
+  else
+    print_error "Android Studio no se instaló correctamente"
+  fi
+else
+  print_warning "Android Emulator omitido"
+fi
+
+print_success "Alternativas de Android completadas"
+
+# ═══════════════════════════════════════════════════════════
+# COMANDOS ÚTILES PARA WAYDROID
+# ═══════════════════════════════════════════════════════════
+
+cat >~/.local/bin/waydroid-helpers.sh <<'EOL'
+#!/bin/bash
+# Comandos útiles para Waydroid
+
+case "$1" in
+  status)
+    echo "📊 Estado de Waydroid:"
+    waydroid status
+    ;;
+  restart)
+    echo "🔄 Reiniciando Waydroid..."
+    waydroid session stop
+    sudo systemctl restart waydroid-container
+    sleep 10
+    waydroid session start
+    echo "✅ Reiniciado"
+    ;;
+  open)
+    if [[ -z "$2" ]]; then
+      waydroid show-full-ui
+    else
+      waydroid app launch "$2"
+    fi
+    ;;
+  logcat)
+    waydroid logcat "$@"
+    ;;
+  adb)
+    waydroid adb enable
+    adb connect 192.168.240.112:5555
+    ;;
+  *)
+    echo "Uso: waydroid-helpers.sh [status|restart|open|logcat|adb]"
+    ;;
+esac
+EOL
+
+chmod +x ~/.local/bin/waydroid-helpers.sh
+
+print_success "Helpers de Waydroid creados: waydroid-helpers.sh"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 13.5: STREMIO (AUR vs FLATPAK)
@@ -820,21 +1365,154 @@ print_step "14/35: Herramientas de Desarrollo"
 print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx \
-  docker docker-compose rust \
+  docker docker-compose docker-desktop rust \
   llvm clang patchelf git github-cli tgpt
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   claude-code gemini-cli-git
-print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
-
-sudo systemctl enable docker
-sudo usermod -aG docker $USER
+print_success "Gemini, TGPT, Docker-desktop, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
 python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
 
 print_installing "Node packages (neovim)"
 npm install -g neovim 2>/dev/null || true
+
+# ═══════════════════════════════════════════════════════════
+# DOCKER SETUP (FUNCIONAL Y ROBUSTO)
+# ═══════════════════════════════════════════════════════════
+print_header "Configurando Docker"
+
+# 1. Habilitar Docker service
+print_status "Habilitando servicios de Docker..."
+sudo systemctl daemon-reload
+sudo systemctl enable docker.socket 2>/dev/null || true
+sudo systemctl enable docker 2>/dev/null || true
+sudo systemctl start docker.socket 2>/dev/null || true
+sudo systemctl start docker 2>/dev/null || true
+
+# 2. Agregar usuario a grupo docker
+sudo usermod -aG docker $USER 2>/dev/null || true
+print_success "Docker CLI configurado"
+
+# 3. Verificar instalación básica
+if command -v docker &>/dev/null; then
+  print_success "Docker disponible: $(docker --version)"
+else
+  print_warning "Docker CLI no disponible en PATH"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# DOCKER DESKTOP (OPCIONAL - FALLBACK INTELIGENTE)
+# ═══════════════════════════════════════════════════════════
+echo
+echo -e "${CYAN}Opciones de Docker:${NC}"
+echo -e "  ${MAGENTA}1.${NC} Docker Desktop (binarios estáticos+GUI - recomendado si necesitas GUI)"
+echo -e "  ${MAGENTA}2.${NC} (OMITIR) Docker CLI (ya instalado - suficiente)"
+echo
+read -p "Selecciona [1=(OMITIR) CLI solamente, 2=Agregar Desktop]: " docker_choice
+
+if [[ "$docker_choice" == "1" ]]; then
+  print_header "Instalando Docker Desktop (Binarios Estáticos)"
+  
+  # Crear directorio temporal
+  DOCKER_TEMP="/tmp/docker-desktop-install-$$"
+  mkdir -p "$DOCKER_TEMP"
+  cd "$DOCKER_TEMP"
+  
+  # DESCARGA CORRECTA
+  print_status "Descargando Docker binarios estáticos v29.1.4..."
+  if wget -q --show-progress https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz 2>/dev/null; then
+    wget -q --show-progress https://desktop.docker.com/linux/main/amd64/214940/docker-desktop-x86_64.pkg.tar.zst
+    sudo pacman -U ./docker-desktop-x86_64.pkg.tar.zst
+    print_success "GUI => Descarga completada [Pacman -U para instalaciones Locales] + Binario Estático"
+    
+    # EXTRACCIÓN CORRECTA (sin errores de sintaxis)
+    print_status "Extrayendo archivos..."
+    if tar -xzf docker-29.1.4.tgz 2>/dev/null; then
+      print_success "Extracción completada"
+      
+      # INSTALACIÓN CORRECTA
+      print_installing "Instalando binarios en /usr/local/bin/"
+      if sudo cp -rp docker/* /usr/local/bin/ && rm -rf docker; then
+        print_success "Binarios instalados"
+        
+        # CREAR SERVICIO SYSTEMD (para docker daemon)
+        print_status "Creando servicio Docker daemon..."
+        sudo tee /etc/systemd/system/docker.service >/dev/null <<'DOCKERSVC'
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target docker.socket
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/dockerd -H fd://
+ExecReload=/bin/kill -s HUP $MAINPID
+RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+DOCKERSVC
+
+        # Habilitar servicios
+        sudo systemctl daemon-reload
+        sudo systemctl enable docker docker.socket 2>/dev/null || true
+        sudo systemctl restart docker 2>/dev/null || true
+        
+        print_success "Docker daemon configurado"
+        
+        # Verificación
+        sleep 2
+        if docker --version &>/dev/null; then
+          print_success "✅ Docker funcional: $(docker --version)"
+          
+          # Prueba rápida (sin descargar imagen)
+          print_status "Verificando conectividad..."
+          if docker ps &>/dev/null; then
+            print_success "✅ Docker listo para usar"
+          fi
+        else
+          print_warning "⚠️  Docker instalado pero no disponible en PATH"
+          print_status "Intenta: /usr/local/bin/docker --version"
+        fi
+      else
+        print_error "❌ Error al copiar binarios"
+      fi
+    else
+      print_error "❌ Error al extraer archivo tar"
+    fi
+  else
+    print_error "❌ Error descargando Docker (sin internet o servidor caído)"
+    print_status "Descarga manual: https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz"
+  fi
+  
+  # Limpiar
+  cd ~
+  rm -rf "$DOCKER_TEMP"
+  
+elif [[ "$docker_choice" == "2" ]]; then
+  print_success "Usando Docker CLI (suficiente para la mayoría)"
+else
+  print_warning "Docker Desktop omitido"
+fi
+
+print_success "Docker configurado"
+
+# ═══════════════════════════════════════════════════════════
+# PYTHON + NODE SUPPORT
+# ═══════════════════════════════════════════════════════════
+print_installing "Python LSP + Neovim support"
+python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
+
+print_installing "Node packages (neovim)"
+npm install -g neovim 2>/dev/null || true
+
+# ═══════════════════════════════════════════════════════════
+# GEMINI CLI (OPCIONAL)
+# ═══════════════════════════════════════════════════════════
 
 # Gemini CLI - Interactivo
 echo
@@ -2042,8 +2720,7 @@ read -p "¿Instalar Ollama + opencommit para commits con IA? [S/n]: " install_ol
 
 if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_installing "Ollama"
-  sudo pacman -S --needed --noconfirm ollama
-  yay -S --needed --noconfirm open-webui # Interfaz gráfica para Ollama
+  sudo pacman -S --needed --noconfirm ollama # open-webui: Interfaz gráfica para Ollama
   sudo systemctl enable --now ollama
 
   print_installing "Descargando modelo qwen2.5:0.5b (más ligero y rápido)"
@@ -2067,6 +2744,71 @@ if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_status "Uso: git add . && oco"
 else
   print_warning "Ollama omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 28.5: OPEN-WEBUI (CON FALLBACK A DOCKER)
+# ═══════════════════════════════════════════════════════════
+print_step "28.5/35: Open-WebUI (Interfaz para Ollama)"
+
+echo
+echo -e "${CYAN}Opciones para acceder a Ollama:${NC}"
+echo -e "  ${MAGENTA}1.${NC} Open-WebUI (interfaz completa + historial)"
+echo -e "  ${MAGENTA}2.${NC} Omitir (usar solo CLI de Ollama)"
+echo
+read -p "¿Instalar Open-WebUI? [S/n]: " install_webui
+
+if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Open-WebUI"
+
+  # Intento 1: Compilar desde AUR
+  print_status "Intentando instalación desde AUR..."
+  if yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    open-webui 2>/dev/null; then
+    print_success "Open-WebUI instalado desde AUR"
+    print_status "Accede a: http://localhost:8080"
+  else
+    # Fallback: Docker
+    print_warning "Compilación AUR falló, usando Docker..."
+    
+    if ! command -v docker &>/dev/null; then
+      print_status "Instalando Docker..."
+      sudo pacman -S --needed --noconfirm docker
+      sudo systemctl enable --now docker
+      sudo systemctl start docker.service
+      sudo systemctl enable docker.service
+      sudo usermod -aG docker $USER
+      docker run hello-world
+    fi
+
+    print_installing "Open-WebUI via Docker"
+    # EXTRAIDO DE: 
+    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/ 
+
+    # I’m going to choose the option to install Open WebUI with Bundled Ollama Support and select the container that utilizes a GPU:
+    # if [[ -f /etc/arch-release ]]; then # esto esta MAL, usa:
+      if command -v nvidia-smi &> /dev/null; then
+      print_status "Detectado Arch Linux"
+      print_installing "Open-WebUI via Docker (GPU)"
+      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama  2>/dev/null
+    else
+      print_status "Detectado Debian/Ubuntu"
+      print_installing "Open-WebUI via Docker (CPU)"
+      # If you’re not using a GPU, use this command:
+      docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama 2>/dev/null
+    fi
+
+    if [[ $? -eq 0 ]]; then
+      print_success "Open-WebUI iniciado en Docker"
+      print_status "Accede a: http://localhost:3000"
+      print_status "Primer inicio toma ~30 segundos"
+    else
+      print_error "Docker falló, instálalo manualmente después:"
+      echo -e "${YELLOW}docker run -d --name open-webui -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main${NC}"
+    fi
+  fi
+else
+  print_warning "Open-WebUI omitido"
 fi
 
 # ═════════════════════════════════════════════════════════════════
