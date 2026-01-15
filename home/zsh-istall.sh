@@ -22,6 +22,13 @@ rm -rf ~/.oh-my-zsh/custom/plugins/zsh-*
 rm -rf ~/.zsh/zsh-autocomplete
 rm -rf ~/.zsh/fzf-tab
 
+# 2.5 Instalar Powerlevel10k theme
+if [[ ! -d ~/.oh-my-zsh/custom/themes/powerlevel10k ]]; then
+  echo -e "${GREEN}Instalando Powerlevel10k...${NC}"
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+    ~/.oh-my-zsh/custom/themes/powerlevel10k
+fi
+
 # 3. Ir a dotfiles y clonar plugins DENTRO del repo
 cd ~/dotfiles-dizzi
 
