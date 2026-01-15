@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=   Github  
+Comment=Open    Github  
+Exec=brave --app="https://github.com/"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/_Github__(Brave).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=_Github__(Brave)

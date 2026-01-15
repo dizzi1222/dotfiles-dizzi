@@ -776,3 +776,8 @@ if [[ -d /run/user/$(id -u)/keyring ]]; then
   
   unset _keyring_control _keyring_ssh
 fi
+
+# PARA BUSCAR nombres USA:
+# cd ~/.config/nvim
+# rg "ziontee113/move" -l
+# ALIAS PARA BUSCAR COINCIDENCIAS:
