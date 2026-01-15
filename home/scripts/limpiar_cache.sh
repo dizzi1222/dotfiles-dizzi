@@ -59,6 +59,12 @@ while true; do
   5)
     echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo [& journalctl, docker, electron]...${RESET}"
     rm -rf ~/.cache/*
+    # Brave
+    rm -rf ~/.config/BraveSoftware/Brave-Browser/Default/Cache
+    rm -rf ~/.cache/BraveSoftware
+
+    # Firefox
+    rm -rf ~/.mozilla/firefox/*.default*/cache2
     flatpak uninstall --unused
     rm -rf ~/.var/app/*/cache/*
     sudo journalctl --vacuum-size=50M

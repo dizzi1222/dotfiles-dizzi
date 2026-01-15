@@ -3,6 +3,7 @@ Version=1.0
 Name=Stremio Web
 Comment=Open Stremio Web
 # Exec=brave --app="https://web.stremio.com/"
+Hidden=true
 Exec=/home/diego/.local/bin/stremio-web-brave-App.sh
 Terminal=false
 Type=Application

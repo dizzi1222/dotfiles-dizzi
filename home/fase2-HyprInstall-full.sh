@@ -690,7 +690,7 @@ sudo pacman -S --needed --noconfirm --answerdiff=None --answerclean=None --remov
 proton-vpn-gtk-app \
   2>/dev/null || print_warning "Algunos extras fallaron"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  stacer-bin zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
+  stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
@@ -1366,7 +1366,7 @@ print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx \
   docker docker-desktop rust \
-  llvm clang patchelf git github-cli tgpt
+  llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   claude-code gemini-cli-git

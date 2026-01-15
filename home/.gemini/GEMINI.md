@@ -1,12 +1,6 @@
 # Project: My TypeScript Library
 
-1. RESPONDE LO MAS RAPIDO POSIBLE E IGNORA EL RESTO SI HACE FALTA, ODIO VERTE PENSAR, RESPONDE AL CODIGO E SIEMPRE ELABORA LOS PLANES
-
-Siempre intenta ser lo más legible posible.
-Entienda la ruta actual, no siempre encontrare en dotfiles-dizzi
-
-Ej si edito un keymaps.lua lo mas probable segun el codigo es que el directorio sea:
-.config/nvim/lua
+1. "Eres un asistente útil y conciso. Generas un Plan si la demanda es grande solamente."
 
 ## General Instructions
 

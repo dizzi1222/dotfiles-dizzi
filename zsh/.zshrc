@@ -355,10 +355,39 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
-# ═══════════════════════════════════════════════════════════
-# Configuración de opencommit (oco) con Ollama ~ [opencommit]
-# ═══════════════════════════════════════════════════════════
-alias aicommit='oco'
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+# Configuración de opencommit (oco) con Ollama ~ [opencommit] > con control de Nothink
+# alias aicommit='oco'
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+
+# Activar nothink por defecto (commits rápidos)
+export OCO_NOTHINK=true
+
+# Wrapper inteligente
+aicommit() {
+  if [ "$OCO_NOTHINK" = true ]; then
+    local nothink_prompt="/set nothink"
+    
+    if [ $# -eq 0 ]; then
+      oco -c "$nothink_prompt"
+    else
+      oco -c "$nothink_prompt. Context: $*"
+    fi
+  else
+    oco "$@"
+  fi
+}
+
+# Toggle rápido
+aicommit-toggle() {
+  if [ "$OCO_NOTHINK" = true ]; then
+    export OCO_NOTHINK=false
+    echo "🧠 Reasoning activado"
+  else
+    export OCO_NOTHINK=true
+    echo "⚡ Nothink activado"
+  fi
+}
 
 # Comando para reconfigurar opencommit fácilmente
 # Función dinámica para configurar opencommit
@@ -759,7 +788,6 @@ export GIT_EDITOR="nvim"
 # ═══════════════════════════════════════════════════════════
 # Alias para la herramienta de MACROS de LINUX
 # ═══════════════════════════════════════════════════════════
-alias ydover="ydotool version"
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 
 # ═══════════════════════════════════════════════════════════
@@ -777,7 +805,15 @@ if [[ -d /run/user/$(id -u)/keyring ]]; then
   unset _keyring_control _keyring_ssh
 fi
 
+# ═════════════════════════════
+#   TRUCAZOS A SABER 🗒️    #
+# ═════════════════════════════
 # PARA BUSCAR nombres USA:
 # cd ~/.config/nvim
 # rg "ziontee113/move" -l
 # ALIAS PARA BUSCAR COINCIDENCIAS.
+# ------------------------------------------------------------------------------
+# Comparar archivos
+# diff <(sort /home/diego/dotfiles-wsl-dizzi/nvim-wsl/.config/nvim/lua/config/keymaps.lua) <(sort /home/diego/dotfiles-dizzi/nvim/.config/nvim/lua/config/keymaps.lua)
+# ------------------------------------------------------------------------------
+#
