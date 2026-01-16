@@ -13,3 +13,8 @@
 [core]
 	editor = nvim
 	filemode = true
+	quotepath = false
+	precomposeunicode = true
+[i18n]
+	commitencoding = utf-8
+	logoutputencoding = utf-8

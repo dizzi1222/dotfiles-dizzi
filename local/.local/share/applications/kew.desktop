@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Kew Music Player
 Comment=Terminal music player
-# Exec=kitty kew
-Exec=/home/diego/scripts/toggle-music.sh
+Exec=kitty kew
+# Exec=/home/diego/scripts/toggle-music.sh
 # Icon=audio-x-generic
 Icon=/home/diego/.local/share/icons/kew-icon.png
 Icon[es]=/home/diego/.local/share/icons/kew-icon.png

@@ -349,6 +349,12 @@ eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDob
 # export STARSHIP_CONFIG="$HOME/dotfiles-dizzi/starship/.config/starship/starship.toml"
 # eval "$(starship init zsh)"
 
+# Configuración global de Git
+git config --global core.quotepath false
+git config --global core.precomposeunicode true
+git config --global i18n.commitencoding utf-8
+git config --global i18n.logoutputencoding utf-8
+
 # Agrega al final del archivo ~/.zshrc
 # Reparar problemas de codificación de caracteres. [UTF-8]
 export LANG=en_US.UTF-8
