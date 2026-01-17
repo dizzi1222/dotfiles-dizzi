@@ -2,7 +2,8 @@
 Version=1.0
 Name=   Github  
 Comment=Open    Github  
-Exec=brave --app="https://github.com/"
+# Exec=brave --app="https://github.com/"
+Exec=firefox --new-window --kiosk "https://github.com/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/_Github__(Brave).png

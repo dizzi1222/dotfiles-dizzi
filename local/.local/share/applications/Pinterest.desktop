@@ -2,7 +2,8 @@
 Version=1.0
 Name=Pinterest
 Comment=Open Pinterest
-Exec=brave --app="https://www.pinterest.com/"
+# Exec=brave --app="https://www.pinterest.com/"
+Exec=firefox --new-window --kiosk "https://www.pinterest.com/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Pinterest.png
