@@ -2,7 +2,8 @@
 Version=1.0
 Name=Gemini AI
 Comment=Open Gemini AI
-Exec=brave --app="https://gemini.google.com/app"
+# Exec=brave --app="https://gemini.google.com/app"
+Exec=firefox --new-window --kiosk "https://gemini.google.com/app"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Gemini_AI.png

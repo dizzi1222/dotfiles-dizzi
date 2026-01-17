@@ -135,9 +135,9 @@ interactive_mode() {
   echo -e "\n${BLUE}🌍 ¿En qué navegador quieres abrirlo?${RESET}"
   echo -e "${DIM}   (Brave/Chrome abren como APLICACIÓN, Firefox como ventana dedicada)${RESET}"
   BROWSER=$(gum choose \
+    "firefox (recomendado - modo aplicación)" \
     "brave  (recomendado - modo aplicación)" \
     "chrome (modo aplicación)" \
-    "firefox (ventana dedicada)" \
     "chromium (modo aplicación)" \
     --header "Selecciona navegador" | cut -d' ' -f1)
 
