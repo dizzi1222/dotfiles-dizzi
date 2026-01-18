@@ -92,6 +92,15 @@ declare -a ROOT_FILES=(
   "steam-native.desktop"
   # "net.lutris.winetricks-121.desktop"
   # "net.lutris.yazi-search-68.desktop"
+  # -- =============================
+  # --  WEBAPP DE BRAVE OFICIALES!  - one time function
+  # -- =============================
+  # Comment=Access  GitHub using Brave Browser  .
+  "brave-mjoklplbddabcmpepnokjaffbmgbkkgg-Default.desktop"
+  # Comment=Access ▶ 󰑈 YouTube using Brave Browser  .
+  "brave-agimnkijcaahngcdmfeangaknmldooml-Default.desktop"
+  # Comment=Access 🎭 Versus Themes using Brave Browser  WallpaperEngine 󰸉 .
+  "brave-pajkdhhgfpceeeogijbogempjggmpjco-Default.desktop"
   "net.lutris.youtube-music-69.desktop"
   "net.lutris.spotify-client-127.desktop"
   # "net.lutris.cursor-64.desktop"

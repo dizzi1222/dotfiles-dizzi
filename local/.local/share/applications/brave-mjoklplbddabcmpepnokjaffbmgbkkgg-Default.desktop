@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Comment=Access  GitHub using Brave Browser  .
+Terminal=false
+Type=Application
+Name=GitHub
+Exec=/opt/brave-bin/brave --profile-directory=Default --app-id=mjoklplbddabcmpepnokjaffbmgbkkgg
+Icon=brave-mjoklplbddabcmpepnokjaffbmgbkkgg-Default
+StartupWMClass=crx_mjoklplbddabcmpepnokjaffbmgbkkgg

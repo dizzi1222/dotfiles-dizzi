@@ -39,16 +39,15 @@ if [[ "$BROWSER" == "firefox" ]] && command -v firefox &>/dev/null; then
     firefox -CreateProfile "$DOMAIN $HOME/.mozilla/firefox/$DOMAIN" 2>/dev/null
   fi
 
-  # O COMENTA lo de arriba y usa tu perfil por defecto
   firefox "$DOMAIN" --new-window "$URL" &
-
+# --kiosk    otro parametro de Firefox: fuerza fullscreen
 # Chromium/Chrome con --app
 elif [[ "$BROWSER" =~ chrome|chromium|brave|edge ]] && command -v "$BROWSER" &>/dev/null; then
   USER_DATA="$HOME/.config/$BROWSER-webapps/$DOMAIN"
   mkdir -p "$USER_DATA"
   "$BROWSER" --app="$URL" \
-    --class="WebApp-$DOMAIN" & # \
-  # --user-data-dir="$USER_DATA" & # Descomenta apartir de \ hasta & aqui si quieres perfiles separados
+    --class="WebApp-$DOMAIN" \
+    --user-data-dir="$USER_DATA" &
 
 # Navegador genérico
 elif command -v "$BROWSER" &>/dev/null; then

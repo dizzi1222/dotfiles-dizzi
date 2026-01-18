@@ -2,8 +2,8 @@
 Version=1.0
 Name=ChatGPT OpenAI
 Comment=Open ChatGPT OpenAI
-# Exec=brave --app="https://chatgpt.com/"
-Exec=firefox --new-window --kiosk "https://chatgpt.com/"
+Exec=brave --app="https://chatgpt.com/"
+# Exec=firefox --new-window "https://chatgpt.com/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/ChatGPT_OpenAI.png

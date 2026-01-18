@@ -70,8 +70,11 @@ create_webapp() {
   firefox)
     # Firefox no tiene --app, pero podemos usar ventana dedicada
     # Extraer dominio para perfil único
-    DOMAIN=$(echo "$APP_URL" | sed -E 's|^https?://([^/]+).*|\1|' | tr -cd '[:alnum:]')
-    EXEC_COMMAND="sh -c 'if ! pgrep -f \"firefox.*-P.*$DOMAIN\" >/dev/null; then firefox -CreateProfile \"$DOMAIN\" 2>/dev/null; fi; firefox -P \"$DOMAIN\" --new-window \"$APP_URL\"'"
+    # EXEC_COMMAND="sh -c 'if ! pgrep -f \"firefox.*-P.*$DOMAIN\" >/dev/null; then firefox -CreateProfile \"$DOMAIN\" 2>/dev/null; fi; firefox -P \"$DOMAIN\" --new-window --kiosk \"$APP_URL\"'"
+
+    # COMENTA lo de arriba y usa tu perfil por defecto
+    EXEC_COMMAND="firefox --new-window --kiosk $APP_URL"
+    # --kiosk    otro parametro de Firefox: fuerza fullscreen
     notify-send "📱 Para cambiar de perfil de firefox:  firefox -ProfileManager"
     ;;
   *)

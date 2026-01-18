@@ -68,10 +68,10 @@ while true; do
     flatpak uninstall --unused
     rm -rf ~/.var/app/*/cache/*
     sudo journalctl --vacuum-size=50M
-    rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/* &&
-      paccache -rk1 && docker system prune -af &&
-      docker builder prune \
-        notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
+    rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/*
+    docker system prune -af
+    docker builder prune
+    notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   6)
     echo -e "\n${YELLOW}⚡ Limpiando caché de neovim...${RESET}"

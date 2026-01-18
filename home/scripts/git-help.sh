@@ -16,7 +16,7 @@ show_help() {
 EOF
 
   echo -e "\n${CYAN}┌──────────────────────────────────────────────────────────────┐${RESET}"
-  echo -e "${CYAN}│${BOLD}           GIT ALIASES - GUÍA COMPLETA 🎯${RESET}${CYAN}                  │${RESET}"
+  echo -e "${CYAN}│${BOLD}           GIT ALIASES - GUÍA COMPLETA 🎯${RESET}${CYAN}                     │${RESET}"
   echo -e "${CYAN}└──────────────────────────────────────────────────────────────┘${RESET}\n"
 
   echo -e "${MAGENTA}${BOLD}🖥️  WORKFLOW PRINCIPAL:${RESET}"
@@ -33,6 +33,7 @@ EOF
   echo -e "                       Con args: agrega contexto extra"
   echo -e "                       Ejemplo: ${CYAN}gitquick \"actualizar configs\"${RESET}\n"
 
+  echo -e "  ${GREEN}aicommit${RESET}              → Commit con ${YELLOW}IA LOCAL${RESET} (qwen2.5:0.5b)"
   echo -e "                       Usa opencommit (oco) con Ollama"
   echo -e "                       Genera mensaje automático"
   echo -e "                       Te pregunta si pushear\n"
@@ -43,6 +44,19 @@ EOF
   echo -e "  ${GREEN}gitconv${RESET}            → Commit estilo ${YELLOW}Conventional Commits${RESET}"
   echo -e "                       Te pregunta: tipo, scope, mensaje"
   echo -e "                       Ejemplo final: ${CYAN}feat(hyprland): agregar keybinds${RESET}\n"
+
+  # ═════════════════════════════
+  #   TRUCAZOS APARTE 🗒️    #
+  # ═════════════════════════════
+  echo -e "${MAGENTA}${BOLD}🗿 TRUCAZOS DE FILTRADO (tema aparte):${RESET}"
+
+  # Comparar archivos
+  echo -e "  ${GREEN}cd ~/.config/nvim && # rg 'ziontee113/move' -l${RESET}                                                                                       → PARA BUSCAR ${YELLOW}COINCIDENCIAS EN UN DIRECTORIO${RESET}\n\n\n"
+
+  # ALIAS PARA BUSCAR COINCIDENCIAS.
+  echo -e "  ${GREEN}diff <(sort ~/.bashrc) <(sort ~/.zshrc)${RESET}                                                                                              → COMPARAR DOS ARCHIVOS (Util para gitflow)${YELLOW}IGNORANDO ORDEN${RESET}\n\n\n"
+
+  echo -e "  ${GREEN}diff <(sort ~/nvim-wsl/.config/nvim/lua/config/keymaps.lua) <(sort /home/user/nvim/.config/nvim/lua/config/keymaps.lua)${RESET}              → OTRO ${YELLOW}EJEMPLO${RESET}\n\n\n"
 
   echo -e "${MAGENTA}${BOLD}🔍 VISUALIZACIÓN:${RESET}"
   echo -e "  ${GREEN}gits${RESET}               → Estado del repo en formato ${YELLOW}compacto${RESET}"
