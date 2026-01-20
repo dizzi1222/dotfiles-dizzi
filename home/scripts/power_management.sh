@@ -17,7 +17,7 @@ case "$CHOICE" in
   ;;
 "")
   sleep 1
-  hyprlock
+  hyprlock # funciona en Niri too
   ;;
 "")
   cd /$HOME
@@ -28,6 +28,7 @@ case "$CHOICE" in
   cd /$HOME
   sleep 1
   hyprctl dispatch exit
+  killall niri
   ;;
 *)
   exit 1

@@ -226,7 +226,7 @@ fi
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
-  hyprland niri xdg-desktop-portal-hyprland \
+  hyprland xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
   kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
@@ -236,9 +236,10 @@ sudo pacman -S --needed --noconfirm \
   swww hyprpaper hyprshot \
   qt5-wayland qt6-wayland gtk-layer-shell
 
-yay -S --needed --noconfirm zellij nix
+yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
 print_success "Hyprland instalado"
-print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO"
+print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
+[Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 8: DRIVERS
@@ -1600,7 +1601,7 @@ if [[ -d ~/dotfiles-dizzi ]]; then
 
   print_status "Aplicando dotfiles con stow..."
 
-  for pkg in kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart copyq dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons firefox vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
+  for pkg in niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart copyq dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons firefox vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
     if [[ -d $pkg ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"

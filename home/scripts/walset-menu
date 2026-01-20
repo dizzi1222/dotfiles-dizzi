@@ -19,19 +19,19 @@ if [ -n "$SELECTED_WALL" ]; then
   transitions=(
     # 1️⃣ Ola épica desde cualquier dirección
     "wave --transition-angle 45 --transition-fps 60 --transition-step 90 --transition-wave 30,20"
-    
+
     # 2️⃣ Crecimiento explosivo desde el centro
     "grow --transition-pos 0.5,0.5 --transition-fps 60 --transition-step 90"
-    
+
     # 3️⃣ Barrido circular impactante
     "wipe --transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120"
-    
+
     # 4️⃣ Zoom desde esquina aleatoria
     "outer --transition-pos $(shuf -e "0.0,0.0" "1.0,0.0" "0.0,1.0" "1.0,1.0" -n 1) --transition-fps 60 --transition-step 100"
-    
+
     # 5️⃣ Múltiples ondas entrelazadas
     "wave --transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120 --transition-wave 50,30"
-    
+
     # 6️⃣ Centro clásico suave (animación original)
     "center --transition-fps 30 --transition-step 2"
   )
@@ -41,6 +41,7 @@ if [ -n "$SELECTED_WALL" ]; then
 
   # 🌊 Cambiar el fondo con swww y animación épica
   swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
+  swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
 
   # Generar paleta de colores con Pywal (silencioso)
   wal -q -i "$WALL_DIR/$SELECTED_WALL"
@@ -59,6 +60,6 @@ if [ -n "$SELECTED_WALL" ]; then
 
   hyprctl reload
   swaync-client -rs
-  
+
   notify-send "✅ Wallpaper aplicado" "Con animación épica 🔥"
 fi
