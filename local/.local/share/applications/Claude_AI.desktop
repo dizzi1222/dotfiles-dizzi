@@ -2,8 +2,8 @@
 Version=1.0
 Name=Claude AI
 Comment=Open Claude AI
-Exec=brave --app="https://claude.ai/chat"
-# Exec=firefox --new-window "https://claude.ai/chat"
+# Exec=brave --app="https://claude.ai/chat"
+Exec=firefox --new-window --kiosk "https://claude.ai/chat"
 Terminal=false
 Type=Application
 # Icon=web-browser

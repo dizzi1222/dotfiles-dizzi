@@ -2,8 +2,8 @@
 Version=1.0
 Name=Kick
 Comment=Open Kick
-Exec=brave --app="https://kick.com/"
-# Exec=firefox --new-window "https://kick.com/"
+# Exec=brave --app="https://kick.com/"
+Exec=firefox --new-window --kiosk "https://kick.com/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Kick.png

@@ -1,4 +1,4 @@
-#!/bin/bash
+#
 # Script interactivo para limpiar caché y dependencias en Arch Linux + yay
 
 # Colores y formato
@@ -58,38 +58,75 @@ while true; do
     ;;
   5)
     echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo [& journalctl, docker, electron]...${RESET}"
+    # -- Lo mas pesado
     rm -rf ~/.cache/*
+    rm -rf ~/.bun/install/cache/
+    $HOME/.docker/desktop/vms/
     # Brave
     rm -rf ~/.config/BraveSoftware/Brave-Browser/Default/Cache
     rm -rf ~/.cache/BraveSoftware
+
+    # Python & NPM
+    rm -rf $HOME/.pyenv/versions/3.11.9/lib/python3.11/test/__pycache__/
+    rm -rf $HOME/.npm/_cacache/
 
     # Firefox
     rm -rf ~/.mozilla/firefox/*.default*/cache2
     flatpak uninstall --unused
     rm -rf ~/.var/app/*/cache/*
     sudo journalctl --vacuum-size=50M
-    rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/*
+    rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/
+    $HOME/.local/share/Trash/files/
+    sudo rm -rf /tmp/
     docker system prune -af
     docker builder prune
-    notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
+
+    notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos [Windows + B] 󰸉  y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   6)
     echo -e "\n${YELLOW}⚡ Limpiando caché de neovim...${RESET}"
     rm -rf ~/.local/share/nvim/backup
     rm -rf ~/.local/share/nvim/swap
     rm -rf ~/.local/share/nvim/undo
-    notify-send "🗑️ Neovim Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
+
+    notify-send "🗑️ Neovim Cache" 'Clean  🎨'
     ;;
   7)
     echo -e "\n${RED}${BOLD}⚠️  Reinstalando todos los plugins de Neovim...${RESET}"
     echo -e "${DIM}Esto fuerza la descarga de repositorios: útil para depurar updates, cambiar nombres de repo (como Supermaven) o forzar un downgrade.${RESET}"
     # Elimina el directorio de plugins y caché de Lazy/Packer
     rm -rf ~/.local/share/nvim/{lazy,packer,site,lspconfig,log} # limpieza selectiva
-    # rm -rf ~/.local/share/nvim                                  # limpieza total
+
+    # En WSL/Linux
+    rm -rf ~/.local/share/nvim/mason
+    rm -rf ~/.local/state/nvim/mason.log
+
+    # Detectar qué gestor de paquetes está disponible e instalar tree-sitter-cli
+    if command -v npm >/dev/null 2>&1; then
+      echo -e "${YELLOW}📦 Instalando tree-sitter-cli con npm...${RESET}"
+      npm install -g tree-sitter-cli
+    elif command -v cargo >/dev/null 2>&1; then
+      echo -e "${YELLOW}📦 Instalando tree-sitter-cli con cargo...${RESET}"
+      cargo install tree-sitter-cli
+    elif command -v yarn >/dev/null 2>&1; then
+      echo -e "${YELLOW}📦 Instalando tree-sitter-cli con yarn...${RESET}"
+      yarn global add tree-sitter-cli
+    elif command -v pipx >/dev/null 2>&1; then
+      echo -e "${YELLOW}📦 Instalando tree-sitter-cli con pipx...${RESET}"
+      pipx install tree-sitter-cli
+    else
+      echo -e "${RED}⚠️  No se encontró npm, cargo, yarn ni pipx.${RESET}"
+      echo -e "${YELLOW}Por favor, instala tree-sitter-cli manualmente.${RESET}"
+    fi
     echo -e "${MAGENTA}Directorio de plugins borrado. Los plugins se reinstalarán al abrir Neovim.${RESET}"
     notify-send "🔄 Plugins Neovim Eliminados" \
       'Abre NVIM y ejecuta :Lazy sync o :PackerSync para reinstalar todos los plugins.'
+    echo -e "${MAGENTA}  :MasonInstall lua-language-server typescript-language-server json-lsp eslint-lsp angular-language-server marksman${RESET}"
+
     # nvim & # <--- Se ejecuta en background, el script continúa inmediatamente
+    # CASO EXTREMO NO RECOMENDADO! Solo si falla continuamente Mason
+    # rm -rf ~/.local/share/nvim                                  # limpieza total
+    # rm -rf ~/.local/share/nvim/lazy
     ;;
   8)
     echo -e "\n${CYAN}👋 Saliendo...${RESET}"

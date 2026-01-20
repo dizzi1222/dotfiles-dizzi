@@ -92,7 +92,7 @@ element {
     orientation:             vertical;
     spacing:                 8px;
     padding:                 8px;
-    border:                  0px solid;
+    border:                  1px solid;
     border-radius:           8px;
     background-color:        transparent;
     text-color:              @foreground;
@@ -126,7 +126,7 @@ element selected.normal {
     background-color:        @selected-normal-background; /* si le cambio a @transparent le quito el fondo al seleccionado */
     text-color:              @selected-normal-foreground;
     border:                  1px solid;
-    border-color:            @selected-active-background;
+    border-color:            @selected-active-foreground;
     border-radius:           10px;
 }
 

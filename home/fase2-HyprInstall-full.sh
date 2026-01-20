@@ -226,7 +226,7 @@ fi
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland \
+  hyprland niri xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
   kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
@@ -238,6 +238,7 @@ sudo pacman -S --needed --noconfirm \
 
 yay -S --needed --noconfirm zellij nix
 print_success "Hyprland instalado"
+print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 8: DRIVERS

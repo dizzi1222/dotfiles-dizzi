@@ -202,3 +202,35 @@ local/.local/share/lutris/runtime/
 home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.2/venv/
 home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.1/venv/
 
+
+# ═══════════════════════════════════════════════════════════
+# NVIM GITIGNORE - API KEYS Y ARCHIVOS SENSIBLES
+# ═══════════════════════════════════════════════════════════
+
+# API Keys (MUY IMPORTANTE - NO SUBIR)
+api-keys.sh
+api-keys.ps1
+.env
+*.key
+
+# Logs y cachés de plugins
+lazy-lock.json
+plugin/
+spell/
+.luarc.json
+
+# Archivos de sesión
+Session.vim
+.netrwhist
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Avante history (opcional, puede tener info sensible)
+.avante_chat_history
+
+# Copilot chat history
+copilot-chat-history/

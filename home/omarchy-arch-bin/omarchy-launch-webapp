@@ -39,7 +39,7 @@ if [[ "$BROWSER" == "firefox" ]] && command -v firefox &>/dev/null; then
     firefox -CreateProfile "$DOMAIN $HOME/.mozilla/firefox/$DOMAIN" 2>/dev/null
   fi
 
-  firefox "$DOMAIN" --new-window "$URL" &
+  firefox "$DOMAIN" --new-window --kiosk "$URL" &
 # --kiosk    otro parametro de Firefox: fuerza fullscreen
 # Chromium/Chrome con --app
 elif [[ "$BROWSER" =~ chrome|chromium|brave|edge ]] && command -v "$BROWSER" &>/dev/null; then

@@ -1,336 +1,332 @@
-
 {
-        /* Para refrescar la config usa:
+  /* Para refrescar la config usa:
   Ctrl Shift P  >  Developer: Reload Window
   Ctrl Shift P  >  Custom UI: Reload/
   */
-    // ========== CONFIGURACIÓN DE DIÁLOGOS ==========
+  // ========== CONFIGURACIÓN DE DIÁLOGOS ==========
   "window.dialogStyle": "custom",
   "window.titleBarStyle": "custom",
-        // centrar el editor
-        "workbench.editor.centerLayout": true,
-        "workbench.editor.centeredLayoutAutoResize": false,
-        // En caso de que uses muchos archivos abiertos
-        "workbench.editor.wrapTabs": true,
-        "workbench.editor.tabSizing": "shrink",
-        // Para navegación rápida entre archivos [TAB]
-        "workbench.editor.quickOpen.previousEditor": false,
-        // "workbench.editor.showTabs": "single", // Si quieres centrar los tabs, ver la ruta:
-        "workbench.editor.showTabs": "multiple", // Activa la barra de migas de pan. util para navegar en proyectos grandes
-        "workbench.action.nextEditor": "ctrl+]", // Tambien lo agregue en keybindings.json por si acaso
-        "workbench.action.previousEditor": "ctrl+[",
-        // Configuración de Neovim - [TAB] {para evitar conflictos} acelerar:
-        "vscode-neovim.neovimInitVimOptions": {
-                "set": {
-                        "timeoutlen": "300", // Buen balance
-                        "ttimeoutlen": "0", // Instantáneo para teclas especiales
-                        "updatetime": "100", // Más rápido para autocompletado
-                        "clipboard": "unnamedplus" // Compartir portapapeles
-                }
-        },
+  // centrar el editor
+  "workbench.editor.centerLayout": true,
+  "workbench.editor.centeredLayoutAutoResize": false,
+  // En caso de que uses muchos archivos abiertos
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.tabSizing": "shrink",
+  // Para navegación rápida entre archivos [TAB]
+  "workbench.editor.quickOpen.previousEditor": false,
+  // "workbench.editor.showTabs": "single", // Si quieres centrar los tabs, ver la ruta:
+  "workbench.editor.showTabs": "multiple", // Activa la barra de migas de pan. util para navegar en proyectos grandes
+  "workbench.action.nextEditor": "ctrl+]", // Tambien lo agregue en keybindings.json por si acaso
+  "workbench.action.previousEditor": "ctrl+[",
+  // Configuración de Neovim - [TAB] {para evitar conflictos} acelerar:
+  "vscode-neovim.neovimInitVimOptions": {
+    "set": {
+      "timeoutlen": "300", // Buen balance
+      "ttimeoutlen": "0", // Instantáneo para teclas especiales
+      "updatetime": "100", // Más rápido para autocompletado
+      "clipboard": "unnamedplus", // Compartir portapapeles
+    },
+  },
 
-        // Otras opciones útiles para Neovim:
-        "vscode-neovim.useCtrlKeysForNormalMode": true,
-        "vscode-neovim.useCtrlKeysForInsertMode": false,
+  // Otras opciones útiles para Neovim:
+  "vscode-neovim.useCtrlKeysForNormalMode": true,
+  "vscode-neovim.useCtrlKeysForInsertMode": false,
 
-        "workbench.tips.enabled": false,
-        "breadcrumbs.enabled": false, // Si usas Neovim no tiene sentido, aparte lo descentra
-        "material-icon-theme.hidesExplorerArrows": true,
-        "workbench.tree.enableStickyScroll": false,
-        "workbench.tree.renderIndentGuides": "none",
-        "workbench.tree.indent": 8,
-        "explorer.compactFolders": false,
-        "explorer.confirmDragAndDrop": false,
-        "explorer.confirmDelete": false,
-        "explorer.decorations.badges": false,
-        "git.decorations.enabled": false,
-        // "window.customTitleBarVisibility": "never",
-        "window.titleBarStyle": "native",
-        "custom-ui-style.electron": {
-                "titleBarStyle": "hiddenInset",
-                "trafficLightPosition": {
-                        "x": 20,
-                        "y": 16
-                }
+  "workbench.tips.enabled": false,
+  "breadcrumbs.enabled": false, // Si usas Neovim no tiene sentido, aparte lo descentra
+  "material-icon-theme.hidesExplorerArrows": true,
+  "workbench.tree.enableStickyScroll": false,
+  "workbench.tree.renderIndentGuides": "none",
+  "workbench.tree.indent": 8,
+  "explorer.compactFolders": false,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+  "explorer.decorations.badges": false,
+  "git.decorations.enabled": false,
+  // "window.customTitleBarVisibility": "never",
+  "custom-ui-style.electron": {
+    "titleBarStyle": "hiddenInset",
+    "trafficLightPosition": {
+      "x": 20,
+      "y": 16,
+    },
+  },
+  "custom-ui-style.stylesheet": {
+    ".notification-toast": "box-shadow: none !important",
+    ".quick-input-widget.show-file-icons": "box-shadow: 0 0 10px rgba(0,0,0,0.5) !important",
+    // ".quick-input-widget": "top: 25vh !important", // Comentado para evitar que tape el codigo
+    ".quick-input-widget": "background: #191521 !important; border: 1px solid #bd93f9 !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;",
+    ".quick-input-list .scrollbar": "display: none",
+    ".monaco-action-bar.quick-input-inline-action-bar": "display: none",
+    ".editor-widget.find-widget": "box-shadow: 0 2px 8px rgba(0,0,0,0.5); border-radius: 4px",
+    ".quick-input-titlebar": "background: #100B15 !important; border-bottom: 1px solid #44475a;",
+    ".monaco-workbench .part.editor > .content .editor-group-container > .title.title-border-bottom:after": "display: none",
+    ".monaco-scrollable-element > .shadow.top": "display: none",
+    ".sidebar .title-label": "padding: 0 !important",
+    // esto de abajo es para quitar el borde del sidebar line, la raya que lo divide [extensions, explorer, search, git, etc]
+    // ".sidebar": "border: none !important",
+    ".monaco-workbench .monaco-list:not(.element-focused):focus:before": "outline: none !important",
+    ".monaco-list-row.focused": "outline: none !important",
+    ".monaco-editor .scroll-decoration": "display: none",
+    // Aqui cambias el indicador del scroll [fondo]
+    ".monaco-editor .decorationsOverviewRuler": "background: transparent !important; width: 0 !important;",
+    ".monaco-editor .margin-view-overlays": "background: transparent !important;",
+    ".monaco-editor .overviewRuler": "background: transparent !important; width: 0 !important;",
+    ".title-actions": "display: none !important",
+    ".title.show-file-icons .label-container .monaco-icon-label.file-icon": "justify-content: center; padding: 0 !important",
+    ".title .monaco-icon-label:after": "margin-right: 0",
+    ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container > .title-label": "padding-left: 60px",
+    ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container": "justify-content: center !important;",
+    ".title .monaco-icon-label.file-icon": "margin: 0 auto !important;",
+    // ".title .monaco-icon-label.file-icon": "margin: 0 60px",// en conflicto con arriba
+    ".monaco-editor .cursors-layer .cursor": "background-image: linear-gradient(135deg, #ffaffc 10%, #DA70D6 100%)",
+  },
+  // "custom-ui-style.font.sansSerif": "Dank Mono",
+  "custom-ui-style.font.sansSerif": "Fira Code, monospace",
+  // "editor.multiCursorModifier": "ctrlCmd",
+  // "editor.cursorBlinking": "solid",
+  // "editor.cursorStyle": "block",
+  "workbench.colorCustomizations": {
+    // "editorCursor.background": "#000000",
+    // "editorOverviewRuler.wordHighlightStrongForeground": "#0000",
+    // "editorOverviewRuler.selectionHighlightForeground": "#0000",
+    // "editorOverviewRuler.rangeHighlightForeground": "#0000",
+    // "editorOverviewRuler.wordHighlightForeground": "#0000",
+    // "editorOverviewRuler.bracketMatchForeground": "#0000",
+    // "editorOverviewRuler.findMatchForeground": "#0000",
+    // "editorOverviewRuler.modifiedForeground": "#0000",
+    // "editorOverviewRuler.deletedForeground": "#0000",
+    // "editorOverviewRuler.warningForeground": "#0000",
+    // "editorOverviewRuler.addedForeground": "#0000",
+    // "editorOverviewRuler.errorForeground": "#0000",
+    // "editorOverviewRuler.infoForeground": "#0000",
+    // "editorOverviewRuler.border": "#0000",
+    "[Aura Dracula Spirit (Soft)]": {
+      "editorSuggestWidget.selectedBackground": "#3A334B",
+      "sideBar.background": "#191521",
+    },
+  },
+  "editor.fontSize": 14,
+  "editor.lineHeight": 2.5,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "fontStyle": "italic",
         },
-        "custom-ui-style.stylesheet": {
-                ".notification-toast": "box-shadow: none !important",
-                ".quick-input-widget.show-file-icons": "box-shadow: 0 0 10px rgba(0,0,0,0.5) !important",
-                // ".quick-input-widget": "top: 25vh !important", // Comentado para evitar que tape el codigo
-                ".quick-input-widget": "background: #191521 !important; border: 1px solid #bd93f9 !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;",
-                ".quick-input-list .scrollbar": "display: none",
-                ".monaco-action-bar.quick-input-inline-action-bar": "display: none",
-                ".editor-widget.find-widget": "box-shadow: 0 2px 8px rgba(0,0,0,0.5); border-radius: 4px",
-                ".quick-input-titlebar": "background: #100B15 !important; border-bottom: 1px solid #44475a;",
-                ".monaco-workbench .part.editor > .content .editor-group-container > .title.title-border-bottom:after": "display: none",
-                ".monaco-scrollable-element > .shadow.top": "display: none",
-                ".sidebar .title-label": "padding: 0 !important",
-                // esto de abajo es para quitar el borde del sidebar line, la raya que lo divide [extensions, explorer, search, git, etc]
-                // ".sidebar": "border: none !important",
-                ".monaco-workbench .monaco-list:not(.element-focused):focus:before": "outline: none !important",
-                ".monaco-list-row.focused": "outline: none !important",
-                ".monaco-editor .scroll-decoration": "display: none",
-                // Aqui cambias el indicador del scroll [fondo]
-                ".monaco-editor .decorationsOverviewRuler": "background: transparent !important; width: 0 !important;",
-                ".monaco-editor .margin-view-overlays": "background: transparent !important;",
-                ".monaco-editor .overviewRuler": "background: transparent !important; width: 0 !important;",
-                ".title-actions": "display: none !important",
-                ".title.show-file-icons .label-container .monaco-icon-label.file-icon": "justify-content: center; padding: 0 !important",
-                ".title .monaco-icon-label:after": "margin-right: 0",
-                ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container > .title-label": "padding-left: 60px",
-                ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container": "justify-content: center !important;",
-                ".title .monaco-icon-label.file-icon": "margin: 0 auto !important;",
-                // ".title .monaco-icon-label.file-icon": "margin: 0 60px",// en conflicto con arriba
-                ".monaco-editor .cursors-layer .cursor": "background-image: linear-gradient(135deg, #ffaffc 10%, #DA70D6 100%)"
-        },
-        // "custom-ui-style.font.sansSerif": "Dank Mono",
-        "custom-ui-style.font.sansSerif": "Fira Code, monospace",
-        // "editor.multiCursorModifier": "ctrlCmd",
-        // "editor.cursorBlinking": "solid",
-        // "editor.cursorStyle": "block",
-        "workbench.colorCustomizations": {
-                // "editorCursor.background": "#000000",
-                // "editorOverviewRuler.wordHighlightStrongForeground": "#0000",
-                // "editorOverviewRuler.selectionHighlightForeground": "#0000",
-                // "editorOverviewRuler.rangeHighlightForeground": "#0000",
-                // "editorOverviewRuler.wordHighlightForeground": "#0000",
-                // "editorOverviewRuler.bracketMatchForeground": "#0000",
-                // "editorOverviewRuler.findMatchForeground": "#0000",
-                // "editorOverviewRuler.modifiedForeground": "#0000",
-                // "editorOverviewRuler.deletedForeground": "#0000",
-                // "editorOverviewRuler.warningForeground": "#0000",
-                // "editorOverviewRuler.addedForeground": "#0000",
-                // "editorOverviewRuler.errorForeground": "#0000",
-                // "editorOverviewRuler.infoForeground": "#0000",
-                // "editorOverviewRuler.border": "#0000",
-                "[Aura Dracula Spirit (Soft)]": {
-                        "editorSuggestWidget.selectedBackground": "#3A334B",
-                        "sideBar.background": "#191521"
-                }
-        },
-        "editor.fontSize": 14,
-        "editor.lineHeight": 2.5,
-        "editor.tokenColorCustomizations": {
-                "textMateRules": [
-                        {
-                                "scope": "comment",
-                                "settings": {
-                                        "fontStyle": "italic"
-                                }
-                        }
-                ]
-        },
-        "editor.stickyScroll.enabled": false,
-        // esto activa los colores en linea en CSS, HTML, JS, etc
-        "editor.colorDecorators": true,
-        "editor.codeLens": false,
-        "editor.links": false,
-        "editor.matchBrackets": "never",
-        "editor.parameterHints.enabled": false,
-        "editor.lightbulb.enabled": "off",
-        // Hover nativo VSCODE: Estas son sugerencias para mejorar la experencia, peor rendimiento
-        // tambien permite acceder al color mas facilmente
-        "editor.hover.enabled": true,
-        // Desactiva Documentacion solo lo pesado, mantiene lo útil:
-        /*  "editor.hover.documentation": false,
+      },
+    ],
+  },
+  "editor.stickyScroll.enabled": false,
+  // esto activa los colores en linea en CSS, HTML, JS, etc
+  "editor.colorDecorators": true,
+  "editor.codeLens": false,
+  "editor.links": false,
+  "editor.matchBrackets": "never",
+  "editor.parameterHints.enabled": false,
+  "editor.lightbulb.enabled": "off",
+  // Hover nativo VSCODE: Estas son sugerencias para mejorar la experencia, peor rendimiento
+  // tambien permite acceder al color mas facilmente
+  "editor.hover.enabled": true,
+  // Desactiva Documentacion solo lo pesado, mantiene lo útil:
+  /*  "editor.hover.documentation": false,
   "editor.hover.references": false, */
-        //  ARRIBA VAN LAS CONFIGURACIONES PARA LOS LENGUAJE 
-        "files.trimTrailingWhitespace": true,
-        "files.insertFinalNewline": true,
-        "scm.diffDecorations": "none",
-        "editor.lineNumbers": "relative",
-        "editor.tabSize": 2,
-        "editor.detectIndentation": false,
-        "editor.showFoldingControls": "never",
-        "editor.guides.indentation": false,
-        "editor.renderWhitespace": "none",
-        "editor.renderLineHighlight": "none",
-        "editor.occurrencesHighlight": "off",
-        "editor.selectionHighlight": false,
-        // las barras de desplazamiento del editor
-        "editor.scrollbar.horizontal": "hidden",
-        // "editor.scrollbar.vertical": "hidden",
-        "editor.overviewRulerBorder": true,
-        // Aqui cambias el indicador del scroll [cursor]
-        "editor.hideCursorInOverviewRuler": false,
-        "editor.overviewRuler.enable": true,
-        "editor.quickSuggestions": {
-                "other": "on"
-        },
-        "editor.suggestOnTriggerCharacters": true,
-        "editor.tabCompletion": "on",
-        "editor.snippetSuggestions": "top",
-        "emmet.triggerExpansionOnTab": true,
-        "update.mode": "none",
-        "extensions.ignoreRecommendations": true,
-        "editor.mouseWheelZoom": true,
-        "workbench.settings.applyToAllProfiles": ["editor.mouseWheelZoom"],
-        //"vs-color-picker.autoLaunch": true, // mejor mierda
-        "terminal.integrated.env.windows": {},
-        "editor.autoClosingQuotes": "always",
-        "editor.linkedEditing": true,
-        // "editor.cursorSmoothCaretAnimation": "on",
-        // "terminal.integrated.cursorBlinking": true,
-        "console-ninja.featureSet": "Community",
-        "liveServer.settings.donotShowInfoMsg": true,
-        "vs-kubernetes": {
-                "vscode-kubernetes.kubectl-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
-                "vscode-kubernetes.minikube-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe",
-                "vscode-kubernetes.helm-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe"
-        },
-        "workbench.editor.empty.hint": "hidden",
-        "git.autofetch": true,
-        "yaml.schemas": {
-                "c:\\Users\\Diego.DESKTOP-0CQHRL5\\.vscode\\extensions\\continue.continue-1.0.20-win32-x64\\config-yaml-schema.json": [
-                        ".continue/**/*.yaml"
-                ]
-        },
-        "doki.statusbar.name": "2B^ Kaine",
-        "files.autoSave": "onFocusChange",
-        "editor.accessibilitySupport": "off",
-        "workbench.iconTheme": "material-icon-theme",
-        "tabnine.experimentalAutoImports": true,
-        "terminal.integrated.suggest.enabled": true,
-        "workbench.navigationControl.enabled": false,
-        "workbench.layoutControl.enabled": false,
-        "chat.commandCenter.enabled": false,
-        "window.commandCenter": false,
-        "terminal.integrated.env.linux": {},
-        "editor.fontFamily": "Fira Code, monospace",
-        "editor.fontLigatures": true,
-        "doki.sticker.css": "z-index:100;background-position:100% 97",
-        // ...tus configuraciones previas...
-        "doki.background.enabled": false,
-        "indentRainbow.colors": [
-                "rgba(255, 175, 206, 0.5)",
-                "rgba(108, 245, 245, 0.3)",
-                "rgba(255,127,255,0.3)",
-                "rgba(68, 230, 122, 0.3)",
-                "rgba(221, 200, 131, 0.5)",
-                "rgba(255, 255, 255, 0.3)"
-        ],
-        "indentRainbow.indicatorStyle": "light",
-        "indentRainbow.lightIndicatorStyleLineWidth": 1,
-        "indentRainbow.includedLanguages": ["python", "javascript"],
-        "indentRainbow.excludedLanguages": ["plaintext"],
-        "indentRainbow.errorColor": "rgba(128,32,32,0.6)",
-        "indentRainbow.tabmixColor": "rgba(128,32,96,0.6)",
-        "editor.guides.bracketPairs": "active",
-        "security.allowedUNCHosts": ["wsl.localhost"],
-        "extensions.experimental.affinity": {
-                "asvetliakov.vscode-neovim": 1
-        },
-        "vscode-neovim.neovimExecutablePaths.windows": "C:\\Program Files\\Neovim\\bin\\nvim.exe",
-        // Si usas WSL o Linux en un futuro:
-        "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+  //  ARRIBA VAN LAS CONFIGURACIONES PARA LOS LENGUAJE 
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "scm.diffDecorations": "none",
+  "editor.lineNumbers": "relative",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.showFoldingControls": "never",
+  "editor.guides.indentation": false,
+  "editor.renderWhitespace": "none",
+  "editor.renderLineHighlight": "none",
+  "editor.occurrencesHighlight": "off",
+  "editor.selectionHighlight": false,
+  // las barras de desplazamiento del editor
+  "editor.scrollbar.horizontal": "hidden",
+  // "editor.scrollbar.vertical": "hidden",
+  "editor.overviewRulerBorder": true,
+  // Aqui cambias el indicador del scroll [cursor]
+  "editor.hideCursorInOverviewRuler": false,
+  "editor.overviewRuler.enable": true,
+  "editor.quickSuggestions": {
+    "other": "on",
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.tabCompletion": "on",
+  "editor.snippetSuggestions": "top",
+  "emmet.triggerExpansionOnTab": true,
+  "update.mode": "none",
+  "extensions.ignoreRecommendations": true,
+  "editor.mouseWheelZoom": true,
+  "workbench.settings.applyToAllProfiles": ["editor.mouseWheelZoom"],
+  //"vs-color-picker.autoLaunch": true, // mejor mierda
+  "terminal.integrated.env.windows": {},
+  "editor.autoClosingQuotes": "always",
+  "editor.linkedEditing": true,
+  // "editor.cursorSmoothCaretAnimation": "on",
+  // "terminal.integrated.cursorBlinking": true,
+  "console-ninja.featureSet": "Community",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "vs-kubernetes": {
+    "vscode-kubernetes.kubectl-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
+    "vscode-kubernetes.minikube-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe",
+    "vscode-kubernetes.helm-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe",
+  },
+  "workbench.editor.empty.hint": "hidden",
+  "git.autofetch": true,
+  "yaml.schemas": {
+    "c:\\Users\\Diego.DESKTOP-0CQHRL5\\.vscode\\extensions\\continue.continue-1.0.20-win32-x64\\config-yaml-schema.json": [
+      ".continue/**/*.yaml",
+    ],
+  },
+  "doki.statusbar.name": "2B^ Kaine",
+  "files.autoSave": "onFocusChange",
+  "editor.accessibilitySupport": "off",
+  "workbench.iconTheme": "material-icon-theme",
+  "tabnine.experimentalAutoImports": true,
+  "terminal.integrated.suggest.enabled": true,
+  "workbench.navigationControl.enabled": false,
+  "workbench.layoutControl.enabled": false,
+  "chat.commandCenter.enabled": false,
+  "window.commandCenter": false,
+  "terminal.integrated.env.linux": {},
+  "editor.fontFamily": "Fira Code, monospace",
+  "editor.fontLigatures": true,
+  "doki.sticker.css": "z-index:100;background-position:100% 97",
+  // ...tus configuraciones previas...
+  "doki.background.enabled": false,
+  "indentRainbow.colors": [
+    "rgba(255, 175, 206, 0.5)",
+    "rgba(108, 245, 245, 0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(68, 230, 122, 0.3)",
+    "rgba(221, 200, 131, 0.5)",
+    "rgba(255, 255, 255, 0.3)",
+  ],
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 1,
+  "indentRainbow.includedLanguages": ["python", "javascript"],
+  "indentRainbow.excludedLanguages": ["plaintext"],
+  "indentRainbow.errorColor": "rgba(128,32,32,0.6)",
+  "indentRainbow.tabmixColor": "rgba(128,32,96,0.6)",
+  "editor.guides.bracketPairs": "active",
+  "security.allowedUNCHosts": ["wsl.localhost"],
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1,
+  },
+  "vscode-neovim.neovimExecutablePaths.windows": "C:\\Program Files\\Neovim\\bin\\nvim.exe",
+  // Si usas WSL o Linux en un futuro:
+  "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
 
-        "window.menuBarVisibility": "hidden", // Oculta la barra de menú {archivo, editar, seleccion, ver, ir, ayuda}
-        // [para activarlo cambialo a: compact,]
-        "workbench.secondarySideBar.defaultVisibility": "hidden",
-        "workbench.sideBar.location": "right",
-        "editor.minimap.renderCharacters": true,
-        "editor.minimap.enabled": true,
-        "window.controlsStyle": "custom",
-        "glassit.alpha": 230,
-        "colorInfo.languages": [
-                {
-                        "selector": "css",
-                        "colors": "css"
-                },
-                {
-                        "selector": "sass",
-                        "colors": "css"
-                },
-                {
-                        "selector": "scss",
-                        "colors": "css"
-                },
-                {
-                        "selector": "less",
-                        "colors": "css"
-                },
-                {
-                        "selector": "html",
-                        "colors": "css"
-                }
-        ],
-        "colorize.languages": [
-                "css",
-                "scss",
-                "sass",
-                "less",
-                "postcss",
-                "stylus",
-                "xml",
-                "html",
-                "javascript"
-        ],
-        // configuraciones adicionales para CSS
-        //  Desactvar PostCSS selecor decorator color
-        "postcss.validate": false,
-        // esto abre el selector de CSS
-        "css.colorDecorators.enable": true,
-        "files.associations": {
-                "*.css": "css"
-        },
-        //  Habilitar sugerencias para lenguajes específicos 
-        "[html]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                },
-                "editor.suggestOnTriggerCharacters": true
-        },
-        "[javascript]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                },
-                "editor.suggestOnTriggerCharacters": true
-        },
-        "[typescript]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                },
-                "editor.suggestOnTriggerCharacters": true
-        },
-        "[javascriptreact]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                },
-                "editor.suggestOnTriggerCharacters": true
-        },
-        "[typescriptreact]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                },
-                "editor.suggestOnTriggerCharacters": true
-        },
-        "[css]": {
-                "editor.quickSuggestions": {
-                        "other": "on"
-                }
-        },
-        "workbench.editor.centeredLayoutFixedWidth": true,
-        "workbench.editor.enablePreview": false,
-        "git.openRepositoryInParentFolders": "never",
-        "settingsSync.ignoredExtensions": [
-          "leonardssh.vscord"
-        ],
-        "python.defaultInterpreterPath": "c:\\Users\\Diego\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
-        "json.schemaDownload.enable": true,
-        "security.workspace.trust.enabled": false,
-				"window.confirmSaveUntitledWorkspace": false,
-        "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com",
-        "workbench.colorTheme": "Aura Dark",
-        "git.confirmSync": false,
-        "livePreview.notifyOnOpenLooseFile": false,
-        // -------------------- (BLUR GLASS) VIBRANCY SETTINGS -----------------
-        // Activar el Blur , glass effect
-        // "vscode_vibrancy.type": "acrylic",
-        // "vscode_vibrancy.opacity": 0.9,
-        // "vscode_vibrancy.disableFramelessWindow": true,
-        // "vscode_vibrancy.preventFlash": true,
-        // "window.systemColorTheme": "dark",
-        // "window.autoDetectColorScheme": false
-        // "terminal.integrated.gpuAcceleration": "off" // ~ esto relantiza, recordatorio: elminalo cunado actives vribancy
-        // -------------------- VIBRANCY SETTINGS -----------------
+  "window.menuBarVisibility": "hidden", // Oculta la barra de menú {archivo, editar, seleccion, ver, ir, ayuda}
+  // [para activarlo cambialo a: compact,]
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "workbench.sideBar.location": "right",
+  "editor.minimap.renderCharacters": true,
+  "editor.minimap.enabled": true,
+  "window.controlsStyle": "custom",
+  "glassit.alpha": 230,
+  "colorInfo.languages": [
+    {
+      "selector": "css",
+      "colors": "css",
+    },
+    {
+      "selector": "sass",
+      "colors": "css",
+    },
+    {
+      "selector": "scss",
+      "colors": "css",
+    },
+    {
+      "selector": "less",
+      "colors": "css",
+    },
+    {
+      "selector": "html",
+      "colors": "css",
+    },
+  ],
+  "colorize.languages": [
+    "css",
+    "scss",
+    "sass",
+    "less",
+    "postcss",
+    "stylus",
+    "xml",
+    "html",
+    "javascript",
+  ],
+  // configuraciones adicionales para CSS
+  //  Desactvar PostCSS selecor decorator color
+  "postcss.validate": false,
+  // esto abre el selector de CSS
+  "css.colorDecorators.enable": true,
+  "files.associations": {
+    "*.css": "css",
+  },
+  //  Habilitar sugerencias para lenguajes específicos 
+  "[html]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+    "editor.suggestOnTriggerCharacters": true,
+  },
+  "[javascript]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+    "editor.suggestOnTriggerCharacters": true,
+  },
+  "[typescript]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+    "editor.suggestOnTriggerCharacters": true,
+  },
+  "[javascriptreact]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+    "editor.suggestOnTriggerCharacters": true,
+  },
+  "[typescriptreact]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+    "editor.suggestOnTriggerCharacters": true,
+  },
+  "[css]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+    },
+  },
+  "workbench.editor.centeredLayoutFixedWidth": true,
+  "workbench.editor.enablePreview": false,
+  "git.openRepositoryInParentFolders": "never",
+  "settingsSync.ignoredExtensions": ["leonardssh.vscord"],
+  "python.defaultInterpreterPath": "c:\\Users\\Diego\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "json.schemaDownload.enable": true,
+  "security.workspace.trust.enabled": false,
+  "window.confirmSaveUntitledWorkspace": false,
+  "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com",
+  "workbench.colorTheme": "Aura Soft Dark",
+  "git.confirmSync": false,
+  "livePreview.notifyOnOpenLooseFile": false,
+  // -------------------- (BLUR GLASS) VIBRANCY SETTINGS -----------------
+  // Activar el Blur , glass effect
+  // "vscode_vibrancy.type": "acrylic",
+  // "vscode_vibrancy.opacity": 0.9,
+  // "vscode_vibrancy.disableFramelessWindow": true,
+  // "vscode_vibrancy.preventFlash": true,
+  // "window.systemColorTheme": "dark",
+  // "window.autoDetectColorScheme": false
+  // "terminal.integrated.gpuAcceleration": "off" // ~ esto relantiza, recordatorio: elminalo cunado actives vribancy
+  // -------------------- VIBRANCY SETTINGS -----------------
 }

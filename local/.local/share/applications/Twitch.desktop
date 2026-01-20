@@ -2,8 +2,8 @@
 Version=1.0
 Name=Twitch
 Comment=Open Twitch
-Exec=brave --app="https://www.twitch.tv/"
-# Exec=firefox --new-window "https://www.twitch.tv/"
+# Exec=brave --app="https://www.twitch.tv/"
+Exec=firefox --new-window --kiosk "https://www.twitch.tv/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Twitch.png

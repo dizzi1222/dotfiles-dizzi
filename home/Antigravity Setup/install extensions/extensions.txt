@@ -1,5 +1,6 @@
 asvetliakov.vscode-neovim
 bierner.color-info
+supermaven.supermaven
 bourhaouta.tailwindshades
 bradlc.vscode-tailwindcss
 christian-kohler.npm-intellisense

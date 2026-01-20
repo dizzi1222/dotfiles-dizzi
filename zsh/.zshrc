@@ -810,14 +810,17 @@ if [[ -d /run/user/$(id -u)/keyring ]]; then
   
   unset _keyring_control _keyring_ssh
 fi
-# Scoped keys (recommended) PARA |  AVANTE.nvim
-export AVANTE_ANTHROPIC_API_KEY=your-claude-api-key
-export AVANTE_OPENAI_API_KEY=your-openai-api-key
-export AVANTE_AZURE_OPENAI_API_KEY=your-azure-api-key
-export AVANTE_GEMINI_API_KEY=AIzaSyDpUwpMCCyxEHT6Ee9ZdepD5b6yvsnS49g
-export AVANTE_CO_API_KEY=your-cohere-api-key
-export AVANTE_AIHUBMIX_API_KEY=your-aihubmix-api-key
-export AVANTE_MOONSHOT_API_KEY=your-moonshot-api-key
-# For Amazon Bedrock:
-export BEDROCK_KEYS=aws_access_key_id,aws_secret_access_key,aws_region[,aws_session_token] # ~/.aws/profile, or env vars
-export GEMINI_API_KEY="AIzaSyDpUwpMCCyxEHT6Ee9ZdepD5b6yvsnS49g"
+
+# ═══════════════════════════════════════════════════════════
+# LLAVES-KEY... API
+# ═══════════════════════════════════════════════════════════
+# Verificar permisos de ejecución del archivo de API keys
+if [[ ! -x ~/.api-keys.sh ]]; then
+    echo "⚠️  Asignando permisos de ejecución a ~/.api-keys.sh"
+    chmod +x ~/.api-keys.sh
+fi
+# Cargar API keys al iniciar terminal
+if [ -f ~/.api-keys.sh ]; then
+    source ~/.api-keys.sh
+fi
+
