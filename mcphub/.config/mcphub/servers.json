@@ -1,0 +1,152 @@
+{
+  "mcpServers": {
+    "aws_docs": {
+      "args": [
+        "run",
+        "--rm",
+        "--interactive",
+        "--env",
+        "FASTMCP_LOG_LEVEL=${FASTMCP_LOG_LEVEL}",
+        "--env",
+        "AWS_DOCUMENTATION_PARTITION=${AWS_DOCUMENTATION_PARTITION}",
+        "mcp/aws-documentation:latest"
+      ],
+      "command": "docker",
+      "env": []
+    },
+    "aws_kb_retrieval_server": {
+      "args": ["-y", "@modelcontextprotocol/server-aws-kb-retrieval"],
+      "command": "npx",
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${AWS_ACCESS_KEY_ID}",
+        "AWS_REGION": "${AWS_REGION}",
+        "AWS_SECRET_ACCESS_KEY": "${AWS_SECRET_ACCESS_KEY}"
+      }
+    },
+    "blender": {
+      "args": ["blender-mcp"],
+      "command": "uvx"
+    },
+    "browser_tools": {
+      "args": ["@agentdeskai/browser-tools-mcp@latest"],
+      "command": "npx"
+    },
+    "esignatures": {
+      "args": ["mcp-server-esignatures"],
+      "command": "uvx",
+      "env": {
+        "ESIGNATURES_SECRET_TOKEN": "${ESIGNATURES_SECRET_TOKEN}"
+      }
+    },
+    "fetch": {
+      "args": ["run", "-i", "--rm", "mcp/fetch"],
+      "command": "docker"
+    },
+    "figma": {
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--figma-api-key=${FIGMA_API_KEY}",
+        "--stdio"
+      ],
+      "command": "npx",
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
+      }
+    },
+    "filesystem": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${ALLOWED_DIRECTORY}"
+      ],
+      "command": "npx"
+    },
+    "git": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/inspector",
+        "uvx",
+        "mcp-server-git",
+        "--repository",
+        "${REPOSITORY_PATH}"
+      ],
+      "command": "npx"
+    },
+    "github": {
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "gitlab": {
+      "args": ["run", "-i", "--rm", "mcp/gitlab"],
+      "command": "docker",
+      "env": {
+        "GITLAB_API_URL": "${GITLAB_API_URL}",
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "${GITLAB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "memory": {
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "command": "npx"
+    },
+    "playwright": {
+      "args": ["@playwright/mcp@latest"],
+      "command": "npx"
+    },
+    "postgres": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${POSTGRESQL_URL}"
+      ],
+      "command": "npx"
+    },
+    "redis": {
+      "args": ["run", "-i", "--rm", "mcp/redis", "--url", "${REDIS_URL}"],
+      "command": "docker"
+    },
+    "sequentialthinking": {
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "command": "npx"
+    },
+    "slack": {
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "command": "npx",
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
+        "SLACK_CHANNEL_IDS": "${SLACK_CHANNEL_IDS}",
+        "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
+      }
+    },
+    "sqlite": {
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-v",
+        "mcp-sqlite:/mcp",
+        "mcp/sqlite",
+        "--db-path",
+        "${DB_PATH}"
+      ],
+      "command": "docker"
+    },
+    "task_master": {
+      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "command": "npx",
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "AZURE_OPENAI_API_KEY": "${AZURE_OPENAI_API_KEY}",
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+        "MISTRAL_API_KEY": "${MISTRAL_API_KEY}",
+        "OLLAMA_API_KEY": "${OLLAMA_API_KEY}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}",
+        "XAI_API_KEY": "${XAI_API_KEY}"
+      }
+    }
+  }
+}
