@@ -1,4 +1,4 @@
-#!/bin/bash
+#bin/bash
 #######################################################################################
 # Configs DIZZI - Wallpaper Selector con Animaciones Aleatorias
 #######################################################################################
@@ -40,51 +40,53 @@ if [ -n "$SELECTED_WALL" ]; then
   RANDOM_TRANSITION=${transitions[$RANDOM % ${#transitions[@]}]}
 
   # 🔧 Función para detectar el compositor
-detect_compositor() {
-  if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
-    echo "niri"
-  elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
-    echo "hyprland"
-  else
-    echo "unknown"
-  fi
-}
+  detect_compositor() {
+    if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
+      echo "niri"
+    elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
+      echo "hyprland"
+    else
+      echo "unknown"
+    fi
+  }
 
-# 🔧 Función para activar modo noche
-toggle-wallpaper() {
-  local compositor=$(detect_compositor)
+  # 🔧 Función para activar modo noche
+  toggle-wallpaper() {
+    local compositor=$(detect_compositor)
 
-  case "$compositor" in
-  "hyprland")
-    # 🌊 Cambiar el fondo con swww y animación épica
-    swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
-    ;;
-  "niri")
-    swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
-    ;;
-  *)
-    echo "❌ Compositor no soportado"
-    return 1
-    ;;
-  esac
+    case "$compositor" in
+    "hyprland")
+      # 🌊 Cambiar el fondo con swww y animación épica
+      swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
+      ;;
+    "niri")
+      swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
+      ;;
+    *)
+      echo "❌ Compositor no soportado"
+      return 1
+      ;;
+    esac
 
-  # Generar paleta de colores con Pywal (silencioso)
-  wal -q -i "$WALL_DIR/$SELECTED_WALL"
+    # Generar paleta de colores con Pywal (silencioso)
+    wal -q -i "$WALL_DIR/$SELECTED_WALL"
 
-  # Recargar Waybar de manera eficiente
-  if pgrep -x waybar >/dev/null; then
-    pkill -RTMIN+1 waybar
-  else
-    waybar -c ~/.config/waybar/config &
-  fi
+    # Recargar Waybar de manera eficiente
+    if pgrep -x waybar >/dev/null; then
+      pkill -RTMIN+1 waybar
+    else
+      waybar -c ~/.config/waybar/config &
+    fi
 
-  # Recargar Eww solo si está corriendo
-  if pgrep -x eww >/dev/null; then
-    eww reload
-  fi
+    # Recargar Eww solo si está corriendo
+    if pgrep -x eww >/dev/null; then
+      eww reload
+    fi
 
-  hyprctl reload
-  swaync-client -rs
+    hyprctl reload
+    swaync-client -rs
+  }
+  toggle-wallpaper
 
   notify-send "✅ Wallpaper aplicado" "Con animación épica 🔥"
 fi
