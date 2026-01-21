@@ -1,4 +1,4 @@
-[ubmodule "espanso"]
+[submodule "espanso"]
 	path = espanso/.config/espanso/match
 	url = https://gist.github.com/34d57244d9620281584a7436e8afdb34.git
 	branch = main  # <-- Esta línea es importante
