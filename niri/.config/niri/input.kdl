@@ -1,0 +1,34 @@
+// /001 󰫸  input.kdl
+// ═══════════════════════════════════════════════════════════════════════════
+// INPUT CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+input {
+    keyboard {
+        xkb {
+            // layout "us,es"
+            // options "grp:win_space_toggle"
+        }
+        
+        numlock
+        repeat-delay 200
+        repeat-rate 40
+    }
+
+    touchpad {
+        tap
+        // 🔧 COMENTADO: Esto causaba el scroll invertido
+        // natural-scroll
+        accel-profile "flat"
+        // left-handed  // Descomenta esta línea para invertir
+    }
+
+    mouse {
+        accel-profile "flat"
+        scroll-factor 2.0
+        // 🔧 Si quieres scroll "natural" en el mouse, descomenta:
+        // natural-scroll
+        left-handed  // Descomenta esta línea para invertir
+    }
+}
+

@@ -1,0 +1,145 @@
+// /002 󰫸  windows.kdl
+// ═══════════════════════════════════════════════════════════════════════════
+// WINDOW RULES (MIGRADO DESDE windows.conf)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Opacidad de editores
+window-rule {
+    match app-id=r#"^(code-oss|code)$"#
+    opacity 0.90
+}
+
+window-rule {
+    match app-id=r#"^(cursor|Cursor)$"#
+    opacity 0.90
+}
+
+window-rule {
+    match app-id=r#"^(antigravity|Antigravity)$"#
+    opacity 0.90
+}
+
+// Multimedia players
+window-rule {
+    match app-id=r#"^(vlc|mpv|feh|sxiv)$"#
+    open-floating true
+    default-column-width { fixed 664; }
+    default-window-height { fixed 400; }
+}
+
+// Picture in Picture
+window-rule {
+    match title=r#"^(Picture.?in.?[Pp]icture|[Ii]m[aá]gen en [Ii]m[aá]gen|www.twitch.tv_/)$"#
+    open-floating true
+    default-column-width { fixed 600; }
+    default-window-height { fixed 338; }
+    opacity 1.0
+}
+
+// Nemo desktop
+window-rule {
+    match app-id=r#"^(nemo-desktop)$"#
+    open-maximized true
+}
+
+// LibreOffice
+window-rule {
+    match title=r#".*Text Import.*"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^(soffice)$"#
+    open-floating true
+}
+
+// Satty
+window-rule {
+    match app-id=r#"^(com\.gabm\.satty)$"#
+    open-floating true
+    min-width 730
+    min-height 300
+}
+
+// XDG Desktop Portal
+window-rule {
+    match app-id=r#"^(xdg-desktop-portal-gtk)$"#
+    open-floating true
+    default-column-width { fixed 964; }
+    default-window-height { fixed 800; }
+}
+
+// Waydroid
+window-rule {
+    match app-id=r#"^([Ww]aydroid|waydroid.com.*)$"#
+    open-floating true
+    default-column-width { fixed 926; }
+    default-window-height { fixed 809; }
+    opacity 0.95
+}
+
+// GNOME apps
+window-rule {
+    match app-id=r#"^(Gnome-calculator|org\.gnome\.[cC]alculator)$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^(org\.gnome\.Loupe)$"#
+    open-floating true
+}
+
+window-rule {
+    match title=r#"^(Oklch Color Picker|oklch-color-picker)$"#
+    open-floating true
+}
+
+// Firefox
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"firefox$"# title=r#"^(Library|About Mozilla Firefox)$"#
+    open-floating true
+}
+
+// Floating windows
+window-rule {
+    match app-id=r#"floating"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"YaziTerminal"#
+    open-floating true
+    default-column-width { proportion 0.4; }
+}
+
+window-rule {
+    match app-id=r#"^mpv$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^KeePassXC$"#
+    block-out-from "screencast"
+}
+
+window-rule {
+    match app-id=r#"^thunar$"# title=r#"^Rename "#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    default-column-width {}
+}
+
+// Rounded corners para todas las ventanas
+window-rule {
+    geometry-corner-radius 2
+    clip-to-geometry true
+}
+

@@ -1,0 +1,65 @@
+// /003 󰫸  exec-autostart.kdl
+// ═══════════════════════════════════════════════════════════════════════════
+// STARTUP PROGRAMS (MIGRADO DESDE exec-autostart.conf)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Caelestia quickshell
+// spawn-sh-at-startup "caelestia shell -d"
+// spwan-sh-at-startup "qs -c caelestia"
+
+// Quickshell # PARA LOS BORDER
+spawn-sh-at-startup "qs"
+
+// Power management
+spawn-sh-at-startup "powerprofilesctl set balanced"
+
+// Desktop environment
+spawn-sh-at-startup "vicinae server"
+spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x-desktop"
+
+// Authentication and system services
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+spawn-sh-at-startup "nm-applet & volctl & blueman-applet"
+
+// Notification center
+spawn-at-startup "swaync"
+spawn-at-startup "dunst -config ~/.config/dunstrc"
+// -- Si no funciona ninguno usa: mako
+
+// Clipboard management
+spawn-sh-at-startup "wl-paste --watch cliphist store"
+spawn-sh-at-startup "wl-paste --type image --watch cliphist store"
+spawn-at-startup "espanso"
+spawn-sh-at-startup "sh ~/.config/hypr/scripts/toggle_copyq.sh"
+
+// Wallpaper (swaybg reemplaza a swww-daemon)
+
+spawn-sh-at-startup "sleep 1; swaybg &"
+spawn-sh-at-startup "sleep 1; swaybg -i ~/wallpapers/40.jpg -m fill &"
+
+// Status bar
+spawn-sh-at-startup "sleep 3; waybar"
+
+// Scripts
+spawn-sh-at-startup "sh ~/.config/hypr/scripts/text_animation/anitext.sh"
+spawn-sh-at-startup "sh ~/.config/hypr/scripts/weather/weather.sh"
+spawn-sh-at-startup "sh ~/scripts/launch_widgets.sh"
+
+// Mount drives
+spawn-sh-at-startup "/home/diego/montar_gdrive.sh"
+spawn-sh-at-startup "/home/diego/montar_gdmusica.sh"
+
+// Cursor theme
+spawn-sh-at-startup "hyprctl setcursor Kafka 24 || true"
+
+// GTK settings
+spawn-sh-at-startup "gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:'"
+
+// Idle management
+spawn-at-startup "hypridle"
+
+// Input remapper
+spawn-sh-at-startup "sh ~/scripts/setup-keyboard.sh"
+
+// DBus
+spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"

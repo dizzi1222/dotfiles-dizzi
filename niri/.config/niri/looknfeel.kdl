@@ -1,0 +1,45 @@
+// /007 󰫸  looknfeel.kdl
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYOUT
+// ═══════════════════════════════════════════════════════════════════════════
+
+// source = ~/.cache/wal/colors-hyprland.conf -- NO TIENE PYWAL
+
+layout {
+    gaps 8
+    center-focused-column "never"
+    
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    
+    default-column-width { proportion 0.5; }
+    
+    focus-ring {
+        width 1
+        active-color "#7fc8ff"
+        // active-border $color1 $color2 45deg
+        inactive-color "#505050"
+        // inactive_border $background
+    }
+    
+    border {
+        off
+    // active-border $color1 $color2 45deg
+    // inactive_border $background
+    }
+}
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+animations {
+}
+
+prefer-no-csd
+

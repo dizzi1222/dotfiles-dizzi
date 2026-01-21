@@ -39,9 +39,34 @@ if [ -n "$SELECTED_WALL" ]; then
   # 🎲 Seleccionar animación aleatoria
   RANDOM_TRANSITION=${transitions[$RANDOM % ${#transitions[@]}]}
 
-  # 🌊 Cambiar el fondo con swww y animación épica
-  swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
-  swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
+  # 🔧 Función para detectar el compositor
+detect_compositor() {
+  if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
+    echo "niri"
+  elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
+    echo "hyprland"
+  else
+    echo "unknown"
+  fi
+}
+
+# 🔧 Función para activar modo noche
+toggle-wallpaper() {
+  local compositor=$(detect_compositor)
+
+  case "$compositor" in
+  "hyprland")
+    # 🌊 Cambiar el fondo con swww y animación épica
+    swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
+    ;;
+  "niri")
+    swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
+    ;;
+  *)
+    echo "❌ Compositor no soportado"
+    return 1
+    ;;
+  esac
 
   # Generar paleta de colores con Pywal (silencioso)
   wal -q -i "$WALL_DIR/$SELECTED_WALL"

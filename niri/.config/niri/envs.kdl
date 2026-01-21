@@ -1,0 +1,6 @@
+// /008 󰫸  envs.kdl
+environment {
+    QT_QPA_PLATFORM "wayland"
+    TERMINAL  "kitty"
+    EDITOR "nvim"
+}
