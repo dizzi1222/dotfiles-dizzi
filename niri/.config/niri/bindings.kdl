@@ -67,8 +67,8 @@ binds {
     Super+Period hotkey-overlay-title="emoji" { spawn-sh "rofimoji --action copy --selector fuzzel --prompt='Emoji:'"; }
     Super+Shift+Period hotkey-overlay-title="nerd font" { spawn-sh "rofimoji --action copy --selector fuzzel --prompt='Nerd Font:' --files nerd_font"; }
     Mod+Shift+C hotkey-overlay-title="color picker" { spawn-sh "~/.config/niri/scripts/niri-colorpicker.sh"; }
-    Ctrl+Shift+Escape hotkey-overlay-title="monitor" { spawn "gnome-system-monitor"; }
-    Super+Ctrl+Escape hotkey-overlay-title="btop" { spawn-sh "kitty sudo btop"; }
+    Ctrl+Shift+Escape hotkey-overlay-title="monitor" { spawn "kitty btop"; }
+    Super+Ctrl+Escape hotkey-overlay-title="btop" { spawn-sh "gnome-system-monitor"; }
     Super+Z hotkey-overlay-title="system control" { spawn-sh "sh ~/scripts/system_control.sh"; }
     
     // ═══════════════════════════════════════════════════════════════════════
