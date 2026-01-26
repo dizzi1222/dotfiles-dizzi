@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/vesktop
+  working_dir: /usr/bin/

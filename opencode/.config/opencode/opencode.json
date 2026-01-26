@@ -1,7 +1,3 @@
-//
-// if [[ -f ~/.config/nvim/lua/plugins/opencode-chat.lua ]]; then
-// mkdir -p ~/.config/opencode
-// cat > ~/.config/opencode/opencode.json << 'EOF'
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "opencode",
@@ -15,9 +11,3 @@
   },
   "instructions": [".opencode/rules.md"]
 }
-// EOF
-//   echo "✅ Configuración creada"
-// else
-//   rm -rf ~/.config/opencode/opencode.json
-//   echo "❌ El plugin de Neovim no existe"
-// fi
