@@ -60,6 +60,7 @@ while true; do
     echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo [& journalctl, docker, electron]...${RESET}"
     # -- Lo mas pesado
     rm -rf ~/.cache/*
+    rm -rf ~/assets/
     rm -rf ~/.bun/install/cache/
     rm -rf $HOME/.docker/desktop/vms/ 2>/dev/null || true # ✅
     # Brave
