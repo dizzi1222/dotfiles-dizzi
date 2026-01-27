@@ -319,6 +319,9 @@
   "workbench.colorTheme": "Aura Soft Dark",
   "git.confirmSync": false,
   "livePreview.notifyOnOpenLooseFile": false,
+  "symbols.hidesExplorerArrows": false,
+  "terminal.integrated.fontFamily": "Hack Nerd Font",
+  "terminal.integrated.fontLigatures.enabled": true,
   // -------------------- (BLUR GLASS) VIBRANCY SETTINGS -----------------
   // Activar el Blur , glass effect
   // "vscode_vibrancy.type": "acrylic",
