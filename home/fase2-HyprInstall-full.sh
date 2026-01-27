@@ -600,10 +600,10 @@ esac
 # ═══════════════════════════════════════════════════════════
 # Aplicaciones de música y ocio
 # ═══════════════════════════════════════════════════════════
-print_installing "Aplicaciones extra y de Música/OCIO (solo binarios precompilados)"
+print_installing "Aplicaciones extra y de Música/OCIO, Discord/Telegram (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   brave-bin spotify pear-desktop \
-  vencord-bin gyazo-bin discord-screenaudio-bin \
+  vencord-bin telegram-desktop-bin gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
 

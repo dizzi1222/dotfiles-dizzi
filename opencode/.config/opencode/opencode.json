@@ -2,6 +2,8 @@
   "$schema": "https://opencode.ai/config.json",
   "theme": "opencode",
   "model": "ollama/deepseek-v3.1:671b",
+  // "theme": "gemini",
+  // "model": "gemini-3-flash-previewi",
   "autoupdate": true,
   "server": {
     "port": 4096,

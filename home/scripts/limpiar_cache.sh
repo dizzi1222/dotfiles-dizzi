@@ -61,7 +61,7 @@ while true; do
     # -- Lo mas pesado
     rm -rf ~/.cache/*
     rm -rf ~/.bun/install/cache/
-    $HOME/.docker/desktop/vms/
+    rm -rf $HOME/.docker/desktop/vms/ 2>/dev/null || true # ✅
     # Brave
     rm -rf ~/.config/BraveSoftware/Brave-Browser/Default/Cache
     rm -rf ~/.cache/BraveSoftware
@@ -71,13 +71,14 @@ while true; do
     rm -rf $HOME/.npm/_cacache/
 
     # Firefox
-    rm -rf ~/.mozilla/firefox/*.default*/cache2
+    find ~/.mozilla/firefox/*.default*/cache2 -type f -delete 2>/dev/null || true
+    rm -rf ~/.mozilla/firefox/*.default*/cache2 2>/dev/null || true
     flatpak uninstall --unused
     rm -rf ~/.var/app/*/cache/*
     sudo journalctl --vacuum-size=50M
     rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/
-    $HOME/.local/share/Trash/files/
-    sudo rm -rf /tmp/
+    rm -rf $HOME/.local/share/Trash/files/* 2>/dev/null || true # ✅ Solo contenido
+    # sudo rm -rf /tmp/
     docker system prune -af
     docker builder prune
 
