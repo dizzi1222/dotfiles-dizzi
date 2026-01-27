@@ -1608,7 +1608,23 @@ if [[ -d ~/dotfiles-dizzi ]]; then
     fi
   done
 
-  cd ~
+print_status "Aplicando Submodulos [NVIM]    ."
+
+echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+# Verificar submodules
+git submodule update --init --recursive
+rm -rf Librezam retro-portfolio kimu-underground portfolio-terminal-dhardi
+
+# Recuperar cada submódulo
+git submodule update --init --recursive Librezam
+git submodule update --init --recursive retro-portfolio
+git submodule update --init --recursive kimu-underground
+git submodule update --init --recursive portfolio-terminal-dhardi
+
+echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+cd  nvim/.config/nvim  && git checkout main
+cd  ../../../
+
   print_success "Dotfiles aplicados"
 fi
 
