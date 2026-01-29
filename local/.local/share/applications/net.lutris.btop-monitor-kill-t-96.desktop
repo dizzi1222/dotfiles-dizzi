@@ -1,7 +1,8 @@
 #!/usr/bin/env xdg-open
 
 [Desktop Entry]
-Icon=/home/diego/.local/share/lutris/coverart/btop-monitor-kill-t.png
+Icon=/home/diego/.local/share/lutris/coverart/monitor-del-sistema.png
+# Icon=/home/diego/.local/share/lutris/coverart/btop-monitor-kill-t.png
 Type=Application
 Name=Btop Monitor
 Comment=Kill = T

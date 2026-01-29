@@ -130,7 +130,7 @@ declare -a ROOT_FILES=(
   # "YUZU Emulador Switch.desktop"
   # "net.lutris.davinci-resolve-87.desktop"
   # "net.lutris.dragon-ball-z-budokai-tenkaichi-3-93.desktop"
-  "net.lutris.monitor-del-sistema-94.desktop"
+  # "net.lutris.monitor-del-sistema-94.desktop"
   # "net.lutris.usrbingnome-disks-97.desktop"
   "net.lutris.btop-monitor-kill-t-96.desktop"
   # "net.lutris.calculadora-gnome-95.desktop"
