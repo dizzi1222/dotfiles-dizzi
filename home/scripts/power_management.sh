@@ -14,6 +14,7 @@ case "$CHOICE" in
   ;;
 "")
   cd /$HOME
+  hyprctl dispatch exit
   sleep 1
   reboot
   ;;
