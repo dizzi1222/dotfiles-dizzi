@@ -7,14 +7,14 @@ CHOICE=$(printf "\n\n\n\n" | rofi -dmenu -replace -config ~/.conf
 case "$CHOICE" in
 "")
   cd /$HOME
-  hyprctl dispatch exit
+  # hyprctl dispatch exit
   sleep 1
   # shutdown now
   systemctl poweroff
   ;;
 "")
   cd /$HOME
-  hyprctl dispatch exit
+  # hyprctl dispatch exit
   sleep 1
   reboot
   ;;
