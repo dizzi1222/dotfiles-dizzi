@@ -4,6 +4,10 @@
   "model": "ollama/deepseek-v3.1:671b",
   // "theme": "gemini",
   // "model": "gemini-3-flash-previewi",
+  //  "model": "deepseek-chat",
+  //  "model": "claude-opus-4-5",
+  //  "model": "claude-haiku-4-5",
+  //  "model": "claude-sonnet-4-5",
   "autoupdate": true,
   "server": {
     "port": 4096,

@@ -8,5 +8,6 @@ sleep 4
 killall hyprland-dialog
 sudo waydroid session stop
 sudo waydroid session start
+wineserver -k
  
 # notify-send "🎮 Gamescope cerrado"
