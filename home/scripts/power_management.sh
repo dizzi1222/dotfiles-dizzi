@@ -10,6 +10,9 @@ case "$CHOICE" in
   # hyprctl dispatch exit
   sleep 1
   # shutdown now
+  pkill -9 hyprland 2>/dev/null
+  pkill -9 niri 2>/dev/null
+  sleep 1
   systemctl poweroff
   ;;
 "")
