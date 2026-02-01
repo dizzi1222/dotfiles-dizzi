@@ -397,8 +397,6 @@ aicommit-toggle() {
 
 # Comando para reconfigurar opencommit fácilmente
 # Función dinámica para configurar opencommit
-# Comando para reconfigurar opencommit fácilmente
-# Función dinámica para configurar opencommit
 aicommitconfig() {
   echo "📦 Configurando opencommit con Ollama..."
   
