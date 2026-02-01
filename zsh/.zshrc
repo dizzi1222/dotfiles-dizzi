@@ -430,26 +430,17 @@ aicommitconfig() {
   fi
   
   echo "Modelos disponibles:"
-  echo "💡 Modelos :cloud → /api/chat | Locales → endpoint estándar"
+  echo "💡 Tip: Esta configuración usa /api/chat (optimizado para modelos cloud)"
   echo ""
   
   select model in "${models[@]}" "❌ Cancelar"; do
     [[ "$model" == "❌ Cancelar" ]] && return 0
     
     if [[ -n "$model" ]]; then
-      # 🔥 USAR GREP PARA DETECCIÓN ROBUSTA
-      if echo "$model" | grep -q ":cloud"; then
-        local API_ENDPOINT="${OLLAMA_URL}/api/chat"
-        echo "🌐 Modelo CLOUD → ${API_ENDPOINT}"
-      else
-        local API_ENDPOINT="${OLLAMA_URL}"
-        echo "💻 Modelo LOCAL → ${API_ENDPOINT}"
-      fi
-      
       # Configurar
       oco config set OCO_AI_PROVIDER=ollama
       oco config set OCO_MODEL="$model"
-      oco config set OCO_API_URL="${API_ENDPOINT}"  # 🔥 CORREGIDO: usa variable en vez de hardcodear
+      oco config set OCO_API_URL="${OLLAMA_URL}/api/chat"  # 🔥 Usa variable en vez de hardcodear
       oco config set OCO_LANGUAGE=es_ES
       oco config set OCO_TOKENS_MAX_INPUT=12000
       oco config set OCO_TOKENS_MAX_OUTPUT=500
@@ -458,14 +449,10 @@ aicommitconfig() {
       echo ""
       echo "✅ opencommit configurado correctamente:"
       echo "   • Provider: ollama"
-      echo "   • URL: ${API_ENDPOINT}"
+      echo "   • URL: ${OLLAMA_URL}/api/chat"  # 🔥 Muestra URL correcta
       echo "   • Modelo: $model"
       echo "   • Idioma: es_ES"
-      echo "   • Max tokens entrada: 12000"
-      echo "   • Max tokens salida: 500"
-      echo "   • Recomendacion: Usa modelos Cloud, consume 0 GPU y 1.5GB de RAM, Para commits es PERFECTO que >>> Local"
-      echo ""
-      echo "🧪 Probando conexión..."
+      echo "   • Recomendación: Para modelos locales, quita /api/chat manualmente"
       
       if oco --version &>/dev/null; then
         echo "✅ opencommit funcional"
