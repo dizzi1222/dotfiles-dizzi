@@ -320,7 +320,7 @@
   "git.confirmSync": false,
   "livePreview.notifyOnOpenLooseFile": false,
   "symbols.hidesExplorerArrows": false,
-  "terminal.integrated.fontFamily": "Hack Nerd Font",
+  "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
   "terminal.integrated.fontLigatures.enabled": true,
   "redhat.telemetry.enabled": true,
   // -------------------- (BLUR GLASS) VIBRANCY SETTINGS -----------------
