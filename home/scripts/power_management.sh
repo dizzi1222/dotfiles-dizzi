@@ -7,34 +7,35 @@ CHOICE=$(printf "\n\n\n\n" | rofi -dmenu -replace -config ~/.conf
 case "$CHOICE" in
 "")
   cd /$HOME
-  # hyprctl dispatch exit
-  sleep 1
   # shutdown now
-  pkill -9 hyprland 2>/dev/null
-  pkill -9 niri 2>/dev/null
-  sleep 1
-  systemctl poweroff
+  sync # Fuerza escritura a disco
+  sleep 0.5
+  sudo systemctl --force --force poweroff # Doble --force = bypass todo
+
   ;;
 "")
   cd /$HOME
-  # hyprctl dispatch exit
-  sleep 1
-  reboot
+  sync # Fuerza escritura a disco
+  sleep 0.5
+  sudo systemctl --force --force reboot # Doble --force = bypass todo
   ;;
 "")
-  sleep 1
   hyprlock # funciona en Niri too
   ;;
 "")
   cd /$HOME
-  sleep 1
   systemctl suspend
   ;;
 "")
   cd /$HOME
-  sleep 1
   hyprctl dispatch exit
-  killall niri
+  if pgrep -x "niri" >/dev/null; then
+    # Niri: mata el proceso principal (equivale a "exit")
+    killall niri
+    pkill -TERM niri
+    sleep 2
+    pkill -KILL niri # Por si no respondió al TERM
+  fi
   ;;
 *)
   exit 1
