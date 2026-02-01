@@ -397,49 +397,68 @@ aicommit-toggle() {
 
 # Comando para reconfigurar opencommit fácilmente
 # Función dinámica para configurar opencommit
+# Comando para reconfigurar opencommit fácilmente
+# Función dinámica para configurar opencommit
 aicommitconfig() {
   echo "📦 Configurando opencommit con Ollama..."
-  echo ""
-
-  # Verificar que Ollama esté corriendo
-  if ! curl -s http://localhost:11434/api/tags &>/dev/null; then
-    echo "❌ Ollama no está corriendo. Ejecuta: ollama serve"
+  
+  # Detectar entorno
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    local WINDOWS_HOST=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
+    local OLLAMA_URL="http://${WINDOWS_HOST}:11434"
+    echo "🪟 WSL detectado, usando Windows host: ${WINDOWS_HOST}"
+  else
+    local OLLAMA_URL="http://localhost:11434"
+    echo "🐧 Linux nativo detectado, usando localhost"
+  fi
+  
+  # Verificar conexión
+  if ! curl -s "${OLLAMA_URL}/api/tags" &>/dev/null; then
+    echo "❌ Ollama no responde"
     return 1
   fi
-
-  echo "✅ Ollama detectado en http://localhost:11434"
+  
+  echo "✅ Ollama detectado en ${OLLAMA_URL}"
   echo ""
-
+  
+  # Obtener modelos
   local models=($(ollama list | tail -n +2 | awk '{print $1}'))
-
+  
   if [[ ${#models[@]} -eq 0 ]]; then
-    echo "❌ No hay modelos. Ejecuta 'ollama pull qwen2.5:0.5b'"
+    echo "❌ No hay modelos"
     return 1
   fi
-
+  
   echo "Modelos disponibles:"
+  echo "💡 Modelos :cloud → /api/chat | Locales → endpoint estándar"
+  echo ""
+  
   select model in "${models[@]}" "❌ Cancelar"; do
-    if [[ "$model" == "❌ Cancelar" ]] || [[ -z "$model" ]]; then
-      echo "Operación cancelada"
-      return 0
-    fi
-
+    [[ "$model" == "❌ Cancelar" ]] && return 0
+    
     if [[ -n "$model" ]]; then
-      # Configuración completa con URL de Ollama
+      # 🔥 USAR GREP PARA DETECCIÓN ROBUSTA
+      if echo "$model" | grep -q ":cloud"; then
+        local API_ENDPOINT="${OLLAMA_URL}/api/chat"
+        echo "🌐 Modelo CLOUD → ${API_ENDPOINT}"
+      else
+        local API_ENDPOINT="${OLLAMA_URL}"
+        echo "💻 Modelo LOCAL → ${API_ENDPOINT}"
+      fi
+      
+      # Configurar
       oco config set OCO_AI_PROVIDER=ollama
-      oco config set OCO_MODEL="$model" # ← MODELO, recomendacion: Usa modelos Cloud para commits >>> Local
-      # oco config set OCO_OLLAMA_API_URL=http://localhost:11434  # ← Vieja Sintaxis
-      oco config set OCO_API_URL=http://localhost:11434  # ← CLAVE | Nueva sintaxis en WSL 
-      # oco config set OCO_API_KEY=ANTHROPIC_API_KEY # Nueva sintaxis en WSL 
+      oco config set OCO_MODEL="$model"
+      oco config set OCO_API_URL="${API_ENDPOINT}"  # 🔥 CORREGIDO: usa variable en vez de hardcodear
       oco config set OCO_LANGUAGE=es_ES
       oco config set OCO_TOKENS_MAX_INPUT=12000
       oco config set OCO_TOKENS_MAX_OUTPUT=500
       oco config set OCO_ONE_LINE_COMMIT=false
-
+      
       echo ""
       echo "✅ opencommit configurado correctamente:"
       echo "   • Provider: ollama"
-      echo "   • URL: http://localhost:11434"
+      echo "   • URL: ${API_ENDPOINT}"
       echo "   • Modelo: $model"
       echo "   • Idioma: es_ES"
       echo "   • Max tokens entrada: 12000"
@@ -447,12 +466,11 @@ aicommitconfig() {
       echo "   • Recomendacion: Usa modelos Cloud, consume 0 GPU y 1.5GB de RAM, Para commits es PERFECTO que >>> Local"
       echo ""
       echo "🧪 Probando conexión..."
-
-      # Test rápido
+      
       if oco --version &>/dev/null; then
         echo "✅ opencommit funcional"
       fi
-
+      
       break
     fi
   done
