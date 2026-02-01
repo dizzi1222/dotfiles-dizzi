@@ -1,6 +1,6 @@
 OCO_ONE_LINE_COMMIT=false
-OCO_MODEL=deepseek-v3.2:cloud
-OCO_API_URL=http://localhost:11434/api/chat
+OCO_MODEL=deepseek-v3.1:671b-cloud
+OCO_API_URL=http://localhost:11434
 OCO_API_KEY=undefined
 OCO_API_CUSTOM_HEADERS=undefined
 OCO_AI_PROVIDER=ollama
