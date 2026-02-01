@@ -25,6 +25,13 @@
       "clipboard:history"
    ],
    "providers": {
+      "@meshal/store.raycast.antigravity": {
+         "entrypoints": {
+            "open-with-antigravity": {
+               "enabled": false
+            }
+         }
+      },
       "applications": {
          "entrypoints": {
             "net.lutris.neovim-124": {
