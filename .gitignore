@@ -238,3 +238,19 @@ copilot-chat-history/
 home/.opencommit
 *api-keys*
 *.env
+
+# Archivos sensibles
+home/.opencommit
+.opencommit
+**/.opencommit
+*api-keys*
+*.env
+.env.*
+
+# Archivos sensibles
+home/.opencommit
+.opencommit
+**/.opencommit
+*api-keys*
+*.env
+.env.*
