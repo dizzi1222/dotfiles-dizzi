@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
 # TERMUX SETUP COMPLETO - Versión Final con Git Config
