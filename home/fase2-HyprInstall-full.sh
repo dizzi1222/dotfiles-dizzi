@@ -1618,8 +1618,8 @@ rm -rf nvim
 # Recuperar cada submódulo
 git submodule update --init --recursive nvim
 
-echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
-cd  nvim/.config/nvim  && git checkout main
+echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch termix nvim...${RESET}"
+cd  nvim/.config/nvim  && git checkout termux
 cd  ../../../
 
   print_success "Dotfiles aplicados"
