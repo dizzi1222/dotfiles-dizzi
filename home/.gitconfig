@@ -20,3 +20,7 @@
 	logoutputencoding = utf-8
 [push]
 	autoSetupRemote = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
