@@ -234,10 +234,12 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
   curl -sSL https://github.com/aandrew-me/tgpt/releases/latest/download/tgpt-linux-arm64 \
     -o /data/data/com.termux/files/usr/bin/tgpt 2>/dev/null && chmod +x /data/data/com.termux/files/usr/bin/tgpt
   npm install -g opencommit 2>/dev/null
-  pip install pywal anthropic --break-system-packages 2>/dev/null
+  pip install pywal --break-system-packages 2>/dev/null
+  # pip install anthropic --break-system-packages 2>/dev/null
   pkg install -y proot-distro imagemagick >/dev/null 2>&1
   print_success "IA Tools"
 fi
+print_success "No existe Claude Code, Gemini..F o usa proot-distro para usar Ubuntu y quizas puedas instalarlos."
 
 print_step "17/22: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
