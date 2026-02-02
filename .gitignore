@@ -2,6 +2,7 @@
 # cat >> .gitignore << 'EOF'
 
 # MCP específico
+./home/.opencommit
 .mcp-global.json.local
 mcp-config.local.json
 *.mcp-local
@@ -234,3 +235,6 @@ Session.vim
 
 # Copilot chat history
 copilot-chat-history/
+home/.opencommit
+*api-keys*
+*.env
