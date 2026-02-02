@@ -5,14 +5,14 @@
 # =============================================================================
 
 
-# mapear Ctrl + Backspace
-bindkey '^H' backward-kill-word
-bindkey '^[[3;5~' kill-word
-# Borra la palabra anterior (Ctrl+W)
-bindkey '^W' backward-kill-word
-
-# Borra la palabra anterior (Ctrl+Backspace)
-bindkey '^?' backward-kill-word
+# # mapear Ctrl + Backspace
+# bindkey '^H' backward-kill-word
+# bindkey '^[[3;5~' kill-word
+# # Borra la palabra anterior (Ctrl+W)
+# bindkey '^W' backward-kill-word
+#
+# # Borra la palabra anterior (Ctrl+Backspace)
+# bindkey '^?' backward-kill-word
 
 # ESTO HACE QUE neofetch cargue primero
 # si prefieres puedes quitarlo para cargar ANTES el prompt instant.
@@ -135,7 +135,7 @@ plugins=(
 )
 
 # Esta línea debe estar después de 'plugins=()'
-source $ZSH/oh-my-zsh.sh
+# source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -783,7 +783,7 @@ alias gitclean='bash ~/scripts/git_clean.sh'
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# eval "$(pyenv init -)"
 # COMANDOS DE OMARCHY
 alias omarchy-launch-webapp='bash ~/omarchy-arch-bin/omarchy-launch-webapp'
 alias omarchy-webapp-install='bash ~/omarchy-arch-bin/omarchy-webapp-install'
@@ -803,35 +803,26 @@ export VISUAL="nvim"
 export GIT_EDITOR="nvim"
 
 # ═══════════════════════════════════════════════════════════
-# Alias para la herramienta de MACROS de LINUX
+# Config de TERMIX STARSHIP 
 # ═══════════════════════════════════════════════════════════
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 
-# ═══════════════════════════════════════════════════════════
-# GNOME Keyring (protegido contra errores de glob)
-# ═══════════════════════════════════════════════════════════
-if [[ -d /run/user/$(id -u)/keyring ]]; then
-  # Control socket
-  _keyring_control=$(find /run/user/$(id -u)/keyring* -name control 2>/dev/null | head -1)
-  [[ -n "$_keyring_control" ]] && export GNOME_KEYRING_CONTROL="$_keyring_control"
-  
-  # SSH socket
-  _keyring_ssh=$(find /run/user/$(id -u)/keyring* -name ssh 2>/dev/null | head -1)
-  [[ -n "$_keyring_ssh" ]] && export SSH_AUTH_SOCK="$_keyring_ssh"
-  
-  unset _keyring_control _keyring_ssh
-fi
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""
 
-# ═══════════════════════════════════════════════════════════
-# LLAVES-KEY... API
-# ═══════════════════════════════════════════════════════════
-# Verificar permisos de ejecución del archivo de API keys
-if [[ ! -x ~/.api-keys.sh ]]; then
-    echo "⚠️  Asignando permisos de ejecución a ~/.api-keys.sh"
-    chmod +x ~/.api-keys.sh
-fi
-# Cargar API keys al iniciar terminal
-if [ -f ~/.api-keys.sh ]; then
-    source ~/.api-keys.sh
-fi
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions zsh-history-substring-search)
 
+# source $ZSH/oh-my-zsh.sh
+
+[[ -d ~/.zsh/zsh-autocomplete ]] && source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+[[ -d ~/.zsh/fzf-tab ]] && source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
+
+[[ -f ~/.termux_aliases ]] && source ~/.termux_aliases
+
+# Pokemon (comentado por defecto)
+# # command -v pokemon-colorscripts >/dev/null && pokemon-colorscripts -r
+#
+# # Starship (AL FINAL)
+command -v starship >/dev/null && eval "$(starship init zsh)"

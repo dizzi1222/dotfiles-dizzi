@@ -1,0 +1,3 @@
+#!/bin/bash
+POKEMONS=("⚡ Pikachu" "🔥 Charizard" "🌱 Bulbasaur" "💧 Squirtle" "👁️ Mewtwo")
+echo "${POKEMONS[$RANDOM % ${#POKEMONS[@]}]}"
