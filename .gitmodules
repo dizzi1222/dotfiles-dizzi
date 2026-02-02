@@ -29,4 +29,4 @@
 [submodule "nvim-config"]
 	path = nvim/.config/nvim
 	url = https://github.com/dizzi1222/nvim.git
-	branch = main
+	branch = termux # Para separar config android
