@@ -5,11 +5,11 @@
 # =============================================================================
 
 
-# # mapear Ctrl + Backspace
-# bindkey '^H' backward-kill-word
+# mapear Ctrl + Backspace
+bindkey '^H' backward-kill-word
 # bindkey '^[[3;5~' kill-word
-# # Borra la palabra anterior (Ctrl+W)
-# bindkey '^W' backward-kill-word
+# Borra la palabra anterior (Ctrl+W)
+bindkey '^W' backward-kill-word
 #
 # # Borra la palabra anterior (Ctrl+Backspace)
 # bindkey '^?' backward-kill-word
