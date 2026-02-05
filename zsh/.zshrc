@@ -825,3 +825,5 @@ alias termux-help='echo "
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 "'
 # termux-help
+alias xdg-open="termux-open"
+export TMPDIR=$PREFIX/tmp
