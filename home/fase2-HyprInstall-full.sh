@@ -3240,7 +3240,7 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34: DESACTIVAR GESTOR DE LOGIN ACTUAL
+# PASO 33.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
 print_step "33.5/35: Desactivar Display Manager Actual"
 
@@ -3270,7 +3270,230 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 35: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# PASO 34.5: SNAPPER (SNAPSHOTS BTRFS) - SIN YAY
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Snapper (Snapshots BTRFS)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          📸 CONFIGURAR SNAPPER SNAPSHOTS 📸              ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Snapper permite crear snapshots automáticos del sistema:${NC}"
+echo -e "  ${MAGENTA}•${NC} Snapshots antes de actualizaciones (snap-pac)"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos cada hora/día"
+echo -e "  ${MAGENTA}•${NC} Rollback completo desde GRUB (grub-btrfs)"
+echo -e "  ${MAGENTA}•${NC} ${BOLD}SOLO funciona con sistemas BTRFS${NC}"
+echo
+echo -e "${YELLOW}⚠️  IMPORTANTE:${NC} Verifica que tu sistema use BTRFS:"
+echo -e "  ${CYAN}df -T / | grep btrfs${NC}"
+echo
+
+# Verificar sistema de archivos
+FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')
+FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
+FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
+
+echo -e "${CYAN}Sistema de archivos:${NC} ${BOLD}$FS_TYPE${NC}"
+echo -e "${CYAN}Espacio libre en /:${NC} ${BOLD}$FREE_SPACE${NC}"
+echo
+
+if [[ "$FS_TYPE" == "btrfs" ]]; then
+  echo -e "${GREEN}✓ Sistema BTRFS detectado${NC}"
+  
+  # Verificar espacio
+  if [[ $FREE_SPACE_KB -lt 10485760 ]]; then  # <10GB
+    echo -e "${YELLOW}⚠️  Advertencia: Menos de 10GB libres${NC}"
+    echo -e "${YELLOW}   Snapshots pueden consumir espacio rápidamente${NC}"
+  fi
+  
+  echo
+  read -p "¿Instalar y configurar Snapper? [S/n]: " install_snapper
+else
+  echo -e "${RED}✗ Sistema no usa BTRFS (detectado: $FS_TYPE)${NC}"
+  echo -e "${YELLOW}Snapper requiere BTRFS para funcionar correctamente${NC}"
+  echo
+  read -p "¿Instalar Snapper de todos modos? [s/N]: " install_snapper
+fi
+
+if [[ ! "$install_snapper" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Snapper + Herramientas"
+
+  # ═══════════════════════════════════════════════════════════
+  # INSTALACIÓN SIN YAY (solo repos oficiales)
+  # ═══════════════════════════════════════════════════════════
+  print_installing "snapper + snap-pac + grub-btrfs"
+  sudo pacman -S --needed --noconfirm \
+    snapper \
+    snap-pac \
+    grub-btrfs
+
+  print_success "Snapper + herramientas instaladas"
+  print_warning "snapper-gui (AUR) omitido - instalar después con: yay -S snapper-gui-git"
+
+  # ═══════════════════════════════════════════════════════════
+  # CONFIGURACIÓN SOLO PARA BTRFS
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$FS_TYPE" == "btrfs" ]]; then
+    print_header "Configurando Snapper para BTRFS"
+    
+    # ───────────────────────────────────────────────────────────
+    # PASO 1: Preparar directorio .snapshots
+    # ───────────────────────────────────────────────────────────
+    print_status "Verificando directorio /.snapshots..."
+    
+    if [[ -d "/.snapshots" ]]; then
+      if ! mountpoint -q "/.snapshots"; then
+        print_warning "/.snapshots existe pero NO es subvolumen"
+        sudo mv /.snapshots /.snapshots.backup.$(date +%s)
+        print_status "Movido a /.snapshots.backup.*"
+      else
+        print_status "/.snapshots ya es subvolumen, omitiendo"
+      fi
+    fi
+    
+    # ───────────────────────────────────────────────────────────
+    # PASO 2: Crear configuración para root
+    # ───────────────────────────────────────────────────────────
+    print_installing "Configurando snapper para /"
+    
+    if ! snapper list-configs 2>/dev/null | grep -q "root"; then
+      sudo snapper create-config /
+      
+      if [[ $? -eq 0 ]]; then
+        print_success "Configuración 'root' creada"
+      else
+        print_error "Error creando configuración"
+        print_warning "Si hay backup, restaurar: sudo mv /.snapshots.backup.* /.snapshots"
+      fi
+    else
+      print_warning "Configuración 'root' ya existe"
+    fi
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 3: Configurar límites de snapshots
+    # ───────────────────────────────────────────────────────────
+    print_status "Configurando límites de snapshots..."
+    
+    sudo snapper -c root set-config "NUMBER_LIMIT=50"
+    sudo snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=10"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_HOURLY=24"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_DAILY=7"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_WEEKLY=4"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_MONTHLY=12"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_YEARLY=2"
+    
+    # Permitir al usuario gestionar snapshots
+    sudo snapper -c root set-config "ALLOW_USERS=$USER"
+    sudo snapper -c root set-config "SYNC_ACL=yes"
+    
+    print_success "Límites configurados"
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 4: Habilitar servicios automáticos
+    # ───────────────────────────────────────────────────────────
+    print_status "Habilitando servicios automáticos..."
+    
+    sudo systemctl enable --now snapper-timeline.timer
+    sudo systemctl enable --now snapper-cleanup.timer
+    sudo systemctl enable --now grub-btrfsd  # Auto-detecta snapshots para GRUB
+    
+    print_success "Servicios habilitados"
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 5: Configurar /home si es subvolumen separado
+    # ───────────────────────────────────────────────────────────
+    if mount | grep -qE "subvol.*@home"; then
+      print_status "Detectado subvolumen @home separado"
+      read -p "¿Configurar snapper para /home también? [S/n]: " config_home
+      
+      if [[ ! "$config_home" =~ ^[Nn]$ ]]; then
+        if ! snapper list-configs 2>/dev/null | grep -q "home"; then
+          sudo snapper create-config /home
+          sudo snapper -c home set-config "NUMBER_LIMIT=30"
+          sudo snapper -c home set-config "TIMELINE_LIMIT_DAILY=7"
+          sudo snapper -c home set-config "ALLOW_USERS=$USER"
+          sudo snapper -c home set-config "SYNC_ACL=yes"
+          print_success "Configuración 'home' creada"
+        fi
+      fi
+    fi
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 6: Crear primer snapshot
+    # ───────────────────────────────────────────────────────────
+    print_status "Creando primer snapshot..."
+    sudo snapper -c root create --description "Configuración inicial SDDM + Snapper - $(date +'%Y-%m-%d %H:%M')"
+    
+    # Actualizar GRUB para incluir el snapshot
+    print_status "Actualizando GRUB (detectar snapshots)..."
+    sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || \
+      print_warning "Error actualizando GRUB (normal en algunos sistemas)"
+    
+    print_success "Primer snapshot creado"
+
+    # ═══════════════════════════════════════════════════════════
+    # GUÍA DE USO
+    # ═══════════════════════════════════════════════════════════
+    echo
+    echo -e "${GREEN}${BOLD}✨ SNAPPER - GUÍA COMPLETA DE USO ✨${NC}"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Comandos básicos:${NC}"
+    echo -e "  ${YELLOW}snapper list${NC}                        # Listar snapshots (SIN sudo)"
+    echo -e "  ${YELLOW}snapper create -d \"Mi snapshot\"${NC}     # Crear snapshot manual"
+    echo -e "  ${YELLOW}sudo snapper delete NUM${NC}              # Eliminar snapshot"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Rollback desde GRUB:${NC}"
+    echo -e "  ${MAGENTA}1.${NC} Reinicia el sistema"
+    echo -e "  ${MAGENTA}2.${NC} En GRUB: ${CYAN}\"Arch Linux snapshots\"${NC}"
+    echo -e "  ${MAGENTA}3.${NC} Selecciona el snapshot deseado"
+    echo -e "  ${MAGENTA}4.${NC} Bootea normalmente"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Snapshots automáticos:${NC}"
+    echo -e "  ${MAGENTA}•${NC} Cada hora (mantiene 24)"
+    echo -e "  ${MAGENTA}•${NC} Cada día (mantiene 7)"
+    echo -e "  ${MAGENTA}•${NC} Antes de pacman -Syu (snap-pac)"
+    echo -e "  ${MAGENTA}•${NC} Límite total: 50 snapshots"
+    echo
+    echo -e "${CYAN}Ubicación:${NC} ${YELLOW}/.snapshots/${NC}"
+    echo
+
+    # ═══════════════════════════════════════════════════════════
+    # CREAR ALIASES
+    # ═══════════════════════════════════════════════════════════
+    if [[ -f ~/.zshrc ]]; then
+      if ! grep -q "# Snapper aliases" ~/.zshrc; then
+        cat >> ~/.zshrc <<'ALIASES'
+
+# Snapper aliases
+alias snls='snapper list'
+alias sncreate='snapper create -d'
+alias sndelete='sudo snapper delete'
+alias snundo='sudo snapper undochange'
+alias snrollback='sudo snapper rollback'
+alias snconfigs='snapper list-configs'
+alias snstatus='systemctl status snapper-timeline.timer snapper-cleanup.timer grub-btrfsd'
+ALIASES
+        print_success "Aliases agregados a .zshrc"
+      fi
+    fi
+
+  else
+    # Sistema no-BTRFS
+    print_warning "Sistema no-BTRFS: Snapper instalado pero NO configurado"
+    echo
+    echo -e "${YELLOW}Alternativa para ext4:${NC} ${CYAN}sudo pacman -S timeshift${NC}"
+  fi
+
+else
+  print_warning "Snapper omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
 # ═══════════════════════════════════════════════════════════
 print_step "34/35: Display Manager (GDM o SDDM)"
 
