@@ -7,12 +7,12 @@
 
 # mapear Ctrl + Backspace
 bindkey '^H' backward-kill-word
-bindkey '^[[3;5~' kill-word
+# bindkey '^[[3;5~' kill-word
 # Borra la palabra anterior (Ctrl+W)
 bindkey '^W' backward-kill-word
-
-# Borra la palabra anterior (Ctrl+Backspace)
-bindkey '^?' backward-kill-word
+#
+# # Borra la palabra anterior (Ctrl+Backspace)
+# bindkey '^?' backward-kill-word
 
 # ESTO HACE QUE neofetch cargue primero
 # si prefieres puedes quitarlo para cargar ANTES el prompt instant.
@@ -135,7 +135,7 @@ plugins=(
 )
 
 # Esta línea debe estar después de 'plugins=()'
-source $ZSH/oh-my-zsh.sh
+# source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -248,88 +248,10 @@ alias lsd='exa -D --icons --color=always'                  # Solo directorios
 alias lss='exa -lha --sort=size --reverse --icons'         # Por tamaño
 alias lst='exa -lha --sort=modified --reverse --icons'     # Por fecha
 
-# notepad estilo Windows
-notepad() {
-  if [ $# -eq 0 ]; then
-    gedit --new-window >/dev/null 2>&1 &
-  else
-    gedit --new-window "$@" >/dev/null 2>&1 &
-  fi
-  disown
-}
-
-# explorer estilo Windows
-explorer() {
-  if [ $# -eq 0 ]; then
-    nautilus --new-window >/dev/null 2>&1 &
-  else
-    nautilus --new-window "$@" >/dev/null 2>&1 &
-  fi
-  disown
-}
 # === Tus otros aliases y configuraciones ===
 
 
 # alias vlc='flatpak run org.videolan.VLC'
-
-# Shell Integration para Ghostty
-if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
-    source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
-fi
-
-export PATH=/home/diego/musicpresence/musicpresence-2.3.2-linux-x86_64/usr/bin:$PATH
-export PATH=$HOME/cmus/bin:$PATH
-
-# Gemini AI instalacion:
-# Añade el directorio global de npm al PATH. NPM_GLOBAL
-export PATH=~/.npm-global/bin:$PATH
-
-# ⚙️ Abre la configuración de Wine (winecfg) para el prefijo .wine-11
-# ⚙️ Abre la configuración de Wine (w# 1. Función Principal para correr comandos con Wine en el prefijo 11
-
-# 🍷  alternativa a wine del prefijo .wine
-# 1. Función Principal para correr comandos con Wine en el prefijo 11
-# Uso: wine11 /ruta/al/instalador.exe, o wine11 explorer
-wine11() {
-    echo "⚙️ Ejecutando comando en el prefijo: /home/diego/.wine-11"
-    # El $@ pasa todos los argumentos al comando 'wine'
-    WINEPREFIX=/home/diego/.wine-11 wine "$@"
-}
-
-# 2. Función para Winetricks
-# Uso: wine11tricks d3dx9 corefonts vcrun2022
-wine11tricks() {
-    echo "⚙️ Ejecutando winetricks en el prefijo: /home/diego/.wine-11"
-    # El $@ pasa todos los argumentos al comando 'winetricks'
-    WINEPREFIX=/home/diego/.wine-11 winetricks "$@"
-}
-
-# 3. Función para Winecfg (Configuración)
-# Uso: wine11cfg (no necesita argumentos adicionales)
-wine11cfg() {
-    echo "⚙️ Abriendo winecfg para el prefijo: /home/diego/.wine-11"
-    WINEPREFIX=/home/diego/.wine-11 winecfg
-}
-wine11uninstaller() {
-    echo "⚙️ Abriendo el desinstalador para el prefijo: /home/diego/.wine-11"
-    WINEPREFIX=/home/diego/.wine-11 wine uninstaller
-}
-wineuninstaller() {
-    echo "⚙️ Abriendo el desinstalador para el prefijo: /home/diego/.wine-11"
-    wine uninstaller
-}
-wine11file() {
-    echo "⚙️ Abriendo winefile para el prefijo: /home/diego/.wine-11"
-    WINEPREFIX=/home/diego/.wine-11 winefile
-}
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto"
-alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto"
-
-export PATH=$PATH:/home/diego/.spicetify
 
 # =============================================================================
 #
@@ -768,7 +690,7 @@ alias gitclean='bash ~/scripts/git_clean.sh'
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# eval "$(pyenv init -)"
 # COMANDOS DE OMARCHY
 alias omarchy-launch-webapp='bash ~/omarchy-arch-bin/omarchy-launch-webapp'
 alias omarchy-webapp-install='bash ~/omarchy-arch-bin/omarchy-webapp-install'
@@ -799,11 +721,11 @@ if [[ -d /run/user/$(id -u)/keyring ]]; then
   # Control socket
   _keyring_control=$(find /run/user/$(id -u)/keyring* -name control 2>/dev/null | head -1)
   [[ -n "$_keyring_control" ]] && export GNOME_KEYRING_CONTROL="$_keyring_control"
-  
+
   # SSH socket
   _keyring_ssh=$(find /run/user/$(id -u)/keyring* -name ssh 2>/dev/null | head -1)
   [[ -n "$_keyring_ssh" ]] && export SSH_AUTH_SOCK="$_keyring_ssh"
-  
+
   unset _keyring_control _keyring_ssh
 fi
 
@@ -820,3 +742,69 @@ if [ -f ~/.api-keys.sh ]; then
     source ~/.api-keys.sh
 fi
 
+# ═══════════════════════════════════════════════════════════
+# Config de TERMUX STARSHIP 
+# ═══════════════════════════════════════════════════════════
+
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""
+
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions zsh-history-substring-search)
+
+# source $ZSH/oh-my-zsh.sh
+
+[[ -d ~/.zsh/zsh-autocomplete ]] && source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+[[ -d ~/.zsh/fzf-tab ]] && source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
+
+[[ -f ~/.termux_aliases ]] && source ~/.termux_aliases
+
+# Pokemon (comentado por defecto)
+# # command -v pokemon-colorscripts >/dev/null && pokemon-colorscripts -r
+#
+# # Starship (AL FINAL)
+command -v starship >/dev/null && eval "$(starship init zsh)"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📱 TERMUX / ANDROID SCRIPTS - Auto-configuración post-reinicio
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Rutas base
+TERMUX_SCRIPTS="$HOME/dotfiles-dizzi/home/termux"
+
+# 🔧 Scripts de configuración
+alias Dtermux-shizuku='bash $TERMUX_SCRIPTS/start_shizuku.sh'
+alias Dtermux-shizuku-enhanced='bash $TERMUX_SCRIPTS/start_shizuku_enhanced.sh'
+alias Dtermux-ix-pin='bash $TERMUX_SCRIPTS/ejecutar_comando_PIN_sin_ok.sh'
+
+# 🔍 Ver estado
+alias Dtermux-ver-servicios='bash $TERMUX_SCRIPTS/ver-servicios.sh'
+alias ver-servicios='bash $TERMUX_SCRIPTS/ver-servicios.sh'
+
+# ⚡ Activar servicios
+alias Dtermux-activar-servicios='bash $TERMUX_SCRIPTS/activar-servicios.sh'
+alias Dtermux-activar='bash $TERMUX_SCRIPTS/activar-servicios.sh'
+
+# 🔌 Conexión rápida
+alias Dtermux-conectar-ADB='bash ~/quick-connect.sh'
+alias Dtermux-adb-connect='bash ~/quick-connect.sh'
+  
+# 📋 Ayuda rápida
+alias termux-help='echo "
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 SCRIPTS DISPONIBLES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  shizuku          → Iniciar Shizuku
+  fix-pin          → Configurar PIN automático
+  ver / ver-servicios → Ver servicios activos
+  activar          → Activar todos los servicios
+  conectar         → Conectar ADB rápido
+  detectar         → Detectar servicios instalados
+  fix / fix-all    → TODO EN UNO (post-reinicio)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"'
+# termux-help
+alias xdg-open="termux-open"
+export TMPDIR=$PREFIX/tmp
