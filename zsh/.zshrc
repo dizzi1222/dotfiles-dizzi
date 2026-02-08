@@ -764,7 +764,11 @@ TEMPLATE
     11)
       git merge --abort
       ;;
-    12)
+    12)                       
+      git reset --hard
+      git pull                         
+      ;;
+    13)
       echo "❌ Cancelado"
       ;;
     *)
