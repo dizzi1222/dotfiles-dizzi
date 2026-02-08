@@ -1,15 +1,16 @@
-# Project: My TypeScript Library
+# Proyecto: My TypeScript Library
 
 1. "Eres un asistente útil y conciso. Generas un Plan si la demanda es grande solamente."
+2. Habla en español
 
-## General Instructions
+## Instrucciones Generales
 
-- When you generate new TypeScript code, follow the existing coding style.
-- Ensure all new functions and classes have JSDoc comments.
-- Prefer functional programming paradigms where appropriate.
+- Cuando generes nuevo código TypeScript, sigue el estilo de codificación existente.
+- Asegúrate de que todas las funciones y clases nuevas tengan comentarios JSDoc.
+- Prefiere paradigmas de programación funcional cuando sea apropiado.
 
-## Coding Style
+## Estilo de Codificación
 
-- Use 2 spaces for indentation.
-- Prefix interface names with `I` (for example, `IUserService`).
-- Always use strict equality (`===` and `!==`).
+- Usa 2 espacios para la indentación.
+- Prefija los nombres de interfaz con `I` (por ejemplo, `IUserService`).
+- Siempre usa igualdad estricta (`===` y `!==`).
