@@ -600,9 +600,9 @@ esac
 # ═══════════════════════════════════════════════════════════
 # Aplicaciones de música y ocio
 # ═══════════════════════════════════════════════════════════
-print_installing "Aplicaciones extra y de Música/OCIO, Discord/Telegram (solo binarios precompilados)"
+print_installing "Aplicaciones extra y de Música/OCIO, Youtube Music [pear-desktop], Discord, Soundbound (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  brave-bin spotify pear-desktop \
+  brave-bin spotify pear-desktop soundbound-app-bin \
   vencord-bin telegram-desktop-bin bitwarden gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
@@ -1371,7 +1371,7 @@ sudo pacman -S --needed --noconfirm \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code gemini-cli-git
+  claude-code gemini-cli-git aichat
 print_success "Gemini, TGPT, Docker-desktop, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
@@ -1601,8 +1601,7 @@ if [[ -d ~/dotfiles-dizzi ]]; then
 
   print_status "Aplicando dotfiles con stow..."
 
-  for pkg in niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons themes vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
-
+  for pkg in niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
     if [[ -d $pkg ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
@@ -1619,8 +1618,8 @@ rm -rf nvim
 # Recuperar cada submódulo
 git submodule update --init --recursive nvim
 
-echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch termix nvim...${RESET}"
-cd  nvim/.config/nvim  && git checkout termux
+echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
+cd  nvim/.config/nvim  && git checkout main
 cd  ../../../
 
   print_success "Dotfiles aplicados"
@@ -3241,7 +3240,7 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34: DESACTIVAR GESTOR DE LOGIN ACTUAL
+# PASO 33.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
 print_step "33.5/35: Desactivar Display Manager Actual"
 
@@ -3271,9 +3270,232 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 35: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# PASO 34: SNAPPER (SNAPSHOTS BTRFS) - SIN YAY
 # ═══════════════════════════════════════════════════════════
-print_step "34/35: Display Manager (GDM o SDDM)"
+print_step "34/35: Snapper (Snapshots BTRFS)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          📸 CONFIGURAR SNAPPER SNAPSHOTS 📸              ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Snapper permite crear snapshots automáticos del sistema:${NC}"
+echo -e "  ${MAGENTA}•${NC} Snapshots antes de actualizaciones (snap-pac)"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos cada hora/día"
+echo -e "  ${MAGENTA}•${NC} Rollback completo desde GRUB (grub-btrfs)"
+echo -e "  ${MAGENTA}•${NC} ${BOLD}SOLO funciona con sistemas BTRFS${NC}"
+echo
+echo -e "${YELLOW}⚠️  IMPORTANTE:${NC} Verifica que tu sistema use BTRFS:"
+echo -e "  ${CYAN}df -T / | grep btrfs${NC}"
+echo
+
+# Verificar sistema de archivos
+FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')
+FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
+FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
+
+echo -e "${CYAN}Sistema de archivos:${NC} ${BOLD}$FS_TYPE${NC}"
+echo -e "${CYAN}Espacio libre en /:${NC} ${BOLD}$FREE_SPACE${NC}"
+echo
+
+if [[ "$FS_TYPE" == "btrfs" ]]; then
+  echo -e "${GREEN}✓ Sistema BTRFS detectado${NC}"
+  
+  # Verificar espacio
+  if [[ $FREE_SPACE_KB -lt 10485760 ]]; then  # <10GB
+    echo -e "${YELLOW}⚠️  Advertencia: Menos de 10GB libres${NC}"
+    echo -e "${YELLOW}   Snapshots pueden consumir espacio rápidamente${NC}"
+  fi
+  
+  echo
+  read -p "¿Instalar y configurar Snapper? [S/n]: " install_snapper
+else
+  echo -e "${RED}✗ Sistema no usa BTRFS (detectado: $FS_TYPE)${NC}"
+  echo -e "${YELLOW}Snapper requiere BTRFS para funcionar correctamente${NC}"
+  echo
+  read -p "¿Instalar Snapper de todos modos? [s/N]: " install_snapper
+fi
+
+if [[ ! "$install_snapper" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Snapper + Herramientas"
+
+  # ═══════════════════════════════════════════════════════════
+  # INSTALACIÓN SIN YAY (solo repos oficiales)
+  # ═══════════════════════════════════════════════════════════
+  print_installing "snapper + snap-pac + grub-btrfs"
+  sudo pacman -S --needed --noconfirm \
+    snapper \
+    snap-pac \
+    grub-btrfs
+
+  print_success "Snapper + herramientas instaladas"
+  print_warning "snapper-gui (AUR) omitido - instalar después con: yay -S snapper-gui-git"
+
+  # ═══════════════════════════════════════════════════════════
+  # CONFIGURACIÓN SOLO PARA BTRFS
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$FS_TYPE" == "btrfs" ]]; then
+    print_header "Configurando Snapper para BTRFS"
+    
+    # ───────────────────────────────────────────────────────────
+    # PASO 1: Preparar directorio .snapshots
+    # ───────────────────────────────────────────────────────────
+    print_status "Verificando directorio /.snapshots..."
+    
+    if [[ -d "/.snapshots" ]]; then
+      if ! mountpoint -q "/.snapshots"; then
+        print_warning "/.snapshots existe pero NO es subvolumen"
+        sudo mv /.snapshots /.snapshots.backup.$(date +%s)
+        print_status "Movido a /.snapshots.backup.*"
+      else
+        print_status "/.snapshots ya es subvolumen, omitiendo"
+      fi
+    fi
+    
+    # ───────────────────────────────────────────────────────────
+    # PASO 2: Crear configuración para root
+    # ───────────────────────────────────────────────────────────
+    print_installing "Configurando snapper para /"
+    
+    if ! snapper list-configs 2>/dev/null | grep -q "root"; then
+      sudo snapper create-config /
+      
+      if [[ $? -eq 0 ]]; then
+        print_success "Configuración 'root' creada"
+      else
+        print_error "Error creando configuración"
+        print_warning "Si hay backup, restaurar: sudo mv /.snapshots.backup.* /.snapshots"
+      fi
+    else
+      print_warning "Configuración 'root' ya existe"
+    fi
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 3: Configurar límites de snapshots
+    # ───────────────────────────────────────────────────────────
+    print_status "Configurando límites de snapshots..."
+    
+    sudo snapper -c root set-config "NUMBER_LIMIT=50"
+    sudo snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=10"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_HOURLY=24"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_DAILY=7"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_WEEKLY=4"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_MONTHLY=12"
+    sudo snapper -c root set-config "TIMELINE_LIMIT_YEARLY=2"
+    
+    # Permitir al usuario gestionar snapshots
+    sudo snapper -c root set-config "ALLOW_USERS=$USER"
+    sudo snapper -c root set-config "SYNC_ACL=yes"
+    
+    print_success "Límites configurados"
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 4: Habilitar servicios automáticos
+    # ───────────────────────────────────────────────────────────
+    print_status "Habilitando servicios automáticos..."
+    
+    sudo systemctl enable --now snapper-timeline.timer
+    sudo systemctl enable --now snapper-cleanup.timer
+    sudo systemctl enable --now grub-btrfsd  # Auto-detecta snapshots para GRUB
+    
+    print_success "Servicios habilitados"
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 5: Configurar /home si es subvolumen separado
+    # ───────────────────────────────────────────────────────────
+    if mount | grep -qE "subvol.*@home"; then
+      print_status "Detectado subvolumen @home separado"
+      read -p "¿Configurar snapper para /home también? [S/n]: " config_home
+      
+      if [[ ! "$config_home" =~ ^[Nn]$ ]]; then
+        if ! snapper list-configs 2>/dev/null | grep -q "home"; then
+          sudo snapper create-config /home
+          sudo snapper -c home set-config "NUMBER_LIMIT=30"
+          sudo snapper -c home set-config "TIMELINE_LIMIT_DAILY=7"
+          sudo snapper -c home set-config "ALLOW_USERS=$USER"
+          sudo snapper -c home set-config "SYNC_ACL=yes"
+          print_success "Configuración 'home' creada"
+        fi
+      fi
+    fi
+
+    # ───────────────────────────────────────────────────────────
+    # PASO 6: Crear primer snapshot
+    # ───────────────────────────────────────────────────────────
+    print_status "Creando primer snapshot..."
+    sudo snapper -c root create --description "Configuración inicial SDDM + Snapper - $(date +'%Y-%m-%d %H:%M')"
+    
+    # Actualizar GRUB para incluir el snapshot
+    print_status "Actualizando GRUB (detectar snapshots)..."
+    sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || \
+      print_warning "Error actualizando GRUB (normal en algunos sistemas)"
+    
+    print_success "Primer snapshot creado"
+
+    # ═══════════════════════════════════════════════════════════
+    # GUÍA DE USO
+    # ═══════════════════════════════════════════════════════════
+    echo
+    echo -e "${GREEN}${BOLD}✨ SNAPPER - GUÍA COMPLETA DE USO ✨${NC}"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Comandos básicos:${NC}"
+    echo -e "  ${YELLOW}snapper list${NC}                        # Listar snapshots (SIN sudo)"
+    echo -e "  ${YELLOW}snapper create -d \"Mi snapshot\"${NC}     # Crear snapshot manual"
+    echo -e "  ${YELLOW}sudo snapper delete NUM${NC}              # Eliminar snapshot"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Rollback desde GRUB:${NC}"
+    echo -e "  ${MAGENTA}1.${NC} Reinicia el sistema"
+    echo -e "  ${MAGENTA}2.${NC} En GRUB: ${CYAN}\"Arch Linux snapshots\"${NC}"
+    echo -e "  ${MAGENTA}3.${NC} Selecciona el snapshot deseado"
+    echo -e "  ${MAGENTA}4.${NC} Bootea normalmente"
+    echo
+    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${YELLOW}Snapshots automáticos:${NC}"
+    echo -e "  ${MAGENTA}•${NC} Cada hora (mantiene 24)"
+    echo -e "  ${MAGENTA}•${NC} Cada día (mantiene 7)"
+    echo -e "  ${MAGENTA}•${NC} Antes de pacman -Syu (snap-pac)"
+    echo -e "  ${MAGENTA}•${NC} Límite total: 50 snapshots"
+    echo
+    echo -e "${CYAN}Ubicación:${NC} ${YELLOW}/.snapshots/${NC}"
+    echo
+
+    # ═══════════════════════════════════════════════════════════
+    # CREAR ALIASES
+    # ═══════════════════════════════════════════════════════════
+    if [[ -f ~/.zshrc ]]; then
+      if ! grep -q "# Snapper aliases" ~/.zshrc; then
+        cat >> ~/.zshrc <<'ALIASES'
+
+# Snapper aliases
+alias snls='snapper list'
+alias sncreate='snapper create -d'
+alias sndelete='sudo snapper delete'
+alias snundo='sudo snapper undochange'
+alias snrollback='sudo snapper rollback'
+alias snconfigs='snapper list-configs'
+alias snstatus='systemctl status snapper-timeline.timer snapper-cleanup.timer grub-btrfsd'
+ALIASES
+        print_success "Aliases agregados a .zshrc"
+      fi
+    fi
+
+  else
+    # Sistema no-BTRFS
+    print_warning "Sistema no-BTRFS: Snapper instalado pero NO configurado"
+    echo
+    echo -e "${YELLOW}Alternativa para ext4:${NC} ${CYAN}sudo pacman -S timeshift${NC}"
+  fi
+
+else
+  print_warning "Snapper omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.5: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Display Manager (GDM o SDDM)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
@@ -3420,6 +3642,200 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 34.9: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
+# ═══════════════════════════════════════════════════════════
+function configure_swap() {
+  print_step "34.9/35: Configurar Swap Automático"
+
+  echo
+  echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾          ║${NC}"
+  echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+  echo
+
+  # Detectar RAM total del sistema
+  local TOTAL_RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+  local TOTAL_RAM_GB=$((TOTAL_RAM_KB / 1024 / 1024))
+  local CURRENT_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+  local CURRENT_SWAP_GB=$((CURRENT_SWAP_KB / 1024 / 1024))
+
+  echo -e "${CYAN}Sistema detectado:${NC}"
+  echo -e "  ${MAGENTA}•${NC} RAM total: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swap actual: ${BOLD}${CURRENT_SWAP_GB}GB${NC}"
+
+  # Calcular swap recomendado
+  local RECOMMENDED_SWAP
+  if [[ $TOTAL_RAM_GB -le 8 ]]; then
+    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2))  # 2x RAM si ≤8GB
+  elif [[ $TOTAL_RAM_GB -le 16 ]]; then
+    RECOMMENDED_SWAP=$TOTAL_RAM_GB          # 1x RAM si ≤16GB
+  else
+    RECOMMENDED_SWAP=16                     # Máximo 16GB si >16GB RAM
+  fi
+
+  echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
+
+  # Verificar espacio libre en disco
+  local FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
+  local FREE_SPACE_GB=$((FREE_SPACE_KB / 1024 / 1024))
+  echo -e "  ${MAGENTA}•${NC} Espacio libre en /: ${BOLD}${FREE_SPACE_GB}GB${NC}"
+
+  # Verificar si ya hay suficiente swap
+  if [[ $CURRENT_SWAP_GB -ge $RECOMMENDED_SWAP ]]; then
+    echo
+    echo -e "${GREEN}✓ Swap actual (${CURRENT_SWAP_GB}GB) es suficiente${NC}"
+    read -p "¿Configurar swap adicional de todos modos? [s/N]: " force_swap
+    if [[ ! "$force_swap" =~ ^[Ss]$ ]]; then
+      print_warning "Configuración de swap omitida"
+      return
+    fi
+  fi
+
+  # Verificar espacio suficiente
+  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2))  # +2GB de margen
+  if [[ $FREE_SPACE_GB -lt $REQUIRED_SPACE ]]; then
+    echo
+    echo -e "${RED}⚠️  Espacio insuficiente:${NC}"
+    echo -e "  Requerido: ${RED}${REQUIRED_SPACE}GB${NC}"
+    echo -e "  Disponible: ${YELLOW}${FREE_SPACE_GB}GB${NC}"
+    echo
+    read -p "¿Crear swap más pequeño de ${FREE_SPACE_GB}GB? [s/N]: " create_smaller
+    if [[ "$create_smaller" =~ ^[Ss]$ ]]; then
+      RECOMMENDED_SWAP=$((FREE_SPACE_GB - 1))
+    else
+      print_warning "Configuración de swap omitida por falta de espacio"
+      return
+    fi
+  fi
+
+echo
+echo -e "${CYAN}Opciones de swap:${NC}"
+echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
+echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
+echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
+echo -e "  ${MAGENTA}4.${NC} Omitir configuración"
+echo
+read -p "Seleccionar opción [1-4]: " swap_choice
+
+case "$swap_choice" in
+  1|3)
+    print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
+    
+    # Verificar si ya existe swapfile
+    if [[ -f /swapfile ]]; then
+      print_warning "Ya existe /swapfile"
+      sudo swapoff /swapfile 2>/dev/null || true
+      sudo rm -f /swapfile
+      print_status "Swapfile anterior eliminado"
+    fi
+    
+    # Crear swapfile con fallocate (más rápido que dd)
+    print_installing "Creando swapfile de ${RECOMMENDED_SWAP}GB"
+    if sudo fallocate -l ${RECOMMENDED_SWAP}G /swapfile 2>/dev/null; then
+      print_success "Swapfile creado con fallocate"
+    else
+      print_status "fallocate falló, usando dd..."
+      sudo dd if=/dev/zero of=/swapfile bs=1M count=$((RECOMMENDED_SWAP * 1024)) status=progress
+    fi
+    
+    # Configurar permisos y formato
+    print_status "Configurando swapfile..."
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    
+    # Agregar a /etc/fstab si no existe
+    if ! grep -q "/swapfile" /etc/fstab; then
+      echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+      print_success "Swapfile agregado a /etc/fstab"
+    fi
+    
+    print_success "Swapfile de ${RECOMMENDED_SWAP}GB configurado"
+    ;;
+esac
+
+case "$swap_choice" in
+  2|3)
+    print_header "Configurando Zswap (Compresión en RAM)"
+    
+    # Verificar soporte del kernel
+    if [[ ! -f /sys/module/zswap/parameters/enabled ]]; then
+      print_warning "Zswap no soportado por el kernel actual"
+    else
+      # Habilitar zswap
+      print_installing "Habilitando zswap"
+      echo 1 | sudo tee /sys/module/zswap/parameters/enabled
+      
+      # Configurar algoritmo de compresión (lz4 es más rápido)
+      echo lz4 | sudo tee /sys/module/zswap/parameters/compressor 2>/dev/null || true
+      echo zbud | sudo tee /sys/module/zswap/parameters/zpool 2>/dev/null || true
+      
+      # Configurar porcentaje de RAM para zswap (20% por defecto)
+      echo 20 | sudo tee /sys/module/zswap/parameters/max_pool_percent
+      
+      # Hacer permanente agregando a kernel parameters
+      if [[ -f /etc/default/grub ]]; then
+        if ! grep -q "zswap.enabled=1" /etc/default/grub; then
+          sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="zswap.enabled=1 zswap.compressor=lz4 zswap.max_pool_percent=20 /' /etc/default/grub
+          print_status "Parámetros zswap agregados a GRUB"
+          print_warning "Ejecuta 'sudo grub-mkconfig -o /boot/grub/grub.cfg' después del reinicio"
+        fi
+      fi
+      
+      print_success "Zswap configurado (20% RAM, compresión lz4)"
+    fi
+    ;;
+esac
+
+if [[ "$swap_choice" == "4" ]]; then
+  print_warning "Configuración de swap omitida"
+else
+  # Configurar swappiness (agresividad del swap)
+  print_status "Configurando swappiness..."
+  
+  # Swappiness recomendado según RAM
+  if [[ $TOTAL_RAM_GB -ge 16 ]]; then
+    SWAPPINESS=10  # Menos agresivo con mucha RAM
+  elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
+    SWAPPINESS=20  # Moderado con RAM media
+  else
+    SWAPPINESS=60  # Más agresivo con poca RAM
+  fi
+  
+  echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
+  sudo sysctl vm.swappiness=$SWAPPINESS
+  
+  print_success "Swappiness configurado a $SWAPPINESS"
+  
+  # Mostrar estado final
+  echo
+  echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
+  echo
+  NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+  NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
+  echo -e "${CYAN}Estado actual:${NC}"
+  echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
+  
+  if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
+    ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
+    echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
+  fi
+  
+  echo
+  echo -e "${YELLOW}Comandos útiles:${NC}"
+  echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
+  echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
+  echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
+  echo
+  fi
+}
+
+# Llamar la función de swap
+configure_swap
+
+# ═══════════════════════════════════════════════════════════
 # PASO 35: LIMPIEZA FINAL
 # ═══════════════════════════════════════════════════════════
 print_step "35/35: Limpieza Final"
@@ -3432,6 +3848,13 @@ yay -Sc --noconfirm 2>/dev/null || true
 sudo pacman -Sc --noconfirm 2>/dev/null || true
 rm -rf ~/.cache/yay 2>/dev/null || true
 rm -rf /tmp/sddm-astronaut-theme 2>/dev/null || true
+hyprctl reload # o niri reload
+
+# Reiniciar Waybar desacoplado de la terminal
+print_status "Reiniciando Waybar..."
+killall waybar 2>/dev/null || true
+nohup waybar >/dev/null 2>&1 & # NOHUP LA SOLUCION PARA QUE NO SE CIERRE AL CERRAR TERMINAL
+sleep 1
 
 print_success "Limpieza completada"
 
