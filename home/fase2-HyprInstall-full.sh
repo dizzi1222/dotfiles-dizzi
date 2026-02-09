@@ -1371,7 +1371,7 @@ sudo pacman -S --needed --noconfirm \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code gemini-cli-git aichat
+  claude-code clawdbot gemini-cli-git aichat
 print_success "Gemini, TGPT, Docker-desktop, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
@@ -3322,13 +3322,27 @@ if [[ ! "$install_snapper" =~ ^[Nn]$ ]]; then
   # ═══════════════════════════════════════════════════════════
   # INSTALACIÓN SIN YAY (solo repos oficiales)
   # ═══════════════════════════════════════════════════════════
-  print_installing "snapper + snap-pac + grub-btrfs"
+  print_installing "snapper + snap-pac + grub-btrfs + timeshift"
   sudo pacman -S --needed --noconfirm \
     snapper \
     snap-pac \
-    grub-btrfs
+    grub-btrfs \
+    timeshift
+    
+print_success "Snapper + Timeshift (repos oficiales) instalados"
 
-  print_success "Snapper + herramientas instaladas"
+# Herramientas GUI desde AUR
+print_installing "GUIs para gestión de snapshots (AUR)"
+
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  snapper-gui-git \
+  btrfs-assistant \
+  timeshift-autosnap \
+  2>/dev/null || print_warning "Algunas GUIs fallaron (instalar después manualmente)"
+
+  print_success "Herramientas de snapshots completadas"
+
+  print_success "Snapper + Otras herramientas Comodas (Alt) instaladas"
   print_warning "snapper-gui (AUR) omitido - instalar después con: yay -S snapper-gui-git"
 
   # ═══════════════════════════════════════════════════════════
@@ -3490,6 +3504,17 @@ ALIASES
 
 else
   print_warning "Snapper omitido"
+fi
+# DESPUÉS DE LA LÍNEA 2280 (donde termina configuración de Snapper)
+echo
+read -p "¿Instalar Btrfs Assistant (GUI recomendada)? [S/n]: " install_btrfs_gui
+
+if [[ ! "$install_btrfs_gui" =~ ^[Nn]$ ]]; then
+  print_installing "Btrfs Assistant (GUI moderna)"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None btrfs-assistant
+  print_success "Btrfs Assistant instalado → Ejecuta: btrfs-assistant"
+else
+  print_warning "GUI omitida (instalar después: yay -S btrfs-assistant)"
 fi
 
 # ═══════════════════════════════════════════════════════════
