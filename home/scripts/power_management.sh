@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\n\n\n\n" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
+CHOICE=$(printf "\n\n\n\n󰒲\n" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
 
 case "$CHOICE" in
 "")
@@ -26,6 +26,14 @@ case "$CHOICE" in
   cd /$HOME
   systemctl suspend
   ;;
+"󰒲")
+  # hibernar
+  cd /$HOME
+  sync # Fuerza escritura a disco
+  sleep 0.5
+  # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
+  sudo systemctl hibernate
+  ;;
 "")
   cd /$HOME
   hyprctl dispatch exit
@@ -41,3 +49,4 @@ case "$CHOICE" in
   exit 1
   ;;
 esac
+
