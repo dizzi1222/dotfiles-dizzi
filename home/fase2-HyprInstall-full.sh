@@ -1371,7 +1371,7 @@ sudo pacman -S --needed --noconfirm \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code gemini-cli-git aichat
+  claude-code clawdbot gemini-cli-git aichat
 print_success "Gemini, TGPT, Docker-desktop, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
