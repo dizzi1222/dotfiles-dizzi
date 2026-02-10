@@ -3083,9 +3083,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 32: RCLONE GOOGLE DRIVE (OPCIONAL)
+# PASO 31.5: RCLONE GOOGLE DRIVE (OPCIONAL)
 # ═══════════════════════════════════════════════════════════
-print_step "32/35: Rclone Google Drive (Opcional)"
+print_step "31.5/35: Rclone Google Drive (Opcional)"
 
 echo
 read -p "¿Configurar Rclone para Google Drive? [s/N]: " setup_rclone
@@ -3175,9 +3175,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 33: CONFIGURACIÓN AUTOMÁTICA DE TEMAS QT/GTK
+# PASO 32: CONFIGURACIÓN AUTOMÁTICA DE TEMAS QT/GTK
 # ═══════════════════════════════════════════════════════════
-print_step "33/35: Configuración Automática de Temas"
+print_step "32/35: Configuración Automática de Temas"
 
 echo
 read -p "¿Configurar temas Qt/GTK automáticamente? [S/n]: " config_themes
@@ -3240,9 +3240,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 33.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
+# PASO 32.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
-print_step "33.5/35: Desactivar Display Manager Actual"
+print_step "32.5/35: Desactivar Display Manager Actual"
 
 # Detectar gestor actual
 CURRENT_DM=""
@@ -3270,198 +3270,11 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34: CONFIGURAR SWAP
+# PASO 33: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
 # ═══════════════════════════════════════════════════════════
-configure_swap
 
-# ═══════════════════════════════════════════════════════════
-# PASO 34.5: SISTEMA UNIFICADO DE BACKUPS (TIMESHIFT/SNAPPER)
-# ═══════════════════════════════════════════════════════════
-print_step "34.5/35: Sistema Unificado de Backups (Snapshots)"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║      🔄 SISTEMA UNIFICADO DE SNAPSHOTS/BACKUPS 🔄        ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Sistema modular y completo de backups/snapshots:${NC}"
-echo -e "  ${MAGENTA}•${NC} Detección automática de filesystem (ext4/Btrfs)"
-echo -e "  ${MAGENTA}•${NC} Timeshift para ext4 (rsync incremental)"
-echo -e "  ${MAGENTA}•${NC} Snapper para Btrfs (snapshots nativos)"
-echo -e "  ${MAGENTA}•${NC} Límite de 5GB máximo para ahorro de espacio"
-echo -e "  ${MAGENTA}•${NC} Snapshots automáticos antes de actualizaciones"
-echo -e "  ${MAGENTA}•${NC} Opción de desinstalación/reversión completa"
-echo
-
-# Ejecutar script de configuración de backups
-if [[ -f ~/dotfiles-dizzi/setup-backup-system.sh ]]; then
-  bash ~/dotfiles-dizzi/setup-backup-system.sh
-else
-  print_error "Script de configuración no encontrado: ~/dotfiles-dizzi/setup-backup-system.sh"
-  read -p "¿Continuar sin configurar backups? [S/n]: " skip_backups
-
-  if [[ "$skip_backups" =~ ^[Nn]$ ]]; then
-    print_error "Backup system setup abortado"
-  fi
-fi
-
-echo
-print_success "Configuración de backups completada"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 34.9: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
-# ═══════════════════════════════════════════════════════════
-print_step "34.9/35: Display Manager (GDM o SDDM)"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️              ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Opciones disponibles:${NC}"
-echo
-echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
-echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
-echo -e "  ${MAGENTA}•${NC} Soporte Wayland nativo"
-echo -e "  ${MAGENTA}•${NC} Más ligero (~100MB RAM)"
-echo
-echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
-echo -e "  ${MAGENTA}•${NC} ${BOLD}Setup.sh interactivo funcional${NC}"
-echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
-echo -e "  ${MAGENTA}•${NC} Wallpapers animados"
-echo -e "  ${MAGENTA}•${NC} Teclado virtual integrado"
-echo -e "  ${MAGENTA}•${NC} Instalación robusta y confiable"
-echo
-echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
-echo
-read -p "Seleccionar Display Manager [1=GDM, 2=SDDM, 3=Ninguno]: " dm_choice
-
-if [[ "$dm_choice" == "2" ]]; then
-  print_header "🚀 Instalando SDDM + Astronaut Theme (Versión Mejorada)"
-
-  # Paso 1: Instalar SDDM y dependencias
-  print_installing "SDDM + Dependencias Qt6"
-  sudo pacman -S --needed --noconfirm \
-    sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
-
-  print_success "SDDM instalado"
-
-  # Paso 2: Limpiar instalación anterior si existe
-  print_status "Limpiando instalaciones previas del tema..."
-  sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
-  rm -rf /tmp/sddm-astronaut-theme
-
-  # Paso 3: Clonar tema en /tmp
-  print_installing "Clonando tema Astronaut"
-  cd /tmp
-  git clone --depth 1 https://github.com/keyitdev/sddm-astronaut-theme.git
-  cd sddm-astronaut-theme
-
-  print_success "Tema clonado"
-
-  # Paso 4: Verificar que setup.sh existe
-  if [[ ! -f "setup.sh" ]]; then
-    print_error "Error: setup.sh no encontrado"
-    print_warning "Instalando tema manualmente..."
-
-    # Fallback: instalación manual
-    sudo cp -r /tmp/sddm-astronaut-theme /usr/share/sddm/themes/
-
-    if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
-      sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
-      fc-cache -fv >/dev/null
-    fi
-  else
-    # Paso 5: Hacer setup.sh ejecutable
-    chmod +x setup.sh
-
-    # Paso 6: Ejecutar setup.sh INTERACTIVO
-    print_status "Iniciando configuración interactiva del tema..."
-    echo
-    echo -e "${CYAN}╔═══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║  ${BOLD}CONFIGURACIÓN INTERACTIVA DEL TEMA ASTRONAUT${NC}${CYAN}    ║${NC}"
-    echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
-    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles          ║${NC}"
-    echo -e "${CYAN}║  • Personalizar colores y apariencia                 ║${NC}"
-    echo -e "${CYAN}║  • Configurar wallpaper                              ║${NC}"
-    echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
-    echo
-    echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
-    echo -e "  ${GREEN}1.${NC} classic           ${GREEN}6.${NC} penguin"
-    echo -e "  ${GREEN}2.${NC} astronaut         ${GREEN}7.${NC} jake_the_dog"
-    echo -e "  ${GREEN}3.${NC} future            ${GREEN}8.${NC} rick_and_morty"
-    echo -e "  ${GREEN}4.${NC} cyberpunk         ${GREEN}9.${NC} space_ship"
-    echo -e "  ${GREEN}5.${NC} nixos            ${GREEN}10.${NC} custom"
-    echo
-    echo -e "${CYAN}${BOLD}Presiona Enter para continuar con la configuración...${NC}"
-    read -p ""
-
-    # Ejecutar setup.sh con sudo (necesario para copiar a /usr/share)
-    sudo bash setup.sh
-
-    print_success "Tema configurado mediante setup.sh"
-  fi
-
-  # Paso 7: Configurar SDDM para usar el tema
-  print_status "Configurando SDDM..."
-
-  sudo tee /etc/sddm.conf >/dev/null <<EOF
-[Theme]
-Current=sddm-astronaut-theme
-
-[General]
-InputMethod=qtvirtualkeyboard
-EOF
-
-  # Paso 8: Configurar teclado virtual en conf.d
-  sudo mkdir -p /etc/sddm.conf.d
-  sudo tee /etc/sddm.conf.d/virtualkbd.conf >/dev/null <<EOF
-[General]
-InputMethod=qtvirtualkeyboard
-EOF
-
-  print_success "Configuración de SDDM completada"
-
-  # Paso 9: Copiar fuentes si existen
-  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
-    print_status "Instalando fuentes del tema..."
-    sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
-    fc-cache -fv >/dev/null
-    print_success "Fuentes instaladas"
-  fi
-
-  # Paso 10: Habilitar servicio SDDM
-  print_status "Habilitando servicio SDDM..."
-  sudo systemctl enable sddm
-  print_success "SDDM habilitado"
-
-  # Resumen final
-  echo
-  echo -e "${GREEN}${BOLD}✨ SDDM + Astronaut Theme instalado correctamente ✨${NC}"
-  echo
-  echo -e "${CYAN}Comandos útiles:${NC}"
-  echo -e "  ${YELLOW}•${NC} Probar tema: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
-  echo -e "  ${YELLOW}•${NC} Editar config: ${YELLOW}sudo nano /etc/sddm.conf${NC}"
-  echo -e "  ${YELLOW}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
-  echo
-
-elif [[ "$dm_choice" == "1" ]]; then
-  print_header "Instalando GDM"
-
-  print_installing "GDM (GNOME Display Manager)"
-  sudo pacman -S --needed --noconfirm gdm
-  sudo systemctl enable gdm
-  print_success "GDM habilitado"
-else
-  print_warning "Display Manager omitido (manteniendo actual)"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 34: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
-# ═══════════════════════════════════════════════════════════
 function configure_swap() {
-  print_step "34/35: Configurar Swap Automático"
+  print_step "33/35: Configurar Swap Automático"
 
   echo
   echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
@@ -3702,9 +3515,9 @@ else
 }
 
 # Llamar la función de swap
-# ═══════════════════════════════════════════════════════════
-# PASO 34.8: CONFIGURAR HIBERNATION (SLEEP TO DISK)
-# ═══════════════════════════════════════════════════════════
+configure_swap
+
+# PASO 33.5: CONFIGURAR HIBERNATION (SLEEP TO DISK)
 function configure_hibernation() {
   # Verificar si se saltó por eliminación de swap
   if [[ "$SKIP_HIBERNATION" == "true" ]]; then
@@ -3712,11 +3525,11 @@ function configure_hibernation() {
     return 0
   fi
 
-  print_step "34.8/35: Configurar Hibernation (Sleep to Disk)"
+  print_step "33.5/35: Configurar Hibernation (Sleep to Disk)"
 
   echo
   echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤             ║${NC}"
+  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤                ║${NC}"
   echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
   echo
 
@@ -3906,6 +3719,189 @@ function configure_hibernation() {
 configure_hibernation
 
 # ═══════════════════════════════════════════════════════════
+# PASO 34: SISTEMA UNIFICADO DE BACKUPS (TIMESHIFT/SNAPPER)
+# ═══════════════════════════════════════════════════════════
+print_step "34/35: Sistema Unificado de Backups (Snapshots)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║      🔄 SISTEMA UNIFICADO DE SNAPSHOTS/BACKUPS 🔄         ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Sistema modular y completo de backups/snapshots:${NC}"
+echo -e "  ${MAGENTA}•${NC} Detección automática de filesystem (ext4/Btrfs)"
+echo -e "  ${MAGENTA}•${NC} Timeshift para ext4 (rsync incremental)"
+echo -e "  ${MAGENTA}•${NC} Snapper para Btrfs (snapshots nativos)"
+echo -e "  ${MAGENTA}•${NC} Límite de 5GB máximo para ahorro de espacio"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos antes de actualizaciones"
+echo -e "  ${MAGENTA}•${NC} Opción de desinstalación/reversión completa"
+echo
+
+# Ejecutar script de configuración de backups
+if [[ -f ~/dotfiles-dizzi/setup-backup-system.sh ]]; then
+  bash ~/dotfiles-dizzi/setup-backup-system.sh
+else
+  print_error "Script de configuración no encontrado: ~/dotfiles-dizzi/setup-backup-system.sh"
+  read -p "¿Continuar sin configurar backups? [S/n]: " skip_backups
+
+  if [[ "$skip_backups" =~ ^[Nn]$ ]]; then
+    print_error "Backup system setup abortado"
+  fi
+fi
+
+echo
+print_success "Configuración de backups completada"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.5: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Display Manager (GDM o SDDM)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️              ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Opciones disponibles:${NC}"
+echo
+echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
+echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
+echo -e "  ${MAGENTA}•${NC} Soporte Wayland nativo"
+echo -e "  ${MAGENTA}•${NC} Más ligero (~100MB RAM)"
+echo
+echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
+echo -e "  ${MAGENTA}•${NC} ${BOLD}Setup.sh interactivo funcional${NC}"
+echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
+echo -e "  ${MAGENTA}•${NC} Wallpapers animados"
+echo -e "  ${MAGENTA}•${NC} Teclado virtual integrado"
+echo -e "  ${MAGENTA}•${NC} Instalación robusta y confiable"
+echo
+echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
+echo
+read -p "Seleccionar Display Manager [1=GDM, 2=SDDM, 3=Ninguno]: " dm_choice
+
+if [[ "$dm_choice" == "2" ]]; then
+  print_header "🚀 Instalando SDDM + Astronaut Theme (Versión Mejorada)"
+
+  # Paso 1: Instalar SDDM y dependencias
+  print_installing "SDDM + Dependencias Qt6"
+  sudo pacman -S --needed --noconfirm \
+    sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
+
+  print_success "SDDM instalado"
+
+  # Paso 2: Limpiar instalación anterior si existe
+  print_status "Limpiando instalaciones previas del tema..."
+  sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
+  rm -rf /tmp/sddm-astronaut-theme
+
+  # Paso 3: Clonar tema en /tmp
+  print_installing "Clonando tema Astronaut"
+  cd /tmp
+  git clone --depth 1 https://github.com/keyitdev/sddm-astronaut-theme.git
+  cd sddm-astronaut-theme
+
+  print_success "Tema clonado"
+
+  # Paso 4: Verificar que setup.sh existe
+  if [[ ! -f "setup.sh" ]]; then
+    print_error "Error: setup.sh no encontrado"
+    print_warning "Instalando tema manualmente..."
+
+    # Fallback: instalación manual
+    sudo cp -r /tmp/sddm-astronaut-theme /usr/share/sddm/themes/
+
+    if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
+      sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
+      fc-cache -fv >/dev/null
+    fi
+  else
+    # Paso 5: Hacer setup.sh ejecutable
+    chmod +x setup.sh
+
+    # Paso 6: Ejecutar setup.sh INTERACTIVO
+    print_status "Iniciando configuración interactiva del tema..."
+    echo
+    echo -e "${CYAN}╔═══════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║  ${BOLD}CONFIGURACIÓN INTERACTIVA DEL TEMA ASTRONAUT${NC}${CYAN}    ║${NC}"
+    echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
+    echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
+    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles          ║${NC}"
+    echo -e "${CYAN}║  • Personalizar colores y apariencia                 ║${NC}"
+    echo -e "${CYAN}║  • Configurar wallpaper                              ║${NC}"
+    echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
+    echo
+    echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
+    echo -e "  ${GREEN}1.${NC} classic           ${GREEN}6.${NC} penguin"
+    echo -e "  ${GREEN}2.${NC} astronaut         ${GREEN}7.${NC} jake_the_dog"
+    echo -e "  ${GREEN}3.${NC} future            ${GREEN}8.${NC} rick_and_morty"
+    echo -e "  ${GREEN}4.${NC} cyberpunk         ${GREEN}9.${NC} space_ship"
+    echo -e "  ${GREEN}5.${NC} nixos            ${GREEN}10.${NC} custom"
+    echo
+    echo -e "${CYAN}${BOLD}Presiona Enter para continuar con la configuración...${NC}"
+    read -p ""
+
+    # Ejecutar setup.sh con sudo (necesario para copiar a /usr/share)
+    sudo bash setup.sh
+
+    print_success "Tema configurado mediante setup.sh"
+  fi
+
+  # Paso 7: Configurar SDDM para usar el tema
+  print_status "Configurando SDDM..."
+
+  sudo tee /etc/sddm.conf >/dev/null <<EOF
+[Theme]
+Current=sddm-astronaut-theme
+
+[General]
+InputMethod=qtvirtualkeyboard
+EOF
+
+  # Paso 8: Configurar teclado virtual en conf.d
+  sudo mkdir -p /etc/sddm.conf.d
+  sudo tee /etc/sddm.conf.d/virtualkbd.conf >/dev/null <<EOF
+[General]
+InputMethod=qtvirtualkeyboard
+EOF
+
+  print_success "Configuración de SDDM completada"
+
+  # Paso 9: Copiar fuentes si existen
+  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
+    print_status "Instalando fuentes del tema..."
+    sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
+    fc-cache -fv >/dev/null
+    print_success "Fuentes instaladas"
+  fi
+
+  # Paso 10: Habilitar servicio SDDM
+  print_status "Habilitando servicio SDDM..."
+  sudo systemctl enable sddm
+  print_success "SDDM habilitado"
+
+  # Resumen final
+  echo
+  echo -e "${GREEN}${BOLD}✨ SDDM + Astronaut Theme instalado correctamente ✨${NC}"
+  echo
+  echo -e "${CYAN}Comandos útiles:${NC}"
+  echo -e "  ${YELLOW}•${NC} Probar tema: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
+  echo -e "  ${YELLOW}•${NC} Editar config: ${YELLOW}sudo nano /etc/sddm.conf${NC}"
+  echo -e "  ${YELLOW}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
+  echo
+
+elif [[ "$dm_choice" == "1" ]]; then
+  print_header "Instalando GDM"
+
+  print_installing "GDM (GNOME Display Manager)"
+  sudo pacman -S --needed --noconfirm gdm
+  sudo systemctl enable gdm
+  print_success "GDM habilitado"
+else
+  print_warning "Display Manager omitido (manteniendo actual)"
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 35: LIMPIEZA FINAL
 # ═══════════════════════════════════════════════════════════
 print_step "35/35: Limpieza Final"
@@ -3979,10 +3975,6 @@ echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15mi
 echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
 echo -e "  ${CYAN}•${NC} Ollama: ${YELLOW}sudo pacman -S ollama && ollama pull qwen2.5:0.5b${NC}"
 echo
-echo -e "${GREEN}${BOLD}Dotfiles:${NC}"
-echo -e "  ${CYAN}•${NC} Aplicar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow .${NC}"
-echo -e "  ${CYAN}•${NC} Quitar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow -D .${NC}"
-echo -e "  ${CYAN}•${NC} Aplicar específico: ${YELLOW}cd ~/dotfiles-dizzi && stow hypr waybar rofi${NC}"
 echo
 echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
 echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
