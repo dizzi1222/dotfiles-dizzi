@@ -714,12 +714,12 @@ echo -e "${BOLD}${YELLOW}║        📱 WAYDROID + MAGISTV + ALTERNATIVAS TV �
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Waydroid permite ejecutar Android en Linux (Wayland native).${NC}"
-echo -e "${CYAN}Se incluye MagisTV con firma ya configurada.{{NC}"
+echo -e "${CYAN}Se incluye MagisTV con firma ya configurada.$NC}"
 echo
-echo -e "${BOLD}${GREEN}Requisitos:{{NC}"
-echo -e "  ${MAGENTA}•{{NC} 5GB+ de espacio libre"
-echo -e "  ${MAGENTA}•{{NC} CPU con soporte para virtualización (KVM)"
-echo -e "  ${MAGENTA}•{{NC} RAM: 4GB+ recomendado"
+echo -e "${BOLD}${GREEN}Requisitos:$NC}"
+echo -e "  ${MAGENTA}•$NC} 5GB+ de espacio libre"
+echo -e "  ${MAGENTA}•$NC} CPU con soporte para virtualización (KVM)"
+echo -e "  ${MAGENTA}•$NC} RAM: 4GB+ recomendado"
 echo
 read -p "¿Instalar Waydroid + MagisTV? [S/n]: " install_waydroid
 
@@ -744,10 +744,10 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   print_header "Inicializando Waydroid con Google Apps (~1.2GB)"
   print_warning "IMPORTANTE: NO CANCELES LA DESCARGA"
   echo
-  echo -e "${CYAN}Esto descargará:{{NC}"
-  echo -e "  ${MAGENTA}•{{NC} Sistema Android 13"
-  echo -e "  ${MAGENTA}•{{NC} Google Apps (Play Store, Gmail, etc.)"
-  echo -e "  ${MAGENTA}•{{NC} Duración estimada: 10-20 minutos"
+  echo -e "${CYAN}Esto descargará:$NC}"
+  echo -e "  ${MAGENTA}•$NC} Sistema Android 13"
+  echo -e "  ${MAGENTA}•$NC} Google Apps (Play Store, Gmail, etc.)"
+  echo -e "  ${MAGENTA}•$NC} Duración estimada: 10-20 minutos"
   echo
   read -p "Presiona Enter para iniciar (esto es IRREVERSIBLE)..."
 
@@ -788,18 +788,18 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   print_header "Instalando libhoudini (ARM Translation) - CRUCIAL"
 
   echo
-  echo -e "${BOLD}${CYAN}¿Por qué necesitas libhoudini?{{NC}"
-  echo -e "  ${MAGENTA}•{{NC} La mayoría de apps Android (incluida MagisTV) son ARM"
-  echo -e "  ${MAGENTA}•{{NC} Tu PC es x86_64 (Intel/AMD)"
-  echo -e "  ${MAGENTA}•{{NC} libhoudini traduce ARM → x86_64"
-  echo -e "  ${MAGENTA}•{{NC} Sin esto: error 'App not compatible'"
-  echo -e "  ${MAGENTA}•{{NC} Para más detalles ver: https://github.com/waydroid/waydroid/wiki/Installing-libhoudini O consulta la imagen abajo"
+  echo -e "${BOLD}${CYAN}¿Por qué necesitas libhoudini?$NC}"
+  echo -e "  ${MAGENTA}•$NC} La mayoría de apps Android (incluida MagisTV) son ARM"
+  echo -e "  ${MAGENTA}•$NC} Tu PC es x86_64 (Intel/AMD)"
+  echo -e "  ${MAGENTA}•$NC} libhoudini traduce ARM → x86_64"
+  echo -e "  ${MAGENTA}•$NC} Sin esto: error 'App not compatible'"
+  echo -e "  ${MAGENTA}•$NC} Para más detalles ver: https://github.com/waydroid/waydroid/wiki/Installing-libhoudini O consulta la imagen abajo"
   # O en heredoc
 cat <<"EOF"
 Instrucciones en: 
 https://raw.githubusercontent.com/casualsnek/waydroid_script/main/assets/img/README/image-20230430013148814.png
 EOF
-  echo -e "  ${MAGENTA}•{{NC} La imagen muestra otras dependencias aparte que te pueden servir. Y seleciona android 13 90% de ocasiones."
+  echo -e "  ${MAGENTA}•$NC} La imagen muestra otras dependencias aparte que te pueden servir. Y seleciona android 13 90% de ocasiones."
   echo
   read -p "¿Instalar libhoudini? [S/n]: " install_libhoudini
 
@@ -823,11 +823,11 @@ EOF
 
     print_status "Instalando libhoudini (esto toma 5-10 minutos)..."
     echo
-    echo -e "${CYAN}Sigue estos pasos en el menú interactivo:{{NC}"
-    echo -e "  ${MAGENTA}1.{{NC} Versión: {{${YELLOW}Android 13${NC}"
-    echo -e "  ${MAGENTA}2.{{NC} Acción: {{${YELLOW}Install{{NC}"
-    echo -e "  ${MAGENTA}3.{{NC} Marca {{${YELLOW}libhoudini{{NC} con ESPACIO"
-    echo -e "  ${MAGENTA}4.{{NC} Presiona ENTER"
+    echo -e "${CYAN}Sigue estos pasos en el menú interactivo:$NC}"
+    echo -e "  ${MAGENTA}1.$NC} Versión: ${YELLOW}Android 13${NC}"
+    echo -e "  ${MAGENTA}2.$NC} Acción: ${YELLOW}Install$NC}"
+    echo -e "  ${MAGENTA}3.$NC} Marca ${YELLOW}libhoudini$NC} con ESPACIO"
+    echo -e "  ${MAGENTA}4.$NC} Presiona ENTER"
     echo
 
     # Ejecutar script interactivo
@@ -854,22 +854,22 @@ EOF
   print_header "Certificación de Google Play (Opcional)"
 
   echo
-  echo -e "${BOLD}${CYAN}¿Por qué certificar?{{NC}"
-  echo -e "  ${MAGENTA}•{{NC} Acceder a Play Store premium"
-  echo -e "  ${MAGENTA}•{{NC} Instalar apps que requieren certificación"
-  echo -e "  {{${MAGENTA}•{{NC} NO es necesario para MagisTV (ya tiene firma)"
+  echo -e "${BOLD}${CYAN}¿Por qué certificar?$NC}"
+  echo -e "  ${MAGENTA}•$NC} Acceder a Play Store premium"
+  echo -e "  ${MAGENTA}•$NC} Instalar apps que requieren certificación"
+  echo -e "  ${MAGENTA}•$NC} NO es necesario para MagisTV (ya tiene firma)"
   echo
   read -p "¿Obtener Android ID para certificación? [s/N]: " get_device_id
 
   if [[ "$get_device_id" =~ ^[Ss]$ ]]; then
     echo
-    echo -e "${YELLOW}Opción A (Automática - Recomendada):{{NC}"
+    echo -e "${YELLOW}Opción A (Automática - Recomendada):$NC}"
     echo -e "  cd ~/waydroid_script"
     echo -e "  source venv/bin/activate"
     echo -e "  sudo venv/bin/python main.py"
-    echo -e "  → {{${CYAN}Get Google Device ID to Get Certified{{NC}"
+    echo -e "  → ${CYAN}Get Google Device ID to Get Certified$NC}"
     echo
-    echo -e "${YELLOW}Opción B (Manual):{{NC}"
+    echo -e "${YELLOW}Opción B (Manual):$NC}"
     echo -e "  waydroid show-full-ui"
     echo -e "  Settings → About phone → Copia Android ID"
     echo
@@ -879,7 +879,7 @@ EOF
       print_status "Abriendo herramienta automática..."
       cd ~/waydroid_script 2>/dev/null && {
         source venv/bin/activate 2>/dev/null
-        echo -e "${CYAN}Selecciona la opción de Device ID{{NC}"
+        echo -e "${CYAN}Selecciona la opción de Device ID$NC}"
         sudo venv/bin/python main.py
         deactivate
       } || print_warning "waydroid_script no encontrado, usa método B"
@@ -890,14 +890,14 @@ EOF
     fi
 
     echo
-    echo -e "${BOLD}${YELLOW}PASOS PARA CERTIFICAR:{{NC}"
-    echo -e "  {{${MAGENTA}1.{{NC} Obtén el Android ID (arriba)"
-    echo -e "  {{${MAGENTA}2.{{NC} Abre: {{${CYAN}https://www.google.com/android/uncertified/{{NC}"
-    echo -e "  {{${MAGENTA}3.{{NC} Pega el ID"
-    echo -e "  {{${MAGENTA}4.{{NC} Registra"
-    echo -e "  {{${RED}5.{{NC} {{${RED}ESPERA 10-20 MINUTOS{{NC} (a veces 1-2 horas)"
-    echo -e "  {{${MAGENTA}6.{{NC} Verifica: Play Store → Tu perfil → Play Protection"
-    echo -e "  {{${MAGENTA}7.{{NC} Debe decir: {{${GREEN}Device is certified{{NC}"
+    echo -e "${BOLD}${YELLOW}PASOS PARA CERTIFICAR:$NC}"
+    echo -e "  ${MAGENTA}1.$NC} Obtén el Android ID (arriba)"
+    echo -e "  ${MAGENTA}2.$NC} Abre: ${CYAN}https://www.google.com/android/uncertified/$NC}"
+    echo -e "  ${MAGENTA}3.$NC} Pega el ID"
+    echo -e "  ${MAGENTA}4.$NC} Registra"
+    echo -e "  ${RED}5.$NC} ${RED}ESPERA 10-20 MINUTOS$NC} (a veces 1-2 horas)"
+    echo -e "  ${MAGENTA}6.$NC} Verifica: Play Store → Tu perfil → Play Protection"
+    echo -e "  ${MAGENTA}7.$NC} Debe decir: ${GREEN}Device is certified$NC}"
     echo
 
     read -p "¿Ya certificaste? [s/N]: " certified
@@ -917,8 +917,8 @@ EOF
   print_header "Instalando MagisTV"
 
   echo
-  echo -e "${CYAN}MagisTV viene con firma ya configurada.{{NC}"
-  echo -e "${CYAN}Se instala directamente sin necesidad de setup adicional.{{NC}"
+  echo -e "${CYAN}MagisTV viene con firma ya configurada.$NC}"
+  echo -e "${CYAN}Se instala directamente sin necesidad de setup adicional.$NC}"
   echo
   read -p "¿Instalar MagisTV ahora? [S/n]: " install_magistv_app
 
@@ -935,12 +935,12 @@ EOF
     if [[ -z "$MAGISTV_APK" ]]; then
       print_warning "APK de MagisTV no encontrado"
       echo
-      echo -e "${CYAN}Descargalo desde:{{NC}"
-      echo -e "  {{${YELLOW}linktr.ee/MagisReddit{{NC}"
+      echo -e "${CYAN}Descargalo desde:$NC}"
+      echo -e "  ${YELLOW}linktr.ee/MagisReddit$NC}"
       echo -e "  (Selecciona versión Android)"
       echo
-      echo -e "${CYAN}Guarda como:{{NC}"
-      echo -e "  {{${YELLOW}~/Descargas/MAGIS_6.4.2.apk{{NC}"
+      echo -e "${CYAN}Guarda como:$NC}"
+      echo -e "  ${YELLOW}~/Descargas/MAGIS_6.4.2.apk$NC}"
       echo
       read -p "Presiona Enter cuando tengas el APK..."
 
@@ -1016,7 +1016,7 @@ EOF
     if [[ -d ~/waydroid_script ]]; then
       cd ~/waydroid_script
       source venv/bin/activate 2>/dev/null
-      echo -e "${CYAN}Selecciona en el menú: Install → magisk{{NC}"
+      echo -e "${CYAN}Selecciona en el menú: Install → magisk$NC}"
       sudo venv/bin/python main.py
       deactivate
       cd ~
@@ -1051,23 +1051,23 @@ echo -e "${BOLD}${YELLOW}╔═════════════════�
 echo -e "${BOLD}${YELLOW}║          📺 ALTERNATIVAS TV PARA DESKTOP 📺             ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
-echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):{{NC}"
+echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):$NC}"
 echo
-echo -e "${BOLD}${GREEN}1. Yuki-IPTV{{NC}"
-echo -e "  {{${MAGENTA}•{{NC} Cliente IPTV con M3U support"
-echo -e "  {{${MAGENTA}•{{NC} Interfaz GTK moderna"
-echo -e "  {{${MAGENTA}•{{NC} Recomendado si tienes lista M3U"
+echo -e "${BOLD}${GREEN}1. Yuki-IPTV$NC}"
+echo -e "  ${MAGENTA}•$NC} Cliente IPTV con M3U support"
+echo -e "  ${MAGENTA}•$NC} Interfaz GTK moderna"
+echo -e "  ${MAGENTA}•$NC} Recomendado si tienes lista M3U"
 echo
-echo -e "${BOLD}${GREEN}2. Hypnotix{{NC}"
-echo -e "  {{${MAGENTA}•{{NC} Reproductor IPTV avanzado"
-echo -e "  {{${MAGENTA}•{{NC} Compatible con XTREAM codes"
-echo -e "  {{${MAGENTA}•{{NC} Requiere configuración de servidor"
+echo -e "${BOLD}${GREEN}2. Hypnotix$NC}"
+echo -e "  ${MAGENTA}•$NC} Reproductor IPTV avanzado"
+echo -e "  ${MAGENTA}•$NC} Compatible con XTREAM codes"
+echo -e "  ${MAGENTA}•$NC} Requiere configuración de servidor"
 echo
-echo -e "${YELLOW}⚠️  IMPORTANTE - SEGURIDAD CON VPN:{{NC}"
-echo -e "  {{${RED}•{{NC} {{${RED}NUNCA usar IPTV sin VPN{{NC}"
-echo -e "  {{${RED}•{{NC} {{${RED}Se expone tu IP real al servidor IPTV{{NC}"
-echo -e "  {{${RED}•{{NC} {{${RED}Algunos proveedores bloquean sin VPN{{NC}"
-echo -e "  {{${GREEN}•{{NC} {{${GREEN}RECOMENDACIÓN: Activa VPN ANTES de usar{{NC}"
+echo -e "${YELLOW}⚠️  IMPORTANTE - SEGURIDAD CON VPN:$NC}"
+echo -e "  ${RED}•$NC} ${RED}NUNCA usar IPTV sin VPN$NC}"
+echo -e "  ${RED}•$NC} ${RED}Se expone tu IP real al servidor IPTV$NC}"
+echo -e "  ${RED}•$NC} ${RED}Algunos proveedores bloquean sin VPN$NC}"
+echo -e "  ${GREEN}•$NC} ${GREEN}RECOMENDACIÓN: Activa VPN ANTES de usar$NC}"
 echo
 read -p "¿Instalar Yuki-IPTV? [s/N]: " install_yuki
 read -p "¿Instalar Hypnotix? [s/N]: " install_hypnotix
@@ -1110,10 +1110,10 @@ if [[ "$setup_vpn" =~ ^[Ss]$ ]]; then
   print_header "Configuración de VPN"
 
   echo
-  echo -e "${CYAN}¿Cuál es tu proveedor VPN?{{NC}"
-  echo -e "  {{${MAGENTA}1.{{NC} ProtonVPN (Recomendado + Gratuito)"
-  echo -e "  {{${MAGENTA}2.{{NC} Windscribe"
-  echo -e "  {{${MAGENTA}3.{{NC} Otro / No instalar"
+  echo -e "${CYAN}¿Cuál es tu proveedor VPN?$NC}"
+  echo -e "  ${MAGENTA}1.$NC} ProtonVPN (Recomendado + Gratuito)"
+  echo -e "  ${MAGENTA}2.$NC} Windscribe"
+  echo -e "  ${MAGENTA}3.$NC} Otro / No instalar"
   echo
   read -p "Selecciona [1-3]: " vpn_choice
 
@@ -1144,7 +1144,7 @@ EOF
     ;;
   *)
     print_warning "VPN no configurada"
-    echo -e "${YELLOW}Recuerda: SIEMPRE usa VPN antes de IPTV{{NC}"
+    echo -e "${YELLOW}Recuerda: SIEMPRE usa VPN antes de IPTV$NC}"
     ;;
   esac
 fi
@@ -1157,16 +1157,16 @@ print_success "Alternativas TV configuradas"
 print_step "13.4/35: Android Emulator (SDK AVD - Último Recurso)"
 
 echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗{{NC}"
-echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖           ║{{NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝{{NC}"
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗$NC}"
+echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖           ║$NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝$NC}"
 echo
-echo -e "${YELLOW}⚠️  NOTA:{{NC} Usa {{${RED}SOLO si Waydroid no funciona{{NC}"
+echo -e "${YELLOW}⚠️  NOTA:$NC} Usa ${RED}SOLO si Waydroid no funciona$NC}"
 echo
-echo -e "${CYAN}Características:{{NC}"
-echo -e "  {{${MAGENTA}•{{NC} {{${RED}Mucho más lento{{NC} que Waydroid (~5-10x)"
-echo -e "  {{${MAGENTA}•{{NC} {{${RED}Más pesado{{NC} (consume más RAM/CPU)"
-echo -e "  {{${MAGENTA}•{{NC} {{${GREEN}Mejor compatibilidad{{NC} en algunos casos raros"
+echo -e "${CYAN}Características:$NC}"
+echo -e "  ${MAGENTA}•$NC} ${RED}Mucho más lento$NC} que Waydroid (~5-10x)"
+echo -e "  ${MAGENTA}•$NC} ${RED}Más pesado$NC} (consume más RAM/CPU)"
+echo -e "  ${MAGENTA}•$NC} ${GREEN}Mejor compatibilidad$NC} en algunos casos raros"
 echo
 read -p "¿Instalar Android Emulator (SDK)? [s/N]: " install_android_studio
 
@@ -1181,15 +1181,15 @@ if [[ "$install_android_studio" =~ ^[Ss]$ ]]; then
     print_success "Android Studio instalado en /opt/android-studio"
 
     echo
-    echo -e "${CYAN}Pasos para usar:{{NC}"
-    echo -e "  {{${MAGENTA}1.{{NC} Ejecuta: {{${YELLOW}/opt/android-studio/bin/studio.sh{{NC}"
-    echo -e "  {{${MAGENTA}2.{{NC} Selecciona: {{${YELLOW}AVD Manager{{NC}"
-    echo -e "  {{${MAGENTA}3.{{NC} Crea: {{${YELLOW}Pixel 2{{NC} (recomendado)"
-    echo -e "  {{${MAGENTA}4.{{NC} Lanza y espera ({{${RED}LENTO{{NC})"
-    echo -e "  {{${MAGENTA}5.{{NC} Instala MagisTV desde APK"
+    echo -e "${CYAN}Pasos para usar:$NC}"
+    echo -e "  ${MAGENTA}1.$NC} Ejecuta: ${YELLOW}/opt/android-studio/bin/studio.sh$NC}"
+    echo -e "  ${MAGENTA}2.$NC} Selecciona: ${YELLOW}AVD Manager$NC}"
+    echo -e "  ${MAGENTA}3.$NC} Crea: ${YELLOW}Pixel 2$NC} (recomendado)"
+    echo -e "  ${MAGENTA}4.$NC} Lanza y espera (${RED}LENTO$NC})"
+    echo -e "  ${MAGENTA}5.$NC} Instala MagisTV desde APK"
     echo
 
-    print_warning "{{${RED}Esto es MUCHO MÁS LENTO que Waydroid{{NC}"
+    print_warning "${RED}Esto es MUCHO MÁS LENTO que Waydroid$NC}"
     print_status "Solo usa si Waydroid falla"
   else
     print_error "Android Studio no se instaló correctamente"
@@ -3270,257 +3270,48 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34: SNAPPER (SNAPSHOTS BTRFS) - SIN YAY
+# PASO 34: CONFIGURAR SWAP
 # ═══════════════════════════════════════════════════════════
-print_step "34/35: Snapper (Snapshots BTRFS)"
+configure_swap
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.5: SISTEMA UNIFICADO DE BACKUPS (TIMESHIFT/SNAPPER)
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Sistema Unificado de Backups (Snapshots)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          📸 CONFIGURAR SNAPPER SNAPSHOTS 📸              ║${NC}"
+echo -e "${BOLD}${YELLOW}║      🔄 SISTEMA UNIFICADO DE SNAPSHOTS/BACKUPS 🔄        ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
-echo -e "${CYAN}Snapper permite crear snapshots automáticos del sistema:${NC}"
-echo -e "  ${MAGENTA}•${NC} Snapshots antes de actualizaciones (snap-pac)"
-echo -e "  ${MAGENTA}•${NC} Snapshots automáticos cada hora/día"
-echo -e "  ${MAGENTA}•${NC} Rollback completo desde GRUB (grub-btrfs)"
-echo -e "  ${MAGENTA}•${NC} ${BOLD}SOLO funciona con sistemas BTRFS${NC}"
-echo
-echo -e "${YELLOW}⚠️  IMPORTANTE:${NC} Verifica que tu sistema use BTRFS:"
-echo -e "  ${CYAN}df -T / | grep btrfs${NC}"
-echo
-
-# Verificar sistema de archivos
-FS_TYPE=$(df -T / | tail -1 | awk '{print $2}')
-FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
-FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
-
-echo -e "${CYAN}Sistema de archivos:${NC} ${BOLD}$FS_TYPE${NC}"
-echo -e "${CYAN}Espacio libre en /:${NC} ${BOLD}$FREE_SPACE${NC}"
+echo -e "${CYAN}Sistema modular y completo de backups/snapshots:${NC}"
+echo -e "  ${MAGENTA}•${NC} Detección automática de filesystem (ext4/Btrfs)"
+echo -e "  ${MAGENTA}•${NC} Timeshift para ext4 (rsync incremental)"
+echo -e "  ${MAGENTA}•${NC} Snapper para Btrfs (snapshots nativos)"
+echo -e "  ${MAGENTA}•${NC} Límite de 5GB máximo para ahorro de espacio"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos antes de actualizaciones"
+echo -e "  ${MAGENTA}•${NC} Opción de desinstalación/reversión completa"
 echo
 
-if [[ "$FS_TYPE" == "btrfs" ]]; then
-  echo -e "${GREEN}✓ Sistema BTRFS detectado${NC}"
-  
-  # Verificar espacio
-  if [[ $FREE_SPACE_KB -lt 10485760 ]]; then  # <10GB
-    echo -e "${YELLOW}⚠️  Advertencia: Menos de 10GB libres${NC}"
-    echo -e "${YELLOW}   Snapshots pueden consumir espacio rápidamente${NC}"
+# Ejecutar script de configuración de backups
+if [[ -f ~/dotfiles-dizzi/setup-backup-system.sh ]]; then
+  bash ~/dotfiles-dizzi/setup-backup-system.sh
+else
+  print_error "Script de configuración no encontrado: ~/dotfiles-dizzi/setup-backup-system.sh"
+  read -p "¿Continuar sin configurar backups? [S/n]: " skip_backups
+
+  if [[ "$skip_backups" =~ ^[Nn]$ ]]; then
+    print_error "Backup system setup abortado"
   fi
-  
-  echo
-  read -p "¿Instalar y configurar Snapper? [S/n]: " install_snapper
-else
-  echo -e "${RED}✗ Sistema no usa BTRFS (detectado: $FS_TYPE)${NC}"
-  echo -e "${YELLOW}Snapper requiere BTRFS para funcionar correctamente${NC}"
-  echo
-  read -p "¿Instalar Snapper de todos modos? [s/N]: " install_snapper
 fi
 
-if [[ ! "$install_snapper" =~ ^[Nn]$ ]]; then
-  print_header "Instalando Snapper + Herramientas"
-
-  # ═══════════════════════════════════════════════════════════
-  # INSTALACIÓN SIN YAY (solo repos oficiales)
-  # ═══════════════════════════════════════════════════════════
-  print_installing "snapper + snap-pac + grub-btrfs + timeshift"
-  sudo pacman -S --needed --noconfirm \
-    snapper \
-    snap-pac \
-    grub-btrfs \
-    timeshift
-    
-print_success "Snapper + Timeshift (repos oficiales) instalados"
-
-# Herramientas GUI desde AUR
-print_installing "GUIs para gestión de snapshots (AUR)"
-
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  snapper-gui-git \
-  btrfs-assistant \
-  timeshift-autosnap \
-  2>/dev/null || print_warning "Algunas GUIs fallaron (instalar después manualmente)"
-
-  print_success "Herramientas de snapshots completadas"
-
-  print_success "Snapper + Otras herramientas Comodas (Alt) instaladas"
-  print_warning "snapper-gui (AUR) omitido - instalar después con: yay -S snapper-gui-git"
-
-  # ═══════════════════════════════════════════════════════════
-  # CONFIGURACIÓN SOLO PARA BTRFS
-  # ═══════════════════════════════════════════════════════════
-  if [[ "$FS_TYPE" == "btrfs" ]]; then
-    print_header "Configurando Snapper para BTRFS"
-    
-    # ───────────────────────────────────────────────────────────
-    # PASO 1: Preparar directorio .snapshots
-    # ───────────────────────────────────────────────────────────
-    print_status "Verificando directorio /.snapshots..."
-    
-    if [[ -d "/.snapshots" ]]; then
-      if ! mountpoint -q "/.snapshots"; then
-        print_warning "/.snapshots existe pero NO es subvolumen"
-        sudo mv /.snapshots /.snapshots.backup.$(date +%s)
-        print_status "Movido a /.snapshots.backup.*"
-      else
-        print_status "/.snapshots ya es subvolumen, omitiendo"
-      fi
-    fi
-    
-    # ───────────────────────────────────────────────────────────
-    # PASO 2: Crear configuración para root
-    # ───────────────────────────────────────────────────────────
-    print_installing "Configurando snapper para /"
-    
-    if ! snapper list-configs 2>/dev/null | grep -q "root"; then
-      sudo snapper create-config /
-      
-      if [[ $? -eq 0 ]]; then
-        print_success "Configuración 'root' creada"
-      else
-        print_error "Error creando configuración"
-        print_warning "Si hay backup, restaurar: sudo mv /.snapshots.backup.* /.snapshots"
-      fi
-    else
-      print_warning "Configuración 'root' ya existe"
-    fi
-
-    # ───────────────────────────────────────────────────────────
-    # PASO 3: Configurar límites de snapshots
-    # ───────────────────────────────────────────────────────────
-    print_status "Configurando límites de snapshots..."
-    
-    sudo snapper -c root set-config "NUMBER_LIMIT=50"
-    sudo snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=10"
-    sudo snapper -c root set-config "TIMELINE_LIMIT_HOURLY=24"
-    sudo snapper -c root set-config "TIMELINE_LIMIT_DAILY=7"
-    sudo snapper -c root set-config "TIMELINE_LIMIT_WEEKLY=4"
-    sudo snapper -c root set-config "TIMELINE_LIMIT_MONTHLY=12"
-    sudo snapper -c root set-config "TIMELINE_LIMIT_YEARLY=2"
-    
-    # Permitir al usuario gestionar snapshots
-    sudo snapper -c root set-config "ALLOW_USERS=$USER"
-    sudo snapper -c root set-config "SYNC_ACL=yes"
-    
-    print_success "Límites configurados"
-
-    # ───────────────────────────────────────────────────────────
-    # PASO 4: Habilitar servicios automáticos
-    # ───────────────────────────────────────────────────────────
-    print_status "Habilitando servicios automáticos..."
-    
-    sudo systemctl enable --now snapper-timeline.timer
-    sudo systemctl enable --now snapper-cleanup.timer
-    sudo systemctl enable --now grub-btrfsd  # Auto-detecta snapshots para GRUB
-    
-    print_success "Servicios habilitados"
-
-    # ───────────────────────────────────────────────────────────
-    # PASO 5: Configurar /home si es subvolumen separado
-    # ───────────────────────────────────────────────────────────
-    if mount | grep -qE "subvol.*@home"; then
-      print_status "Detectado subvolumen @home separado"
-      read -p "¿Configurar snapper para /home también? [S/n]: " config_home
-      
-      if [[ ! "$config_home" =~ ^[Nn]$ ]]; then
-        if ! snapper list-configs 2>/dev/null | grep -q "home"; then
-          sudo snapper create-config /home
-          sudo snapper -c home set-config "NUMBER_LIMIT=30"
-          sudo snapper -c home set-config "TIMELINE_LIMIT_DAILY=7"
-          sudo snapper -c home set-config "ALLOW_USERS=$USER"
-          sudo snapper -c home set-config "SYNC_ACL=yes"
-          print_success "Configuración 'home' creada"
-        fi
-      fi
-    fi
-
-    # ───────────────────────────────────────────────────────────
-    # PASO 6: Crear primer snapshot
-    # ───────────────────────────────────────────────────────────
-    print_status "Creando primer snapshot..."
-    sudo snapper -c root create --description "Configuración inicial SDDM + Snapper - $(date +'%Y-%m-%d %H:%M')"
-    
-    # Actualizar GRUB para incluir el snapshot
-    print_status "Actualizando GRUB (detectar snapshots)..."
-    sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || \
-      print_warning "Error actualizando GRUB (normal en algunos sistemas)"
-    
-    print_success "Primer snapshot creado"
-
-    # ═══════════════════════════════════════════════════════════
-    # GUÍA DE USO
-    # ═══════════════════════════════════════════════════════════
-    echo
-    echo -e "${GREEN}${BOLD}✨ SNAPPER - GUÍA COMPLETA DE USO ✨${NC}"
-    echo
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${YELLOW}Comandos básicos:${NC}"
-    echo -e "  ${YELLOW}snapper list${NC}                        # Listar snapshots (SIN sudo)"
-    echo -e "  ${YELLOW}snapper create -d \"Mi snapshot\"${NC}     # Crear snapshot manual"
-    echo -e "  ${YELLOW}sudo snapper delete NUM${NC}              # Eliminar snapshot"
-    echo
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${YELLOW}Rollback desde GRUB:${NC}"
-    echo -e "  ${MAGENTA}1.${NC} Reinicia el sistema"
-    echo -e "  ${MAGENTA}2.${NC} En GRUB: ${CYAN}\"Arch Linux snapshots\"${NC}"
-    echo -e "  ${MAGENTA}3.${NC} Selecciona el snapshot deseado"
-    echo -e "  ${MAGENTA}4.${NC} Bootea normalmente"
-    echo
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${YELLOW}Snapshots automáticos:${NC}"
-    echo -e "  ${MAGENTA}•${NC} Cada hora (mantiene 24)"
-    echo -e "  ${MAGENTA}•${NC} Cada día (mantiene 7)"
-    echo -e "  ${MAGENTA}•${NC} Antes de pacman -Syu (snap-pac)"
-    echo -e "  ${MAGENTA}•${NC} Límite total: 50 snapshots"
-    echo
-    echo -e "${CYAN}Ubicación:${NC} ${YELLOW}/.snapshots/${NC}"
-    echo
-
-    # ═══════════════════════════════════════════════════════════
-    # CREAR ALIASES
-    # ═══════════════════════════════════════════════════════════
-    if [[ -f ~/.zshrc ]]; then
-      if ! grep -q "# Snapper aliases" ~/.zshrc; then
-        cat >> ~/.zshrc <<'ALIASES'
-
-# Snapper aliases
-alias snls='snapper list'
-alias sncreate='snapper create -d'
-alias sndelete='sudo snapper delete'
-alias snundo='sudo snapper undochange'
-alias snrollback='sudo snapper rollback'
-alias snconfigs='snapper list-configs'
-alias snstatus='systemctl status snapper-timeline.timer snapper-cleanup.timer grub-btrfsd'
-ALIASES
-        print_success "Aliases agregados a .zshrc"
-      fi
-    fi
-
-  else
-    # Sistema no-BTRFS
-    print_warning "Sistema no-BTRFS: Snapper instalado pero NO configurado"
-    echo
-    echo -e "${YELLOW}Alternativa para ext4:${NC} ${CYAN}sudo pacman -S timeshift${NC}"
-  fi
-
-else
-  print_warning "Snapper omitido"
-fi
-# DESPUÉS DE LA LÍNEA 2280 (donde termina configuración de Snapper)
 echo
-read -p "¿Instalar Btrfs Assistant (GUI recomendada)? [S/n]: " install_btrfs_gui
-
-if [[ ! "$install_btrfs_gui" =~ ^[Nn]$ ]]; then
-  print_installing "Btrfs Assistant (GUI moderna)"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None btrfs-assistant
-  print_success "Btrfs Assistant instalado → Ejecuta: btrfs-assistant"
-else
-  print_warning "GUI omitida (instalar después: yay -S btrfs-assistant)"
-fi
+print_success "Configuración de backups completada"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34.5: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# PASO 34.9: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
 # ═══════════════════════════════════════════════════════════
-print_step "34.5/35: Display Manager (GDM o SDDM)"
+print_step "34.9/35: Display Manager (GDM o SDDM)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
@@ -3667,10 +3458,10 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34.9: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
+# PASO 34: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
 # ═══════════════════════════════════════════════════════════
 function configure_swap() {
-  print_step "34.9/35: Configurar Swap Automático"
+  print_step "34/35: Configurar Swap Automático"
 
   echo
   echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
@@ -3738,11 +3529,64 @@ echo -e "${CYAN}Opciones de swap:${NC}"
 echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
 echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
 echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
-echo -e "  ${MAGENTA}4.${NC} Omitir configuración"
+echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
+echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
 echo
-read -p "Seleccionar opción [1-4]: " swap_choice
+read -p "Seleccionar opción [1-5]: " swap_choice
 
 case "$swap_choice" in
+  4)
+    print_header "Eliminando Swap Completamente"
+
+    echo
+    print_warning "⚠️  ADVERTENCIA: Esto desactivará hibernation"
+    read -p "¿Estás seguro? [s/N]: " confirm_delete
+
+    if [[ "$confirm_delete" =~ ^[Ss]$ ]]; then
+      # Desactivar swap
+      print_status "Desactivando swap..."
+      sudo swapoff -a 2>/dev/null || true
+      print_success "Swap desactivado"
+
+      # Eliminar swapfile
+      if [[ -f /swapfile ]]; then
+        print_status "Eliminando /swapfile..."
+        sudo rm -f /swapfile
+        print_success "Swapfile eliminado"
+      fi
+
+      # Limpiar /etc/fstab
+      if grep -q "/swapfile" /etc/fstab 2>/dev/null; then
+        print_status "Removiendo entrada de fstab..."
+        sudo sed -i '/\/swapfile/d' /etc/fstab
+        print_success "Línea removida de /etc/fstab"
+      fi
+
+      # Limpiar parámetros de hibernation en GRUB
+      if [[ -f /etc/default/grub ]]; then
+        if grep -q "resume=" /etc/default/grub; then
+          print_status "Removiendo parámetros de hibernation de GRUB..."
+          sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+          sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+          sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+          sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null
+          print_success "GRUB actualizado"
+        fi
+      fi
+
+      # Mostrar espacio recuperado
+      echo
+      FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
+      echo -e "${GREEN}✓ Swap eliminado completamente${NC}"
+      echo -e "${CYAN}Espacio libre ahora: ${BOLD}$FREE_SPACE${NC}"
+      echo
+
+      # Marcar para saltar hibernation
+      SKIP_HIBERNATION=true
+    else
+      print_warning "Eliminación cancelada"
+    fi
+    ;;
   1|3)
     print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
     
@@ -3812,7 +3656,7 @@ case "$swap_choice" in
     ;;
 esac
 
-if [[ "$swap_choice" == "4" ]]; then
+if [[ "$swap_choice" == "5" ]]; then
   print_warning "Configuración de swap omitida"
 else
   # Configurar swappiness (agresividad del swap)
@@ -3858,7 +3702,208 @@ else
 }
 
 # Llamar la función de swap
-configure_swap
+# ═══════════════════════════════════════════════════════════
+# PASO 34.8: CONFIGURAR HIBERNATION (SLEEP TO DISK)
+# ═══════════════════════════════════════════════════════════
+function configure_hibernation() {
+  # Verificar si se saltó por eliminación de swap
+  if [[ "$SKIP_HIBERNATION" == "true" ]]; then
+    print_warning "Hibernation omitido (swap eliminado)"
+    return 0
+  fi
+
+  print_step "34.8/35: Configurar Hibernation (Sleep to Disk)"
+
+  echo
+  echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤             ║${NC}"
+  echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+  echo
+
+  # Verificar si systemctl soporta hibernation
+  if ! systemctl hibernate --dry-run &>/dev/null; then
+    print_warning "Hibernation NO soportado en este kernel"
+    print_warning "Saltando configuración de hibernation"
+    return
+  fi
+
+  read -p "¿Configurar Hibernation? [S/n]: " setup_hibernation
+  [[ "$setup_hibernation" =~ ^[Nn]$ ]] && return
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 1: Obtener offset del swapfile
+  # ───────────────────────────────────────────────────────────
+  print_header "Calculando OFFSET del swapfile"
+
+  if [[ ! -f /swapfile ]]; then
+    print_error "No existe /swapfile. Hibernation requiere swap configurado."
+    return
+  fi
+
+  SWAP_OFFSET=$(sudo filefrag -v /swapfile 2>/dev/null | grep "0:" | awk '{print $4}' | cut -d. -f1)
+
+  if [[ -z "$SWAP_OFFSET" ]]; then
+    print_error "No se pudo calcular el offset. Saltando hibernation."
+    return
+  fi
+
+  print_success "Offset calculado: $SWAP_OFFSET"
+  echo -e "${CYAN}Guardando en ${YELLOW}/root/.hibernation_offset${NC}"
+  echo "$SWAP_OFFSET" | sudo tee /root/.hibernation_offset >/dev/null
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 2: Detectar bootloader
+  # ───────────────────────────────────────────────────────────
+  print_status "Detectando bootloader..."
+
+  BOOTLOADER="none"
+  if [[ -f /etc/default/grub ]]; then
+    BOOTLOADER="grub"
+    print_success "GRUB detectado"
+  elif [[ -d /boot/loader/entries ]]; then
+    BOOTLOADER="systemd-boot"
+    print_warning "systemd-boot detectado (hibernation manual)"
+  fi
+
+  if [[ "$BOOTLOADER" == "none" ]]; then
+    print_warning "No se detectó bootloader conocido"
+    return
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 3: Configurar GRUB (si aplica)
+  # ───────────────────────────────────────────────────────────
+  if [[ "$BOOTLOADER" == "grub" ]]; then
+    print_header "Configurando GRUB para Hibernation"
+
+    echo
+    echo -e "${YELLOW}Opciones:${NC}"
+    echo -e "  ${MAGENTA}1.${NC} ${GREEN}Automático${NC} (editar GRUB automáticamente)"
+    echo -e "  ${MAGENTA}2.${NC} ${YELLOW}Manual${NC} (mostrar instrucciones)"
+    echo -e "  ${MAGENTA}3.${NC} ${RED}Omitir${NC}"
+    echo
+    read -p "Seleccionar [1-3]: " grub_choice
+
+    case "$grub_choice" in
+    1)
+      print_status "Editando /etc/default/grub..."
+
+      # Hacer backup
+      sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+      print_success "Backup creado"
+
+      # Buscar la línea GRUB_CMDLINE_LINUX_DEFAULT
+      if grep -q "GRUB_CMDLINE_LINUX_DEFAULT=" /etc/default/grub; then
+        # Remover parámetros resume antiguos (si existen)
+        sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+        sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+
+        # Agregar parámetros nuevos
+        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"resume=\/swapfile resume_offset=$SWAP_OFFSET /" /etc/default/grub
+
+        print_success "Parámetros agregados a GRUB"
+      else
+        print_warning "No se encontró GRUB_CMDLINE_LINUX_DEFAULT"
+        echo "resume=/swapfile resume_offset=$SWAP_OFFSET" | sudo tee -a /etc/default/grub
+      fi
+
+      # Mostrar configuración
+      echo
+      echo -e "${CYAN}Nueva configuración:${NC}"
+      grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub
+      echo
+
+      # Actualizar GRUB
+      print_status "Actualizando GRUB..."
+      sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+      if [[ $? -eq 0 ]]; then
+        print_success "GRUB actualizado exitosamente"
+      else
+        print_error "Error actualizando GRUB"
+        print_warning "Restaurar backup: sudo cp /etc/default/grub.backup.* /etc/default/grub"
+      fi
+      ;;
+    2)
+      echo
+      echo -e "${YELLOW}${BOLD}CONFIGURACIÓN MANUAL DE GRUB${NC}"
+      echo
+      echo -e "  ${CYAN}1. Abre el archivo con:${NC}"
+      echo -e "     ${YELLOW}sudo nano /etc/default/grub${NC}"
+      echo
+      echo -e "  ${CYAN}2. Busca la línea:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"...\"${NC}"
+      echo
+      echo -e "  ${CYAN}3. Agrega al final (antes del cierre \"):${NC}"
+      echo -e "     ${GREEN}resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+      echo
+      echo -e "  ${CYAN}Ejemplo:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet resume=/swapfile resume_offset=$SWAP_OFFSET\"${NC}"
+      echo
+      echo -e "  ${CYAN}4. Guarda (Ctrl+O, Enter, Ctrl+X)"
+      echo
+      echo -e "  ${CYAN}5. Actualiza GRUB:${NC}"
+      echo -e "     ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+      echo
+      read -p "Presiona Enter cuando hayas completado los pasos..."
+      ;;
+    3)
+      print_warning "GRUB no configurado"
+      ;;
+    esac
+  fi
+
+  if [[ "$BOOTLOADER" == "systemd-boot" ]]; then
+    echo
+    echo -e "${YELLOW}${BOLD}systemd-boot detectado${NC}"
+    echo -e "${CYAN}Para hibernation en systemd-boot:${NC}"
+    echo
+    echo -e "  ${MAGENTA}1.${NC} Edita ${YELLOW}/boot/loader/entries/arch.conf${NC}:"
+    echo -e "     Agrega: ${GREEN}options resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+    echo
+    echo -e "  ${MAGENTA}2.${NC} O usa ${YELLOW}bootctl edit arch${NC} (más seguro)"
+    echo
+    read -p "Presiona Enter cuando completes..."
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 4: Configurar systemd-sleep (duraciones)
+  # ───────────────────────────────────────────────────────────
+  print_header "Configurando systemd-sleep"
+
+  print_status "Permitir hibernation sin sudo (opcional)..."
+
+  read -p "¿Crear permisos sudo para systemctl hibernate? [S/n]: " setup_sudo
+  if [[ ! "$setup_sudo" =~ ^[Nn]$ ]]; then
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl hibernate" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl suspend" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    print_success "Permisos configurados en /etc/sudoers.d/hibernation"
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 5: Mostrar resumen
+  # ───────────────────────────────────────────────────────────
+  echo
+  echo -e "${GREEN}${BOLD}✨ HIBERNATION CONFIGURADO ✨${NC}"
+  echo
+  echo -e "${CYAN}Comandos para usar:${NC}"
+  echo -e "  ${YELLOW}systemctl hibernate${NC}      # Dormir a disco"
+  echo -e "  ${YELLOW}systemctl suspend${NC}        # Dormir en RAM"
+  echo -e "  ${YELLOW}systemctl suspend-then-hibernate${NC}  # RAM→Disco (timeout)"
+  echo
+  echo -e "${CYAN}Variables guardadas:${NC}"
+  echo -e "  ${MAGENTA}•${NC} Offset: ${BOLD}$SWAP_OFFSET${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swapfile: ${BOLD}/swapfile${NC}"
+  echo -e "  ${MAGENTA}•${NC} Bootloader: ${BOLD}$BOOTLOADER${NC}"
+  echo
+  echo -e "${YELLOW}${BOLD}⚠️  IMPORTANTE:${NC}"
+  echo -e "  ${CYAN}•${NC} ${YELLOW}Reinicia el sistema${NC} para que los cambios tomen efecto"
+  echo -e "  ${CYAN}•${NC} Si GRUB se corrompe, usa: ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+  echo
+}
+
+# Llamar la función de hibernation
+configure_hibernation
 
 # ═══════════════════════════════════════════════════════════
 # PASO 35: LIMPIEZA FINAL
@@ -3938,6 +3983,18 @@ echo -e "${GREEN}${BOLD}Dotfiles:${NC}"
 echo -e "  ${CYAN}•${NC} Aplicar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow .${NC}"
 echo -e "  ${CYAN}•${NC} Quitar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow -D .${NC}"
 echo -e "  ${CYAN}•${NC} Aplicar específico: ${YELLOW}cd ~/dotfiles-dizzi && stow hypr waybar rofi${NC}"
+echo
+echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
+echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
+echo -e "  ${CYAN}•${NC} Ver snapshots: ${YELLOW}snapper list${NC} o ${YELLOW}snls${NC} (alias)"
+echo -e "  ${CYAN}•${NC} Crear snapshot: ${YELLOW}snapper create -d 'Mi snapshot'${NC}"
+echo -e "  ${CYAN}•${NC} Snapshots automáticos: ${YELLOW}Antes de pacman -Syu${NC} (snap-pac)"
+echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 snapshots (con compresión)"
+echo
+echo -e "${CYAN}💡 TIPS:${NC}"
+echo -e "  ${MAGENTA}•${NC} Hibernation: Verifica con ${YELLOW}systemctl hibernate --dry-run${NC}"
+echo -e "  ${MAGENTA}•${NC} Si no bootea: Edita GRUB manualmente"
+echo -e "  ${MAGENTA}•${NC} Snapshots: Rollback desde GRUB en 'Arch Linux snapshots'"
 echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
   htop # --> Usa F6 para ordenar por CPU
   sudo intel_gpu_top # Ver GPU en tiempo real de Intel [latitude 7440]
