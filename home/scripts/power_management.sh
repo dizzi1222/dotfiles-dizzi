@@ -47,7 +47,7 @@ case "$CHOICE" in
     sleep 2
     pkill -KILL niri # Por si no respondió al TERM
   fi
-  hyprctl dispatch --force --force exit
+  hyprctl dispatch exit
   ;;
 *)
   exit 1
