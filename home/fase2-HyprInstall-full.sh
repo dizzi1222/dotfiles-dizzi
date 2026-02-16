@@ -232,7 +232,7 @@ sudo pacman -S --needed --noconfirm \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
-  wofi fuzzel polkit-kde-agent udiskie \
+  wofi fuzzel polkit-kde-agent polkit-gnome udiskie \
   swww hyprpaper hyprshot \
   qt5-wayland qt6-wayland gtk-layer-shell
 
