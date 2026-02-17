@@ -228,7 +228,7 @@ print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
-  kitty ghostty thunar nemo \
+  kitty ghostty konsole thunar nemo \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
@@ -373,12 +373,12 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
 
   print_installing "Steam + Lutris + GameMode + Wine-staging"
   sudo pacman -S --needed --noconfirm \
-    steam lutris wine-staging winetricks bottles \
+    steam lutris wine-staging winetricks \
     gamemode lib32-gamemode
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron geforce-infinity-bin
+    gfn-electron geforce-infinity-bin bottles
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -553,7 +553,7 @@ sudo pacman -S --needed --noconfirm \
 # ═══════════════════════════════════════════════════════════
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎬 KDENLIVE (EDITOR DE VIDEO) 🎬                ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🎬 KDENLIVE (EDITOR DE VIDEO) 🎬                 ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
@@ -602,7 +602,7 @@ esac
 # ═══════════════════════════════════════════════════════════
 print_installing "Aplicaciones extra y de Música/OCIO, Youtube Music [pear-desktop], Discord, Soundbound (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  brave-bin spotify pear-desktop soundbound-app-bin \
+  brave-bin zen-browser-bin spotify pear-desktop soundbound-app-bin \
   vencord-bin telegram-desktop-bin bitwarden gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
@@ -612,7 +612,7 @@ yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
 # ═══════════════════════════════════════════════════════════
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          💻 SELECCIONAR EDITOR DE CÓDIGO 💻              ║${NC}"
+echo -e "${BOLD}${YELLOW}║          💻 SELECCIONAR EDITOR DE CÓDIGO 💻               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
@@ -678,6 +678,8 @@ case "$editor_choice" in
 
   print_success "Antigravity instalado"
   ;;
+  bash ~/dotfiles-dizzi/home/Antigravity\ Setup/install\ extensions/install-vscode-extensions.sh
+  print_success "Extensiones de VSCode instaladas"
 *)
   print_warning "Editor de código omitido"
   ;;
@@ -710,7 +712,7 @@ print_step "13.2/35: Waydroid + MagisTV + Alternativas TV"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║        📱 WAYDROID + MAGISTV + ALTERNATIVAS TV 📱       ║${NC}"
+echo -e "${BOLD}${YELLOW}║        📱 WAYDROID + MAGISTV + ALTERNATIVAS TV 📱         ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Waydroid permite ejecutar Android en Linux (Wayland native).${NC}"
@@ -1048,7 +1050,7 @@ print_step "13.3/35: Alternativas TV en Desktop"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          📺 ALTERNATIVAS TV PARA DESKTOP 📺             ║${NC}"
+echo -e "${BOLD}${YELLOW}║          📺 ALTERNATIVAS TV PARA DESKTOP 📺               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):$NC}"
@@ -1158,7 +1160,7 @@ print_step "13.4/35: Android Emulator (SDK AVD - Último Recurso)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗$NC}"
-echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖           ║$NC}"
+echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖             ║$NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝$NC}"
 echo
 echo -e "${YELLOW}⚠️  NOTA:$NC} Usa ${RED}SOLO si Waydroid no funciona$NC}"
@@ -1366,13 +1368,13 @@ fi
 print_step "14/35: Herramientas de Desarrollo"
 print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
-  nodejs npm python python-pip python-gobject python-pipx \
-  docker docker-desktop rust \
+  nodejs npm python python-pip python-gobject python-pipx pyenv \
+  docker rust \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   claude-code clawdbot gemini-cli-git aichat
-print_success "Gemini, TGPT, Docker-desktop, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
+print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
 python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
@@ -1546,6 +1548,8 @@ if [[ -f ~/dotfiles-dizzi/home/zsh-istall.sh ]]; then
 else
   print_warning "zsh-istall.sh no encontrado, instalando manual..."
 
+#  0. Limpiar/Reinstalar Oh My Zsh si existe
+  rm -rf ~/.oh-my-zsh
   if [[ ! -d ~/.oh-my-zsh ]]; then
     print_installing "Oh-My-Zsh + Plugins"
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -2117,7 +2121,7 @@ print_step "24/35: PyMacroRecord + AutoClickers + PreMiD"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎮 HERRAMIENTAS DE AUTOMATIZACIÓN 🎮            ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🎮 HERRAMIENTAS DE AUTOMATIZACIÓN 🎮             ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 read -p "¿Instalar PyMacroRecord? [S/n]: " install_pymacro
@@ -2623,7 +2627,7 @@ print_step "25/35: Gruvbox Ecosystem"
 
 echo
 read -p "¿Instalar Gruvbox Icon Pack? [S/n]: " install_gruvbox_icons
-read -p "¿Instalar Gruvbox GTK Theme? [S/n]: " install_gruvbox_gtk
+read -p " [💀DURA 1H☠️] ¿Instalar Gruvbox GTK Theme? [S/n]: " install_gruvbox_gtk
 
 # Icons
 if [[ ! "$install_gruvbox_icons" =~ ^[Nn]$ ]]; then
@@ -2836,7 +2840,7 @@ print_step "28/35: Glyphs, Iconos y Emojis"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨                   ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨                    ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Este paso instala herramientas para buscar e insertar:${NC}"
@@ -3278,7 +3282,7 @@ function configure_swap() {
 
   echo
   echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾          ║${NC}"
+  echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾           ║${NC}"
   echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
   echo
 
@@ -3529,7 +3533,7 @@ function configure_hibernation() {
 
   echo
   echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤                ║${NC}"
+  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤               ║${NC}"
   echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
   echo
 
@@ -3759,7 +3763,7 @@ print_step "34.5/35: Display Manager (GDM o SDDM)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️              ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
@@ -3826,9 +3830,9 @@ if [[ "$dm_choice" == "2" ]]; then
     echo -e "${CYAN}║  ${BOLD}CONFIGURACIÓN INTERACTIVA DEL TEMA ASTRONAUT${NC}${CYAN}    ║${NC}"
     echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
     echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
-    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles          ║${NC}"
-    echo -e "${CYAN}║  • Personalizar colores y apariencia                 ║${NC}"
-    echo -e "${CYAN}║  • Configurar wallpaper                              ║${NC}"
+    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles           ║${NC}"
+    echo -e "${CYAN}║  • Personalizar colores y apariencia                  ║${NC}"
+    echo -e "${CYAN}║  • Configurar wallpaper                               ║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
     echo
     echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
@@ -3947,7 +3951,6 @@ cat <<"EOF"
 ║  ✨ SDDM Astronaut Theme configurado interactivamente                ║
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
-
 EOF
 
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
@@ -3963,7 +3966,6 @@ echo
 echo -e "${YELLOW}${BOLD}Configuraciones post-instalación:${NC}"
 echo -e "  ${CYAN}•${NC} Neovim: Abre ${YELLOW}nvim${NC} y ejecuta ${YELLOW}:MasonInstall prettier markdownlint-cli2${NC}"
 echo -e "  ${CYAN}•${NC} Copilot: En nvim ejecuta ${YELLOW}:CopilotAuth${NC}"
-echo -e "  ${CYAN}•${NC} Gemini CLI: ${YELLOW}gemini-cli setup${NC}"
 echo -e "  ${CYAN}•${NC} Pywal: ${YELLOW}wal -i ~/wallpapers/tu-imagen.jpg${NC}"
 echo -e "  ${CYAN}•${NC} Music Presence: ${YELLOW}source ~/.zshrc && musicpresence${NC}"
 echo -e "  ${CYAN}•${NC} Rclone: ${YELLOW}~/montar_gdrive.sh${NC} (si configuraste)"
@@ -3975,7 +3977,6 @@ echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15mi
 echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
 echo -e "  ${CYAN}•${NC} Ollama: ${YELLOW}sudo pacman -S ollama && ollama pull qwen2.5:0.5b${NC}"
 echo
-echo
 echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
 echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
 echo -e "  ${CYAN}•${NC} Ver snapshots: ${YELLOW}snapper list${NC} o ${YELLOW}snls${NC} (alias)"
@@ -3985,7 +3986,6 @@ echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 sna
 echo
 echo -e "${CYAN}💡 TIPS:${NC}"
 echo -e "  ${MAGENTA}•${NC} Hibernation: Verifica con ${YELLOW}systemctl hibernate --dry-run${NC}"
-echo -e "  ${MAGENTA}•${NC} Si no bootea: Edita GRUB manualmente"
 echo -e "  ${MAGENTA}•${NC} Snapshots: Rollback desde GRUB en 'Arch Linux snapshots'"
 echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
   htop # --> Usa F6 para ordenar por CPU

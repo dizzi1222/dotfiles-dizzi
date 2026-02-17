@@ -56,8 +56,8 @@ binds {
     // APPS
     // ═══════════════════════════════════════════════════════════════════════
     
-    F1 hotkey-overlay-title="brave" { spawn "brave"; }
-    F10 hotkey-overlay-title="firefox" { spawn "firefox"; }
+    F1 hotkey-overlay-title="firefox" { spawn "zen-browser"; } 
+    F10 hotkey-overlay-title="brave" { spawn "brave"; }
     Mod+E hotkey-overlay-title="nautilus" { spawn "nautilus"; }
     Super+Alt+M hotkey-overlay-title="yazi" { spawn-sh "kitty --class YaziTerminal -- yazi"; }
     Super+Ctrl+M hotkey-overlay-title="nvim fzf" { spawn-sh "~/.config/hypr/scripts/open_nvim_fzf.sh"; }

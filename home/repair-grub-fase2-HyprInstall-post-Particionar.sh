@@ -112,6 +112,57 @@ SUDO_PID=$!
 trap "kill $SUDO_PID 2>/dev/null" EXIT
 
 # ═══════════════════════════════════════════════════════════
+# PASO 15: ZSH + OH-MY-ZSH
+# ═══════════════════════════════════════════════════════════
+print_step "15/35: Zsh + Oh-My-Zsh"
+
+if [[ -f ~/dotfiles-dizzi/home/zsh-istall.sh ]]; then
+  print_installing "Ejecutando zsh-istall.sh"
+  sudo chmod +x ~/dotfiles-dizzi/home/zsh-istall.sh
+  ~/dotfiles-dizzi/home/zsh-istall.sh
+  print_success "ZSH configurado con script dizzi"
+else
+  print_warning "zsh-istall.sh no encontrado, instalando manual..."
+
+  #  0. Limpiar/Reinstalar Oh My Zsh si existe
+  rm -rf ~/.oh-my-zsh
+  if [[ ! -d ~/.oh-my-zsh ]]; then
+    print_installing "Oh-My-Zsh + Plugins"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+    ZSH_CUSTOM="${ZSH_CUSTOM:-~/.oh-my-zsh/custom}"
+
+    git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions 2>/dev/null || true
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting $ZSH_CUSTOM/plugins/zsh-syntax-highlighting 2>/dev/null || true
+    git clone https://github.com/zsh-users/zsh-completions $ZSH_CUSTOM/plugins/zsh-completions 2>/dev/null || true
+    git clone https://github.com/zsh-users/zsh-history-substring-search $ZSH_CUSTOM/plugins/zsh-history-substring-search 2>/dev/null || true
+
+    # Plugins extra que tu .zshrc busca en ~/.zsh/
+    print_installing "Plugins extra (zsh-autocomplete, fzf-tab)"
+    mkdir -p ~/.zsh
+
+    if [[ ! -d ~/.zsh/zsh-autocomplete ]]; then
+      git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete 2>/dev/null || true
+    fi
+
+    if [[ ! -d ~/.zsh/fzf-tab ]]; then
+      git clone --depth 1 https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null || true
+    fi
+
+    print_success "Oh-My-Zsh y plugins instalados"
+  else
+    print_success "Oh-My-Zsh ya instalado"
+
+    # Asegurar plugins extra incluso si OMZ ya estaba
+    mkdir -p ~/.zsh
+    [[ ! -d ~/.zsh/zsh-autocomplete ]] && git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete 2>/dev/null || true
+    [[ ! -d ~/.zsh/fzf-tab ]] && git clone --depth 1 https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null || true
+  fi
+fi
+
+sudo chsh -s $(which zsh) $USER 2>/dev/null || print_warning "Cambio de shell manual requerido"
+
+# ═══════════════════════════════════════════════════════════
 # PASO 17: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
 print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
@@ -164,7 +215,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: GRUB config"
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
-  
+
   # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
@@ -172,7 +223,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
 
-  # Para reparar problemas con WIFI                                                                                                 
+  # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
     print_package "Symlink: WIFI reparar problemas"
     sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
@@ -321,23 +372,23 @@ if [[ ! "$enable_services" =~ ^[Nn]$ ]]; then
     systemctl --user start gemini.service 2>/dev/null || true
   fi
 
-# Espanso
-if [[ -f ~/.config/systemd/user/espanso.service ]]; then
-  killall espanso 2>/dev/null || true
-  print_package "Habilitando: espanso.service"
-  
-  # Registrar servicio si no está registrado
-  espanso service register 2>/dev/null || true
-  
-  # Habilitar e iniciar via systemd (NO usar 'espanso start' directamente)
-  systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
-  systemctl --user start espanso.service 2>/dev/null || true
-  
-  # Esperar 2 segundos para que inicie
-  sleep 2
-  
-  print_success "Espanso iniciado via systemd"
-fi
+  # Espanso
+  if [[ -f ~/.config/systemd/user/espanso.service ]]; then
+    killall espanso 2>/dev/null || true
+    print_package "Habilitando: espanso.service"
+
+    # Registrar servicio si no está registrado
+    espanso service register 2>/dev/null || true
+
+    # Habilitar e iniciar via systemd (NO usar 'espanso start' directamente)
+    systemctl --user enable espanso.service 2>/dev/null || print_warning "espanso.service no encontrado"
+    systemctl --user start espanso.service 2>/dev/null || true
+
+    # Esperar 2 segundos para que inicie
+    sleep 2
+
+    print_success "Espanso iniciado via systemd"
+  fi
 
   # Kanata
   if [[ -f ~/.config/systemd/user/kanata.service ]]; then
@@ -374,18 +425,18 @@ fi
     systemctl --user start ydotool.service 2>/dev/null || true
   fi
 
-  # NetworkManager y bluetooth 
+  # NetworkManager y bluetooth
   if [[ -f ~/home/ ]]; then
     print_package "Habilitando: NetworkManager"
-    systemctl --user enable NetworkManager 
-    systemctl --user start NetworkManager 
+    systemctl --user enable NetworkManager
+    systemctl --user start NetworkManager
   fi
 
   # bluetooth
   if [[ -f ~/home/ ]]; then
     print_package "Habilitando: bluetooth"
-    systemctl --user enable bluetooth 
-    systemctl --user start bluetooth 
+    systemctl --user enable bluetooth
+    systemctl --user start bluetooth
   fi
 
   print_success "Servicios de usuario habilitados"
@@ -470,14 +521,14 @@ read -p "¿Configurar Bottles para gaming? [s/N]: " setup_bottles
 
 if [[ "$setup_bottles" =~ ^[Ss]$ ]]; then
   print_header "Configurando Bottles"
-  
+
   # Verificar si install-bottles.sh existe
   BOTTLES_SCRIPT_PATHS=(
     ~/dotfiles-dizzi/home/install-bottles.sh
     ~/install-bottles.sh
     ~/Descargas/install-bottles.sh
   )
-  
+
   BOTTLES_SCRIPT=""
   for path in "${BOTTLES_SCRIPT_PATHS[@]}"; do
     if [[ -f "$path" ]]; then
@@ -485,35 +536,34 @@ if [[ "$setup_bottles" =~ ^[Ss]$ ]]; then
       break
     fi
   done
-  
+
   if [[ -z "$BOTTLES_SCRIPT" ]]; then
     print_warning "install-bottles.sh no encontrado"
     print_status "Descargando script desde repositorio..."
-    
+
     wget -q https://raw.githubusercontent.com/dizzi1222/dotfiles-dizzi/main/home/install-bottles.sh \
       -O ~/install-bottles.sh 2>/dev/null || {
       print_error "Error descargando script"
       print_info "Instalación manual: yay -S bottles"
     }
-    
+
     BOTTLES_SCRIPT=~/install-bottles.sh
   fi
-  
+
   if [[ -f "$BOTTLES_SCRIPT" ]]; then
     chmod +x "$BOTTLES_SCRIPT"
     print_status "Ejecutando configuración de Bottles..."
     "$BOTTLES_SCRIPT"
-    
+
     print_success "Bottles configurado"
   else
     print_error "No se pudo ejecutar install-bottles.sh"
   fi
-  
+
 else
   print_warning "Bottles omitido (puedes instalarlo después con: yay -S bottles)"
 fi
 
-# ═══════════════════════════════════════════════════════════
 # PASO 22: SPOTIFY SPICETIFY
 # ═══════════════════════════════════════════════════════════
 print_step "22/35: Spicetify (Opcional)"
@@ -660,12 +710,12 @@ print_step "24/35: PyMacroRecord + AutoClickers + PreMiD"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎮 HERRAMIENTAS DE AUTOMATIZACIÓN 🎮            ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🎮 HERRAMIENTAS DE AUTOMATIZACIÓN 🎮             ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 read -p "¿Instalar PyMacroRecord? [S/n]: " install_pymacro
 read -p "¿Instalar AutoClickers? [S/n]: " install_autoclickers
-read -p "¿Instalar PreMiD (Discord Rich Presence)? [s/N]: " install_premid
+# read -p "¿Instalar PreMiD (Discord Rich Presence)? [s/N]: " install_premid
 
 # ═══════════════════════════════════════════════════════════
 # PYMACRORECORD (CON PERMISOS INTEGRADOS)
@@ -680,13 +730,14 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
     zlib libjpeg-turbo libtiff libwebp openjpeg2 \
     python-setuptools python-wheel python-pillow
 
-  # Buscar PyMacroRecord
+  # Buscar PyMacroRecord (CORREGIDO)
   PYMACRO_PATHS=(
-    ~/dotfiles-dizzi/home/PyMacroRecord-1.4.2
-    ~/dotfiles-dizzi/PyMacroRecord-1.4.2
+    ~/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.2
+    ~/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.1
+    ~/LinuxPyMacroRecord/PyMacroRecord-1.4.2
+    ~/LinuxPyMacroRecord/PyMacroRecord-1.4.1
     ~/Descargas/PyMacroRecord-1.4.2
-    ~/"{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2"
-    ~/{Linux} Tinytask Alternativa - PyMacroRecord ~ [Instalacion] 1.4.2/PyMacroRecord-1.4.2/
+    ~/Descargas/PyMacroRecord-1.4.1
   )
 
   PYMACRO_FOUND=false
@@ -705,7 +756,9 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
     print_warning "PyMacroRecord no encontrado"
     echo
     echo -e "${CYAN}Descarga desde:${NC} ${YELLOW}https://www.pymacrorecord.com/download${NC}"
-    echo -e "${CYAN}Extrae el ZIP en:${NC} ${YELLOW}~/Descargas/${NC}"
+    echo -e "${CYAN}O tienes las carpetas en:${NC}"
+    echo "  • ~/LinuxPyMacroRecord/PyMacroRecord-1.4.2"
+    echo "  • ~/LinuxPyMacroRecord/PyMacroRecord-1.4.1"
     echo
     read -p "Introduce ruta completa (o Enter para omitir): " custom_path
 
@@ -718,13 +771,20 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
   if [[ "$PYMACRO_FOUND" == true ]]; then
     print_installing "Configurando PyMacroRecord"
 
-    # Copiar a ubicación definitiva
+    # CRÍTICO: Copiar SOLO la carpeta de PyMacroRecord, NO todo ~
     mkdir -p ~/.local/share
-    rm -rf ~/.local/share/pymacro
+
+    # Eliminar instalación anterior
+    if [[ -d ~/.local/share/pymacro ]]; then
+      print_status "Eliminando instalación anterior..."
+      rm -rf ~/.local/share/pymacro
+    fi
+
+    # Copiar CORRECTAMENTE
     cp -r "$PYMACRO_PATH" ~/.local/share/pymacro
     cd ~/.local/share/pymacro
 
-    # Eliminar venv viejo
+    # Eliminar venv viejo si existe
     if [[ -d venv ]]; then
       print_status "Eliminando venv antiguo..."
       rm -rf venv
@@ -752,35 +812,63 @@ if [[ ! "$install_pymacro" =~ ^[Nn]$ ]]; then
 
     deactivate
 
-    # ═══════════════════════════════════════════════════════════
-    # CONFIGURAR PERMISOS (CRÍTICO)
-    # ═══════════════════════════════════════════════════════════
+    # Configurar permisos
     setup_input_permissions "PyMacroRecord"
 
-    # Crear launcher mejorado con verificación
-    print_installing "Creando launcher"
+    # Crear launcher con XWayland wrapper
+    print_installing "Creando launcher XWayland"
     mkdir -p ~/.local/bin
+
     cat >~/.local/bin/pymacrorecord <<'EOL'
 #!/bin/bash
-# Launcher de PyMacroRecord con verificación de permisos
+# Wrapper DEFINITIVO para PyMacroRecord en Hyprland/Wayland
 
-# Verificar permisos básicos
-if [[ ! -r /dev/uinput ]]; then
-  echo "⚠️  Advertencia: Sin permisos para /dev/uinput"
-  echo "   Ejecutando con sudo..."
-  cd ~/.local/share/pymacro
-  source venv/bin/activate
-  cd src
-  sudo python main.py
-  exit $?
+PYMACRO_DIR=~/.local/share/pymacro
+
+# Verificar instalación
+if [[ ! -d "$PYMACRO_DIR" ]]; then
+    echo "❌ PyMacroRecord no encontrado en $PYMACRO_DIR"
+    exit 1
 fi
 
-# Todo OK, ejecutar normalmente
-cd ~/.local/share/pymacro
+# Encontrar display de XWayland
+find_xwayland_display() {
+    local display=$(ps aux | grep -i xwayland | grep -oE ':[0-9]+' | head -1)
+    if [[ -z "$display" ]]; then
+        display=$(ls /tmp/.X11-unix/ 2>/dev/null | grep -oE 'X[0-9]+' | head -1 | sed 's/X/:/')
+    fi
+    if [[ -z "$display" ]]; then
+        display=":0"
+    fi
+    echo "$display"
+}
+
+XWAYLAND_DISPLAY=$(find_xwayland_display)
+
+# Configurar variables de entorno para XWayland
+export DISPLAY="$XWAYLAND_DISPLAY"
+export GDK_BACKEND=x11
+export QT_QPA_PLATFORM=xcb
+export XAUTHORITY="$HOME/.Xauthority"
+
+# Verificar conexión a XWayland
+xhost +si:localuser:$USER 2>/dev/null
+
+# Activar entorno virtual
+cd "$PYMACRO_DIR"
+
+if [[ ! -d "venv" ]]; then
+    echo "❌ Entorno virtual no encontrado"
+    exit 1
+fi
+
 source venv/bin/activate
+
+# Ejecutar PyMacroRecord en XWayland
 cd src
-python main.py
+exec python main.py
 EOL
+
     chmod +x ~/.local/bin/pymacrorecord
 
     # Desktop file
@@ -800,7 +888,7 @@ EOL
     # Actualizar base de datos
     update-desktop-database ~/.local/share/applications 2>/dev/null || true
 
-    print_success "PyMacroRecord instalado con permisos configurados"
+    print_success "PyMacroRecord instalado con wrapper XWayland"
 
     # Verificar si necesita cerrar sesión
     if ! groups | grep -q input; then
@@ -808,12 +896,9 @@ EOL
       echo -e "${RED}${BOLD}⚠️  IMPORTANTE:${NC} ${YELLOW}Debes cerrar sesión y volver a entrar${NC}"
       echo -e "   (para aplicar permisos del grupo 'input')"
       echo
-    else
-      echo
-      echo -e "${GREEN}✓ Permisos aplicados, puedes usar PyMacroRecord ahora${NC}"
-      echo
     fi
 
+    echo
     echo -e "${GREEN}${BOLD}✨ GUÍA DE USO - PYMACRORECORD ✨${NC}"
     echo
     echo -e "${CYAN}Ejecutar:${NC}"
@@ -824,12 +909,6 @@ EOL
     echo -e "  ${RED}●${NC} ${RED}Botón ROJO${NC} → Grabar"
     echo -e "  ${YELLOW}■${NC} ${YELLOW}Botón NEGRO${NC} → Detener grabación"
     echo -e "  ${GREEN}▶${NC} ${GREEN}Botón VERDE${NC} → Reproducir"
-    echo -e "  ${YELLOW}F3${NC} → Detener reproducción"
-    echo
-    echo -e "${CYAN}Atajos:${NC}"
-    echo -e "  ${YELLOW}Ctrl+S${NC} - Guardar macro (.pmr)"
-    echo -e "  ${YELLOW}Ctrl+L${NC} - Cargar macro"
-    echo -e "  ${YELLOW}Ctrl+N${NC} - Nueva (limpiar)"
     echo
   else
     print_error "PyMacroRecord no instalado"
@@ -845,14 +924,16 @@ if [[ ! "$install_autoclickers" =~ ^[Nn]$ ]]; then
   echo
   echo -e "${CYAN}Selecciona autoclicker(s):${NC}"
   echo -e "${BOLD}${GREEN}1. TheClicker${NC} (Rust, RECOMENDADO)"
-  echo -e "${BOLD}${GREEN}2. ydotool${NC} (Universal)"
-  echo -e "${BOLD}${GREEN}3. Flatpak Clicker${NC} (GUI)"
-  echo -e "${BOLD}${GREEN}4. Xclicker${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}2. ydotool [like Wtype, dtool, xdtool]${NC} (Universal)"
+  echo -e "${BOLD}${GREEN}3. Flatpak Clicker & BiggerTask ${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}4. Xclicker & atbswp [Tinytask?] ${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}5. Clonar Macro-Tool [Tinytask?] ${NC} (GUI)"
   echo
   read -p "¿Instalar TheClicker? [S/n]: " install_theclicker
   read -p "¿Instalar ydotool? [s/N]: " install_ydotool
   read -p "¿Instalar Flatpak Clicker? [s/N]: " install_flatpak
-  read -p "¿Instalar Flatpak Clicker? [s/N]: " install_xclickerAUR
+  read -p "¿Instalar xClicker? (yay) [s/N]: " install_xclickerAUR
+  read -p "¿Instalar Macro-Tool? [s/N]: " install_macrotool
 
   # ═══════════════════════════════════════════════════════════
   # THECLICKER (CON PERMISOS INTEGRADOS)
@@ -950,9 +1031,9 @@ EOL
     echo
   fi
 
-  # ═══════════════════════════════════════════════════════════
-  # FLATPAK CLICKER (CON VERIFICACIÓN MEJORADA)
-  # ═══════════════════════════════════════════════════════════
+  # ══════════════════════════════════════════════════════════════════
+  # FLATPAK CLICKER+Tinytask [BiggerTask] (CON VERIFICACIÓN MEJORADA)
+  # ══════════════════════════════════════════════════════════════════
   if [[ "$install_flatpak" =~ ^[Ss]$ ]]; then
     print_installing "Flatpak Clicker"
 
@@ -975,6 +1056,8 @@ EOL
       print_status "Instalando desde flathub..."
       if flatpak install -y flathub net.codelogistics.clicker; then
         print_success "Flatpak Clicker instalado"
+        flatpak install -y io.github.taboulet.BiggerTask
+        print_success "Flatpak BiggerTask instalado (Tinytask)"
       else
         print_error "Error instalando Flatpak Clicker"
         print_warning "Intenta manualmente: flatpak install flathub net.codelogistics.clicker"
@@ -989,20 +1072,80 @@ EOL
     echo
     echo -e "${YELLOW}⚠️  Nota:${NC} Requiere permisos de portal Wayland cada vez"
   fi
-    # ═══════════════════════════════════════════════════════════
-    # XCLICKER (GUI)
-    # ═══════════════════════════════════════════════════════════
-    if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
-      print_installing "Xclicker"
-      sudo pacman -S --needed --noconfirm xclicker
-      yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-        xclicker 2>/dev/null || print_warning "Xclicker falló"
+  # ═══════════════════════════════════════════════════════════
+  # XCLICKER, & atbswp [Tinytask?] (GUI)
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
+    print_installing "Xclicker"
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      xclicker atbswp 2>/dev/null || print_warning "Xclicker falló"
 
-      print_success "Xclicker instalado"
-    else
-      print_warning "Xclicker omitido"
-    fi
-    echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
+    print_success "Xclicker instalado"
+  else
+    print_warning "Xclicker omitido"
+  fi
+
+  # ═══════════════════════════════════════════════════════════
+  # MACRO-TOOL - INSTALACIÓN SIMPLE Y DIRECTA
+  # ═══════════════════════════════════════════════════════════
+  if [[ "$install_macrotool" =~ ^[Ss]$ ]]; then
+    print_header "Instalando Macro-Tool"
+
+    # Dependencias del sistema
+    print_installing "Dependencias del sistema"
+    sudo pacman -S --needed --noconfirm python python-pip git tk xdotool wmctrl
+
+    # Directorio de instalación
+    MACROTOOL_DIR=~/.local/share/macro-tool
+    [[ -d "$MACROTOOL_DIR" ]] && rm -rf "$MACROTOOL_DIR"
+
+    # Clonar repositorio
+    print_installing "Clonando Macro-Tool desde GitHub"
+    git clone --depth 1 https://github.com/YatoVoid/Macro-Tool.git "$MACROTOOL_DIR"
+    cd "$MACROTOOL_DIR"
+
+    # Setup automático (crea venv e instala dependencias)
+    print_installing "Configurando entorno virtual"
+    python3 run_macro.py &
+    SETUP_PID=$!
+    sleep 5
+    kill $SETUP_PID 2>/dev/null || pkill -f "python3 run_macro.py"
+
+    # Launcher
+    print_installing "Creando launcher"
+    mkdir -p ~/.local/bin
+    cat >~/.local/bin/macro-tool <<'EOF'
+#!/bin/bash
+cd ~/.local/share/macro-tool
+source venv/bin/activate
+python3 AutoClicker.py
+EOF
+    chmod +x ~/.local/bin/macro-tool
+
+    # Desktop entry
+    mkdir -p ~/.local/share/applications
+    cat >~/.local/share/applications/macro-tool.desktop <<'EOF'
+[Desktop Entry]
+Name=Macro-Tool AutoClicker
+Exec=macro-tool
+Icon=input-mouse
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+
+    update-desktop-database ~/.local/share/applications 2>/dev/null
+
+    print_success "Macro-Tool instalado → Ejecuta: macro-tool"
+
+    echo
+    echo -e "${CYAN}Ubicación:${NC}"
+    echo -e "  ${YELLOW}~/.local/share/macro-tool/${NC}"
+    echo
+  else
+    print_warning "Macro-Tool omitido"
+  fi
+  echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
 fi
 
 # ═════════════════════════════════════════════════════════════
@@ -1053,7 +1196,8 @@ echo -e "${GREEN}${BOLD}Herramientas instaladas:${NC}"
 command -v theclicker &>/dev/null && echo -e "  ${GREEN}✓${NC} TheClicker"
 command -v ydotool &>/dev/null && echo -e "  ${GREEN}✓${NC} ydotool"
 flatpak list | grep -q clicker && echo -e "  ${GREEN}✓${NC} Flatpak Clicker"
-command -v premid &>/dev/null && echo -e "  ${GREEN}✓${NC} PreMiD"
+[[ -f ~/.local/bin/macro-tool ]] && echo -e "  ${GREEN}✓${NC} Macro-Tool"
+# command -v premid &>/dev/null && echo -e "  ${GREEN}✓${NC} PreMiD"
 
 echo
 if ! groups | grep -q input; then
@@ -1072,7 +1216,7 @@ print_step "25/35: Gruvbox Ecosystem"
 
 echo
 read -p "¿Instalar Gruvbox Icon Pack? [S/n]: " install_gruvbox_icons
-read -p "¿Instalar Gruvbox GTK Theme? [S/n]: " install_gruvbox_gtk
+read -p " [💀DURA 1H☠️] ¿Instalar Gruvbox GTK Theme? [S/n]: " install_gruvbox_gtk
 
 # Icons
 if [[ ! "$install_gruvbox_icons" =~ ^[Nn]$ ]]; then
@@ -1102,6 +1246,52 @@ if [[ ! "$install_gruvbox_gtk" =~ ^[Nn]$ ]]; then
   gsettings set org.gnome.desktop.interface gtk-theme 'Gruvbox-Dark' 2>/dev/null || true
   print_success "Gruvbox GTK instalado"
 fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 25.5: GRUB (CORREGIDO - Faltaba fi)
+# ═══════════════════════════════════════════════════════════
+print_step "25.5/35: GRUB + Iconos"
+
+echo
+read -p "¿Instalar temas Minecraft para GRUB? [S/n]: " install_minecraft_grub
+
+if [[ ! "$install_minecraft_grub" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Temas Minecraft"
+
+  sudo mkdir -p /boot/grub/themes
+
+  # World Selection
+  if [[ ! -d /boot/grub/themes/minegrub-world-selection ]]; then
+    git clone --depth 1 https://github.com/Lxtharia/minegrub-world-selection.git /tmp/minegrub-ws
+    sudo cp -r /tmp/minegrub-ws/minegrub-world-selection /boot/grub/themes/
+    rm -rf /tmp/minegrub-ws
+    print_success "World Selection instalado"
+  fi
+
+  # Classic
+  if [[ ! -d /boot/grub/themes/minegrub ]]; then
+    git clone --depth 1 https://github.com/Lxtharia/minegrub-theme.git /tmp/minegrub-classic
+    sudo cp -r /tmp/minegrub-classic/minegrub /boot/grub/themes/
+    rm -rf /tmp/minegrub-classic
+    print_success "Classic instalado"
+  fi
+
+  echo
+  read -p "¿Reconfigurar GRUB? [S/n]: " reconfig_grub
+
+  if [[ ! "$reconfig_grub" =~ ^[Nn]$ ]]; then
+    if [[ -L /etc/default/grub ]]; then
+      sudo grub-mkconfig -o /boot/grub/grub.cfg
+      print_success "GRUB reconfigurado"
+    else
+      print_warning "Symlink GRUB no existe"
+    fi
+  fi
+fi # 🔴 ESTE FI FALTABA
+
+print_status "Actualizando cachés..."
+update-desktop-database ~/.local/share/applications 2>/dev/null || true
+gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════════
 # PASO 26: PYTHON-PYWAL
@@ -1139,8 +1329,7 @@ read -p "¿Instalar Ollama + opencommit para commits con IA? [S/n]: " install_ol
 
 if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_installing "Ollama"
-  sudo pacman -S --needed --noconfirm ollama
-  yay -S --needed --noconfirm open-webui # Interfaz gráfica para Ollama
+  sudo pacman -S --needed --noconfirm ollama # open-webui: Interfaz gráfica para Ollama
   sudo systemctl enable --now ollama
 
   print_installing "Descargando modelo qwen2.5:0.5b (más ligero y rápido)"
@@ -1166,6 +1355,73 @@ else
   print_warning "Ollama omitido"
 fi
 
+# ═══════════════════════════════════════════════════════════
+# PASO 28.5: OPEN-WEBUI (CON FALLBACK A DOCKER)
+# ═══════════════════════════════════════════════════════════
+print_step "28.5/35: Open-WebUI (Interfaz para Ollama)"
+
+echo
+echo -e "${CYAN}Opciones para acceder a Ollama:${NC}"
+echo -e "  ${MAGENTA}1.${NC} Open-WebUI (interfaz completa + historial)"
+echo -e "  ${MAGENTA}2.${NC} Omitir (usar solo CLI de Ollama)"
+echo -e "  ${MAGENTA}BTW.${NC} La realidad es que open-webui es más FACIL de instalar en DOCKER-desktop EXTENSIONS [No HUB]"
+echo -e "  ${MAGENTA}BUSCALO COMO:${NC} rw4lll/openwebui-docker-extension"
+echo
+read -p "¿Instalar Open-WebUI? [S/n]: " install_webui
+
+if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
+  print_header "Instalando Open-WebUI"
+
+  # Intento 1: Compilar desde AUR
+  print_status "Intentando instalación desde AUR..."
+  if yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    open-webui 2>/dev/null; then
+    print_success "Open-WebUI instalado desde AUR"
+    print_status "Accede a: http://localhost:8080"
+  else
+    # Fallback: Docker
+    print_warning "Compilación AUR falló, usando Docker..."
+
+    if ! command -v docker &>/dev/null; then
+      print_status "Instalando Docker..."
+      sudo pacman -S --needed --noconfirm docker
+      sudo systemctl enable --now docker
+      sudo systemctl start docker.service
+      sudo systemctl enable docker.service
+      sudo usermod -aG docker $USER
+      docker run hello-world
+    fi
+
+    print_installing "Open-WebUI via Docker"
+    # EXTRAIDO DE:
+    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/
+
+    # I’m going to choose the option to install Open WebUI with Bundled Ollama Support and select the container that utilizes a GPU:
+    # if [[ -f /etc/arch-release ]]; then # esto esta MAL, usa:
+    if command -v nvidia-smi &>/dev/null; then
+      print_status "Detectado Arch Linux"
+      print_installing "Open-WebUI via Docker (GPU)"
+      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama 2>/dev/null
+    else
+      print_status "Detectado Debian/Ubuntu"
+      print_installing "Open-WebUI via Docker (CPU)"
+      # If you’re not using a GPU, use this command:
+      docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama 2>/dev/null
+    fi
+
+    if [[ $? -eq 0 ]]; then
+      print_success "Open-WebUI iniciado en Docker"
+      print_status "Accede a: http://localhost:3000"
+      print_status "Primer inicio toma ~30 segundos"
+    else
+      print_error "Docker falló, instálalo manualmente después:"
+      echo -e "${YELLOW}docker run -d --name open-webui -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main${NC}"
+    fi
+  fi
+else
+  print_warning "Open-WebUI omitido"
+fi
+
 # ═════════════════════════════════════════════════════════════════
 # PASO 29: GLYPHS, ICONOS Y EMOJIS (RAYCAST-LIKE): Vicinae + Fuzzel
 # ═════════════════════════════════════════════════════════════════
@@ -1173,7 +1429,7 @@ print_step "28/35: Glyphs, Iconos y Emojis"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨                   ║${NC}"
+echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨                    ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Este paso instala herramientas para buscar e insertar:${NC}"
@@ -1420,9 +1676,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 32: RCLONE GOOGLE DRIVE (OPCIONAL)
+# PASO 31.5: RCLONE GOOGLE DRIVE (OPCIONAL)
 # ═══════════════════════════════════════════════════════════
-print_step "32/35: Rclone Google Drive (Opcional)"
+print_step "31.5/35: Rclone Google Drive (Opcional)"
 
 echo
 read -p "¿Configurar Rclone para Google Drive? [s/N]: " setup_rclone
@@ -1512,9 +1768,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 33: CONFIGURACIÓN AUTOMÁTICA DE TEMAS QT/GTK
+# PASO 32: CONFIGURACIÓN AUTOMÁTICA DE TEMAS QT/GTK
 # ═══════════════════════════════════════════════════════════
-print_step "33/35: Configuración Automática de Temas"
+print_step "32/35: Configuración Automática de Temas"
 
 echo
 read -p "¿Configurar temas Qt/GTK automáticamente? [S/n]: " config_themes
@@ -1577,9 +1833,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34: DESACTIVAR GESTOR DE LOGIN ACTUAL
+# PASO 32.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
-print_step "33.5/35: Desactivar Display Manager Actual"
+print_step "32.5/35: Desactivar Display Manager Actual"
 
 # Detectar gestor actual
 CURRENT_DM=""
@@ -1607,13 +1863,496 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 35: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# PASO 33: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
 # ═══════════════════════════════════════════════════════════
-print_step "34/35: Display Manager (GDM o SDDM)"
+
+function configure_swap() {
+  print_step "33/35: Configurar Swap Automático"
+
+  echo
+  echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾           ║${NC}"
+  echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+  echo
+
+  # Detectar RAM total del sistema
+  local TOTAL_RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+  local TOTAL_RAM_GB=$((TOTAL_RAM_KB / 1024 / 1024))
+  local CURRENT_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+  local CURRENT_SWAP_GB=$((CURRENT_SWAP_KB / 1024 / 1024))
+
+  echo -e "${CYAN}Sistema detectado:${NC}"
+  echo -e "  ${MAGENTA}•${NC} RAM total: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swap actual: ${BOLD}${CURRENT_SWAP_GB}GB${NC}"
+
+  # Calcular swap recomendado
+  local RECOMMENDED_SWAP
+  if [[ $TOTAL_RAM_GB -le 8 ]]; then
+    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2)) # 2x RAM si ≤8GB
+  elif [[ $TOTAL_RAM_GB -le 16 ]]; then
+    RECOMMENDED_SWAP=$TOTAL_RAM_GB # 1x RAM si ≤16GB
+  else
+    RECOMMENDED_SWAP=16 # Máximo 16GB si >16GB RAM
+  fi
+
+  echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
+
+  # Verificar espacio libre en disco
+  local FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
+  local FREE_SPACE_GB=$((FREE_SPACE_KB / 1024 / 1024))
+  echo -e "  ${MAGENTA}•${NC} Espacio libre en /: ${BOLD}${FREE_SPACE_GB}GB${NC}"
+
+  # Verificar si ya hay suficiente swap
+  if [[ $CURRENT_SWAP_GB -ge $RECOMMENDED_SWAP ]]; then
+    echo
+    echo -e "${GREEN}✓ Swap actual (${CURRENT_SWAP_GB}GB) es suficiente${NC}"
+    read -p "¿Configurar swap adicional de todos modos? [s/N]: " force_swap
+    if [[ ! "$force_swap" =~ ^[Ss]$ ]]; then
+      print_warning "Configuración de swap omitida"
+      return
+    fi
+  fi
+
+  # Verificar espacio suficiente
+  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2)) # +2GB de margen
+  if [[ $FREE_SPACE_GB -lt $REQUIRED_SPACE ]]; then
+    echo
+    echo -e "${RED}⚠️  Espacio insuficiente:${NC}"
+    echo -e "  Requerido: ${RED}${REQUIRED_SPACE}GB${NC}"
+    echo -e "  Disponible: ${YELLOW}${FREE_SPACE_GB}GB${NC}"
+    echo
+    read -p "¿Crear swap más pequeño de ${FREE_SPACE_GB}GB? [s/N]: " create_smaller
+    if [[ "$create_smaller" =~ ^[Ss]$ ]]; then
+      RECOMMENDED_SWAP=$((FREE_SPACE_GB - 1))
+    else
+      print_warning "Configuración de swap omitida por falta de espacio"
+      return
+    fi
+  fi
+
+  echo
+  echo -e "${CYAN}Opciones de swap:${NC}"
+  echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
+  echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
+  echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
+  echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
+  echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
+  echo
+  read -p "Seleccionar opción [1-5]: " swap_choice
+
+  case "$swap_choice" in
+  4)
+    print_header "Eliminando Swap Completamente"
+
+    echo
+    print_warning "⚠️  ADVERTENCIA: Esto desactivará hibernation"
+    read -p "¿Estás seguro? [s/N]: " confirm_delete
+
+    if [[ "$confirm_delete" =~ ^[Ss]$ ]]; then
+      # Desactivar swap
+      print_status "Desactivando swap..."
+      sudo swapoff -a 2>/dev/null || true
+      print_success "Swap desactivado"
+
+      # Eliminar swapfile
+      if [[ -f /swapfile ]]; then
+        print_status "Eliminando /swapfile..."
+        sudo rm -f /swapfile
+        print_success "Swapfile eliminado"
+      fi
+
+      # Limpiar /etc/fstab
+      if grep -q "/swapfile" /etc/fstab 2>/dev/null; then
+        print_status "Removiendo entrada de fstab..."
+        sudo sed -i '/\/swapfile/d' /etc/fstab
+        print_success "Línea removida de /etc/fstab"
+      fi
+
+      # Limpiar parámetros de hibernation en GRUB
+      if [[ -f /etc/default/grub ]]; then
+        if grep -q "resume=" /etc/default/grub; then
+          print_status "Removiendo parámetros de hibernation de GRUB..."
+          sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+          sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+          sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+          sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null
+          print_success "GRUB actualizado"
+        fi
+      fi
+
+      # Mostrar espacio recuperado
+      echo
+      FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
+      echo -e "${GREEN}✓ Swap eliminado completamente${NC}"
+      echo -e "${CYAN}Espacio libre ahora: ${BOLD}$FREE_SPACE${NC}"
+      echo
+
+      # Marcar para saltar hibernation
+      SKIP_HIBERNATION=true
+    else
+      print_warning "Eliminación cancelada"
+    fi
+    ;;
+  1 | 3)
+    print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
+
+    # Verificar si ya existe swapfile
+    if [[ -f /swapfile ]]; then
+      print_warning "Ya existe /swapfile"
+      sudo swapoff /swapfile 2>/dev/null || true
+      sudo rm -f /swapfile
+      print_status "Swapfile anterior eliminado"
+    fi
+
+    # Crear swapfile con fallocate (más rápido que dd)
+    print_installing "Creando swapfile de ${RECOMMENDED_SWAP}GB"
+    if sudo fallocate -l ${RECOMMENDED_SWAP}G /swapfile 2>/dev/null; then
+      print_success "Swapfile creado con fallocate"
+    else
+      print_status "fallocate falló, usando dd..."
+      sudo dd if=/dev/zero of=/swapfile bs=1M count=$((RECOMMENDED_SWAP * 1024)) status=progress
+    fi
+
+    # Configurar permisos y formato
+    print_status "Configurando swapfile..."
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+
+    # Agregar a /etc/fstab si no existe
+    if ! grep -q "/swapfile" /etc/fstab; then
+      echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+      print_success "Swapfile agregado a /etc/fstab"
+    fi
+
+    print_success "Swapfile de ${RECOMMENDED_SWAP}GB configurado"
+    ;;
+  esac
+
+  case "$swap_choice" in
+  2 | 3)
+    print_header "Configurando Zswap (Compresión en RAM)"
+
+    # Verificar soporte del kernel
+    if [[ ! -f /sys/module/zswap/parameters/enabled ]]; then
+      print_warning "Zswap no soportado por el kernel actual"
+    else
+      # Habilitar zswap
+      print_installing "Habilitando zswap"
+      echo 1 | sudo tee /sys/module/zswap/parameters/enabled
+
+      # Configurar algoritmo de compresión (lz4 es más rápido)
+      echo lz4 | sudo tee /sys/module/zswap/parameters/compressor 2>/dev/null || true
+      echo zbud | sudo tee /sys/module/zswap/parameters/zpool 2>/dev/null || true
+
+      # Configurar porcentaje de RAM para zswap (20% por defecto)
+      echo 20 | sudo tee /sys/module/zswap/parameters/max_pool_percent
+
+      # Hacer permanente agregando a kernel parameters
+      if [[ -f /etc/default/grub ]]; then
+        if ! grep -q "zswap.enabled=1" /etc/default/grub; then
+          sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="zswap.enabled=1 zswap.compressor=lz4 zswap.max_pool_percent=20 /' /etc/default/grub
+          print_status "Parámetros zswap agregados a GRUB"
+          print_warning "Ejecuta 'sudo grub-mkconfig -o /boot/grub/grub.cfg' después del reinicio"
+        fi
+      fi
+
+      print_success "Zswap configurado (20% RAM, compresión lz4)"
+    fi
+    ;;
+  esac
+
+  if [[ "$swap_choice" == "5" ]]; then
+    print_warning "Configuración de swap omitida"
+  else
+    # Configurar swappiness (agresividad del swap)
+    print_status "Configurando swappiness..."
+
+    # Swappiness recomendado según RAM
+    if [[ $TOTAL_RAM_GB -ge 16 ]]; then
+      SWAPPINESS=10 # Menos agresivo con mucha RAM
+    elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
+      SWAPPINESS=20 # Moderado con RAM media
+    else
+      SWAPPINESS=60 # Más agresivo con poca RAM
+    fi
+
+    echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
+    sudo sysctl vm.swappiness=$SWAPPINESS
+
+    print_success "Swappiness configurado a $SWAPPINESS"
+
+    # Mostrar estado final
+    echo
+    echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
+    echo
+    NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+    NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
+    echo -e "${CYAN}Estado actual:${NC}"
+    echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
+
+    if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
+      ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
+      echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
+    fi
+
+    echo
+    echo -e "${YELLOW}Comandos útiles:${NC}"
+    echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
+    echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
+    echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
+    echo
+  fi
+}
+
+# Llamar la función de swap
+configure_swap
+
+# PASO 33.5: CONFIGURAR HIBERNATION (SLEEP TO DISK)
+function configure_hibernation() {
+  # Verificar si se saltó por eliminación de swap
+  if [[ "$SKIP_HIBERNATION" == "true" ]]; then
+    print_warning "Hibernation omitido (swap eliminado)"
+    return 0
+  fi
+
+  print_step "33.5/35: Configurar Hibernation (Sleep to Disk)"
+
+  echo
+  echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}${YELLOW}║          💤 CONFIGURACIÓN DE HIBERNATION 💤               ║${NC}"
+  echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+  echo
+
+  # Verificar si systemctl soporta hibernation
+  if ! systemctl hibernate --dry-run &>/dev/null; then
+    print_warning "Hibernation NO soportado en este kernel"
+    print_warning "Saltando configuración de hibernation"
+    return
+  fi
+
+  read -p "¿Configurar Hibernation? [S/n]: " setup_hibernation
+  [[ "$setup_hibernation" =~ ^[Nn]$ ]] && return
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 1: Obtener offset del swapfile
+  # ───────────────────────────────────────────────────────────
+  print_header "Calculando OFFSET del swapfile"
+
+  if [[ ! -f /swapfile ]]; then
+    print_error "No existe /swapfile. Hibernation requiere swap configurado."
+    return
+  fi
+
+  SWAP_OFFSET=$(sudo filefrag -v /swapfile 2>/dev/null | grep "0:" | awk '{print $4}' | cut -d. -f1)
+
+  if [[ -z "$SWAP_OFFSET" ]]; then
+    print_error "No se pudo calcular el offset. Saltando hibernation."
+    return
+  fi
+
+  print_success "Offset calculado: $SWAP_OFFSET"
+  echo -e "${CYAN}Guardando en ${YELLOW}/root/.hibernation_offset${NC}"
+  echo "$SWAP_OFFSET" | sudo tee /root/.hibernation_offset >/dev/null
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 2: Detectar bootloader
+  # ───────────────────────────────────────────────────────────
+  print_status "Detectando bootloader..."
+
+  BOOTLOADER="none"
+  if [[ -f /etc/default/grub ]]; then
+    BOOTLOADER="grub"
+    print_success "GRUB detectado"
+  elif [[ -d /boot/loader/entries ]]; then
+    BOOTLOADER="systemd-boot"
+    print_warning "systemd-boot detectado (hibernation manual)"
+  fi
+
+  if [[ "$BOOTLOADER" == "none" ]]; then
+    print_warning "No se detectó bootloader conocido"
+    return
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 3: Configurar GRUB (si aplica)
+  # ───────────────────────────────────────────────────────────
+  if [[ "$BOOTLOADER" == "grub" ]]; then
+    print_header "Configurando GRUB para Hibernation"
+
+    echo
+    echo -e "${YELLOW}Opciones:${NC}"
+    echo -e "  ${MAGENTA}1.${NC} ${GREEN}Automático${NC} (editar GRUB automáticamente)"
+    echo -e "  ${MAGENTA}2.${NC} ${YELLOW}Manual${NC} (mostrar instrucciones)"
+    echo -e "  ${MAGENTA}3.${NC} ${RED}Omitir${NC}"
+    echo
+    read -p "Seleccionar [1-3]: " grub_choice
+
+    case "$grub_choice" in
+    1)
+      print_status "Editando /etc/default/grub..."
+
+      # Hacer backup
+      sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+      print_success "Backup creado"
+
+      # Buscar la línea GRUB_CMDLINE_LINUX_DEFAULT
+      if grep -q "GRUB_CMDLINE_LINUX_DEFAULT=" /etc/default/grub; then
+        # Remover parámetros resume antiguos (si existen)
+        sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+        sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+
+        # Agregar parámetros nuevos
+        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"resume=\/swapfile resume_offset=$SWAP_OFFSET /" /etc/default/grub
+
+        print_success "Parámetros agregados a GRUB"
+      else
+        print_warning "No se encontró GRUB_CMDLINE_LINUX_DEFAULT"
+        echo "resume=/swapfile resume_offset=$SWAP_OFFSET" | sudo tee -a /etc/default/grub
+      fi
+
+      # Mostrar configuración
+      echo
+      echo -e "${CYAN}Nueva configuración:${NC}"
+      grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub
+      echo
+
+      # Actualizar GRUB
+      print_status "Actualizando GRUB..."
+      sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+      if [[ $? -eq 0 ]]; then
+        print_success "GRUB actualizado exitosamente"
+      else
+        print_error "Error actualizando GRUB"
+        print_warning "Restaurar backup: sudo cp /etc/default/grub.backup.* /etc/default/grub"
+      fi
+      ;;
+    2)
+      echo
+      echo -e "${YELLOW}${BOLD}CONFIGURACIÓN MANUAL DE GRUB${NC}"
+      echo
+      echo -e "  ${CYAN}1. Abre el archivo con:${NC}"
+      echo -e "     ${YELLOW}sudo nano /etc/default/grub${NC}"
+      echo
+      echo -e "  ${CYAN}2. Busca la línea:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"...\"${NC}"
+      echo
+      echo -e "  ${CYAN}3. Agrega al final (antes del cierre \"):${NC}"
+      echo -e "     ${GREEN}resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+      echo
+      echo -e "  ${CYAN}Ejemplo:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet resume=/swapfile resume_offset=$SWAP_OFFSET\"${NC}"
+      echo
+      echo -e "  ${CYAN}4. Guarda (Ctrl+O, Enter, Ctrl+X)"
+      echo
+      echo -e "  ${CYAN}5. Actualiza GRUB:${NC}"
+      echo -e "     ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+      echo
+      read -p "Presiona Enter cuando hayas completado los pasos..."
+      ;;
+    3)
+      print_warning "GRUB no configurado"
+      ;;
+    esac
+  fi
+
+  if [[ "$BOOTLOADER" == "systemd-boot" ]]; then
+    echo
+    echo -e "${YELLOW}${BOLD}systemd-boot detectado${NC}"
+    echo -e "${CYAN}Para hibernation en systemd-boot:${NC}"
+    echo
+    echo -e "  ${MAGENTA}1.${NC} Edita ${YELLOW}/boot/loader/entries/arch.conf${NC}:"
+    echo -e "     Agrega: ${GREEN}options resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+    echo
+    echo -e "  ${MAGENTA}2.${NC} O usa ${YELLOW}bootctl edit arch${NC} (más seguro)"
+    echo
+    read -p "Presiona Enter cuando completes..."
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 4: Configurar systemd-sleep (duraciones)
+  # ───────────────────────────────────────────────────────────
+  print_header "Configurando systemd-sleep"
+
+  print_status "Permitir hibernation sin sudo (opcional)..."
+
+  read -p "¿Crear permisos sudo para systemctl hibernate? [S/n]: " setup_sudo
+  if [[ ! "$setup_sudo" =~ ^[Nn]$ ]]; then
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl hibernate" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl suspend" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    print_success "Permisos configurados en /etc/sudoers.d/hibernation"
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 5: Mostrar resumen
+  # ───────────────────────────────────────────────────────────
+  echo
+  echo -e "${GREEN}${BOLD}✨ HIBERNATION CONFIGURADO ✨${NC}"
+  echo
+  echo -e "${CYAN}Comandos para usar:${NC}"
+  echo -e "  ${YELLOW}systemctl hibernate${NC}      # Dormir a disco"
+  echo -e "  ${YELLOW}systemctl suspend${NC}        # Dormir en RAM"
+  echo -e "  ${YELLOW}systemctl suspend-then-hibernate${NC}  # RAM→Disco (timeout)"
+  echo
+  echo -e "${CYAN}Variables guardadas:${NC}"
+  echo -e "  ${MAGENTA}•${NC} Offset: ${BOLD}$SWAP_OFFSET${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swapfile: ${BOLD}/swapfile${NC}"
+  echo -e "  ${MAGENTA}•${NC} Bootloader: ${BOLD}$BOOTLOADER${NC}"
+  echo
+  echo -e "${YELLOW}${BOLD}⚠️  IMPORTANTE:${NC}"
+  echo -e "  ${CYAN}•${NC} ${YELLOW}Reinicia el sistema${NC} para que los cambios tomen efecto"
+  echo -e "  ${CYAN}•${NC} Si GRUB se corrompe, usa: ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+  echo
+}
+
+# Llamar la función de hibernation
+configure_hibernation
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34: SISTEMA UNIFICADO DE BACKUPS (TIMESHIFT/SNAPPER)
+# ═══════════════════════════════════════════════════════════
+print_step "34/35: Sistema Unificado de Backups (Snapshots)"
 
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️              ║${NC}"
+echo -e "${BOLD}${YELLOW}║      🔄 SISTEMA UNIFICADO DE SNAPSHOTS/BACKUPS 🔄         ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo
+echo -e "${CYAN}Sistema modular y completo de backups/snapshots:${NC}"
+echo -e "  ${MAGENTA}•${NC} Detección automática de filesystem (ext4/Btrfs)"
+echo -e "  ${MAGENTA}•${NC} Timeshift para ext4 (rsync incremental)"
+echo -e "  ${MAGENTA}•${NC} Snapper para Btrfs (snapshots nativos)"
+echo -e "  ${MAGENTA}•${NC} Límite de 5GB máximo para ahorro de espacio"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos antes de actualizaciones"
+echo -e "  ${MAGENTA}•${NC} Opción de desinstalación/reversión completa"
+echo
+
+# Ejecutar script de configuración de backups
+if [[ -f ~/dotfiles-dizzi/setup-backup-system.sh ]]; then
+  bash ~/dotfiles-dizzi/setup-backup-system.sh
+else
+  print_error "Script de configuración no encontrado: ~/dotfiles-dizzi/setup-backup-system.sh"
+  read -p "¿Continuar sin configurar backups? [S/n]: " skip_backups
+
+  if [[ "$skip_backups" =~ ^[Nn]$ ]]; then
+    print_error "Backup system setup abortado"
+  fi
+fi
+
+echo
+print_success "Configuración de backups completada"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.5: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Display Manager (GDM o SDDM)"
+
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
@@ -1680,9 +2419,9 @@ if [[ "$dm_choice" == "2" ]]; then
     echo -e "${CYAN}║  ${BOLD}CONFIGURACIÓN INTERACTIVA DEL TEMA ASTRONAUT${NC}${CYAN}    ║${NC}"
     echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
     echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
-    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles          ║${NC}"
-    echo -e "${CYAN}║  • Personalizar colores y apariencia                 ║${NC}"
-    echo -e "${CYAN}║  • Configurar wallpaper                              ║${NC}"
+    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles           ║${NC}"
+    echo -e "${CYAN}║  • Personalizar colores y apariencia                  ║${NC}"
+    echo -e "${CYAN}║  • Configurar wallpaper                               ║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
     echo
     echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
@@ -1768,6 +2507,13 @@ yay -Sc --noconfirm 2>/dev/null || true
 sudo pacman -Sc --noconfirm 2>/dev/null || true
 rm -rf ~/.cache/yay 2>/dev/null || true
 rm -rf /tmp/sddm-astronaut-theme 2>/dev/null || true
+hyprctl reload # o niri reload
+
+# Reiniciar Waybar desacoplado de la terminal
+print_status "Reiniciando Waybar..."
+killall waybar 2>/dev/null || true
+nohup waybar >/dev/null 2>&1 & # NOHUP LA SOLUCION PARA QUE NO SE CIERRE AL CERRAR TERMINAL
+sleep 1
 
 print_success "Limpieza completada"
 
@@ -1794,7 +2540,6 @@ cat <<"EOF"
 ║  ✨ SDDM Astronaut Theme configurado interactivamente                ║
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
-
 EOF
 
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
@@ -1810,7 +2555,6 @@ echo
 echo -e "${YELLOW}${BOLD}Configuraciones post-instalación:${NC}"
 echo -e "  ${CYAN}•${NC} Neovim: Abre ${YELLOW}nvim${NC} y ejecuta ${YELLOW}:MasonInstall prettier markdownlint-cli2${NC}"
 echo -e "  ${CYAN}•${NC} Copilot: En nvim ejecuta ${YELLOW}:CopilotAuth${NC}"
-echo -e "  ${CYAN}•${NC} Gemini CLI: ${YELLOW}gemini-cli setup${NC}"
 echo -e "  ${CYAN}•${NC} Pywal: ${YELLOW}wal -i ~/wallpapers/tu-imagen.jpg${NC}"
 echo -e "  ${CYAN}•${NC} Music Presence: ${YELLOW}source ~/.zshrc && musicpresence${NC}"
 echo -e "  ${CYAN}•${NC} Rclone: ${YELLOW}~/montar_gdrive.sh${NC} (si configuraste)"
@@ -1822,10 +2566,16 @@ echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15mi
 echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
 echo -e "  ${CYAN}•${NC} Ollama: ${YELLOW}sudo pacman -S ollama && ollama pull qwen2.5:0.5b${NC}"
 echo
-echo -e "${GREEN}${BOLD}Dotfiles:${NC}"
-echo -e "  ${CYAN}•${NC} Aplicar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow .${NC}"
-echo -e "  ${CYAN}•${NC} Quitar todos: ${YELLOW}cd ~/dotfiles-dizzi && stow -D .${NC}"
-echo -e "  ${CYAN}•${NC} Aplicar específico: ${YELLOW}cd ~/dotfiles-dizzi && stow hypr waybar rofi${NC}"
+echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
+echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
+echo -e "  ${CYAN}•${NC} Ver snapshots: ${YELLOW}snapper list${NC} o ${YELLOW}snls${NC} (alias)"
+echo -e "  ${CYAN}•${NC} Crear snapshot: ${YELLOW}snapper create -d 'Mi snapshot'${NC}"
+echo -e "  ${CYAN}•${NC} Snapshots automáticos: ${YELLOW}Antes de pacman -Syu${NC} (snap-pac)"
+echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 snapshots (con compresión)"
+echo
+echo -e "${CYAN}💡 TIPS:${NC}"
+echo -e "  ${MAGENTA}•${NC} Hibernation: Verifica con ${YELLOW}systemctl hibernate --dry-run${NC}"
+echo -e "  ${MAGENTA}•${NC} Snapshots: Rollback desde GRUB en 'Arch Linux snapshots'"
 echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
   htop # --> Usa F6 para ordenar por CPU
   sudo intel_gpu_top # Ver GPU en tiempo real de Intel [latitude 7440]
