@@ -1,0 +1,405 @@
+NAME       MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0        7:0    0   2.6G  1 loop /run/archiso/airootfs
+sda          8:0    0 476.9G  0 disk 
+├─sda1       8:1    0     2G  0 part 
+├─sda2       8:2    0 457.9G  0 part 
+└─sda3       8:3    0    17G  0 part 
+sdb          8:16   1  29.1G  0 disk 
+├─sdb1       8:17   1    29G  0 part 
+│ ├─ventoy 254:0    0   2.9G  1 dm   /run/archiso/bootmnt
+│ └─sdb1   254:1    0    29G  0 dm   
+└─sdb2       8:18   1    32M  0 part 
+[liveuser@eos-2025.03.19 ~]$ sudo mount /dev/sda2 /mnt
+^[[A^[[A[liveuser@eos-2025.03.19 ~]$ sudo mount /dev/sda1 /mnt/boot/efi
+[liveuser@eos-2025.03.19 ~]$ ls /etc/mkinitcpio.d/
+linux.preset
+[liveuser@eos-2025.03.19 ~]$ cat /etc/mkinitcpio.d/linux.preset 
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# mkinitcpio preset file for the 'linux' package on archiso
+
+PRESETS=('archiso')
+
+ALL_kver='/boot/vmlinuz-linux'
+ALL_config='/etc/mkinitcpio.conf'
+
+archiso_image="/boot/initramfs-linux.img"
+[liveuser@eos-2025.03.19 ~]$ nvim /etc/mkinitcpio.d/linux.preset 
+bash: nvim: command not found
+[liveuser@eos-2025.03.19 ~]$ vim /etc/mkinitcpio.d/linux.preset 
+bash: vim: command not found
+[liveuser@eos-2025.03.19 ~]$ sudo pacman -S nvim
+error: target not found: nvim
+[liveuser@eos-2025.03.19 ~]$ 
+[liveuser@eos-2025.03.19 ~]$ sudo pacman -S vim
+resolving dependencies...
+looking for conflicting packages...
+
+Package (2)        New Version  Net Change  Download Size
+
+extra/vim-runtime  9.1.1198-1    37.61 MiB       7.43 MiB
+extra/vim          9.1.1198-1     4.93 MiB       2.26 MiB
+
+Total Download Size:    9.69 MiB
+Total Installed Size:  42.54 MiB
+
+:: Proceed with installation? [Y/n] 
+warning: no /var/cache/pacman/pkg/ cache exists, creating...
+:: Retrieving packages...
+ vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst failed to download
+ vim-9.1.1198-1-x86_64.pkg.tar.zst failed to download
+ Total (2/2)                             9.7 MiB   344 KiB/s 00:29 [------------------------------------] 100%
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+warning: too many errors from mirror.moson.org, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+warning: too many errors from arch.mirror.constant.com, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pseudoform.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pseudoform.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.lty.me : Could not resolve host: mirror.lty.me
+warning: fatal error from mirror.lty.me, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.lty.me : Could not resolve host: mirror.lty.me
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pkgbuild.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pkgbuild.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+warning: too many errors from iad.mirrors.misaka.one, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+warning: too many errors from archlinux.thaller.ws, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from america.mirror.pkgbuild.com : Could not resolve host: america.mirror.pkgbuild.com
+warning: fatal error from america.mirror.pkgbuild.com, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from america.mirror.pkgbuild.com : Could not resolve host: america.mirror.pkgbuild.com
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.wtnet.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.wtnet.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.wtnet.de : The requested URL returned error: 404
+warning: too many errors from mirror.wtnet.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.wtnet.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arlm.tyzoid.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arlm.tyzoid.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arlm.tyzoid.com : The requested URL returned error: 404
+warning: too many errors from arlm.tyzoid.com, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arlm.tyzoid.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from phinau.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from phinau.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from phinau.de : The requested URL returned error: 404
+warning: too many errors from phinau.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from phinau.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.hu.fo : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.hu.fo : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.hu.fo : The requested URL returned error: 404
+warning: too many errors from arch.hu.fo, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.hu.fo : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.chaoticum.net : Could not resolve host: mirror.chaoticum.net
+warning: fatal error from mirror.chaoticum.net, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.chaoticum.net : Could not resolve host: mirror.chaoticum.net
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from archmirror1.octyl.net : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from archmirror1.octyl.net : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from archmirror1.octyl.net : The requested URL returned error: 404
+warning: too many errors from archmirror1.octyl.net, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from archmirror1.octyl.net : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.jensgutermuth.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.jensgutermuth.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.jensgutermuth.de : The requested URL returned error: 404
+warning: too many errors from arch.jensgutermuth.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.jensgutermuth.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.hackingand.coffee : Could not resolve host: mirror.hackingand.coffee
+warning: fatal error from mirror.hackingand.coffee, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.hackingand.coffee : Could not resolve host: mirror.hackingand.coffee
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.zachlge.org : Could not resolve host: arch.mirror.zachlge.org
+warning: fatal error from arch.mirror.zachlge.org, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.zachlge.org : Could not resolve host: arch.mirror.zachlge.org
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.arizona.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.arizona.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.arizona.edu : The requested URL returned error: 404
+warning: too many errors from mirror.arizona.edu, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.arizona.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.mikrogravitation.org : Could not resolve host: mirror.mikrogravitation.org
+warning: fatal error from mirror.mikrogravitation.org, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.mikrogravitation.org : Could not resolve host: mirror.mikrogravitation.org
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.lug.mtu.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.lug.mtu.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.lug.mtu.edu : The requested URL returned error: 404
+warning: too many errors from mirrors.lug.mtu.edu, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.lug.mtu.edu : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from ftp.halifax.rwth-aachen.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from ftp.halifax.rwth-aachen.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from ftp.halifax.rwth-aachen.de : The requested URL returned error: 404
+warning: too many errors from ftp.halifax.rwth-aachen.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from ftp.halifax.rwth-aachen.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.bethselamin.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.bethselamin.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.23m.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.23m.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.23m.com : The requested URL returned error: 404
+warning: too many errors from mirror.23m.com, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.23m.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.ubrco.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.ubrco.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.ubrco.de : The requested URL returned error: 404
+warning: too many errors from mirror.ubrco.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.ubrco.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.niyawe.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.niyawe.de : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.niyawe.de : The requested URL returned error: 404
+warning: too many errors from mirrors.niyawe.de, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirrors.niyawe.de : The requested URL returned error: 404
+warning: failed to retrieve some files
+error: failed to commit transaction (failed to retrieve some files)
+Errors occurred, no packages were upgraded.
+[liveuser@eos-2025.03.19 ~]$ sudo pacman -S vim
+resolving dependencies...
+looking for conflicting packages...
+
+Package (2)        New Version  Net Change  Download Size
+
+extra/vim-runtime  9.1.1198-1    37.61 MiB       7.43 MiB
+extra/vim          9.1.1198-1     4.93 MiB       2.26 MiB
+
+Total Download Size:    9.69 MiB
+Total Installed Size:  42.54 MiB
+
+:: Proceed with installation? [Y/n] 
+:: Retrieving packages...
+ vim-runtime-9.1.1198-1-x86_64
+ vim-9.1.1198-1-x86_64                   0.0   B  0.00   B/s 00:00 [C  o  o  o  o  o  o  o  o  o  o  o  ]   0%
+ Total (0/2)                             9.7 MiB  2.17 MiB/s 00:04 [------------------------------------] 100%
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+warning: too many errors from mirror.moson.org, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.moson.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+warning: too many errors from arch.mirror.constant.com, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from arch.mirror.constant.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pseudoform.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pseudoform.org : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.lty.me : Could not resolve host: mirror.lty.me
+warning: fatal error from mirror.lty.me, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.lty.me : Could not resolve host: mirror.lty.me
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pkgbuild.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from mirror.pkgbuild.com : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+warning: too many errors from iad.mirrors.misaka.one, skipping for the remainder of this transaction
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from iad.mirrors.misaka.one : The requested URL returned error: 404
+error: failed retrieving file 'vim-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+error: failed retrieving file 'vim-runtime-9.1.1198-1-x86_64.pkg.tar.zst' from archlinux.thaller.ws : The requested URL returned error: 404
+warning: failed to retrieve some files
+error: failed to commit transaction (unexpected error)
+Errors occurred, no packages were upgraded.
+[liveuser@eos-2025.03.19 ~]$ sudo pacman -S vi^C
+[liveuser@eos-2025.03.19 ~]$ nano /etc/mkinitcpio.d/linux.preset 
+[liveuser@eos-2025.03.19 ~]$ nano^Cetc/mkinitcpio.d/linux.preset 
+[liveuser@eos-2025.03.19 ~]$ su diego
+su: user diego does not exist or the user entry does not contain all the required fields
+[liveuser@eos-2025.03.19 ~]$ arch-chroot /mnt
+==> ERROR: This script must be run with root privileges
+[liveuser@eos-2025.03.19 ~]$ sud arch-chroot /mnt
+bash: sud: command not found
+[liveuser@eos-2025.03.19 ~]$ su arch-chroot /mnt
+su: user arch-chroot does not exist or the user entry does not contain all the required fields
+[liveuser@eos-2025.03.19 ~]$ lsblk
+NAME       MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0        7:0    0   2.6G  1 loop /run/archiso/airootfs
+sda          8:0    0 476.9G  0 disk 
+├─sda1       8:1    0     2G  0 part /mnt/boot/efi
+├─sda2       8:2    0 457.9G  0 part /mnt
+└─sda3       8:3    0    17G  0 part 
+sdb          8:16   1  29.1G  0 disk 
+├─sdb1       8:17   1    29G  0 part 
+│ ├─ventoy 254:0    0   2.9G  1 dm   /run/archiso/bootmnt
+│ └─sdb1   254:1    0    29G  0 dm   
+└─sdb2       8:18   1    32M  0 part 
+[liveuser@eos-2025.03.19 ~]$ lsb^C
+[liveuser@eos-2025.03.19 ~]$ sudo arch-chroot /mnt
+[root@EndeavourOS /]# nvim
+[root@EndeavourOS /]# su diego
+
+OS   ›  EndeavourOS x86_64
+KER  ›  Linux 6.13.7-arch1-1
+PKG  ›  1742 (pacman)
+SH   ›  kcompactd0
+TER  ›  kthreadd
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+WM   ›  KWin (X11)
+
+                                                                                                              
+ 
+ sudo nvim /etc/mkinitcpio.d/linux.preset
+[sudo] password for diego: 
+ exit
+[root@EndeavourOS /]# su diego
+
+
+                  -`                       diego@EndeavourOS
+                 .o+`
+                `ooo/                        EndeavourOS x86_64
+               `+oooo:                       Linux 6.13.7-arch1-1
+              `+oooooo:                      1742 (pacman)
+              -+oooooo+:                     zsh 5.9
+            `/:-:++oooo+:                    xterm-256color
+Authorization required, but no authorization protocol specified
+          `/++++++++++++++:
+Authorization required, but no authorization protocol specified
+        ./ooosssso++osssssso+`
+       .oossssso-````/ossssss+`              KWin (X11)
+      -osssssso.      :ssssssso.             19 mins
+     :osssssss/        osssso+++.          PU  Intel(R) Core(TM) i7-6650U (4) @ 3.40 GHz
+    /ossssssss/        +ssssooo/-          󰍛  1.39 GiB / 15.50 GiB (9%)
+  `/ossssso+/:-        -:/+osssso+-        󰍹  1920x1080 in 14", 60 Hz [Built-in]
+ `+sso+:-`                 `.-/+oso:       󰌵  Breeze (Light) [Qt], Colloid-Purple-Dark [GTK2], Breeze [GTK3]
+`++:.                           `-/+/      󰋥  Breeze [Qt], Gruvbox-Plus-Dark [GTK2], breeze-dark [GTK3/4]
+.`                                 `/        Noto Sans (10pt) [Qt], Adwaita Sans (11pt) [GTK2], Noto Sans (1]
+                                             Breeze (24px)
+                                           󰍸  Intel Iris Graphics 540 @ 1.05 GHz [Integrated]
+                                           󰋊  135.35 GiB / 449.63 GiB (30%) - ext4
+                                           󰛿  192.168.8.241/23
+                                           󰁹  63% (5 hours, 17 mins remaining) [Discharging]
+                                           󰇫  en_US.UTF-8
+
+                                                                   
+                                                                   
+
+
+ sudo cp /etc/mkinitcpio.d/linux.preset ~/
+ exit
+[root@EndeavourOS /]# mkinitcpio -P
+==> Building image from preset: /etc/mkinitcpio.d/linux.preset: 'default'
+==> Using configuration file: '/etc/mkinitcpio.conf'
+  -> -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img
+==> Starting build: '6.18.9-arch1-2'
+  -> Running build hook: [base]
+  -> Running build hook: [systemd]
+  -> Running build hook: [autodetect]
+  -> Running build hook: [microcode]
+  -> Running build hook: [modconf]
+  -> Running build hook: [kms]
+  -> Running build hook: [keyboard]
+  -> Running build hook: [keymap]
+  -> Running build hook: [sd-vconsole]
+  -> Running build hook: [block]
+  -> Running build hook: [filesystems]
+  -> Running build hook: [fsck]
+==> Generating module dependencies
+==> Creating zstd-compressed initcpio image: '/boot/initramfs-linux.img'
+  -> Early uncompressed CPIO image generation successful
+==> Initcpio image generation successful
+==> Building image from preset: /etc/mkinitcpio.d/linux.preset: 'fallback'
+==> Using configuration file: '/etc/mkinitcpio.conf'
+  -> -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-fallback.img -S autodetect
+==> Starting build: '6.18.9-arch1-2'
+  -> Running build hook: [base]
+  -> Running build hook: [systemd]
+  -> Running build hook: [microcode]
+  -> Running build hook: [modconf]
+  -> Running build hook: [kms]
+==> WARNING: Possibly missing firmware for module: 'ast'
+  -> Running build hook: [keyboard]
+==> WARNING: Possibly missing firmware for module: 'xhci_pci_renesas'
+  -> Running build hook: [keymap]
+  -> Running build hook: [sd-vconsole]
+  -> Running build hook: [block]
+==> WARNING: Possibly missing firmware for module: 'aic94xx'
+==> WARNING: Possibly missing firmware for module: 'qed'
+==> WARNING: Possibly missing firmware for module: 'bfa'
+==> WARNING: Possibly missing firmware for module: 'qla2xxx'
+==> WARNING: Possibly missing firmware for module: 'wd719x'
+==> WARNING: Possibly missing firmware for module: 'qla1280'
+  -> Running build hook: [filesystems]
+  -> Running build hook: [fsck]
+==> Generating module dependencies
+==> Creating zstd-compressed initcpio image: '/boot/initramfs-linux-fallback.img'
+  -> Early uncompressed CPIO image generation successful
+==> Initcpio image generation successful    OS    ➜  EndeavourOS x86_64
+[root@EndeavourOS /]# ^C                     ├   ➜  Linux 6.13.7-arch1-1
+[root@EndeavourOS /]# su diego               ├ 󰏖  ➜  1742 (pacman)
+                                             └   ➜  zsh 5.9
+                     ./o.
+Authorization required, but no authorization protocol specified
+                 `:osssssss+-
+Authorization required, but no authorization protocol specified
+             `-/ossssssssssssso/.
+           `-/+sssssssssssssssso+:`         WM    ➜  KWin (X11)
+         `-:/+sssssssssssssssssso+/.         ├ 󰉼  ➜  Breeze
+       `.://osssssssssssssssssssso++-        ├ 󰀻  ➜  Breeze [Qt], Gruvbox-Plus-Dark [GTK2], breeze-dark [GTK3]
+      .://+ssssssssssssssssssssssso++:       ├   ➜  Breeze (24px)
+    .:///ossssssssssssssssssssssssso++:      ├   ➜  xterm-256color
+  `:////ssssssssssssssssssssssssssso+++.
+`-////+ssssssssssssssssssssssssssso++++-    PC    ➜  Dell Inc. Latitude Type Latitude 7480
+ `..-+oosssssssssssssssssssssssso+++++/`     ├   ➜  22 mins
+   ./++++++++++++++++++++++++++++++/:.       ├   ➜  Intel(R) Core(TM) i7-6650U (2) @ 3.40 GHz GHz
+  `:::::::::::::::::::::::::------``         ├ 󰢮  ➜  Intel Iris Graphics 540 @ 1.05 GHz GHz
+                                             ├   ➜  1.39 GiB / 15.50 GiB (9%)
+                                             ├ 󰓡  ➜  Disabled
+                                             ├ 󰋊  ➜  135.47 GiB / 449.63 GiB (30%) - ext4
+                                             └   ➜  1920x1080 px @ 60 Hz - 310x170 mm (13.92 inches, 158.26 )
+
+
+
+ sudo cp /etc/mkinitcpio.d/linux.preset ~/dotfiles-dizzi/linux.preset
+ sudo cp /etc/mkinitcpio.d/linux.preset ~/dotfiles-dizzi/linux.preset
+
+  diego on Tuesday at 11:26 AM                                                       0s  MEM: 9.09% (1/15GB)
+ >....                                                                                                       
+==> Using configuration file: '/etc/mkinitcpio.conf'
+  -> -k /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-fallback.img -S autodetect
+==> Starting build: '6.18.9-arch1-2'
+  -> Running build hook: [base]
+  -> Running build hook: [systemd]
+  -> Running build hook: [microcode]
+  -> Running build hook: [modconf]
+  -> Running build hook: [kms]
+==> WARNING: Possibly missing firmware for module: 'ast'
+  -> Running build hook: [keyboard]
+==> WARNING: Possibly missing firmware for module: 'xhci_pci_renesas'
+  -> Running build hook: [keymap]
+  -> Running build hook: [sd-vconsole]
+  -> Running build hook: [block]
+==> WARNING: Possibly missing firmware for module: 'aic94xx'
+==> WARNING: Possibly missing firmware for module: 'qed'
+==> WARNING: Possibly missing firmware for module: 'bfa'
+==> WARNING: Possibly missing firmware for module: 'qla2xxx'
+==> WARNING: Possibly missing firmware for module: 'wd719x'
+==> WARNING: Possibly missing firmware for module: 'qla1280'
+  -> Running build hook: [filesystems]
+  -> Running build hook: [fsck]
+==> Generating module dependencies
+==> Creating zstd-compressed initcpio image: '/boot/initramfs-linux-fallback.img'
+  -> Early uncompressed CPIO image generation successful
+==> Initcpio image generation successful
+
+ 
+ 
+ sudo cp /etc/mkinitcpio.d/linux.preset ~/dotlinux.preset
+ nvim ~/dotfiles-dizzi/mkinitcpio-d-linux.preset.txt
+ nvim ~/dotfiles-dizzi/mkinitcpio-d-linux.preset.txt
+
+  diego on Tuesday at 11:27 AM                                                  4.228s  MEM: 12.43% (1/15GB)
+  {  / }                                                                      
+
+
+
+
+
+
+
+
+
+
