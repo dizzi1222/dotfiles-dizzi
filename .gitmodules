@@ -30,3 +30,6 @@
 	path = nvim/.config/nvim
 	url = https://github.com/dizzi1222/nvim.git
 	branch = main
+[submodule "zsh/.zsh/fzf-tab"]
+	path = zsh/.zsh/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab
