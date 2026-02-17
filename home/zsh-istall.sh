@@ -10,6 +10,9 @@ NC='\033[0m'
 
 echo -e "${YELLOW}🔧 Reparando Zsh con dotfiles...${NC}"
 
+#  0. Limpiar Oh My Zsh si existe
+rm -rf ~/.oh-my-zsh
+rm -rf ~/dotfiles-dizzi/zsh/.oh-my-zsh
 # 1. Instalar Oh My Zsh si no existe
 if [[ ! -d ~/.oh-my-zsh ]]; then
   echo -e "${GREEN}Instalando Oh My Zsh...${NC}"
@@ -63,14 +66,14 @@ mkdir -p zsh/.zsh
 [[ ! -d zsh/.zsh/fzf-tab ]] &&
   git clone --depth 1 https://github.com/Aloxaf/fzf-tab.git \
     zsh/.zsh/fzf-tab
-
-# 4. Limpiar .git internos y agregar a tu repo
-echo -e "${GREEN}Agregando plugins al repo...${NC}"
-find zsh/.oh-my-zsh/custom/plugins -name ".git" -exec rm -rf {} + 2>/dev/null || true
-find zsh/.zsh -name ".git" -exec rm -rf {} + 2>/dev/null || true
-
-git add zsh/ 2>/dev/null || true
-git commit -m "feat(zsh): add plugins as regular files" 2>/dev/null || true
+#
+# # 4. Limpiar .git internos y agregar a tu repo
+# echo -e "${GREEN}Agregando plugins al repo...${NC}"
+# find zsh/.oh-my-zsh/custom/plugins -name ".git" -exec rm -rf {} + 2>/dev/null || true
+# find zsh/.zsh -name ".git" -exec rm -rf {} + 2>/dev/null || true
+#
+# git add zsh/ 2>/dev/null || true
+# git commit -m "feat(zsh): add plugins as regular files" 2>/dev/null || true
 
 # 5. Backup y aplicar dotfiles con stow
 echo -e "${GREEN}Aplicando dotfiles con stow...${NC}"
