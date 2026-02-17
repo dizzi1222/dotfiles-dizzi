@@ -124,8 +124,9 @@ if [[ -f ~/dotfiles-dizzi/home/zsh-istall.sh ]]; then
 else
   print_warning "zsh-istall.sh no encontrado, instalando manual..."
 
-  #  0. Limpiar/Reinstalar Oh My Zsh si existe
   rm -rf ~/.oh-my-zsh
+  rm -rf ~/dotfiles-dizzi/zsh/.oh-my-zsh
+  #  0. Limpiar/Reinstalar Oh My Zsh si existe
   if [[ ! -d ~/.oh-my-zsh ]]; then
     print_installing "Oh-My-Zsh + Plugins"
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -227,14 +228,14 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
     print_package "Symlink: WIFI reparar problemas"
     sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
-    sudo modprobe -r iwlwifi
+    # sudo modprobe -r iwlwifi
     sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
-    sudo modprobe -r iwlwifi
+    # sudo modprobe -r iwlwifi
     sudo modprobe iwlwifi power_save=0
-    print_status "Recuerda usar:
+    # print_status "Recuerda usar:
     ip link show
     nmcli device status
-    sudo dmesg | grep iwlwifi"
+    sudo dmesg | grep iwlwifi
 
     # Esto comprueba si hay problemas con el WIFI o las BIOS
   fi
@@ -245,8 +246,26 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/systemd/logind.conf /etc/systemd/logind.conf
     # sudo systemctl restart systemd-logind
     print_status "Recuerda usar:
-    sudo systemctl restart systemd-logind   O reiniciar el sistema
-    systemctl status systemd-logind   para ver si se ejecuto"
+    sudo systemctl restart systemd-logind  O reiniciar el sistema
+    systemctl status systemd-logind  para ver si se ejecuto"
+  fi
+
+  # Para solucionar initramfs-linux [/etc/mkinitcpio.conf] Tambien puedes consultar el historial root para guiarte con:
+  if [[ -f ~/dotfiles-dizzi/etc/mkinitcpio.conf ]]; then
+    print_package "Symlink: FIX initramfs-linux"
+    sudo ln -sf ~/dotfiles-dizzi/etc/mkinitcpio.conf /etc/mkinitcpio.conf
+    print_status "Tambien puedes consultar el historial ARRIBA root para guiarte. Por si vuelve a dar ese pantallazo azul con el 🐧 
+    [Y Recuerda Usar:
+    nano /etc/mkinitcpio.conf
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd
+    sudo mkinitcpio -P -v]
+
+    󰁃 ¿Diferencias entre usar udev y systemd?
+    󱞩 - systemd: resulta en una .img: 8.6/16mb
+    - udev: resulta en una .img: 206mb
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd"
   fi
 
   # Recargar servicios
@@ -564,6 +583,7 @@ else
   print_warning "Bottles omitido (puedes instalarlo después con: yay -S bottles)"
 fi
 
+# ═══════════════════════════════════════════════════════════
 # PASO 22: SPOTIFY SPICETIFY
 # ═══════════════════════════════════════════════════════════
 print_step "22/35: Spicetify (Opcional)"
@@ -1626,9 +1646,11 @@ if [[ "$install_music_presence" =~ ^[Ss]$ ]]; then
     # Descargar última release
     MUSIC_PRESENCE_URL="https://github.com/ungive/discord-music-presence/releases/download/v2.3.2/musicpresence-2.3.2-linux-x86_64.tar.gz"
 
-    wget -q --show-progress "$MUSIC_PRESENCE_URL" -O musicpresence.tar.gz || {
+    wget -q --show-progress "$MUSIC_PRESENCE_URL" -O musicpresence.tar.gz
+    {
       print_error "Error descargando Music Presence"
       cd ~
+      return
     }
 
     if [[ -f musicpresence.tar.gz ]]; then
@@ -1636,14 +1658,12 @@ if [[ "$install_music_presence" =~ ^[Ss]$ ]]; then
       tar -xzf musicpresence.tar.gz
       rm musicpresence.tar.gz
 
-      # Dar permisos
       chmod +x musicpresence-*/usr/bin/musicpresence 2>/dev/null || true
     fi
 
     cd ~
   fi
 
-  # Agregar PATH automáticamente
   print_installing "Configurando PATH"
 
   MUSIC_PRESENCE_PATH="export PATH=\$HOME/musicpresence/musicpresence-2.3.2-linux-x86_64/usr/bin:\$PATH"
