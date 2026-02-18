@@ -8,31 +8,28 @@ case "$CHOICE" in
 "")
   cd /$HOME
   # shutdown now
-  sync # Fuerza escritura a disco
-  sleep 0.5
-  sudo systemctl --force --force poweroff # Doble --force = bypass todo
+  sync               # Fuerza escritura a disco
+  systemctl poweroff # Doble --force = bypass todo
 
   ;;
 "")
   cd /$HOME
-  sync # Fuerza escritura a disco
-  sleep 0.5
-  sudo systemctl --force --force reboot # Doble --force = bypass todo
+  sync             # Fuerza escritura a disco
+  systemctl reboot # Doble --force = bypass todo
   ;;
 "")
   hyprlock # funciona en Niri too
   ;;
 "")
   cd /$HOME
-  sync # Fuerza escritura a disco
-  sleep 0.5
-  systemctl --force --force suspend # o usa sleep
+  sync              # Fuerza escritura a disco
+  systemctl suspend # o usa sleep
   ;;
 "󰒲")
   # hibernar
   # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
   # sudo systemctl hibernate --force --force
-  sudo systemctl hibernate
+  systemctl hibernate
   # Verificar si la hibernación está correctamente configurada
   if ! grep -q "resume=" /proc/cmdline || ! swapon --show | grep -q "/"; then
     notify-send "⚠️ NO PUEDES HIBERNAR!" "Falta configuración de SWAP o parámetros de resume en GRUB " -i dialog-warning -t 5000
@@ -41,13 +38,29 @@ case "$CHOICE" in
 "")
   cd /$HOME
   if pgrep -x "niri" >/dev/null; then
+    niri msg action quit
     # Niri: mata el proceso principal (equivale a "exit")
     killall niri
     pkill -TERM niri
     sleep 2
     pkill -KILL niri # Por si no respondió al TERM
+  elif pgrep -x "Hyprland" >/dev/null; then
+    hyprctl dispatch exit
+  elif pgrep -x "plasmashell" >/dev/null; then
+    qdbus org.kde.ksmserver /KSMServer logout 0 0 0
+  elif pgrep -x "gnome-shell" >/dev/null; then
+    gnome-session-quit --no-prompt
+  elif pgrep -x "cinnamon" >/dev/null; then
+    cinnamon-session-quit --logout --no-prompt
+  elif pgrep -x "mate-session" >/dev/null; then
+    mate-session-save --force-logout
+  elif pgrep -x "xfce4-session" >/dev/null; then
+    xfce4-session-logout --logout
+  elif pgrep -x "sway" >/dev/null; then
+    swaymsg exit
+  else
+    loginctl terminate-session "$XDG_SESSION_ID"
   fi
-  hyprctl dispatch exit
   ;;
 *)
   exit 1

@@ -1,19 +1,54 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "opencode",
-  "model": "ollama/deepseek-v3.1:671b",
-  // "theme": "gemini",
-  // "model": "gemini-3-flash-previewi",
-  //  "model": "deepseek-chat",
-  //  "model": "claude-opus-4-5",
-  //  "model": "claude-haiku-4-5",
-  //  "model": "claude-sonnet-4-5",
-  "autoupdate": true,
-  "server": {
-    "port": 4096,
-    "hostname": "0.0.0.0",
-    "mdns": true,
-    "cors": ["http://localhost:5170"]
-  },
-  "instructions": [".opencode/rules.md"]
+  "provider": {
+    "ollama": {
+      "models": {
+        "deepseek-v3.1:671b-cloud": {
+          "_launch": true,
+          "name": "deepseek-v3.1:671b-cloud"
+        },
+        "deepseek-v3.2:cloud": {
+          "_launch": true,
+          "limit": {
+            "context": 163840,
+            "output": 65536
+          },
+          "name": "deepseek-v3.2:cloud"
+        },
+        "gemini-3-flash-preview:cloud": {
+          "_launch": true,
+          "name": "gemini-3-flash-preview:cloud"
+        },
+        "gemma3:27b-cloud": {
+          "_launch": true,
+          "name": "gemma3:27b-cloud"
+        },
+        "gpt-oss:120b-cloud": {
+          "_launch": true,
+          "name": "gpt-oss:120b-cloud"
+        },
+        "mistral-large-3:675b-cloud": {
+          "_launch": true,
+          "name": "mistral-large-3:675b-cloud"
+        },
+        "qwen3-coder:480b-cloud": {
+          "_launch": true,
+          "name": "qwen3-coder:480b-cloud"
+        },
+        "qwen3-next:80b-cloud": {
+          "_launch": true,
+          "name": "qwen3-next:80b-cloud"
+        },
+        "qwen3-vl:235b-instruct-cloud": {
+          "_launch": true,
+          "name": "qwen3-vl:235b-instruct-cloud"
+        }
+      },
+      "name": "Ollama (local)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1"
+      }
+    }
+  }
 }

@@ -177,6 +177,19 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules /etc/udev/rules.d/
   fi
 
+  # Config de Sudoers POWER para systemctl reboot --force --force
+  if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
+    print_package "Symlink: Sudoers POWER"
+    sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
+  fi
+
+  # TIMESHIFT Snapshots config
+  if [[ -f ~/dotfiles-dizzi/etc/timeshift/timeshift.json ]]; then
+    print_package "Symlink: Timeshift Snapshots"
+    sudo ln -sf ~/dotfiles-dizzi/etc/timeshift/timeshift.json /etc/timeshift/timeshift.json
+  fi
+
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-ds4-controllers.rules ]]; then
     print_package "Symlink: DualShock 4 (PS4)"
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-ds4-controllers.rules /etc/udev/rules.d/
@@ -1355,10 +1368,10 @@ if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_installing "Descargando modelo qwen2.5:0.5b (más ligero y rápido)"
   ollama pull qwen2.5:0.5b
   # Modelos Onlines
-  ollama run qwen3-coder:480b-cloud
-  ollama run gpt-oss:120b-cloud
-  ollama run gemma3:27b-cloud
-  ollama run deepseek-v3.1:671b-cloud
+  ollama pull qwen3-coder:480b-cloud
+  ollama pull gpt-oss:120b-cloud
+  ollama pull gemma3:27b-cloud
+  ollama pull deepseek-v3.1:671b-cloud
 
   print_installing "opencommit (npm)"
   npm install -g opencommit
