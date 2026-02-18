@@ -8,26 +8,30 @@ case "$CHOICE" in
 "")
   cd /$HOME
   # shutdown now
-  sync               # Fuerza escritura a disco
-  systemctl poweroff # Doble --force = bypass todo
+  sync                                             # Fuerza escritura a disco
+  kitty -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
 
   ;;
 "")
   cd /$HOME
-  sync             # Fuerza escritura a disco
-  systemctl reboot # Doble --force = bypass todo
+  sync # Fuerza escritura a disco
+  sleep 1
+  kitty -- sudo systemctl reboot --force --force # Doble --force = bypass todo
   ;;
 "")
   hyprlock # funciona en Niri too
   ;;
 "")
   cd /$HOME
-  sync              # Fuerza escritura a disco
-  systemctl suspend # o usa sleep
+  sync # Fuerza escritura a disco
+  sleep 1
+  kitty -- sudo systemctl suspend --force --force # o usa sleep
   ;;
 "󰒲")
   # hibernar
   # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
+  sync # Fuerza escritura a disco
+  sleep 1
   # sudo systemctl hibernate --force --force
   systemctl hibernate
   # Verificar si la hibernación está correctamente configurada
