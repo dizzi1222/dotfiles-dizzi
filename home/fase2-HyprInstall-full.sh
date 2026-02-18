@@ -228,7 +228,7 @@ print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
-  kitty ghostty konsole thunar nemo \
+  kitty ghostty konsole thunar nemo plasma-desktop \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
@@ -378,7 +378,7 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron geforce-infinity-bin bottles
+    gfn-electron geforce-infinity-bin bottles curseforge minecraft-launcher lucem-git # LUCEM = BLOXTRAP PARA JUGAR ROBLOX
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -438,7 +438,7 @@ sudo pacman -R --noconfirm linuxconsole 2>/dev/null || true
 sudo pacman -S --needed --noconfirm joyutils
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  ds4drv xpadneo-dkms sixpair input-remapper \
+  ds4drv xpadneo-dkms sixpair input-remapper espanso-wayland \
   2>/dev/null || print_warning "Algunos drivers fallaron"
 
 # Crear grupos
@@ -534,7 +534,6 @@ EOL
 else
   print_warning "Configuración PS3 omitida"
 fi
-
 # ═══════════════════════════════════════════════════════════
 # PASO 13: APLICACIONES (SOLO -BIN)
 # ═══════════════════════════════════════════════════════════
@@ -543,10 +542,14 @@ print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
 sudo pacman -S --needed --noconfirm \
   firefox vlc vlc-plugins-all mpv obs-studio \
   gimp inkscape krita \
-  libreoffice-fresh filezilla transmission-gtk \
+  libreoffice-fresh okular filezilla transmission-gtk \
   pavucontrol loupe \
   scrcpy android-file-transfer \
   gvfs gvfs-gphoto2 kio-extras libxfce4ui
+
+yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  open-fuse-iso
+print_success "Aplicaciones de gestión de discos instaladas [ISO]"
 
 # ═══════════════════════════════════════════════════════════
 # Kdenlive - Selección interactiva
@@ -596,13 +599,12 @@ case "$kdenlive_choice" in
   print_warning "Kdenlive omitido"
   ;;
 esac
-
 # ═══════════════════════════════════════════════════════════
 # Aplicaciones de música y ocio
 # ═══════════════════════════════════════════════════════════
 print_installing "Aplicaciones extra y de Música/OCIO, Youtube Music [pear-desktop], Discord, Soundbound (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  brave-bin zen-browser-bin spotify pear-desktop soundbound-app-bin \
+  brave-bin zen-browser-bin spotify pear-desktop-bin soundbound-app-bin \
   vencord-bin telegram-desktop-bin bitwarden gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
@@ -690,10 +692,8 @@ esac
 # ═══════════════════════════════════════════════════════════
 print_installing "Extras (SOLO -bin, sin compilar)"
 print_installing "Las Mejores VPN (No esta Urban)"
-sudo pacman -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \ 
-proton-vpn-gtk-app \
-  2>/dev/null || print_warning "Algunos extras fallaron"
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+sudo pacman -S proton-vpn-gtk-app --needed --noconfirm
+yay -S --needed --noconfirm \ 
   stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
@@ -1642,6 +1642,19 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules ]]; then
     print_package "Symlink: DualSense (PS5)"
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules /etc/udev/rules.d/
+  fi
+
+  # Config de Sudoers POWER para systemctl reboot --force --force
+  if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
+    print_package "Symlink: Sudoers POWER"
+    sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
+  fi
+
+  # TIMESHIFT Snapshots config
+  if [[ -f ~/dotfiles-dizzi/etc/timeshift/timeshift.json ]]; then
+    print_package "Symlink: Timeshift Snapshots"
+    sudo ln -sf ~/dotfiles-dizzi/etc/timeshift/timeshift.json /etc/timeshift/timeshift.json
   fi
 
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-ds4-controllers.rules ]]; then
@@ -2746,10 +2759,10 @@ if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_installing "Descargando modelo qwen2.5:0.5b (más ligero y rápido)"
   ollama pull qwen2.5:0.5b
   # Modelos Onlines
-  ollama run qwen3-coder:480b-cloud
-  ollama run gpt-oss:120b-cloud
-  ollama run gemma3:27b-cloud
-  ollama run deepseek-v3.1:671b-cloud
+  ollama pull qwen3-coder:480b-cloud
+  ollama pull gpt-oss:120b-cloud
+  ollama pull gemma3:27b-cloud
+  ollama pull deepseek-v3.1:671b-cloud
 
   print_installing "opencommit (npm)"
   npm install -g opencommit

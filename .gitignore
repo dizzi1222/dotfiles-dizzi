@@ -1,6 +1,12 @@
 # Añadir esto a tu .gitignore actual
 # cat >> .gitignore << 'EOF'
 
+home/clawd/.git/
+
+# Antigravity - ignorar datos sensibles y caches
+Antigravity/.config/Antigravity/User/globalStorage/state.vscdb
+Antigravity/.config/Antigravity/User/globalStorage/state.vscdb.backup
+
 # MCP específico
 .mcp-global.json.local
 mcp-config.local.json
@@ -172,7 +178,7 @@ firefox/.mozilla/firefox/*/crashes/
 **/nvim/spell/*.txt
 
 # Wallpapers duplicados
-wallpapers/wallpapers/
+# wallpapers/wallpapers/
 
 # CopyQ locks
 copyq/.config/copyq/*.lock*

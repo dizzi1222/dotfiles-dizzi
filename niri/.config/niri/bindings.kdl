@@ -10,7 +10,6 @@ binds {
    
     Mod+O repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
     Mod+Shift+Slash hotkey-overlay-title="Important hotkeys" { show-hotkey-overlay; }
-    Mod+O repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
     Mod+Escape allow-inhibiting=false hotkey-overlay-title="Toggle shortcuts inhibit" { toggle-keyboard-shortcuts-inhibit; }
     
     // ═══════════════════════════════════════════════════════════════════════

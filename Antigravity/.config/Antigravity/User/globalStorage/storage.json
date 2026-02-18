@@ -1,0 +1,82 @@
+{
+    "telemetry.sqmId": "",
+    "telemetry.machineId": "fcf15096c524742e51b60f39188b517a52d7f9381002310be8e1b4a573590e53",
+    "telemetry.devDeviceId": "26ba237c-bbba-40cd-bc2b-3008c0e2f64e",
+    "backupWorkspaces": {
+        "workspaces": [],
+        "folders": [],
+        "emptyWindows": [
+            {
+                "backupFolder": "1771372681796"
+            }
+        ]
+    },
+    "profileAssociations": {
+        "workspaces": {},
+        "emptyWindows": {
+            "1771372681796": "__default__profile__"
+        }
+    },
+    "antigravityUnifiedStateSync.oauthToken.hasLegacyMigrated": true,
+    "unifiedStateSync.hasTrajectorySummariesMigrated": true,
+    "unifiedStateSync.hasWindowPreferencesMigrated": true,
+    "unifiedStateSync.hasUserStatusMigrated": true,
+    "windowsState": {
+        "lastActiveWindow": {
+            "backupPath": "/home/diego/.config/Antigravity/Backups/1771372681796",
+            "uiState": {
+                "mode": 0,
+                "x": 0,
+                "y": 0,
+                "width": 1920,
+                "height": 1080
+            }
+        },
+        "openedWindows": []
+    },
+    "antigravityUnifiedStateSync.agentPreferences.hasPlanningModeMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasArtifactReviewPolicyMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasTerminalAutoExecutionPolicyMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasTerminalAllowedCommandsMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasTerminalDeniedCommandsMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasAgentFileAccessMigration": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasExplainAndFixInCurrentConversationMigrated": true,
+    "antigravityUnifiedStateSync.agentPreferences.hasAutoContinueOnMaxGeneratorInvocationsMigrated": true,
+    "antigravityUnifiedStateSync.modelPreferences.hasLastSelectedCascadeModelMigrated": true,
+    "antigravityUnifiedStateSync.modelPreferences.hasLastModelDefaultOverrideVersionIdMigrated": true,
+    "antigravityUnifiedStateSync.editorPreferences.hasShowSelectionPopupMigrated": true,
+    "antigravityUnifiedStateSync.editorPreferences.hasDemoModeEnabledMigrated": true,
+    "sidebarWorkspaces.migratedFromInitState": true,
+    "theme": "vs-dark",
+    "themeBackground": "#262335",
+    "windowSplash": {
+        "zoomLevel": 0,
+        "baseTheme": "vs-dark",
+        "colorInfo": {
+            "foreground": "#dddddd",
+            "background": "#262335",
+            "editorBackground": "#262335",
+            "titleBarBackground": "#241b2f",
+            "activityBarBackground": "#171520",
+            "sideBarBackground": "#241b2f",
+            "statusBarBackground": "#241b2f",
+            "statusBarNoFolderBackground": "#241b2f"
+        },
+        "layoutInfo": {
+            "sideBarSide": "right",
+            "editorPartMinWidth": 220,
+            "titleBarHeight": 30,
+            "activityBarWidth": 42,
+            "sideBarWidth": 0,
+            "auxiliaryBarWidth": 300,
+            "statusBarHeight": 22,
+            "windowBorder": false
+        }
+    },
+    "antigravityUnifiedStateSync.tabPreferences.hasMigrated": true,
+    "antigravityUnifiedStateSync.seenNuxOneTimeMigration": true,
+    "artifactReviewState.migratedFromInitState": true,
+    "antigravityUnifiedStateSync.browserPreferences.hasBrowserAllowlistMigrated": true,
+    "antigravityUnifiedStateSync.browserPreferences.hasBrowserLaunchPreferencesMigrated": true,
+    "antigravityUnifiedStateSync.browserPreferences.hasAddedLocalhostToAllowlist": true
+}

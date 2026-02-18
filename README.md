@@ -788,11 +788,11 @@ cd ~/dotfiles-dizzi
 stow *
 
 # Opción 2: Aplicar selectivamente
-stow alacritty autostart bottom copyq cursor dunst easyeffects espanso \
-     eww fastfetch ghostty home htop hypr kanata kew kitty local \
-     manual-ln neofetch nixconf nvim picom polybar qtile rofi starship \
-     systemd themes tmux wal wallpapers waybar wireplumber wofi xprofile \
-     yazi zsh input-remapper quickshell caelestia icons firefox vscode
+stow niri mcphub kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart bottom cursor dunst easyeffects swaync espanso \
+eww fastfetch ghostty home htop hypr kew kitty local \
+manual-ln neofetch nvim polybar qtile opencode rofi starship \
+systemd tmux wal wallpapers waybar wireplumber wofi \
+yazi zsh input-remapper quickshell caelestia icons vscode
 ```
 
 #### Configurar GRUB

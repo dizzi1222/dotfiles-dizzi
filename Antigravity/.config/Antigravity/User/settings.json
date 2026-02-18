@@ -128,7 +128,7 @@
   "editor.lightbulb.enabled": "off",
   // Hover nativo VSCODE: Estas son sugerencias para mejorar la experencia, peor rendimiento
   // tambien permite acceder al color mas facilmente
-  "editor.hover.enabled": true,
+  "editor.hover.enabled": "on",
   // Desactiva Documentacion solo lo pesado, mantiene lo útil:
   /*  "editor.hover.documentation": false,
   "editor.hover.references": false, */
@@ -316,7 +316,7 @@
   "security.workspace.trust.enabled": false,
   "window.confirmSaveUntitledWorkspace": false,
   "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com",
-  "workbench.colorTheme": "Aura Soft Dark",
+  "workbench.colorTheme": "SynthWave84",
   "git.confirmSync": false,
   "livePreview.notifyOnOpenLooseFile": false,
   "symbols.hidesExplorerArrows": false,
