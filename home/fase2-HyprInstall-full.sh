@@ -1647,7 +1647,8 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   # Config de Sudoers POWER para systemctl reboot --force --force
   if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
     print_package "Symlink: Sudoers POWER"
-    sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # como root ejecuta: su - # &
     # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
   fi
 
@@ -3208,7 +3209,6 @@ if [[ ! "$config_themes" =~ ^[Nn]$ ]]; then
 
   # Configurar Qt para usar temas oscuros
   print_installing "Configurando Qt5/Qt6"
-
   # Qt5
   mkdir -p ~/.config/qt5ct
   cat >~/.config/qt5ct/qt5ct.conf <<'EOL'
@@ -3220,7 +3220,6 @@ color_scheme_path=~/.config/qt5ct/colors/darker.conf
 fixed=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 general=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 EOL
-
   # Qt6
   mkdir -p ~/.config/qt6ct
   cat >~/.config/qt6ct/qt6ct.conf <<'EOL'
@@ -3232,20 +3231,17 @@ color_scheme_path=~/.config/qt6ct/colors/darker.conf
 fixed=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 general=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 EOL
-
   # Variables de entorno para Qt
   if [[ -f ~/.config/hypr/hyprland.conf ]]; then
     if ! grep -q "QT_QPA_PLATFORMTHEME" ~/.config/hypr/hyprland.conf; then
       echo "env = QT_QPA_PLATFORMTHEME,qt6ct" >>~/.config/hypr/hyprland.conf
     fi
   fi
-
   # Configurar GTK para tema oscuro
   print_installing "Configurando GTK"
 
   gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark' 2>/dev/null || true
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
-
   # Si existe tema Colloid en dotfiles, aplicarlo
   if [[ -d ~/.themes/Colloid-Dark ]]; then
     gsettings set org.gnome.desktop.interface gtk-theme 'Colloid-Dark' 2>/dev/null || true
@@ -3260,7 +3256,6 @@ fi
 # PASO 32.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
 print_step "32.5/35: Desactivar Display Manager Actual"
-
 # Detectar gestor actual
 CURRENT_DM=""
 if systemctl is-enabled gdm &>/dev/null; then
@@ -3298,7 +3293,6 @@ function configure_swap() {
   echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾           ║${NC}"
   echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
   echo
-
   # Detectar RAM total del sistema
   local TOTAL_RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   local TOTAL_RAM_GB=$((TOTAL_RAM_KB / 1024 / 1024))
@@ -3308,7 +3302,6 @@ function configure_swap() {
   echo -e "${CYAN}Sistema detectado:${NC}"
   echo -e "  ${MAGENTA}•${NC} RAM total: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
   echo -e "  ${MAGENTA}•${NC} Swap actual: ${BOLD}${CURRENT_SWAP_GB}GB${NC}"
-
   # Calcular swap recomendado
   local RECOMMENDED_SWAP
   if [[ $TOTAL_RAM_GB -le 8 ]]; then
@@ -3320,7 +3313,6 @@ function configure_swap() {
   fi
 
   echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
-
   # Verificar espacio libre en disco
   local FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
   local FREE_SPACE_GB=$((FREE_SPACE_KB / 1024 / 1024))
@@ -3367,7 +3359,6 @@ read -p "Seleccionar opción [1-5]: " swap_choice
 case "$swap_choice" in
   4)
     print_header "Eliminando Swap Completamente"
-
     echo
     print_warning "⚠️  ADVERTENCIA: Esto desactivará hibernation"
     read -p "¿Estás seguro? [s/N]: " confirm_delete
@@ -3410,7 +3401,6 @@ case "$swap_choice" in
       echo -e "${GREEN}✓ Swap eliminado completamente${NC}"
       echo -e "${CYAN}Espacio libre ahora: ${BOLD}$FREE_SPACE${NC}"
       echo
-
       # Marcar para saltar hibernation
       SKIP_HIBERNATION=true
     else
@@ -3419,7 +3409,6 @@ case "$swap_choice" in
     ;;
   1|3)
     print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
-    
     # Verificar si ya existe swapfile
     if [[ -f /swapfile ]]; then
       print_warning "Ya existe /swapfile"
@@ -3427,7 +3416,6 @@ case "$swap_choice" in
       sudo rm -f /swapfile
       print_status "Swapfile anterior eliminado"
     fi
-    
     # Crear swapfile con fallocate (más rápido que dd)
     print_installing "Creando swapfile de ${RECOMMENDED_SWAP}GB"
     if sudo fallocate -l ${RECOMMENDED_SWAP}G /swapfile 2>/dev/null; then
@@ -3436,7 +3424,6 @@ case "$swap_choice" in
       print_status "fallocate falló, usando dd..."
       sudo dd if=/dev/zero of=/swapfile bs=1M count=$((RECOMMENDED_SWAP * 1024)) status=progress
     fi
-    
     # Configurar permisos y formato
     print_status "Configurando swapfile..."
     sudo chmod 600 /swapfile
