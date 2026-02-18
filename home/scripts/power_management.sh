@@ -30,10 +30,8 @@ case "$CHOICE" in
 "󰒲")
   # hibernar
   # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
-  sync # Fuerza escritura a disco
-  sleep 1
-  # sudo systemctl hibernate --force --force
-  systemctl hibernate
+  # systemctl hibernate
+  kitty -- sudo systemctl hibernate --force --force
   # Verificar si la hibernación está correctamente configurada
   if ! grep -q "resume=" /proc/cmdline || ! swapon --show | grep -q "/"; then
     notify-send "⚠️ NO PUEDES HIBERNAR!" "Falta configuración de SWAP o parámetros de resume en GRUB " -i dialog-warning -t 5000
