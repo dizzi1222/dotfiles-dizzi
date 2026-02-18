@@ -13,10 +13,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-print_info()    { echo -e "${BLUE}ℹ${NC} $*"; }
+print_info() { echo -e "${BLUE}ℹ${NC} $*"; }
 print_success() { echo -e "${GREEN}✓${NC} $*"; }
 print_warning() { echo -e "${YELLOW}⚠${NC} $*"; }
-print_error()   { echo -e "${RED}✗${NC} $*"; }
+print_error() { echo -e "${RED}✗${NC} $*"; }
 
 run_sudo() {
   if sudo -v &>/dev/null; then
@@ -74,6 +74,9 @@ setup_timeshift_ext4() {
   if ! command_exists timeshift; then
     print_info "Instalando Timeshift..."
     run_sudo pacman -S --noconfirm timeshift
+    yay -S timeshift-autosnap
+    sudo timeshift-autosnap
+    print_success "Timeshift y autosnap ya están instalados"
   else
     print_success "Timeshift ya está instalado"
   fi
@@ -92,7 +95,7 @@ setup_timeshift_ext4() {
   # FIX #1 APLICADO: snapshot_count=2 (antes era 0 = sin límite)
   # snapshot_size=0 es correcto (Timeshift no lo usa para limitar)
   # El límite real está en snapshot_count
-  cat << 'EOF' | run_sudo tee "$config_file" > /dev/null
+  cat <<'EOF' | run_sudo tee "$config_file" >/dev/null
 {
   "backup_device_uuid": "",
   "parent_device_uuid": "",
@@ -144,7 +147,7 @@ EOF
   # FIX #2 APLICADO: eliminado --tags O (argumento inválido en Timeshift)
   # --scripted es suficiente para ejecución no interactiva
   print_info "Creando hook de pacman para pre-actualización..."
-  cat << 'EOF' | run_sudo tee /etc/pacman.d/hooks/timeshift-pre-update.hook > /dev/null
+  cat <<'EOF' | run_sudo tee /etc/pacman.d/hooks/timeshift-pre-update.hook >/dev/null
 [Trigger]
 Operation = Upgrade
 Type = Package
@@ -182,10 +185,10 @@ setup_snapper_btrfs() {
   local snapper_config="/etc/snapper/configs/root"
 
   if [ -f "$snapper_config" ]; then
-    run_sudo sed -i 's/^SPACE_LIMIT=.*/SPACE_LIMIT="0.2"/'         "$snapper_config"
-    run_sudo sed -i 's/^NUMBER_LIMIT=.*/NUMBER_LIMIT="5"/'          "$snapper_config"
+    run_sudo sed -i 's/^SPACE_LIMIT=.*/SPACE_LIMIT="0.2"/' "$snapper_config"
+    run_sudo sed -i 's/^NUMBER_LIMIT=.*/NUMBER_LIMIT="5"/' "$snapper_config"
     run_sudo sed -i 's/^TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="10"/' "$snapper_config"
-    run_sudo sed -i 's/^TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="3"/'   "$snapper_config"
+    run_sudo sed -i 's/^TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="3"/' "$snapper_config"
     run_sudo sed -i 's/^TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="2"/' "$snapper_config"
     run_sudo sed -i 's/^TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="1"/' "$snapper_config"
     print_success "Límites configurados"
@@ -193,7 +196,7 @@ setup_snapper_btrfs() {
 
   [ ! -d "/etc/pacman.d/hooks" ] && run_sudo mkdir -p /etc/pacman.d/hooks
 
-  cat << 'EOF' | run_sudo tee /etc/pacman.d/hooks/snapper-pre-update.hook > /dev/null
+  cat <<'EOF' | run_sudo tee /etc/pacman.d/hooks/snapper-pre-update.hook >/dev/null
 [Trigger]
 Operation = Upgrade
 Type = Package
@@ -231,8 +234,8 @@ remove_old_snapshots() {
   # Parsear nombres reales del formato de timeshift --list
   # Formato de salida: "  1)  2025-02-09_22:39:45  ..."
   local snapshots
-  snapshots=$(sudo timeshift --list 2>/dev/null \
-    | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}')
+  snapshots=$(sudo timeshift --list 2>/dev/null |
+    grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}:[0-9]{2}:[0-9]{2}')
 
   if [[ -z "$snapshots" ]]; then
     print_warning "No hay snapshots para remover"
@@ -257,7 +260,7 @@ remove_old_snapshots() {
     else
       print_success "Conservado (más reciente): $snap"
     fi
-  done <<< "$snapshots"
+  done <<<"$snapshots"
 
   echo
   print_success "Limpieza completada. Snapshots restantes:"
@@ -278,29 +281,29 @@ create_full_backup() {
   read -p "Selecciona opción (1-3): " option
 
   case "$option" in
-    1)
-      run_sudo timeshift --create --comments "Full-Backup-$(date +%Y%m%d)" --scripted
-      print_success "Snapshot completo creado"
-      ;;
-    2)
-      read -p "¿Confirmar imagen dd? (si/no): " confirm2
-      if [ "$confirm2" = "si" ]; then
-        local source_disk
-        source_disk=$(df / | grep -oE '/dev/[a-z0-9]+' | head -1)
-        run_sudo dd if="$source_disk" of="$backup_dir/full-image.img" bs=4M status=progress
-        print_success "Imagen dd: $backup_dir/full-image.img"
-      fi
-      ;;
-    3)
-      run_sudo tar --exclude=/proc --exclude=/sys --exclude=/dev \
-        --exclude=/run --exclude=/tmp --exclude=/mnt \
-        -czf "$backup_dir/system-backup.tar.gz" /
-      print_success "Backup tar: $backup_dir/system-backup.tar.gz"
-      ;;
-    *)
-      print_error "Opción inválida"
-      return 1
-      ;;
+  1)
+    run_sudo timeshift --create --comments "Full-Backup-$(date +%Y%m%d)" --scripted
+    print_success "Snapshot completo creado"
+    ;;
+  2)
+    read -p "¿Confirmar imagen dd? (si/no): " confirm2
+    if [ "$confirm2" = "si" ]; then
+      local source_disk
+      source_disk=$(df / | grep -oE '/dev/[a-z0-9]+' | head -1)
+      run_sudo dd if="$source_disk" of="$backup_dir/full-image.img" bs=4M status=progress
+      print_success "Imagen dd: $backup_dir/full-image.img"
+    fi
+    ;;
+  3)
+    run_sudo tar --exclude=/proc --exclude=/sys --exclude=/dev \
+      --exclude=/run --exclude=/tmp --exclude=/mnt \
+      -czf "$backup_dir/system-backup.tar.gz" /
+    print_success "Backup tar: $backup_dir/system-backup.tar.gz"
+    ;;
+  *)
+    print_error "Opción inválida"
+    return 1
+    ;;
   esac
 
   print_info "Ubicación: $backup_dir"
@@ -315,8 +318,8 @@ show_grub_info() {
   if [ -f "/boot/grub/grub.cfg" ]; then
     print_success "Grub instalado en /boot/grub/grub.cfg"
     print_info "Entradas de snapshot en Grub:"
-    sudo grep -i "timeshift\|snapshot" /boot/grub/grub.cfg | head -5 \
-      || print_warning "No hay entradas de snapshot aún (normal en primera instalación)"
+    sudo grep -i "timeshift\|snapshot" /boot/grub/grub.cfg | head -5 ||
+      print_warning "No hay entradas de snapshot aún (normal en primera instalación)"
   else
     print_error "Grub no encontrado en /boot/grub/grub.cfg"
     return 1
@@ -344,18 +347,21 @@ show_menu() {
     read -p "Selecciona opción (1-7): " menu_option
 
     case "$menu_option" in
-      1) sudo timeshift --list ;;
-      2)
-        read -p "Descripción (enter = 'Manual snapshot'): " description
-        [[ -z "$description" ]] && description="Manual snapshot"
-        sudo timeshift --create --comments "$description" --scripted
-        ;;
-      3) create_full_backup ;;
-      4) remove_old_snapshots ;;
-      5) show_grub_info ;;
-      6) configure_timeshift_limits ;;
-      7) print_success "¡Hasta luego!"; exit 0 ;;
-      *) print_error "Opción inválida" ;;
+    1) sudo timeshift --list ;;
+    2)
+      read -p "Descripción (enter = 'Manual snapshot'): " description
+      [[ -z "$description" ]] && description="Manual snapshot"
+      sudo timeshift --create --comments "$description" --scripted
+      ;;
+    3) create_full_backup ;;
+    4) remove_old_snapshots ;;
+    5) show_grub_info ;;
+    6) configure_timeshift_limits ;;
+    7)
+      print_success "¡Hasta luego!"
+      exit 0
+      ;;
+    *) print_error "Opción inválida" ;;
     esac
   done
 }
@@ -363,7 +369,7 @@ show_menu() {
 # ==================== Main ====================
 
 show_help() {
-  cat << 'EOF'
+  cat <<'EOF'
 ╔════════════════════════════════════════════════════════════════════╗
 ║     Script de Gestión de Backup del Sistema (Timeshift/Snapper)   ║
 ╚════════════════════════════════════════════════════════════════════╝
@@ -402,48 +408,48 @@ main() {
   local action="${1:-setup}"
 
   case "$action" in
-    setup)
-      print_info "═════════════════════════════════════════"
-      print_info "  Setup del Sistema de Backup"
-      print_info "═════════════════════════════════════════"
+  setup)
+    print_info "═════════════════════════════════════════"
+    print_info "  Setup del Sistema de Backup"
+    print_info "═════════════════════════════════════════"
 
-      local fs_type
-      fs_type=$(detect_filesystem)
-      print_info "Filesystem detectado: ${BLUE}$fs_type${NC}"
+    local fs_type
+    fs_type=$(detect_filesystem)
+    print_info "Filesystem detectado: ${BLUE}$fs_type${NC}"
 
-      case "$fs_type" in
-        ext4)  setup_timeshift_ext4  ;;
-        btrfs) setup_snapper_btrfs   ;;
-        *)
-          print_error "Filesystem no soportado: $fs_type"
-          print_info "Se soportan: ext4 (Timeshift) y btrfs (Snapper)"
-          exit 1
-          ;;
-      esac
-
-      echo
-      print_success "Setup completado"
-      print_warning "Paso obligatorio: sudo timeshift --ui → selecciona dispositivo destino"
-      print_info "Gestión: sudo bash setup-backup-system.sh menu"
-      ;;
-
-    menu)        show_menu ;;
-    list)        sudo timeshift --list ;;
-    create)
-      read -p "Descripción (enter = 'Manual snapshot'): " description
-      [[ -z "$description" ]] && description="Manual snapshot"
-      sudo timeshift --create --comments "$description" --scripted
-      ;;
-    full-backup) create_full_backup ;;
-    remove)      remove_old_snapshots ;;
-    grub-info)   show_grub_info ;;
-    limits)      configure_timeshift_limits ;;
-    help)        show_help ;;
+    case "$fs_type" in
+    ext4) setup_timeshift_ext4 ;;
+    btrfs) setup_snapper_btrfs ;;
     *)
-      print_error "Acción desconocida: $action"
-      show_help
+      print_error "Filesystem no soportado: $fs_type"
+      print_info "Se soportan: ext4 (Timeshift) y btrfs (Snapper)"
       exit 1
       ;;
+    esac
+
+    echo
+    print_success "Setup completado"
+    print_warning "Paso obligatorio: sudo timeshift --ui → selecciona dispositivo destino"
+    print_info "Gestión: sudo bash setup-backup-system.sh menu"
+    ;;
+
+  menu) show_menu ;;
+  list) sudo timeshift --list ;;
+  create)
+    read -p "Descripción (enter = 'Manual snapshot'): " description
+    [[ -z "$description" ]] && description="Manual snapshot"
+    sudo timeshift --create --comments "$description" --scripted
+    ;;
+  full-backup) create_full_backup ;;
+  remove) remove_old_snapshots ;;
+  grub-info) show_grub_info ;;
+  limits) configure_timeshift_limits ;;
+  help) show_help ;;
+  *)
+    print_error "Acción desconocida: $action"
+    show_help
+    exit 1
+    ;;
   esac
 }
 

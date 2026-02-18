@@ -1,0 +1,21 @@
+[Unit]
+Description=Clawdbot Gateway (v2026.1.24-3)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart="/usr/bin/node" "/usr/lib/node_modules/clawdbot/dist/entry.js" gateway --port 18789
+Restart=always
+RestartSec=5
+KillMode=process
+Environment=HOME=/home/diego
+Environment="PATH=/home/diego/.nvm/current/bin:/home/diego/.local/bin:/home/diego/.npm-global/bin:/home/diego/bin:/home/diego/.fnm/current/bin:/home/diego/.volta/bin:/home/diego/.asdf/shims:/home/diego/.local/share/pnpm:/home/diego/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+Environment=CLAWDBOT_GATEWAY_PORT=18789
+Environment=CLAWDBOT_GATEWAY_TOKEN=3bfc8d030a6a1f641ddde6da3c771a26fb89fe79ab3c0bdc
+Environment="CLAWDBOT_SYSTEMD_UNIT=clawdbot-gateway.service"
+Environment=CLAWDBOT_SERVICE_MARKER=clawdbot
+Environment=CLAWDBOT_SERVICE_KIND=gateway
+Environment=CLAWDBOT_SERVICE_VERSION=2026.1.24-3
+
+[Install]
+WantedBy=default.target

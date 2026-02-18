@@ -5,13 +5,15 @@
 SCRIPT_DIR="$HOME/waydroid_script/"
 VENV_DIR="$SCRIPT_DIR/venv"
 
-# Verificar si el directorio existe
+# Verificar si el directorio existe, si no, clonarlo
 if [ ! -d "$SCRIPT_DIR" ]; then
-  echo "Error: No se encuentra el directorio $SCRIPT_DIR"
-  echo "Por favor, clona el repositorio primero:"
-  echo "git clone https://github.com/casualsnek/waydroid_script.git ~/Descargas/waydroid_script"
-  read -p "Presiona Enter para salir..."
-  exit 1
+  echo "No se encuentra el directorio $SCRIPT_DIR"
+  echo "Clonando repositorio..."
+  git clone https://github.com/casualsnek/waydroid_script.git "$SCRIPT_DIR" || {
+    echo "Error al clonar el repositorio."
+    read -p "Presiona Enter para salir..."
+    exit 1
+  }
 fi
 
 cd "$SCRIPT_DIR" || exit 1
