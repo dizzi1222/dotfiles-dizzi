@@ -1497,7 +1497,42 @@ DOCKERSVC
   # Limpiar
   cd ~
   rm -rf "$DOCKER_TEMP"
-  
+
+  # ── GPG / pass para Docker Desktop Login ──────────────────────────
+  echo
+  echo -e "${CYAN}Docker Desktop requiere GPG + pass para iniciar sesión.${NC}"
+  read -p "¿Configurar GPG/pass ahora? [s/N]: " gpg_choice
+  if [[ "$gpg_choice" =~ ^[sS]$ ]]; then
+    print_header "Configurando GPG + pass para Docker Desktop"
+
+    # Instalar dependencias si faltan
+    for pkg in gnupg pass; do
+      if ! command -v "$pkg" &>/dev/null; then
+        print_status "Instalando $pkg..."
+        sudo pacman -S --noconfirm "$pkg"
+      fi
+    done
+
+    echo
+    print_status "Generando clave GPG (sigue las instrucciones en pantalla)..."
+    gpg --generate-key
+
+    echo
+    echo -e "${CYAN}Busca la línea 'pub' en la salida anterior y copia el ID (ej: 3ABCD1234EF56G78)${NC}"
+    read -p "Pega tu GPG ID aquí: " gpg_id
+
+    if [[ -n "$gpg_id" ]]; then
+      pass init "$gpg_id"
+      print_success "✅ pass inicializado con GPG ID: $gpg_id"
+      echo -e "${CYAN}Ahora puedes iniciar sesión en Docker Desktop desde la GUI.${NC}"
+    else
+      print_warning "⚠️  GPG ID vacío — omitiendo pass init. Puedes hacerlo manualmente: pass init <TU_GPG_ID>"
+    fi
+  else
+    print_warning "GPG/pass omitido — necesario para iniciar sesión en Docker Desktop"
+    print_status "Manual: gpg --generate-key && pass init <GPG_ID>"
+  fi
+
 elif [[ "$docker_choice" == "1" ]]; then
   print_success "Usando Docker CLI (suficiente para la mayoría)"
 else
