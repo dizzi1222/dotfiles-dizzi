@@ -378,7 +378,7 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron geforce-infinity-bin bottles curseforge minecraft-launcher lucem-git # LUCEM = BLOXTRAP PARA JUGAR ROBLOX
+    gfn-electron geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
