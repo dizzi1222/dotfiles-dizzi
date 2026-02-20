@@ -228,15 +228,16 @@ print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
-  kitty ghostty konsole thunar nemo plasma-desktop \
+  kitty ghostty konsole thunar nemo \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
   wofi fuzzel polkit-kde-agent polkit-gnome udiskie \
   swww hyprpaper hyprshot \
   qt5-wayland qt6-wayland gtk-layer-shell
-
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
+echo
+echo -e "${CYAN}¿Instalar Plasma  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor && print_success "Plasma instalado"
 print_success "Hyprland instalado"
 print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
 [Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
@@ -591,7 +592,7 @@ case "$kdenlive_choice" in
   print_header "Instalando Kdenlive + Dependencias"
   print_installing "kdenlive + qt6-imageformats + kimageformats + recordmydesktop + plasma-desktop"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    kdenlive qt6-imageformats kimageformats recordmydesktop plasma-desktop \
+    kdenlive qt6-imageformats kimageformats recordmydesktop \
     2>/dev/null || print_warning "Algunas dependencias de Kdenlive fallaron"
   print_success "Kdenlive + dependencias instalado"
   ;;
@@ -621,17 +622,13 @@ echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Visual Studio Code${NC} (vscode-bin + code-features)"
 echo -e "  ${MAGENTA}•${NC} Editor más popular"
-echo -e "  ${MAGENTA}•${NC} Extensiones oficiales de Microsoft"
 echo -e "  ${MAGENTA}•${NC} Incluye code-features para mejor integración"
 echo
 echo -e "${BOLD}${GREEN}2. Cursor${NC} (cursor-bin)"
 echo -e "  ${MAGENTA}•${NC} Fork de VSCode con IA integrada"
-echo -e "  ${MAGENTA}•${NC} Copilot++ nativo"
-echo -e "  ${MAGENTA}•${NC} Compatible con extensiones de VSCode"
 echo
 echo -e "${BOLD}${GREEN}3. Antigravity${NC} (yay)"
-echo -e "  ${MAGENTA}•${NC} Editor experimental"
-echo -e "  ${MAGENTA}•${NC} Ligero y rápido"
+echo -e "  ${MAGENTA}•${NC} Editor experimental, Excelente"
 echo
 echo -e "${BOLD}${GREEN}4. Ninguno${NC}"
 echo -e "  ${MAGENTA}•${NC} Omitir instalación de editor"
@@ -698,8 +695,6 @@ yay -S --needed --noconfirm \
   appimagelauncher music-presence-bin copyq pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
-print_success "Instalado apps basicas: zip, 7zip, rar, appimagelauncher"
-print_success "Instalado Downloaders: megasync, jdownloader2, pamac-aur [Panel Control], transmission-gtk (Utorrent)"
 print_success "Aplicaciones instaladas (solo binarios)"
 
 # ═══════════════════════════════════════════════════════════
@@ -993,7 +988,6 @@ EOF
         fi
       else
         print_error "Error instalando MagisTV"
-        print_status "Verifica: libhoudini está instalado? ¿El APK es correcto?"
         print_warning "Error log guardado en: /tmp/magistv_install.log"
       fi
     else
@@ -1057,12 +1051,10 @@ echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):$NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Yuki-IPTV$NC}"
 echo -e "  ${MAGENTA}•$NC} Cliente IPTV con M3U support"
-echo -e "  ${MAGENTA}•$NC} Interfaz GTK moderna"
 echo -e "  ${MAGENTA}•$NC} Recomendado si tienes lista M3U"
 echo
 echo -e "${BOLD}${GREEN}2. Hypnotix$NC}"
 echo -e "  ${MAGENTA}•$NC} Reproductor IPTV avanzado"
-echo -e "  ${MAGENTA}•$NC} Compatible con XTREAM codes"
 echo -e "  ${MAGENTA}•$NC} Requiere configuración de servidor"
 echo
 echo -e "${YELLOW}⚠️  IMPORTANTE - SEGURIDAD CON VPN:$NC}"
@@ -1641,7 +1633,7 @@ if [[ -d ~/dotfiles-dizzi ]]; then
 
   print_status "Aplicando dotfiles con stow..."
 
-  for pkg in niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
+  for pkg in niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile dolphin-files; do
     if [[ -d $pkg ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
@@ -1968,10 +1960,8 @@ echo
 echo -e "${CYAN}Bottles es una alternativa moderna a Wine prefix tradicional:${NC}"
 echo
 echo -e "${GREEN}Ventajas:${NC}"
-echo -e "  ${MAGENTA}•${NC} GUI intuitiva para gestionar juegos/apps"
+echo -e "  ${MAGENTA}•${NC} GUI intuitiva para gestionar juegos/apps modernos, mejor compatibilidad."
 echo -e "  ${MAGENTA}•${NC} Cambio fácil entre Wine-GE y Proton-GE"
-echo -e "  ${MAGENTA}•${NC} Creación automática de .desktop files"
-echo -e "  ${MAGENTA}•${NC} Mejor compatibilidad con juegos modernos"
 echo -e "  ${MAGENTA}•${NC} Gestión de dependencias simplificada"
 echo
 echo -e "${YELLOW}Nota:${NC} La instalación de Bottles compila ~1 hora"
@@ -2486,9 +2476,6 @@ EOL
     echo -e "  ${YELLOW}ydotool click${NC}  → Click izquierdo"
     echo -e "  ${YELLOW}ydotool click 0xC1${NC}  → Click derecho"
     echo
-    echo -e "${CYAN}Autoclicker:${NC}"
-    echo -e "  ${YELLOW}while true; do ydotool click; sleep 0.1; done${NC}"
-    echo
   fi
 
   # ══════════════════════════════════════════════════════════════════
@@ -2893,9 +2880,7 @@ echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨         
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Este paso instala herramientas para buscar e insertar:${NC}"
-echo -e "  ${MAGENTA}•${NC} Emojis (rofimoji)"
-echo -e "  ${MAGENTA}•${NC} Nerd Font glyphs (iconos para nvim, terminal, etc.)"
-echo -e "  ${MAGENTA}•${NC} Font Awesome, Material Icons, etc."
+echo -e "  ${MAGENTA}•${NC} Nerd Font glyphs, rofimoji (iconos para nvim, terminal, etc.)"
 echo -e "  ${MAGENTA}•${NC} Alternativa a Raycast para Linux (Ulauncher + extensiones)"
 echo
 
@@ -2954,21 +2939,14 @@ echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Eww (Elkowar's Wacky Widgets)${NC} - ${MAGENTA}ESENCIAL${NC}"
-echo -e "  ${MAGENTA}•${NC} Widgets ligeros y rápidos"
 echo -e "  ${MAGENTA}•${NC} Configuración en Yuck (similar a Lisp)"
-echo -e "  ${MAGENTA}•${NC} Compatible con Hyprland"
-echo -e "  ${MAGENTA}•${NC} Instalación: ~2 minutos"
 echo
 echo -e "${BOLD}${GREEN}2. Quickshell${NC} - ${YELLOW}OPCIONAL${NC}"
 echo -e "  ${MAGENTA}•${NC} Widgets modernos en QML"
-echo -e "  ${MAGENTA}•${NC} Soporte Qt6"
-echo -e "  ${MAGENTA}•${NC} Compilación: ~15-20 minutos"
 echo
 echo -e "${BOLD}${GREEN}3. Caelestia Shell${NC} - ${YELLOW}OPCIONAL${NC}"
 echo -e "  ${MAGENTA}•${NC} Shell completo basado en Quickshell"
-echo -e "  ${MAGENTA}•${NC} Temas visuales impresionantes"
 echo -e "  ${MAGENTA}•${NC} Compilación: ~30 minutos"
-echo -e "  ${MAGENTA}•${NC} Requiere Quickshell"
 echo
 read -p "¿Instalar Eww (esencial)? [S/n]: " install_eww
 read -p "¿Instalar Quickshell (compilación ~15min)? [s/N]: " install_quickshell
@@ -3805,15 +3783,9 @@ echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
 echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
-echo -e "  ${MAGENTA}•${NC} Soporte Wayland nativo"
-echo -e "  ${MAGENTA}•${NC} Más ligero (~100MB RAM)"
 echo
 echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
-echo -e "  ${MAGENTA}•${NC} ${BOLD}Setup.sh interactivo funcional${NC}"
 echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
-echo -e "  ${MAGENTA}•${NC} Wallpapers animados"
-echo -e "  ${MAGENTA}•${NC} Teclado virtual integrado"
-echo -e "  ${MAGENTA}•${NC} Instalación robusta y confiable"
 echo
 echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
 echo
@@ -3826,9 +3798,15 @@ if [[ "$dm_choice" == "2" ]]; then
   print_installing "SDDM + Dependencias Qt6"
   sudo pacman -S --needed --noconfirm \
     sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
-
+  # Fix 1 - graphical target
+  sudo systemctl set-default graphical.target
+  sudo reboot
+  # Fix 2 - restaurar desktop files
+  sudo pacman -S hyprland  # reinstalación restauró hyprland.desktop
+  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
+  #  Fix 3 - restaurar sddm.service
+  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
   print_success "SDDM instalado"
-
   # Paso 2: Limpiar instalación anterior si existe
   print_status "Limpiando instalaciones previas del tema..."
   sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
@@ -3866,18 +3844,8 @@ if [[ "$dm_choice" == "2" ]]; then
     echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
     echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
     echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles           ║${NC}"
-    echo -e "${CYAN}║  • Personalizar colores y apariencia                  ║${NC}"
-    echo -e "${CYAN}║  • Configurar wallpaper                               ║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
     echo
-    echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
-    echo -e "  ${GREEN}1.${NC} classic           ${GREEN}6.${NC} penguin"
-    echo -e "  ${GREEN}2.${NC} astronaut         ${GREEN}7.${NC} jake_the_dog"
-    echo -e "  ${GREEN}3.${NC} future            ${GREEN}8.${NC} rick_and_morty"
-    echo -e "  ${GREEN}4.${NC} cyberpunk         ${GREEN}9.${NC} space_ship"
-    echo -e "  ${GREEN}5.${NC} nixos            ${GREEN}10.${NC} custom"
-    echo
-    echo -e "${CYAN}${BOLD}Presiona Enter para continuar con la configuración...${NC}"
     read -p ""
 
     # Ejecutar setup.sh con sudo (necesario para copiar a /usr/share)
@@ -3931,10 +3899,15 @@ EOF
 
 elif [[ "$dm_choice" == "1" ]]; then
   print_header "Instalando GDM"
-
   print_installing "GDM (GNOME Display Manager)"
   sudo pacman -S --needed --noconfirm gdm
   sudo systemctl enable gdm
+  sudo systemctl set-default graphical.target
+  sudo reboot
+  sudo pacman -S hyprland  # reinstalación restauró hyprland.desktop
+  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
+  #  Fix 4 - restaurar gdm.service
+  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
   print_success "GDM habilitado"
 else
   print_warning "Display Manager omitido (manteniendo actual)"
@@ -3981,9 +3954,7 @@ cat <<"EOF"
 ║  ✅ Symlinks a /etc configurados                                     ║
 ║  ✅ Temas Qt/GTK configurados automáticamente                        ║
 ║  ✅ Oh-My-Zsh + Plugins completos                                    ║
-║  ✅ Python-pywal + Oh-My-Posh + Rofimoji                             ║
-║  ✅ Ollama + opencommit (si seleccionado)                            ║
-║  ✨ SDDM Astronaut Theme configurado interactivamente                ║
+║  ✅ Apps, DevOps (Docker), Ollama + opencommit (si seleccionado)     ║
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
 EOF
@@ -4010,18 +3981,12 @@ echo -e "  ${CYAN}•${NC} Bottles: ${YELLOW}yay -S bottles${NC} (1+ hora)"
 echo -e "  ${CYAN}•${NC} Caelestia: ${YELLOW}yay -S caelestia-shell${NC} (30min)"
 echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15min)"
 echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
-echo -e "  ${CYAN}•${NC} Ollama: ${YELLOW}sudo pacman -S ollama && ollama pull qwen2.5:0.5b${NC}"
 echo
 echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
 echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
-echo -e "  ${CYAN}•${NC} Ver snapshots: ${YELLOW}snapper list${NC} o ${YELLOW}snls${NC} (alias)"
-echo -e "  ${CYAN}•${NC} Crear snapshot: ${YELLOW}snapper create -d 'Mi snapshot'${NC}"
-echo -e "  ${CYAN}•${NC} Snapshots automáticos: ${YELLOW}Antes de pacman -Syu${NC} (snap-pac)"
 echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 snapshots (con compresión)"
 echo
 echo -e "${CYAN}💡 TIPS:${NC}"
-echo -e "  ${MAGENTA}•${NC} Hibernation: Verifica con ${YELLOW}systemctl hibernate --dry-run${NC}"
-echo -e "  ${MAGENTA}•${NC} Snapshots: Rollback desde GRUB en 'Arch Linux snapshots'"
 echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
   htop # --> Usa F6 para ordenar por CPU
   sudo intel_gpu_top # Ver GPU en tiempo real de Intel [latitude 7440]
