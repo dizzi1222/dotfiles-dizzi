@@ -424,9 +424,20 @@ aicommitconfig() {
   
   if [[ ${#models[@]} -eq 0 ]]; then
     echo "❌ No hay modelos"
-    return 1
+    echo ""
+    read -p "¿Instalar qwen2.5:0.5b ahora? [S/n]: " install_model
+    if [[ ! "$install_model" =~ ^[Nn]$ ]]; then
+      ollama pull qwen2.5:0.5b
+      models=($(ollama list | tail -n +2 | awk '{print $1}'))
+      [[ ${#models[@]} -eq 0 ]] && echo "❌ Falló la instalación" && return 1
+    else
+      echo "💡 Ejecuta manualmente: ollama pull qwen2.5:0.5b"
+      return 1
+    fi
   fi
-  
+
+  echo "Modelos disponibles:"
+  # ... resto igual 
   echo "Modelos disponibles:"
   echo "💡 Tip: Esta configuración usa /api/chat (optimizado para modelos cloud)"
   echo ""
