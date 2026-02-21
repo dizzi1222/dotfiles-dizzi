@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=EWW Kill
+Exec=/home/diego/.config/scripts-plasma-windows-desktop/eww-kill.sh
+NoDisplay=true
+Hidden=true
