@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Rofimoji Picker
+Exec=/home/diego/.config/scripts-plasma-windows-desktop/rofimoji-picker.sh
+NoDisplay=true
+Hidden=true

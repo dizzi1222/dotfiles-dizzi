@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Quickshell Kill
+Exec=/home/diego/.config/scripts-plasma-windows-desktop/quickshell-kill.sh
+NoDisplay=true
+Hidden=true
