@@ -1,0 +1,38 @@
+2026/02/27-21:13:31.947 b0107 Reusing MANIFEST /home/diego/.config/Antigravity/Local Storage/leveldb/MANIFEST-000001
+2026/02/27-21:13:31.989 b0107 Recovering log #21
+2026/02/27-21:13:31.992 b0107 Level-0 table #24: started
+2026/02/27-21:13:32.000 b0107 Level-0 table #24: 38950 bytes OK
+2026/02/27-21:13:32.004 b0107 Delete type=0 #21
+2026/02/27-21:13:32.006 b00e8 Compacting 4@0 + 1@1 files
+2026/02/27-21:13:32.024 b00e8 Generated table #26@0: 2 keys, 38950 bytes
+2026/02/27-21:13:32.025 b00e8 Compacted 4@0 + 1@1 files => 38950 bytes
+2026/02/27-21:13:32.028 b00e8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/02/27-21:13:32.029 b00e8 Delete type=2 #16
+2026/02/27-21:13:32.030 b00e8 Delete type=2 #20
+2026/02/27-21:13:32.030 b00e8 Delete type=2 #24
+2026/02/27-21:13:32.031 b00e8 Delete type=2 #22
+2026/02/27-21:13:32.034 b00e8 Delete type=2 #18
+2026/02/27-21:14:32.024 b0105 Level-0 table #28: started
+2026/02/27-21:14:32.030 b0105 Level-0 table #28: 37599 bytes OK
+2026/02/27-21:14:32.033 b0105 Delete type=0 #25
+2026/02/27-21:15:33.938 b0105 Level-0 table #30: started
+2026/02/27-21:15:33.943 b0105 Level-0 table #30: 38804 bytes OK
+2026/02/27-21:15:33.948 b0105 Delete type=0 #27
+2026/02/27-21:16:33.938 b0105 Level-0 table #32: started
+2026/02/27-21:16:33.943 b0105 Level-0 table #32: 38125 bytes OK
+2026/02/27-21:16:33.947 b0105 Delete type=0 #29
+2026/02/27-21:17:33.939 b0105 Level-0 table #34: started
+2026/02/27-21:17:33.950 b0105 Level-0 table #34: 38829 bytes OK
+2026/02/27-21:17:33.956 b0105 Delete type=0 #31
+2026/02/27-21:17:33.958 b0105 Compacting 4@0 + 1@1 files
+2026/02/27-21:17:33.971 b0105 Generated table #35@0: 3 keys, 38853 bytes
+2026/02/27-21:17:33.971 b0105 Compacted 4@0 + 1@1 files => 38853 bytes
+2026/02/27-21:17:33.975 b0105 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/02/27-21:17:33.976 b0105 Delete type=2 #34
+2026/02/27-21:17:33.976 b0105 Delete type=2 #28
+2026/02/27-21:17:33.976 b0105 Delete type=2 #26
+2026/02/27-21:17:33.976 b0105 Delete type=2 #32
+2026/02/27-21:17:33.977 b0105 Delete type=2 #30
+2026/02/27-21:18:33.940 b0105 Level-0 table #37: started
+2026/02/27-21:18:33.951 b0105 Level-0 table #37: 39262 bytes OK
+2026/02/27-21:18:33.957 b0105 Delete type=0 #33

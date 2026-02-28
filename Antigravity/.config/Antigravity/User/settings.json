@@ -316,7 +316,7 @@
   "security.workspace.trust.enabled": false,
   "window.confirmSaveUntitledWorkspace": false,
   "antigravity.marketplaceGalleryItemURL": "https://marketplace.visualstudio.com",
-  "workbench.colorTheme": "SynthWave84",
+  "workbench.colorTheme": "Aura Dark",
   "git.confirmSync": false,
   "livePreview.notifyOnOpenLooseFile": false,
   "symbols.hidesExplorerArrows": false,

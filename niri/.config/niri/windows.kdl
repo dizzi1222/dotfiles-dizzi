@@ -29,7 +29,8 @@ window-rule {
 
 // Picture in Picture
 window-rule {
-    match title=r#"^(Picture.?in.?[Pp]icture|[Ii]m[aá]gen en [Ii]m[aá]gen|www.twitch.tv_/)$"#
+    // match title=r#"^(Picture.?in.?[Pp]icture|[Ii]m[aá]gen en [Ii]m[aá]gen|www.twitch.tv_/)$"#
+    match title=r#"^(Picture.?in.?[Pp]icture|[Ii]m[aá]gen en [Ii]m[aá]gen)$"#
     open-floating true
     default-column-width { fixed 600; }
     default-window-height { fixed 338; }
@@ -40,6 +41,7 @@ window-rule {
 window-rule {
     match app-id=r#"^(nemo-desktop)$"#
     open-maximized true
+    open-on-workspace "magic"
 }
 
 // LibreOffice

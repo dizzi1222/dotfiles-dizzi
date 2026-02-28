@@ -8,15 +8,15 @@ case "$CHOICE" in
 "")
   cd /$HOME
   # shutdown now
-  sync                                             # Fuerza escritura a disco
-  kitty -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
+  sync                                                                                                   # Fuerza escritura a disco
+  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl poweroff --force --force" # Doble --force = bypass todo
 
   ;;
 "")
   cd /$HOME
   sync # Fuerza escritura a disco
   sleep 1
-  kitty -- sudo systemctl reboot --force --force # Doble --force = bypass todo
+  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl reboot --force --force" # Doble --force = bypass todo
   ;;
 "")
   hyprlock # funciona en Niri too
@@ -25,7 +25,7 @@ case "$CHOICE" in
   cd /$HOME
   sync # Fuerza escritura a disco
   sleep 1
-  kitty -- sudo systemctl suspend --force --force # o usa sleep
+  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl suspend --force --force" # o usa sleep
   ;;
 "󰒲")
   # hibernar
