@@ -228,13 +228,13 @@ print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
   hyprland xdg-desktop-portal-hyprland \
   waybar rofi-wayland dunst \
-  kitty ghostty konsole thunar nemo \
+  kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
   wofi fuzzel polkit-kde-agent polkit-gnome udiskie \
   swww hyprpaper hyprshot \
-  qt5-wayland qt6-wayland gtk-layer-shell
+  qt5-wayland qt6-wayland gtk-layer-shell # konsole es mierda
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
 echo
 echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools && print_success "Plasma instalado"
@@ -374,12 +374,12 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
 
   print_installing "Steam + Lutris + GameMode + Wine-staging"
   sudo pacman -S --needed --noconfirm \
-    steam lutris wine-staging winetricks \
+    gamescope steam lutris wine-staging winetricks \
     gamemode lib32-gamemode
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
+    gfn-electron xbox-cloud-gaming geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -541,15 +541,15 @@ fi
 print_step "13/35: Aplicaciones (Solo binarios precompilados)"
 print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
 sudo pacman -S --needed --noconfirm \
-  firefox vlc vlc-plugins-all mpv obs-studio \
+  satty vlc vlc-plugins-all mpv obs-studio \
   gimp inkscape krita \
   libreoffice-fresh okular filezilla transmission-gtk \
   pavucontrol loupe \
   scrcpy android-file-transfer \
-  gvfs gvfs-gphoto2 kio-extras libxfce4ui
+  gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN
 
 yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  open-fuse-iso
+  open-fuse-iso swappy 
 print_success "Aplicaciones de gestión de discos instaladas [ISO]"
 
 # ═══════════════════════════════════════════════════════════
@@ -730,9 +730,10 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   sudo pacman -S --needed --noconfirm \
     waydroid python-pip git lzip
 
-  # Habilitar KVM
+  # Habilitar KVM + Desinstalar Firewall de EndeavorOS + Permitir UFW.
   print_status "Habilitando KVM..."
-  sudo usermod -aG kvm $USER
+  sudo usermod -aG kvm $USER # no existe python-dbus $USER
+  sudo systemctl disable --now ufw firewalld 2>/dev/null; sudo pacman -Rns --noconfirm ufw firewalld 2>/dev/null; echo "Firewall removido"
   print_package "Usuario agregado al grupo 'kvm'"
 
   # ═══════════════════════════════════════════════════════════
@@ -1285,7 +1286,7 @@ if [[ "$STREMIO_INSTALLED" == false ]]; then
 
     # Instalar Flatpak si no está
     if ! command -v flatpak &>/dev/null; then
-      sudo pacman -S --needed --noconfirm flatpak
+      sudo pacman -S --needed --noconfirm flatpak && read -rp "¿Instalar PokeMMO? [s/N]: " r && [[ "$r" =~ ^[sS]$ ]] && flatpak install flathub com.pokemmo.PokeMMO
     fi
 
     # Agregar Flathub
@@ -3997,4 +3998,3 @@ echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros pr
   ps aux --sort=-%cpu | grep -E "eww | hypr | waybar | dunst | swaync | swww | caelestia" | head -20.${NC}"
 echo
 echo -e "${GREEN}¡Disfruta tu setup Hyprland perfeccionado con SDDM Astronaut! 🚀${NC}"
-echo

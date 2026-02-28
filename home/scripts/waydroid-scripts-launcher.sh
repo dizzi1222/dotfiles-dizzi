@@ -48,4 +48,19 @@ deactivate
 
 echo "=========================================="
 echo "Script finalizado. Presiona Enter para salir..."
+
+# 🔑 TIP CLAVE: cómo obtener el Android ID
+echo ""
+echo "╔══════════════════════════════════════════════════════╗"
+echo "║  💡 TIP: Para obtener el Android ID:                 ║"
+echo "║                                                      ║"
+echo "║  1. waydroid session stop                            ║"
+echo "║  2. sudo systemctl stop waydroid-container           ║"
+echo "║  3. sudo systemctl start waydroid-container          ║"
+echo "║  4. waydroid session start  (espera ~10s)            ║"
+echo "║  5. sudo waydroid shell                              ║"
+echo "║  6. settings get secure android_id                   ║"
+echo "║                                                      ║"
+echo "║  Luego: https://google.com/android/uncertified       ║"
+echo "╚══════════════════════════════════════════════════════╝"
 read
