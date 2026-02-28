@@ -1,7 +1,7 @@
 {
     "telemetry.sqmId": "",
     "telemetry.machineId": "fcf15096c524742e51b60f39188b517a52d7f9381002310be8e1b4a573590e53",
-    "telemetry.devDeviceId": "26ba237c-bbba-40cd-bc2b-3008c0e2f64e",
+    "telemetry.devDeviceId": "8cfdaec5-4753-4d71-87aa-17af641dcdb9",
     "backupWorkspaces": {
         "workspaces": [],
         "folders": [],
@@ -28,8 +28,8 @@
                 "mode": 0,
                 "x": 0,
                 "y": 0,
-                "width": 1920,
-                "height": 1080
+                "width": 960,
+                "height": 1041
             }
         },
         "openedWindows": []
@@ -48,26 +48,30 @@
     "antigravityUnifiedStateSync.editorPreferences.hasDemoModeEnabledMigrated": true,
     "sidebarWorkspaces.migratedFromInitState": true,
     "theme": "vs-dark",
-    "themeBackground": "#262335",
+    "themeBackground": "#15141b",
     "windowSplash": {
         "zoomLevel": 0,
         "baseTheme": "vs-dark",
         "colorInfo": {
-            "foreground": "#dddddd",
-            "background": "#262335",
-            "editorBackground": "#262335",
-            "titleBarBackground": "#241b2f",
-            "activityBarBackground": "#171520",
-            "sideBarBackground": "#241b2f",
-            "statusBarBackground": "#241b2f",
-            "statusBarNoFolderBackground": "#241b2f"
+            "foreground": "#edecee",
+            "background": "#15141b",
+            "editorBackground": "#15141b",
+            "titleBarBackground": "#121016",
+            "titleBarBorder": "#000000",
+            "activityBarBackground": "#15141b",
+            "activityBarBorder": "#000000",
+            "sideBarBackground": "#110f18",
+            "sideBarBorder": "#000000",
+            "statusBarBackground": "#121016",
+            "statusBarBorder": "#000000",
+            "statusBarNoFolderBackground": "#68217a"
         },
         "layoutInfo": {
             "sideBarSide": "right",
             "editorPartMinWidth": 220,
             "titleBarHeight": 30,
             "activityBarWidth": 42,
-            "sideBarWidth": 0,
+            "sideBarWidth": 300,
             "auxiliaryBarWidth": 300,
             "statusBarHeight": 22,
             "windowBorder": false
@@ -78,5 +82,6 @@
     "artifactReviewState.migratedFromInitState": true,
     "antigravityUnifiedStateSync.browserPreferences.hasBrowserAllowlistMigrated": true,
     "antigravityUnifiedStateSync.browserPreferences.hasBrowserLaunchPreferencesMigrated": true,
-    "antigravityUnifiedStateSync.browserPreferences.hasAddedLocalhostToAllowlist": true
+    "antigravityUnifiedStateSync.browserPreferences.hasAddedLocalhostToAllowlist": true,
+    "windowControlHeight": 35
 }

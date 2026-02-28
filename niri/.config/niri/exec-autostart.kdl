@@ -16,6 +16,15 @@ spawn-sh-at-startup "powerprofilesctl set balanced"
 // Desktop environment
 spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x-desktop"
+// ##################
+// # ARRANCAR NEMO  #
+// #################
+spawn-sh-at-startup "nemo-desktop"
+spawn-sh-at-startup "bash -c \"sleep 5 && niri msg action toggle-window-floating\"" # Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+spawn-sh-at-startup "bash -c \"sleep 7 && niri msg action focus-workspace 1\"" # Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+// ##################
+// # ARRANCAR NEMO  #
+// #################
 
 // Authentication and system services
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
@@ -47,7 +56,7 @@ spawn-sh-at-startup "sh ~/scripts/launch_widgets.sh"
 
 // Mount drives
 spawn-sh-at-startup "/home/diego/montar_gdrive.sh"
-spawn-sh-at-startup "/home/diego/montar_gdmusica.sh"
+spawn-sh-at-startup "/home/diego/montar_gd-musica.sh"
 
 // Cursor theme
 spawn-sh-at-startup "hyprctl setcursor Kafka 24 || true"

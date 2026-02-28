@@ -305,10 +305,10 @@ Mod+T {
     // AUTOCLICKER
     // ═══════════════════════════════════════════════════════════════════════
     
-    F4 { spawn-sh "kitty --class=floating -e ~/wrapper/autoclicker-menu"; }
+    F7 { spawn-sh "kitty --class=floating -e ~/wrapper/autoclicker-menu"; }
     F8 { spawn-sh "~/.local/bin/autoclicker stop"; }
-    F6 { spawn-sh "kitty --class=floating -e ~/wrapper/autopress-menu"; }
-    F9 { spawn-sh "~/.local/bin/autopress stop"; }
+    F9 { spawn-sh "kitty --class=floating -e ~/wrapper/autopress-menu"; }
+    F10 { spawn-sh "~/.local/bin/autopress stop"; }
     
     // ═══════════════════════════════════════════════════════════════════════
     // MISC
