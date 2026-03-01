@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=PokeOne
+Exec=bottles-cli run -p "PokeOne" -b "gaming" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/PokeOne.png
+Comment=Launch PokeOne using Bottles.
+StartupWMClass=PokeOne
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"

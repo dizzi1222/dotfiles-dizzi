@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Grand Theft Auto IV Complete Edition GTA
+Exec=bottles-cli run -p "Grand Theft Auto IV Complete Edition GTA" -b "gaming" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Grand Theft Auto IV Complete Edition GTA.png
+Comment=Launch Grand Theft Auto IV Complete Edition GTA using Bottles.
+StartupWMClass=Grand Theft Auto IV Complete Edition GTA
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"

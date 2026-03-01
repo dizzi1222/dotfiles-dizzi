@@ -6,6 +6,13 @@ home/clawd/.git/
 # Antigravity - ignorar datos sensibles y caches
 Antigravity/.config/Antigravity/User/globalStorage/state.vscdb
 Antigravity/.config/Antigravity/User/globalStorage/state.vscdb.backup
+# Ignorar todo Antigravity EXCEPTO settings y keybindings
+Antigravity/
+!Antigravity/.config/
+!Antigravity/.config/Antigravity/
+!Antigravity/.config/Antigravity/User/
+!Antigravity/.config/Antigravity/User/settings.json
+!Antigravity/.config/Antigravity/User/keybindings.json
 
 # MCP específico
 .mcp-global.json.local
