@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Naruto Shippuden Ultimate Ninja Storm 4
+Exec=bottles-cli run -p "Naruto Shippuden Ultimate Ninja Storm 4" -b "gaming" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Naruto Shippuden Ultimate Ninja Storm 4.png
+Comment=Launch Naruto Shippuden Ultimate Ninja Storm 4 using Bottles.
+StartupWMClass=Naruto Shippuden Ultimate Ninja Storm 4
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"

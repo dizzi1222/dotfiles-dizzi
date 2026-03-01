@@ -26,6 +26,11 @@ TITLE=$(echo "$TITLE" | sed 's/"/\\"/g')
 ARTIST=$(echo "$ARTIST" | sed 's/"/\\"/g')
 ALBUM=$(echo "$ALBUM" | sed 's/"/\\"/g')
 
+# Limitar caracteres
+MAX=50
+TITLE=$(echo "$TITLE" | cut -c1-$MAX)$([ ${#TITLE} -gt $MAX ] && echo "…")
+ARTIST=$(echo "$ARTIST" | cut -c1-20)$([ ${#ARTIST} -gt 20 ] && echo "…")
+
 if [ "$CURRENT_STATUS" = "Playing" ]; then
   STATUS_ICON="▶"
 elif [ "$CURRENT_STATUS" = "Paused" ]; then

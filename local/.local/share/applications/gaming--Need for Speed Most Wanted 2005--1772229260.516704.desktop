@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Need for Speed Most Wanted 2005
+Exec=bottles-cli run -p "Need for Speed Most Wanted 2005" -b "gaming" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Need for Speed Most Wanted 2005.png
+Comment=Launch Need for Speed Most Wanted 2005 using Bottles.
+StartupWMClass=Need for Speed Most Wanted 2005
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"

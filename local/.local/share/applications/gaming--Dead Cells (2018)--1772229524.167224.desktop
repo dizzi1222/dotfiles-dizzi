@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Dead Cells (2018)
+Exec=bottles-cli run -p "Dead Cells (2018)" -b "gaming" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=com.usebottles.bottles-program
+Comment=Launch Dead Cells (2018) using Bottles.
+StartupWMClass=Dead Cells (2018)
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"
