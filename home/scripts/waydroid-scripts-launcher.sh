@@ -5,7 +5,43 @@
 SCRIPT_DIR="$HOME/waydroid_script/"
 VENV_DIR="$SCRIPT_DIR/venv"
 
-# Verificar si el directorio existe, si no, clonarlo
+# ─────────────────────────────────────────────────────────────
+# FIX AUTOMÁTICO: EndeavourOS / Arch con nftables
+# El script waydroid-net.sh falla al detectar nft/iptables-legacy
+# en sistemas que usan nftables moderno (común en EndeavourOS)
+# ─────────────────────────────────────────────────────────────
+WAYDROID_NET="/usr/lib/waydroid/data/scripts/waydroid-net.sh"
+
+apply_net_fix() {
+  echo "🔧 Aplicando fix de red para nftables..."
+  sudo sed -i~ -E 's/=.\$\(command -v (nft|ip6?tables-legacy).*/=/g' "$WAYDROID_NET" &&
+    echo "✅ Fix aplicado correctamente." ||
+    echo "⚠️  No se pudo aplicar el fix (¿ya estaba aplicado?)."
+}
+
+if [ -f "$WAYDROID_NET" ]; then
+  # Detectar si es EndeavourOS
+  if grep -qi "endeavouros" /etc/os-release 2>/dev/null; then
+    echo "🐧 Sistema detectado: EndeavourOS"
+    apply_net_fix
+
+  # O si usa nftables (más genérico, aplica a cualquier Arch-based)
+  elif command -v nft &>/dev/null && ! command -v iptables-legacy &>/dev/null; then
+    echo "🐧 Sistema con nftables detectado (sin iptables-legacy)"
+    apply_net_fix
+
+  else
+    echo "✅ Sistema compatible con iptables estándar, no se necesita fix."
+  fi
+else
+  echo "⚠️  No se encontró $WAYDROID_NET — ¿Waydroid instalado?"
+fi
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────
+# CLONAR REPO SI NO EXISTE
+# ─────────────────────────────────────────────────────────────
 if [ ! -d "$SCRIPT_DIR" ]; then
   echo "No se encuentra el directorio $SCRIPT_DIR"
   echo "Clonando repositorio..."
@@ -18,7 +54,9 @@ fi
 
 cd "$SCRIPT_DIR" || exit 1
 
-# Verificar si el entorno virtual existe
+# ─────────────────────────────────────────────────────────────
+# ENTORNO VIRTUAL
+# ─────────────────────────────────────────────────────────────
 if [ ! -d "$VENV_DIR" ]; then
   echo "Creando entorno virtual..."
   python -m venv venv
@@ -38,18 +76,18 @@ else
   source venv/bin/activate
 fi
 
-# Ejecutar el script principal
+# ─────────────────────────────────────────────────────────────
+# EJECUTAR SCRIPT PRINCIPAL
+# ─────────────────────────────────────────────────────────────
 echo "Ejecutando waydroid_script..."
 echo "=========================================="
 sudo venv/bin/python main.py
 
-# Desactivar el entorno virtual al salir
 deactivate
 
 echo "=========================================="
 echo "Script finalizado. Presiona Enter para salir..."
 
-# 🔑 TIP CLAVE: cómo obtener el Android ID
 echo ""
 echo "╔══════════════════════════════════════════════════════╗"
 echo "║  💡 TIP: Para obtener el Android ID:                 ║"

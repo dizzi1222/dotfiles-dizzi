@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Stardew Valley
+# Exec=bottles-cli run -p "Stardew Valley" -b "gaming" -- %u
+Exec=wine "/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe"
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Stardew Valley.png
+Comment=Launch Stardew Valley using Bottles.
+StartupWMClass=Stardew Valley
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=bottles -b "gaming"
