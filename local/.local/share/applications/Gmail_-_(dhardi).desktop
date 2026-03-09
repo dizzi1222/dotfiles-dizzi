@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
-Name=Gmail - (sanakyds)
-Comment=Open Gmail - (sanakyds)
+Name=Gmail - (dhardi)
+Comment=Open Gmail - (dhardi)
 Exec=brave --app="https://mail.google.com/mail/u/1/#inbox"
 # Exec=firefox --new-window --kiosk "https://mail.google.com/mail/u/1/#inbox"
 Terminal=false
