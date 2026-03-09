@@ -68,14 +68,13 @@ create_webapp() {
     EXEC_COMMAND="$BROWSER --app=\"$APP_URL\""
     ;;
   firefox)
-    # Firefox no tiene --app, pero podemos usar ventana dedicada
-    # Extraer dominio para perfil único
-    # EXEC_COMMAND="sh -c 'if ! pgrep -f \"firefox.*-P.*$DOMAIN\" >/dev/null; then firefox -CreateProfile \"$DOMAIN\" 2>/dev/null; fi; firefox -P \"$DOMAIN\" --new-window --kiosk \"$APP_URL\"'"
+    # Priorizar zen-browser sobre firefox si está instalado
+    local FF_BIN="firefox"
+    command -v zen-browser &>/dev/null && FF_BIN="zen-browser"
 
-    # COMENTA lo de arriba y usa tu perfil por defecto
-    EXEC_COMMAND="firefox --new-window --kiosk $APP_URL"
-    # --kiosk    otro parametro de Firefox: fuerza fullscreen
-    notify-send "📱 Para cambiar de perfil de firefox:  firefox -ProfileManager"
+    EXEC_COMMAND="$FF_BIN --new-window --kiosk $APP_URL"
+    # --kiosk    otro parametro de Firefox/Zen: fuerza fullscreen
+    notify-send "📱 Para cambiar de perfil:  $FF_BIN -ProfileManager"
     ;;
   *)
     # Fallback: xdg-open

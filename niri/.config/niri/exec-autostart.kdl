@@ -19,9 +19,9 @@ spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x
 // ##################
 // # ARRANCAR NEMO  #
 // #################
-spawn-sh-at-startup "nemo-desktop"
-spawn-sh-at-startup "bash -c \"sleep 5 && niri msg action toggle-window-floating\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
-spawn-sh-at-startup "bash -c \"sleep 7 && niri msg action focus-workspace 1\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+// spawn-sh-at-startup "nemo-desktop"
+// spawn-sh-at-startup "bash -c \"sleep 5 && niri msg action toggle-window-floating\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+// spawn-sh-at-startup "bash -c \"sleep 7 && niri msg action focus-workspace 1\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
 // ##################
 // # ARRANCAR NEMO  #
 // #################
