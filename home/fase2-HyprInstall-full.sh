@@ -237,7 +237,7 @@ sudo pacman -S --needed --noconfirm \
   qt5-wayland qt6-wayland gtk-layer-shell # konsole es mierda
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
 echo
-echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools && print_success "Plasma instalado"
+echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
 print_success "Hyprland instalado"
 print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
 [Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
@@ -375,11 +375,11 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
   print_installing "Steam + Lutris + GameMode + Wine-staging"
   sudo pacman -S --needed --noconfirm \
     gamescope steam lutris wine-staging winetricks \
-    gamemode lib32-gamemode
+    gamemode lib32-gamemode && sudo usermod -aG gamemode $(whoami)
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron xbox-cloud-gaming geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
+    gfn-electron xbox-cloud-gaming geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -541,12 +541,12 @@ fi
 print_step "13/35: Aplicaciones (Solo binarios precompilados)"
 print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
 sudo pacman -S --needed --noconfirm \
-  satty vlc vlc-plugins-all mpv obs-studio \
+  satty vlc vlc-plugins-all mpv \
   gimp inkscape krita \
   libreoffice-fresh okular filezilla transmission-gtk \
   pavucontrol loupe \
   scrcpy android-file-transfer \
-  gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN
+  gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN, obs-studio funciona mejor en flatpak
 
 yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   open-fuse-iso swappy 
@@ -1732,6 +1732,8 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo pacman -S gnome-keyring --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
+  # Para SDDM THEME
+  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && { print_package "Symlink: SDDM Theme de Jake"; sudo pacman -S sddm --needed --noconfirm; sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf; }
 
   # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
@@ -1745,7 +1747,6 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     ip link show
     nmcli device status
     sudo dmesg | grep iwlwifi
-
     # Esto comprueba si hay problemas con el WIFI o las BIOS
   fi
 
@@ -1766,7 +1767,6 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_status "Tambien puedes consultar el historial ARRIBA root para guiarte. Por si vuelve a dar ese pantallazo azul con el 🐧  
     [Y Recuerda Usar:
     nano /etc/mkinitcpio.conf
-
     # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd
     sudo mkinitcpio -P -v]
 

@@ -831,3 +831,6 @@ if [ -f ~/.api-keys.sh ]; then
     source ~/.api-keys.sh
 fi
 
+
+# Flatpak exports para que apps aparezcan en launcher
+export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/$USER/.local/share/flatpak/exports/share"

@@ -44,6 +44,12 @@ window-rule {
     open-on-workspace "magic"
 }
 
+// Vesktop
+window-rule {
+    match app-id=r#"^(vesktop|Vesktop)$"#
+    open-on-workspace "magic"
+}
+
 // LibreOffice
 window-rule {
     match title=r#".*Text Import.*"#

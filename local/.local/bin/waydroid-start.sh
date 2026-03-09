@@ -1,18 +1,17 @@
 #!/bin/bash
-waydroid session stop 2>/dev/null
+# 1. Parar todo
+waydroid session stop
 sudo systemctl stop waydroid-container
-sudo systemctl start waydroid-container
-sleep 3
 
-# Fix resolución interna
+# 2. Iniciar solo el contenedor
+sudo systemctl start waydroid-container
+
+# 3. Setear props ANTES de la sesión
 waydroid prop set persist.waydroid.width 1920
 waydroid prop set persist.waydroid.height 1080
-waydroid prop set persist.waydroid.multi_windows false # ← importante en Hyprland
+waydroid prop set persist.waydroid.multi_windows false
 
-# Aplicar windowrule en caliente si estamos en Hyprland
-ir [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-  hyprctl keyword windowrulev2 "float, class:^(Waydroid)$"
-  hyprctl keyword windowrulev2 "size 1920 1080, class:^(Waydroid)$"
-fi
-
+# 4. Iniciar sesión y UI
+waydroid session start &
+sleep 5
 waydroid show-full-ui
