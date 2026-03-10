@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Waydroid 1080p HD
 Comment=Inicia Waydroid en 1920x1080 FHD
-Exec=kitty --hold -e /home/diego/.local/bin/waydroid-start.sh
+Exec=kitty --hold -e /home/diego/.local/bin/waydroid-start.sh fullscreen
 Icon=waydroid
 Terminal=false
 Type=Application
