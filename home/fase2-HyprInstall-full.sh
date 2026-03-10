@@ -226,7 +226,7 @@ fi
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland cinnamon \
+  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot weston \ # Weston es el puente entre X11 y Wayland
   waybar rofi-wayland dunst \
   kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
@@ -692,7 +692,7 @@ print_installing "Las Mejores VPN (No esta Urban)"
 sudo pacman -S proton-vpn-gtk-app --needed --noconfirm
 yay -S --needed --noconfirm \ 
   stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
-  appimagelauncher music-presence-bin copyq pamac-aur \
+  appimagelauncher music-presence-bin pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
 print_success "Aplicaciones instaladas (solo binarios)"
@@ -1639,8 +1639,9 @@ if [[ -d ~/dotfiles-dizzi ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
     fi
-  done
+  done # PROCEDO A APLICAR CONFIG DE CINNAMON.
 
+[[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ < ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
 print_status "Aplicando Submodulos [NVIM]    ."
 
 echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
@@ -3944,7 +3945,6 @@ kill $SUDO_PID 2>/dev/null || true
 
 clear
 cat <<"EOF"
-
 ╔══════════════════════════════════════════════════════════════════════╗
 ║              🎉 INSTALACIÓN ULTRA-FAST COMPLETADA 🎉                 ║
 ╠══════════════════════════════════════════════════════════════════════╣

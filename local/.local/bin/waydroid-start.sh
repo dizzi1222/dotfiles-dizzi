@@ -52,6 +52,15 @@ while ! systemctl is-active --quiet waydroid-container; do
   ((COUNT++ >= 30)) && echo "❌ Timeout" && exit 1
 done
 
+# ─── Asegurar Wayland (X11 fallback con weston) ───────
+if [ -z "$WAYLAND_DISPLAY" ]; then
+  echo "⚠️  X11 detectado, iniciando weston como compositor anidado..."
+  weston --backend=x11-backend.so --width="$WIDTH" --height="$HEIGHT" &
+  WESTON_PID=$!
+  sleep 2
+  export WAYLAND_DISPLAY=wayland-1
+fi
+
 # ─── Lanzar UI ────────────────────────────────────────
 waydroid show-full-ui &
 
