@@ -13,7 +13,7 @@ exec='kitty'
 
 [desktop/background]
 picture-options='zoom'
-picture-uri='file:///home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers/madara-uchiha-minimal-5120x2880.png'
+picture-uri='file:///home/diego/wallpapers/wallpapers/0wallpaper-5-frieren-sousou-TODAAA.jpg'
 
 [desktop/background/slideshow]
 delay=15
@@ -29,7 +29,7 @@ cursor-size=24
 toolkit-accessibility=true
 
 [desktop/keybindings]
-custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', '__dummy__']
+custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', 'custom14']
 show-desklets=@as []
 
 [desktop/keybindings/custom-keybindings/custom0]
@@ -48,8 +48,8 @@ command='/home/diego/dotfiles-dizzi/home/scripts/walset-menu'
 name='Wallpaper'
 
 [desktop/keybindings/custom-keybindings/custom11]
-binding=@as []
-command='/home/diego/dotfiles-dizzi/home/scripts/gyazo-wayland-captura-menu-rofi'
+binding=['Print']
+command='/home/diego/dotfiles-dizzi/cinnamon/.config/cinnamon/scripts/cinnamon-satty-fullscreen.sh'
 name='Screenshot'
 
 [desktop/keybindings/custom-keybindings/custom12]
@@ -59,8 +59,13 @@ name='Vicinae Launcher'
 
 [desktop/keybindings/custom-keybindings/custom13]
 binding=['<Shift><Super>space']
-command='rofi -show combi"'
+command='rofi -show'
 name='Rofi Launcher'
+
+[desktop/keybindings/custom-keybindings/custom14]
+binding=['<Shift>Print']
+command='/home/diego/dotfiles-dizzi/cinnamon/.config/cinnamon/scripts/cinnamon-satty-region.sh'
+name='Screenshot Window Area'
 
 [desktop/keybindings/custom-keybindings/custom2]
 binding=['<Super>v']
@@ -73,13 +78,13 @@ command='gpick'
 name='Color Picker'
 
 [desktop/keybindings/custom-keybindings/custom4]
-binding=['<Shift><Super>greater', '<Super>comma']
-command='rofimoji --action copy --selector fuzzel  --prompt="Nerd Font Historial 󰁝 󰁅:" --files nerd_font'
+binding=['<Shift><Alt>period', '<Shift><Alt>greater', '<Alt>comma']
+command='rofimoji --action copy --selector fuzzel --prompt="Nerd Font Historial 󰁝 󰁅:" --files nerd_font'
 name='Emojis Fuzzel'
 
 [desktop/keybindings/custom-keybindings/custom5]
-binding=['<Super>i']
-command='rofimoji'
+binding=['<Alt>period', '<Super>i']
+command='rofimoji --action copy --selector fuzzel --prompt="Emoji Historial 󰁝 󰁅:"'
 name='Emojis'
 
 [desktop/keybindings/custom-keybindings/custom6]
@@ -103,8 +108,9 @@ command='/home/diego/dotfiles-dizzi/home/scripts/system_control.sh'
 name='Utilities'
 
 [desktop/keybindings/media-keys]
+area-screenshot=@as []
 hibernate=['XF86Suspend']
-screenshot=['Print']
+screenshot=@as []
 search=['XF86Search']
 video-rotation-lock=@as []
 

@@ -45,6 +45,10 @@ if [ -n "$SELECTED_WALL" ]; then
       echo "niri"
     elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
       echo "hyprland"
+    elif pgrep -x cinnamon >/dev/null; then
+      echo "cinnamon"
+    elif pgrep -x plasmashell >/dev/null; then
+      echo "plasma"
     else
       echo "unknown"
     fi
@@ -61,6 +65,12 @@ if [ -n "$SELECTED_WALL" ]; then
       ;;
     "niri")
       swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
+      ;;
+    "cinnamon")
+      gsettings set org.cinnamon.desktop.background picture-uri "file://$WALL_DIR/$SELECTED_WALL"
+      ;;
+    "plasma")
+      plasma-apply-wallpaperimage "$WALL_DIR/$SELECTED_WALL"
       ;;
     *)
       echo "❌ Compositor no soportado"

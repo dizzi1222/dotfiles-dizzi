@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=CopyQ
+Comment=Gestor de portapapeles
+Exec=copyq
+Type=Application
+Terminal=false
+Hidden=false
