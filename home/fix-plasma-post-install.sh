@@ -71,15 +71,15 @@ EOF
 
 # ── 7. Espanso: desacoplar de systemd ─────────────────────
 # Crashea sin compositor → bucle infinito → bloquea arranque Plasma
-systemctl --user disable espanso.service 2>/dev/null || true
-systemctl --user stop espanso.service 2>/dev/null || true
+# systemctl --user disable espanso.service 2>/dev/null || true
+# systemctl --user stop espanso.service 2>/dev/null || true
 echo -e "${YELLOW}[INFO] Espanso desacoplado — lanzar desde hyprland.conf:${NC}"
 echo -e "       exec-once = sleep 5 && espanso start"
 
 # ── 8. eww update-cover-loop: deshabilitar servicio duplicado ──
 # El defpoll en eww.yuck ya lo maneja, el .service lo duplica
-systemctl --user disable update-cover.loop.service 2>/dev/null || true
-systemctl --user stop update-cover.loop.service 2>/dev/null || true
+# systemctl --user disable update-cover.loop.service 2>/dev/null || true
+# systemctl --user stop update-cover.loop.service 2>/dev/null || true
 
 # ── 9. Autostart: quitar +x (genera warnings en log) ──────
 for f in \
