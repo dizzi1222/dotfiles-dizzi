@@ -548,6 +548,8 @@ sudo pacman -S --needed --noconfirm \
   scrcpy android-file-transfer \
   gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN, obs-studio funciona mejor en flatpak
 
+echo "user_allow_other" | sudo tee -a /etc/fuse.conf && printf 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2717", RUN+="/usr/bin/su diego -c /usr/bin/simple-mtpfs /home/diego/cel"\n' | sudo tee /etc/udev/rules.d/99-xiaomi-mtp.rules && sudo udevadm control --reload-rules && mkdir -p ~/cel && print_success "Fix MTP Xiaomi aplicado" && print_status "Uso: conecta el cel en modo Transferencia de archivos → archivos en ~/cel"
+
 yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   open-fuse-iso swappy 
 print_success "Aplicaciones de gestión de discos instaladas [ISO]"
@@ -555,7 +557,6 @@ print_success "Aplicaciones de gestión de discos instaladas [ISO]"
 # ═══════════════════════════════════════════════════════════
 # Kdenlive - Selección interactiva
 # ═══════════════════════════════════════════════════════════
-echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}${YELLOW}║          🎬 KDENLIVE (EDITOR DE VIDEO) 🎬                 ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
@@ -578,7 +579,6 @@ echo -e "${BOLD}${GREEN}3. Ninguno${NC}"
 echo -e "  ${MAGENTA}•${NC} Omitir instalación de Kdenlive"
 echo
 read -p "Seleccionar opción [1=Solo Kdenlive, 2=Con dependencias, 3=Ninguno]: " kdenlive_choice
-
 case "$kdenlive_choice" in
 1)
   print_header "Instalando Kdenlive (Solo)"
