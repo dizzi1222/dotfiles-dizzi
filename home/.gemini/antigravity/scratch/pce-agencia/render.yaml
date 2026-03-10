@@ -1,0 +1,24 @@
+# ══════════════════════════════════════════
+# PCE-Agencia — Render Blueprint
+# ══════════════════════════════════════════
+# Deploy automático con un clic desde GitHub
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: pce-agencia
+    runtime: node
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: USE_MEMORY_DB
+        value: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production

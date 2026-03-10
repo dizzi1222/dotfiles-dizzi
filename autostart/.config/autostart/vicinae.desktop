@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Vicinae
+Comment=Vicinae Launcher Daemon
+Exec=vicinae server --replace
+Type=Application
+Terminal=false
+Hidden=false
