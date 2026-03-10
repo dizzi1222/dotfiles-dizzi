@@ -1,0 +1,173 @@
+[/]
+desklet-snap-interval=25
+enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:left:1:separator@cinnamon.org:1', 'panel1:left:2:grouped-window-list@cinnamon.org:2', 'panel1:right:0:systray@cinnamon.org:3', 'panel1:right:1:xapp-status@cinnamon.org:4', 'panel1:right:2:notifications@cinnamon.org:5', 'panel1:right:3:printers@cinnamon.org:6', 'panel1:right:4:removable-drives@cinnamon.org:7', 'panel1:right:5:keyboard@cinnamon.org:8', 'panel1:right:6:favorites@cinnamon.org:9', 'panel1:right:7:network@cinnamon.org:10', 'panel1:right:8:sound@cinnamon.org:11', 'panel1:right:9:power@cinnamon.org:12', 'panel1:right:10:calendar@cinnamon.org:13', 'panel1:right:11:cornerbar@cinnamon.org:14']
+enabled-desklets=@as []
+next-applet-id=15
+workspace-expo-view-as-grid=true
+
+[desktop/a11y/applications]
+screen-keyboard-enabled=true
+
+[desktop/applications/terminal]
+exec='kitty'
+
+[desktop/background]
+picture-options='zoom'
+picture-uri='file:///home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers/madara-uchiha-minimal-5120x2880.png'
+
+[desktop/background/slideshow]
+delay=15
+image-source='directory:///home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers'
+slideshow-enabled=false
+
+[desktop/input-sources]
+sources=[('xkb', 'us')]
+
+[desktop/interface]
+cursor-blink-time=1200
+cursor-size=24
+toolkit-accessibility=true
+
+[desktop/keybindings]
+custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', '__dummy__']
+show-desklets=@as []
+
+[desktop/keybindings/custom-keybindings/custom0]
+binding=['<Super>Return']
+command='kitty'
+name='Terminal'
+
+[desktop/keybindings/custom-keybindings/custom1]
+binding=['F1']
+command='zen-browser'
+name='Navegador Browser'
+
+[desktop/keybindings/custom-keybindings/custom10]
+binding=['<Super>b']
+command='/home/diego/dotfiles-dizzi/home/scripts/walset-menu'
+name='Wallpaper'
+
+[desktop/keybindings/custom-keybindings/custom11]
+binding=@as []
+command='/home/diego/dotfiles-dizzi/home/scripts/gyazo-wayland-captura-menu-rofi'
+name='Screenshot'
+
+[desktop/keybindings/custom-keybindings/custom12]
+binding=['<Super>space']
+command='vicinae open'
+name='Vicinae Launcher'
+
+[desktop/keybindings/custom-keybindings/custom13]
+binding=['<Shift><Super>space']
+command='rofi -show combi"'
+name='Rofi Launcher'
+
+[desktop/keybindings/custom-keybindings/custom2]
+binding=['<Super>v']
+command='copyq toggle'
+name='Clipboard Portapapeles'
+
+[desktop/keybindings/custom-keybindings/custom3]
+binding=['<Shift><Super>c']
+command='gpick'
+name='Color Picker'
+
+[desktop/keybindings/custom-keybindings/custom4]
+binding=['<Shift><Super>greater', '<Super>comma']
+command='rofimoji --action copy --selector fuzzel  --prompt="Nerd Font Historial 󰁝 󰁅:" --files nerd_font'
+name='Emojis Fuzzel'
+
+[desktop/keybindings/custom-keybindings/custom5]
+binding=['<Super>i']
+command='rofimoji'
+name='Emojis'
+
+[desktop/keybindings/custom-keybindings/custom6]
+binding=['<Super>p']
+command='/home/diego/dotfiles-dizzi/home/scripts/power_management.sh'
+name='Apagar menu'
+
+[desktop/keybindings/custom-keybindings/custom7]
+binding=['<Super>h']
+command='/home/diego/dotfiles-dizzi/home/scripts/launch_widgets.sh'
+name='Widgets'
+
+[desktop/keybindings/custom-keybindings/custom8]
+binding=['<Super>k']
+command='eww close-all'
+name='Matar Widgets'
+
+[desktop/keybindings/custom-keybindings/custom9]
+binding=['<Super>z']
+command='/home/diego/dotfiles-dizzi/home/scripts/system_control.sh'
+name='Utilities'
+
+[desktop/keybindings/media-keys]
+hibernate=['XF86Suspend']
+screenshot=['Print']
+search=['XF86Search']
+video-rotation-lock=@as []
+
+[desktop/keybindings/wm]
+close=['<Alt>F4', '<Super>q', '<Alt>q']
+lower=['<Super>m']
+maximize=['<Super>Tab']
+minimize=@as []
+switch-group=['<Alt>Above_Tab']
+switch-input-source=['XF86Keyboard']
+switch-input-source-backward=['<Shift>XF86Keyboard']
+switch-monitor=['XF86Display']
+switch-to-workspace-down=['<Control><Alt>Down', '<Primary><Super>Down']
+switch-to-workspace-left=['<Control><Alt>Left', '<Primary><Super>Left', '<Super>1']
+switch-to-workspace-right=['<Control><Alt>Right', '<Primary><Super>Right', '<Super>2']
+switch-to-workspace-up=['<Control><Alt>Up', '<Super>o', '<Super>s']
+switch-windows-backward=['<Shift><Alt>Tab', '<Primary>Tab']
+toggle-above=['<Super>t']
+toggle-on-all-workspaces=@as []
+unmaximize=['<Alt>F5', '<Super>f']
+
+[desktop/peripherals/keyboard]
+delay=uint32 500
+repeat-interval=uint32 30
+
+[desktop/peripherals/mouse]
+double-click=400
+drag-threshold=8
+left-handed=true
+natural-scroll=false
+speed=0.0
+
+[desktop/peripherals/touchpad]
+natural-scroll=false
+speed=0.0
+
+[desktop/screensaver]
+layout-group=0
+
+[desktop/sound]
+event-sounds=false
+
+[gestures]
+swipe-down-2='PUSH_TILE_DOWN::end'
+swipe-down-3='TOGGLE_OVERVIEW::end'
+swipe-down-4='VOLUME_DOWN::end'
+swipe-left-2='PUSH_TILE_LEFT::end'
+swipe-left-3='WORKSPACE_NEXT::end'
+swipe-left-4='WINDOW_WORKSPACE_PREVIOUS::end'
+swipe-right-2='PUSH_TILE_RIGHT::end'
+swipe-right-3='WORKSPACE_PREVIOUS::end'
+swipe-right-4='WINDOW_WORKSPACE_NEXT::end'
+swipe-up-2='PUSH_TILE_UP::end'
+swipe-up-3='TOGGLE_EXPO::end'
+swipe-up-4='VOLUME_UP::end'
+tap-3='MEDIA_PLAY_PAUSE::end'
+
+[muffin]
+workspace-cycle=true
+workspaces-only-on-primary=false
+
+[settings-daemon/peripherals/touchscreen]
+orientation-lock=true
+
+[settings-daemon/plugins/color]
+night-light-last-coordinates=(18.466667000000001, -69.900000000000006)

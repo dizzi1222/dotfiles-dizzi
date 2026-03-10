@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Espanso
+Comment=Text expander
+Exec=espanso launcher
+Type=Application
+Terminal=false
+Hidden=false
