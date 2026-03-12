@@ -1,2 +1,10 @@
 [Desktop Entry]
-Hidden=true
+Name=SwayNC
+Comment=Inicia el daemon de notificaciones SwayNotificationCenter
+Exec=swaync
+Icon=preferences-system-notifications
+Terminal=false
+Type=Application
+Categories=Utility;
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=X-Cinnamon;
