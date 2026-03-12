@@ -29,7 +29,7 @@ cursor-size=24
 toolkit-accessibility=true
 
 [desktop/keybindings]
-custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', 'custom14']
+custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', 'custom14', 'custom15', '__dummy__']
 show-desklets=@as []
 
 [desktop/keybindings/custom-keybindings/custom0]
@@ -66,6 +66,11 @@ name='Rofi Launcher'
 binding=['<Shift>Print']
 command='/home/diego/dotfiles-dizzi/cinnamon/.config/cinnamon/scripts/cinnamon-satty-region.sh'
 name='Screenshot Window Area'
+
+[desktop/keybindings/custom-keybindings/custom15]
+binding=['<Primary><Super>n', '<Primary><Alt>n']
+command='swaync-client -t -sw'
+name='Swaync Notificaciones - App Volumen Audio'
 
 [desktop/keybindings/custom-keybindings/custom2]
 binding=['<Super>v']
