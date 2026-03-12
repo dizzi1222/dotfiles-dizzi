@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Hyprland (Dev Nested)
+Comment=Lanza Hyprland anidado en la sesión actual con logs en kitty
+Exec=kitty --hold --title "Hyprland [nested]" -e bash -c "if [ -n \"$WAYLAND_DISPLAY\" ]; then WLR_BACKENDS=wayland WLR_NO_HARDWARE_CURSORS=1 Hyprland; else WLR_BACKENDS=x11 WLR_NO_HARDWARE_CURSORS=1 Hyprland; fi 2>&1 | tee /tmp/hyprland-nested.log"
+Icon=/home/diego/.local/share/icons/Hyprland_logo.png
+Terminal=false
+Type=Application
+Categories=System;
+Actions=Logs;
+
+[Desktop Action Logs]
+Name=Ver Logs
+Exec=kitty --hold -e bash -c "tail -f /tmp/hyprland-nested.log"

@@ -1,4 +1,11 @@
 #!/bin/bash
+# ══════════════════════════════════════════════════════
+#  waydroid-start.sh — Lanzador Waydroid con presets
+#  Uso: waydroid-start.sh [fullscreen|portrait|half|WxH]
+#  Wayland nativo: usa waydroid show-full-ui directo
+#  X11 (Cinnamon etc): usa cage como compositor anidado
+# ══════════════════════════════════════════════════════
+
 CFG="/var/lib/waydroid/waydroid.cfg"
 
 declare -A PRESETS=(
@@ -8,6 +15,7 @@ declare -A PRESETS=(
 )
 
 INPUT="${1:-fullscreen}"
+
 if [[ -v PRESETS[$INPUT] ]]; then
   SIZE="${PRESETS[$INPUT]}"
 elif [[ "$INPUT" =~ ^[0-9]+x[0-9]+$ ]]; then
@@ -38,50 +46,67 @@ set_prop() {
   fi
 }
 
-set_prop "persist.waydroid.width"         "$WIDTH"
-set_prop "persist.waydroid.height"        "$HEIGHT"
+set_prop "persist.waydroid.width" "$WIDTH"
+set_prop "persist.waydroid.height" "$HEIGHT"
 set_prop "persist.waydroid.multi_windows" "false"
 echo "✅ cfg actualizado"
 
-# ─── Arrancar ─────────────────────────────────────────
+# ─── Arrancar contenedor ──────────────────────────────
 sudo systemctl start waydroid-container
 echo "⏳ Esperando contenedor..."
 COUNT=0
 while ! systemctl is-active --quiet waydroid-container; do
   sleep 1
-  ((COUNT++ >= 30)) && echo "❌ Timeout" && exit 1
+  ((COUNT++ >= 30)) && echo "❌ Timeout contenedor" && exit 1
 done
 
-# ─── Asegurar Wayland (X11 fallback con weston) ───────
+# ─── Función: esperar window + aplicar tamaño ─────────
+apply_size() {
+  echo "⏳ Esperando servicio window..."
+  COUNT=0
+  until sudo waydroid shell service list 2>/dev/null | grep -q "window"; do
+    sleep 1
+    ((COUNT++ >= 40)) && echo "❌ Timeout window service" && break
+  done
+
+  if [[ "$INPUT" == "fullscreen" ]]; then
+    echo "🖥️  Fullscreen: reseteando override..."
+    sudo waydroid shell wm size reset
+    sudo waydroid shell wm density reset
+  else
+    echo "📏 Forzando wm size ${WIDTH}x${HEIGHT}..."
+    sudo waydroid shell wm size "${WIDTH}x${HEIGHT}"
+    sudo waydroid shell wm density 240
+  fi
+
+  echo "✅ Listo: ${WIDTH}x${HEIGHT}"
+  echo "📏 Tamaño actual: $(sudo waydroid shell wm size 2>/dev/null)"
+}
+
+# ─── X11: cage como compositor anidado ────────────────
 if [ -z "$WAYLAND_DISPLAY" ]; then
-  echo "⚠️  X11 detectado, iniciando weston como compositor anidado..."
-  weston --backend=x11-backend.so --width="$WIDTH" --height="$HEIGHT" &
-  WESTON_PID=$!
-  sleep 2
-  export WAYLAND_DISPLAY=wayland-1
+  echo "⚠️  X11 detectado — usando cage como compositor anidado..."
+
+  CAGE_BIN=$(which cage 2>/dev/null)
+  if [ -z "$CAGE_BIN" ]; then
+    echo "❌ cage no encontrado. Instala: sudo pacman -S cage"
+    exit 1
+  fi
+
+  # cage lanza waydroid directamente (es compositor + runner)
+  # El tamaño Android lo controla wm size después del boot
+  DISPLAY=$DISPLAY "$CAGE_BIN" -- waydroid show-full-ui &
+  CAGE_PID=$!
+
+  # Esperar y aplicar resolución Android
+  apply_size
+
+  # Mantener el script vivo hasta que cage termine
+  wait $CAGE_PID
+  exit 0
 fi
 
-# ─── Lanzar UI ────────────────────────────────────────
+# ─── Wayland nativo: flujo normal ─────────────────────
+echo "✅ Wayland detectado ($WAYLAND_DISPLAY)"
 waydroid show-full-ui &
-
-# ─── Esperar servicio window ──────────────────────────
-echo "⏳ Esperando servicio window..."
-COUNT=0
-until sudo waydroid shell service list 2>/dev/null | grep -q "window"; do
-  sleep 1
-  ((COUNT++ >= 40)) && echo "❌ Timeout window service" && break
-done
-
-# ─── Aplicar tamaño ───────────────────────────────────
-if [[ "$INPUT" == "fullscreen" ]]; then
-  echo "🖥️  Fullscreen: reseteando override..."
-  sudo waydroid shell wm size reset
-  sudo waydroid shell wm density reset
-else
-  echo "📏 Forzando wm size ${WIDTH}x${HEIGHT}..."
-  sudo waydroid shell wm size "${WIDTH}x${HEIGHT}"
-  sudo waydroid shell wm density 240
-fi
-
-echo "✅ Listo: ${WIDTH}x${HEIGHT}"
-echo "📏 Tamaño actual: $(sudo waydroid shell wm size)"
+apply_size

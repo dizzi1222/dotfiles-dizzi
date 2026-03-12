@@ -226,7 +226,7 @@ fi
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
 sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot weston \ # Weston es el puente entre X11 y Wayland
+  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot cage \ # Cage = >>> Weston es el puente entre X11 y Wayland
   waybar rofi-wayland dunst \
   kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
