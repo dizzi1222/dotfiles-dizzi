@@ -22,7 +22,9 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
-      "clipboard:history"
+      "clipboard:history",
+      "applications:waydroid-start-sd",
+      "applications:Stremio_Web"
    ],
    "providers": {
       "@meshal/store.raycast.antigravity": {
