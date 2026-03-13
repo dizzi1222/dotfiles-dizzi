@@ -19,9 +19,9 @@ spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x
 // ##################
 // # ARRANCAR NEMO  #
 // #################
-// spawn-sh-at-startup "nemo-desktop"
-// spawn-sh-at-startup "bash -c \"sleep 5 && niri msg action toggle-window-floating\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
-// spawn-sh-at-startup "bash -c \"sleep 7 && niri msg action focus-workspace 1\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+spawn-sh-at-startup "nemo-desktop"
+spawn-sh-at-startup "bash -c \"sleep 5 && niri msg action toggle-window-floating\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
+spawn-sh-at-startup "bash -c \"sleep 7 && niri msg action focus-workspace 1\"" // Si no quieres que se muestre el desktop NEMO al arrancar [Hide Nemo].
 // ##################
 // # ARRANCAR NEMO  #
 // #################
@@ -38,7 +38,7 @@ spawn-at-startup "dunst -config ~/.config/dunstrc"
 // Clipboard management
 spawn-sh-at-startup "wl-paste --watch cliphist store"
 spawn-sh-at-startup "wl-paste --type image --watch cliphist store"
-spawn-at-startup "sleep 5 && espanso start"
+// spawn-at-startup "sleep 5 && espanso start"
 spawn-at-startup "espanso"
 spawn-sh-at-startup "sh ~/.config/hypr/scripts/toggle_copyq.sh"
 
