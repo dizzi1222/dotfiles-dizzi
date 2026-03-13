@@ -1,5 +1,5 @@
 #!/bin/bash
-# /029   - [13] Regenerar Escritorio+Apps {Nemo Desktop}.sh
+# /029   - [13] Regenerar Escritorio+Apps {Nemo Desktop}.sh
 # Regenerar Escritorio + Apps {Nemo Desktop} - VERSIÓN MEJORADA
 # =================================================================================
 # FUNCIONALIDAD:
@@ -7,7 +7,7 @@
 # 2. Crea symlink de carpeta CustomRP_Icons para Wine
 # 3. Copia archivos .crp SUELTOS al Desktop de Wine (para CustomRP)
 # =================================================================================
-/home/diego/scripts/crear_escritorio-CustomRP.sh
+# /home/diego/scripts/crear_escritorio-CustomRP.sh  # ← Funcionalidad integrada en PASO 3 y 4
 /home/diego/add-icons-to-desktop.sh
 # Colores para output
 GREEN='\033[0;32m'
@@ -94,13 +94,13 @@ declare -a ROOT_FILES=(
   # "net.lutris.winetricks-121.desktop"
   # "net.lutris.yazi-search-68.desktop"
   # -- =============================
-  # --  WEBAPP DE BRAVE OFICIALES!  - one time function
+  # --  WEBAPP DE BRAVE OFICIALES!  - one time function
   # -- =============================
-  # Comment=Access  GitHub using Brave Browser  .
+  # Comment=Access  GitHub using Brave Browser  .
   "brave-mjoklplbddabcmpepnokjaffbmgbkkgg-Default.desktop"
-  # Comment=Access ▶ 󰑈 YouTube using Brave Browser  .
+  # Comment=Access ▶ 󰑈 YouTube using Brave Browser  .
   "brave-agimnkijcaahngcdmfeangaknmldooml-Default.desktop"
-  # Comment=Access 🎭 Versus Themes using Brave Browser  WallpaperEngine 󰸉 .
+  # Comment=Access 🎭 Versus Themes using Brave Browser  WallpaperEngine 󰸉 .
   # "brave-pajkdhhgfpceeeogijbogempjggmpjco-Default.desktop"
   "net.lutris.youtube-music-69.desktop"
   "net.lutris.spotify-client-127.desktop"
@@ -244,34 +244,42 @@ print_success "Enlaces creados: $SUCCESS_COUNT"
 
 print_header "PASO 3: CONFIGURAR CustomRP_Icons PARA WINE"
 
+# FIX: en vez de exit 1, usamos flag para no matar PASO 4 si GDrive no está montado
 if [ ! -d "$GDRIVE_ICONS" ]; then
   print_error "Google Drive no montado o carpeta no existe: $GDRIVE_ICONS"
-  exit 1
-fi
-
-# 3.1: Symlink en el Escritorio (acceso rápido en Nemo)
-print_step "Creando symlink en Escritorio..."
-if [ -L "$ESCRITORIO/CustomRP_Icons" ] || [ -e "$ESCRITORIO/CustomRP_Icons" ]; then
-  rm -rf "$ESCRITORIO/CustomRP_Icons"
-fi
-
-if ln -s "$GDRIVE_ICONS" "$ESCRITORIO/CustomRP_Icons" 2>/dev/null; then
-  print_success "Symlink creado: ~/Escritorio/CustomRP_Icons"
+  print_error "Saltando PASO 3 y PASO 4 — monta GDrive y vuelve a ejecutar"
+  GDRIVE_OK=false
 else
-  print_error "No se pudo crear symlink en Escritorio"
+  GDRIVE_OK=true
 fi
 
-# 3.2: Symlink en Wine drive_c (CRÍTICO para CustomRP)
-print_step "Creando symlink en Wine C:\\ ..."
-if [ -L "$WINE_CUSTOMRP" ] || [ -e "$WINE_CUSTOMRP" ]; then
-  rm -rf "$WINE_CUSTOMRP"
-fi
+if [ "$GDRIVE_OK" = true ]; then
 
-if ln -s "$GDRIVE_ICONS" "$WINE_CUSTOMRP" 2>/dev/null; then
-  print_success "Symlink creado: C:\\CustomRP_Icons"
-  echo -e "  ${BLUE}→${NC} En CustomRP usa: ${GREEN}C:\\CustomRP_Icons\\tuicono.png${NC}"
-else
-  print_error "No se pudo crear symlink en Wine"
+  # 3.1: Symlink en el Escritorio (acceso rápido en Nemo)
+  print_step "Creando symlink en Escritorio..."
+  if [ -L "$ESCRITORIO/CustomRP_Icons" ] || [ -e "$ESCRITORIO/CustomRP_Icons" ]; then
+    rm -rf "$ESCRITORIO/CustomRP_Icons"
+  fi
+
+  if ln -s "$GDRIVE_ICONS" "$ESCRITORIO/CustomRP_Icons" 2>/dev/null; then
+    print_success "Symlink creado: ~/Escritorio/CustomRP_Icons"
+  else
+    print_error "No se pudo crear symlink en Escritorio"
+  fi
+
+  # 3.2: Symlink en Wine drive_c (CRÍTICO para CustomRP)
+  print_step "Creando symlink en Wine C:\\ ..."
+  if [ -L "$WINE_CUSTOMRP" ] || [ -e "$WINE_CUSTOMRP" ]; then
+    rm -rf "$WINE_CUSTOMRP"
+  fi
+
+  if ln -s "$GDRIVE_ICONS" "$WINE_CUSTOMRP" 2>/dev/null; then
+    print_success "Symlink creado: C:\\CustomRP_Icons"
+    echo -e "  ${BLUE}→${NC} En CustomRP usa: ${GREEN}C:\\CustomRP_Icons\\tuicono.png${NC}"
+  else
+    print_error "No se pudo crear symlink en Wine"
+  fi
+
 fi
 
 # =================================================================================
@@ -280,30 +288,36 @@ fi
 
 print_header "PASO 4: COPIAR ARCHIVOS .crp AL DESKTOP DE WINE"
 
-print_step "Limpiando archivos .crp antiguos..."
-rm -f "$WINE_DESKTOP"/*.crp 2>/dev/null
-echo "  (Desktop de Wine limpiado)"
+if [ "$GDRIVE_OK" = true ]; then
 
-print_step "Copiando archivos .crp a Wine Desktop..."
-if [ -d "$GDRIVE_ICONS" ]; then
-  CRP_COUNT=0
-  # Buscar y copiar TODOS los archivos .crp
-  while IFS= read -r -d '' crp_file; do
-    if cp "$crp_file" "$WINE_DESKTOP/" 2>/dev/null; then
-      print_success "$(basename "$crp_file")"
-      ((CRP_COUNT++))
+  print_step "Limpiando archivos .crp antiguos..."
+  rm -f "$WINE_DESKTOP"/*.crp 2>/dev/null
+  echo "  (Desktop de Wine limpiado)"
+
+  print_step "Copiando archivos .crp a Wine Desktop..."
+  if [ -d "$GDRIVE_ICONS" ]; then
+    CRP_COUNT=0
+    # Buscar y copiar TODOS los archivos .crp
+    while IFS= read -r -d '' crp_file; do
+      if cp "$crp_file" "$WINE_DESKTOP/" 2>/dev/null; then
+        print_success "$(basename "$crp_file")"
+        ((CRP_COUNT++))
+      fi
+    done < <(find "$GDRIVE_ICONS" -type f -name "*.crp" -print0)
+
+    if [ $CRP_COUNT -gt 0 ]; then
+      echo ""
+      print_success "Total de archivos .crp copiados: $CRP_COUNT"
+      echo -e "  ${BLUE}→${NC} Ubicación: ${GREEN}$WINE_DESKTOP${NC}"
+    else
+      print_error "No se encontraron archivos .crp en $GDRIVE_ICONS"
     fi
-  done < <(find "$GDRIVE_ICONS" -type f -name "*.crp" -print0)
-
-  if [ $CRP_COUNT -gt 0 ]; then
-    echo ""
-    print_success "Total de archivos .crp copiados: $CRP_COUNT"
-    echo -e "  ${BLUE}→${NC} Ubicación: ${GREEN}$WINE_DESKTOP${NC}"
   else
-    print_error "No se encontraron archivos .crp en $GDRIVE_ICONS"
+    print_error "Carpeta de iconos no accesible"
   fi
+
 else
-  print_error "Carpeta de iconos no accesible"
+  echo "  (Omitido — GDrive no disponible)"
 fi
 
 # =================================================================================

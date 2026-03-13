@@ -276,7 +276,7 @@ sudo pacman -S --needed --noconfirm \
   yazi stow ranger imagemagick \
   inotify-tools acpi power-profiles-daemon cpupower \
   gparted partitionmanager udiskie \
-  tig git-filter-repo man-db fastfetch bluetui impala networkmanager-dmenu gedit hyprsunset rsync gnome-system-monitor
+  tig git-filter-repo man-db fastfetch bluetui impala networkmanager-dmenu gedit hyprsunset rsync gnome-calculator gnome-system-monitor
 
 print_installing "Utilidades extra AUR (pokemon-colorscripts, cava, zoxide)"
 print_installing "Interfaces: bluetui, impala. Para gestionar el Bluetooth y Wifi [mismos devs]"
