@@ -808,3 +808,21 @@ alias termux-help='echo "
 # termux-help
 alias xdg-open="termux-open"
 export TMPDIR=$PREFIX/tmp
+
+# ═══════════════════════════════════════════════════════════
+# ANDROID / TERMUX — Hotspot & Tethering
+# ═══════════════════════════════════════════════════════════
+# Lanza directo el panel de compartir internet en Android vía Termux
+# Uso: hotspot
+alias WifiHotspot_Tether_Share_Internet_Compartir='am start -n com.android.settings/.TetherSettings'
+# Si da error de permisos usar: hotspot2
+alias Hotspot_Wifi='am start -a android.intent.action.MAIN -n com.android.settings/.TetherSettings'
+
+echo "  🏡  󰖩 [Termux] Hotspot rápido:󰋜 󰌗 "
+echo ""
+echo "     - 󱥸  WifiHotspot_Tether_Share_Internet_Compartir → abre TetherSettings directo"
+echo "     - 󱗼 Hotspot_Wifi  → fallback si hay error de permisos"
+echo ""
+echo "Recuerda desactivar 'desconectar dispositivos automaticamente' en Wifi, si quieres mantener tu relacion 💕"
+echo "🎂¡De esta forma aprovechas el Ahorro de Energia de Xiaomi [70h]+!!! 󰂏"
+echo ""
