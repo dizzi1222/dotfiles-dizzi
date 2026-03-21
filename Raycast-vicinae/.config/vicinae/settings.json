@@ -36,6 +36,9 @@
       },
       "applications": {
          "entrypoints": {
+            "Dorion": {
+               "enabled": false
+            },
             "net.lutris.neovim-124": {
                "enabled": false
             }

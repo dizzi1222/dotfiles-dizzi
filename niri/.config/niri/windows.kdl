@@ -145,6 +145,119 @@ window-rule {
     default-column-width {}
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// WORKSPACE: MUSIC
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Spotify + variantes GUI
+window-rule {
+    match app-id=r#"^(spotify|Spotify)$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match app-id=r#"^(spotube|Spotube)$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match app-id=r#"^(dev\.alextren\.Spot)$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*[Ss]pot.*"#
+    open-on-workspace "music"
+}
+
+// YouTube Music
+window-rule {
+    match app-id=r#"^(youtube-music|com\.github\.th_ch\.youtube_music)$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*YouTube Music.*"#
+    open-on-workspace "music"
+}
+
+// SoundCloud
+window-rule {
+    match title=r#".*SoundCloud.*"#
+    open-on-workspace "music"
+}
+
+// Audacious
+window-rule {
+    match app-id=r#"^(audacious|Audacious)$"#
+    open-on-workspace "music"
+}
+
+// Rhythmbox
+window-rule {
+    match app-id=r#"^(org\.gnome\.Rhythmbox3)$"#
+    open-on-workspace "music"
+}
+
+// Strawberry
+window-rule {
+    match app-id=r#"^(strawberry)$"#
+    open-on-workspace "music"
+}
+
+// Lollypop
+window-rule {
+    match app-id=r#"^(org\.gnome\.Lollypop)$"#
+    open-on-workspace "music"
+}
+
+// Reproductores TUI (corren dentro de kitty — timing issue, mejor usar script)
+window-rule {
+    match title=r#"^kew$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*ncspot.*"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*cmus.*"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*ncmpcpp.*"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*musikcube.*"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*spotify.?player.*"#
+    open-on-workspace "music"
+}
+
+// Visualizadores
+window-rule {
+    match app-id=r#"^(GLava)$"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#".*cava.*"#
+    open-on-workspace "music"
+}
+
+window-rule {
+    match title=r#"^vis$"#
+    open-on-workspace "music"
+}
+
 // Rounded corners para todas las ventanas
 window-rule {
     geometry-corner-radius 2
