@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Espanso
+Comment=Text expander
+Exec=espanso service start
+Type=Application
+Terminal=false
+Hidden=false
+# OnlyShowIn=X-Cinnamon;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Fix BT — KZ AZ09 Bluetooth
+Comment=Reconectar auriculares KZ AZ09 con perfil A2DP estéreo
+Exec=kitty /home/diego/scripts/fix-bt-kz-az09.sh
+Icon=/home/diego/.local/share/icons/kz-ksn-pro-headphone.png
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;
