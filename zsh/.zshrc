@@ -834,3 +834,12 @@ fi
 
 # Flatpak exports para que apps aparezcan en launcher
 export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/$USER/.local/share/flatpak/exports/share"
+
+# ═══════════════════════════════════════════════════════════
+# ANDROID / TERMUX — Hotspot & Tethering
+# ═══════════════════════════════════════════════════════════
+# Lanza directo el panel de compartir internet en Android vía Termux
+# Uso: hotspot
+alias WifiHotspot_Tether_Share_Internet_Compartir='am start -n com.android.settings/.TetherSettings'
+# Si da error de permisos usar: hotspot2
+alias Hotspot_Wifi='am start -a android.intent.action.MAIN -n com.android.settings/.TetherSettings'

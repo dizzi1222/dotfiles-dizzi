@@ -180,7 +180,7 @@ print_success "Audio configurado"
 print_step "4/35: Bluetooth"
 print_installing "BlueZ + Blueman + Bluetuith"
 sudo pacman -S --needed --noconfirm \
-  bluez-utils blueman bluez-plugins
+  bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO
 # bluez en conflicto con bluez-ps3 lo quite
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
