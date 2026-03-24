@@ -93,8 +93,24 @@ if [ -n "$SELECTED_WALL" ]; then
       eww reload
     fi
 
-    hyprctl reload
+    if [[ "$compositor" == "hyprland" ]]; then
+      hyprctl reload
+    fi
     swaync-client -rs
+
+    # Reiniciar nemo-desktop y volver a workspace 1
+    pkill -x nemo-desktop 2>/dev/null
+    sleep 1
+    case "$compositor" in
+      hyprland)
+        hyprctl dispatch exec "[workspace special:magic] nemo-desktop"
+        sleep 1 && hyprctl dispatch workspace 1
+        ;;
+      niri)
+        nemo-desktop &
+        sleep 1 && niri msg action focus-workspace 1
+        ;;
+    esac
   }
   toggle-wallpaper
 

@@ -786,6 +786,14 @@ alias omarchy-webapp-install='bash ~/omarchy-arch-bin/omarchy-webapp-install'
 alias omarchy-pkg-install='bash ~/omarchy-arch-bin/omarchy-pkg-install'
 alias omarchy-pkg-aur-install='bash ~/omarchy-arch-bin/omarchy-pkg-aur-install'
 
+# Design Extract — Blueprint + paleta + prompt IA desde imagen
+design-extract() {
+  bash ~/scripts/design-extract "$@"
+}
+design-extract-menu() {
+  bash ~/scripts/design-extract-gum "$@"
+}
+
 # Config para the clicker de CARGO/rust
 export PATH="$HOME/.cargo/bin:$PATH"
 # Si quieres cambiar el repo rápidamente sin menú: para darle uso a Windows +Z 󱞣

@@ -34,19 +34,31 @@ while true; do
   case $opcion in
   1)
     echo -e "\n${YELLOW}⚡ Limpiando caché de pacman...${RESET}"
+    sudo rm -rf /var/cache/pacman/pkg/download-* 2>/dev/null || true
     sudo pacman -Scc
     notify-send "🗑️ PACMAN Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   2)
     echo -e "\n${YELLOW}⚡ Eliminando dependencias huérfanas de pacman...${RESET}"
-    sudo pacman -Rns $(pacman -Qdtq)
+    orphans=$(pacman -Qdtq 2>/dev/null)
+    if [ -n "$orphans" ]; then
+      sudo pacman -Rns $orphans
+    else
+      echo -e "${DIM}✔ No hay dependencias huérfanas de pacman.${RESET}"
+    fi
     notify-send "🗑️ Pacman Huérfanas" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   3)
     echo -e "\n${YELLOW}⚡ Eliminando dependencias huérfanas y caché de yay...${RESET}"
+    sudo rm -rf /var/cache/pacman/pkg/download-* 2>/dev/null || true
     yay -Scc
     rm -rf ~/.cache/yay
-    yay -Rns $(yay -Qdtq)
+    orphans=$(yay -Qdtq 2>/dev/null)
+    if [ -n "$orphans" ]; then
+      yay -Rns $orphans
+    else
+      echo -e "${DIM}✔ No hay dependencias huérfanas de yay.${RESET}"
+    fi
     notify-send "🗑️ YAY Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   4)
@@ -59,6 +71,7 @@ while true; do
   5)
     echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo [& journalctl, docker, electron]...${RESET}"
     # -- Lo mas pesado
+    sudo rm -rf ~/.cache/waydroid-script/ 2>/dev/null || true
     rm -rf ~/.cache/*
     rm -rf ~/assets/
     rm -rf ~/.bun/install/cache/
@@ -80,8 +93,12 @@ while true; do
     rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/
     rm -rf $HOME/.local/share/Trash/files/* 2>/dev/null || true # ✅ Solo contenido
     # sudo rm -rf /tmp/
-    docker system prune -af
-    docker builder prune
+    if docker info >/dev/null 2>&1; then
+      docker system prune -af
+      docker builder prune
+    else
+      echo -e "${DIM}⚠️  Docker no está corriendo, omitiendo limpieza de docker.${RESET}"
+    fi
 
     notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos [Windows + B] 󰸉  y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;

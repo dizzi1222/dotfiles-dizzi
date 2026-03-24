@@ -3,6 +3,15 @@ desklet-snap-interval=25
 enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:left:1:separator@cinnamon.org:1', 'panel1:left:2:grouped-window-list@cinnamon.org:2', 'panel1:right:0:systray@cinnamon.org:3', 'panel1:right:1:xapp-status@cinnamon.org:4', 'panel1:right:2:notifications@cinnamon.org:5', 'panel1:right:3:printers@cinnamon.org:6', 'panel1:right:4:removable-drives@cinnamon.org:7', 'panel1:right:5:keyboard@cinnamon.org:8', 'panel1:right:6:favorites@cinnamon.org:9', 'panel1:right:7:network@cinnamon.org:10', 'panel1:right:8:sound@cinnamon.org:11', 'panel1:right:9:power@cinnamon.org:12', 'panel1:right:10:calendar@cinnamon.org:13', 'panel1:right:11:cornerbar@cinnamon.org:14']
 enabled-desklets=@as []
 next-applet-id=15
+panel-edit-mode=false
+panel-zone-icon-sizes='[{"panelId":1,"left":0,"center":0,"right":24}]'
+panel-zone-symbolic-icon-sizes='[{"panelId": 1, "left": 28, "center": 28, "right": 16}]'
+panel-zone-text-sizes='[{"panelId":1,"left":0,"center":0,"right":0}]'
+panels-autohide=['1:false', '2:false']
+panels-enabled=['1:0:bottom']
+panels-height=['1:35', '2:40']
+panels-hide-delay=['1:50', '2:0']
+panels-show-delay=['1:50', '2:0']
 workspace-expo-view-as-grid=true
 
 [desktop/a11y/applications]
@@ -29,7 +38,8 @@ cursor-size=24
 toolkit-accessibility=true
 
 [desktop/keybindings]
-custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', 'custom14', 'custom15', '__dummy__']
+custom-list=['custom0', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10', 'custom11', 'custom12', 'custom13', 'custom14', 'custom15', 'custom16', 'custom17', '__dummy__']
+pointer-next-monitor=['<Super>comma']
 show-desklets=@as []
 
 [desktop/keybindings/custom-keybindings/custom0]
@@ -71,6 +81,16 @@ name='Screenshot Window Area'
 binding=['<Primary><Super>n', '<Primary><Alt>n']
 command='swaync-client -t -sw'
 name='Swaync Notificaciones - App Volumen Audio'
+
+[desktop/keybindings/custom-keybindings/custom16]
+binding=['<Shift><Super>less']
+command='/home/diego/scripts/toggle-monitor-rotation'
+name='Rotacion de Monitor Vertical > Horizontal'
+
+[desktop/keybindings/custom-keybindings/custom17]
+binding=['<Primary><Shift>Escape']
+command='kitty -e btop'
+name='Kitty System Monitor Btop'
 
 [desktop/keybindings/custom-keybindings/custom2]
 binding=['<Super>v']
@@ -124,14 +144,36 @@ close=['<Alt>F4', '<Super>q', '<Alt>q']
 lower=['<Super>m']
 maximize=['<Super>Tab']
 minimize=@as []
+move-to-workspace-1=['<Shift><Super>exclam', '<Primary>1']
+move-to-workspace-10=['<Shift><Super>parenright', '<Primary>0']
+move-to-workspace-2=['<Shift><Super>at', '<Primary>2']
+move-to-workspace-3=['<Shift><Super>numbersign', '<Primary>3']
+move-to-workspace-4=['<Shift><Super>dollar', '<Primary>4']
+move-to-workspace-5=['<Shift><Super>percent', '<Primary>5']
+move-to-workspace-6=['<Shift><Super>asciicircum', '<Primary>6']
+move-to-workspace-7=['<Shift><Super>ampersand', '<Primary>7']
+move-to-workspace-8=['<Shift><Super>asterisk', '<Primary>8']
+move-to-workspace-9=['<Shift><Super>parenleft', '<Primary>9']
+move-to-workspace-left=['<Control><Shift><Alt>Left']
+move-to-workspace-right=['<Control><Shift><Alt>Right']
 switch-group=['<Alt>Above_Tab']
 switch-input-source=['XF86Keyboard']
 switch-input-source-backward=['<Shift>XF86Keyboard']
 switch-monitor=['XF86Display']
-switch-to-workspace-down=['<Control><Alt>Down', '<Primary><Super>Down']
-switch-to-workspace-left=['<Control><Alt>Left', '<Primary><Super>Left', '<Super>1']
-switch-to-workspace-right=['<Control><Alt>Right', '<Primary><Super>Right', '<Super>2']
-switch-to-workspace-up=['<Control><Alt>Up', '<Super>o', '<Super>s']
+switch-to-workspace-1=['<Super>1']
+switch-to-workspace-10=['<Super>0']
+switch-to-workspace-2=['<Super>2']
+switch-to-workspace-3=['<Super>3']
+switch-to-workspace-4=['<Super>4']
+switch-to-workspace-5=['<Super>5']
+switch-to-workspace-6=['<Super>6']
+switch-to-workspace-7=['<Super>7']
+switch-to-workspace-8=['<Super>8']
+switch-to-workspace-9=['<Super>9']
+switch-to-workspace-down=['<Control><Alt>Down', '<Primary><Super>Down', '<Primary><Alt><Super>Down']
+switch-to-workspace-left=['<Control><Alt>Left', '<Primary><Super>Left']
+switch-to-workspace-right=['<Control><Alt>Right', '<Primary><Super>Right']
+switch-to-workspace-up=['<Super>o', '<Super>s', '<Primary><Super>Up']
 switch-windows-backward=['<Shift><Alt>Tab', '<Primary>Tab']
 toggle-above=['<Super>t']
 toggle-on-all-workspaces=@as []
@@ -178,7 +220,7 @@ workspace-cycle=true
 workspaces-only-on-primary=false
 
 [settings-daemon/peripherals/touchscreen]
-orientation-lock=true
+orientation-lock=false
 
 [settings-daemon/plugins/color]
 night-light-last-coordinates=(18.466667000000001, -69.900000000000006)

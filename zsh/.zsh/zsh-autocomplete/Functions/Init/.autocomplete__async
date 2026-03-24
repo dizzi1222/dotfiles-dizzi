@@ -87,7 +87,6 @@ ${0}:precmd() {
       _autocomplete__rbuffer
 }
 
-# function -T \
 .autocomplete:async:complete() {
   if [[ -v _autocomplete__inserted ]]; then
     unset _autocomplete__inserted
@@ -157,7 +156,6 @@ ${0}:precmd() {
   return 0
 }
 
-# function -T \
 .autocomplete:async:wait() {
   local fd=
 
@@ -167,7 +165,7 @@ ${0}:precmd() {
         builtin zstyle -s :autocomplete: min-delay seconds ||
         (( seconds = 0.05 ))
 
-    (( seconds_delay = max( 0, seconds_delay - _autocomplete__overhead ) ))
+    (( seconds = max( 0, seconds - _autocomplete__overhead ) ))
 
     # Convert to 100ths of a second for `zselect -t`.
     # WORKAROUND: #441 Directly using $(( [#10] … max( … ) )) leads to 0 in Zsh 5.9, as the result
@@ -183,12 +181,11 @@ ${0}:precmd() {
   return 0
 }
 
-# function -T \
 .autocomplete:async:wait:fd-widget() {
+  local -i fd=$1
   {
-    local -i fd=$1
-    builtin zle -F $fd # Unhook ourselves immediately, so we don't get called more than once.
-    exec {fd}<&-
+    # Unhook ourselves immediately, so we don't get called more than once.
+    builtin zle -F $fd 2>/dev/null
 
     if [[ -n $_autocomplete__zle_flags ]]; then
       builtin zle -f $_autocomplete__zle_flags
@@ -204,25 +201,31 @@ ${0}:precmd() {
       .autocomplete:async:same-state &&
           .autocomplete:async:start
     }
+  } always {
+    { exec {fd}<&- } 2>/dev/null
   }
   return 0
 }
 
-# function -T \
 .autocomplete:async:start() {
-  local fd=
-  sysopen -r -o cloexec -u fd <(
+  if [[ -v _autocomplete__async_fd && _autocomplete__async_fd -ge 10 ]]; then
+    # Unhook and close the previous fd. (If it no longer exists, then this will fail harmlessly.)
+    builtin zle -F "$_autocomplete__async_fd" 2>/dev/null
+    { exec {_autocomplete__async_fd}<&- } 2>/dev/null
+  fi
+
+  typeset -g _autocomplete__async_fd=
+  sysopen -r -o cloexec -u _autocomplete__async_fd <(
     local +h PS4=$_autocomplete__ps4
     .autocomplete:async:start:inner 2>>| $_autocomplete__log
   )
-  builtin zle -Fw "$fd" .autocomplete:async:complete:fd-widget
+  builtin zle -Fw "$_autocomplete__async_fd" .autocomplete:async:complete:fd-widget
 
   # WORKAROUND: https://github.com/zsh-users/zsh-autosuggestions/issues/364
   # There's a weird bug in Zsh < 5.8, where ^C stops working unless we force a fork.
   command true
 }
 
-# function -T \
 .autocomplete:async:start:inner() {
   {
     typeset -F SECONDS=0
@@ -278,18 +281,17 @@ ${0}:precmd() {
   }
 }
 
-# function -T \
 .autocomplete:async:pty() {
-  local +h PS4=$_autocomplete__ps4
+  typeset -g +h PS4=pty:$_autocomplete__ps4
 
-  # Make sure this shell dies after it times out.
-  local -F seconds=
+  # Force the shell to exit on timeout.
+  local -i seconds=
   builtin zstyle -s ":autocomplete:${curcontext}" timeout seconds ||
-      seconds=0.5
+      seconds=1
   TMOUT=$(( [#10] 1 + seconds ))
-
-  # WORKAROUND: #654 Inside the PTY, formatting can lead to incorrect list trimming.
-  eval ${${${"$( zstyle -L '*' format )"}//zstyle /zstyle -d }// -e / }
+  TRAPALRM() {
+    builtin exit
+  }
 
   builtin bindkey $'\C-@' .autocomplete:async:pty:zle-widget
   local __tmp__=
@@ -300,10 +302,7 @@ ${0}:precmd() {
   :
 }
 
-# function -T \
 .autocomplete:async:pty:zle-widget() {
-  local +h PS4=$_autocomplete__ps4
-
   setopt localoptions NO_banghist
 
   local -a _autocomplete__comp_mesg=()
@@ -319,7 +318,6 @@ ${0}:precmd() {
     [[ -n $curcontext ]] &&
         setopt $_autocomplete__ctxt_opts[@]
 
-    local +h PS4=$_autocomplete__ps4
     builtin zle .autocomplete:async:pty:completion-widget -w 2>>| $_autocomplete__log
   } always {
     print -rNC1 -- ${_autocomplete__list_lines:-0}$'\C-B'
@@ -327,10 +325,7 @@ ${0}:precmd() {
   }
 } 2>>| $_autocomplete__log
 
-# function -T \
 .autocomplete:async:pty:completion-widget() {
-  local +h PS4=$_autocomplete__ps4
-
   setopt localoptions banghist
   {
     if ! .autocomplete:async:sufficient-input; then
@@ -343,18 +338,18 @@ ${0}:precmd() {
     } always {
       _autocomplete__list_lines=$compstate[list_lines]
     }
-  } 2>>| $_autocomplete__log
-}
+  }
+} 2>>| $_autocomplete__log
 
-# function -T \
 .autocomplete:async:complete:fd-widget() {
   setopt localoptions NO_banghist
+  local -i fd=$1
 
   {
     local +h -F SECONDS=0.0
-    local -i fd=$1
     {
-      builtin zle -F $fd # Unhook ourselves immediately, so we don't get called more than once.
+      # Unhook ourselves immediately, so we don't get called more than once.
+      builtin zle -F $fd 2>/dev/null
 
       if [[ -n $_autocomplete__zle_flags ]]; then
         builtin zle -f $_autocomplete__zle_flags
@@ -375,7 +370,9 @@ ${0}:precmd() {
       (( SECONDS += reply[2] ))
 
     } always {
-      exec {fd}<&-
+      { exec {fd}<&- } 2>/dev/null
+      [[ -v _autocomplete__async_fd && $_autocomplete__async_fd == $fd ]] &&
+          unset _autocomplete__async_fd
     }
 
     [[ -n $curcontext ]] &&
@@ -383,7 +380,7 @@ ${0}:precmd() {
 
     # If a widget can't be called, zle always returns true.
     # Thus, we return false on purpose, so we can check if our widget got called.
-    local +h PS4=$_autocomplete__ps4
+    local +h PS4=zle:$_autocomplete__ps4
     if ! builtin zle ._list_choices -w "$reply[1]" 2>>| $_autocomplete__log; then
 
       typeset -g _autocomplete__overhead=$SECONDS
@@ -438,9 +435,6 @@ ${0}:precmd() {
   .autocomplete:async:sufficient-input ||
       return 2
 
-  compstate[insert]=
-  compstate[old_list]=
-  compstate[pattern_insert]=
   .autocomplete:async:list-choices:main-complete
 
   # Workaround: In Zsh <= 5.9.0, comppostfuncs don't get called after completing subscripts.
@@ -452,6 +446,13 @@ ${0}:precmd() {
   if [[ -v _autocomplete__partial_list ]]; then
     builtin compadd -J -last- -x '%F{0}%K{12}(MORE)%f%k'
     _lastcomp[list_lines]=$compstate[list_lines]
+  fi
+
+  if [[ -n $compstate[exact_string] && -z $_lastcomp[tags] &&
+        compstate[nmatches] -eq 1 && compstate[list_lines] -eq 1 ]]; then
+    # WORKAROUND: _arguments adds $compstate[exact_string] as a completion w/out description.
+    compstate[list]=
+    _lastcomp[list]=
   fi
 
   return 2  # Don't return 1, to prevent beeping.
@@ -594,10 +595,12 @@ ${0}:precmd() {
 
   local -i _old_total_lines=$compstate[list_lines]
 
-  zparseopts -a _xopts_ -D -E -- X: x:
+  # +: Keep all occurences. Otherwise, only last occurence is kept.
+  zparseopts -a _xopts_ -D -E -- X+: x+:
 
   if (( $#_xopts_ )); then
-    local original="$_xopts_[-1]"
+    # Use only the first one, because subsequent ones are ignored by compadd anyway.
+    local original="$_xopts_[2]"
     local formatted="${(%g:ce:)original}"
 
     # Trim text to one line and omit ANSI sequences to avoid crash in command substitution.
@@ -605,7 +608,7 @@ ${0}:precmd() {
     local ansi_end=${(M)formatted%%($'\C-[['[;[:digit:]]#m)#}
     local text=${${formatted#$ansi_start}%$ansi_end}
     _xopts_=(
-      "$_xopts_[-2]"
+      "$_xopts_[1]"
       "${(mr:COLUMNS-1:)text%%[[:space:]]#}"
     )
   fi
@@ -617,7 +620,7 @@ ${0}:precmd() {
 
   if (( $#_xopts_ )); then
     # Replace original text with trimmed text.
-    _xopts_[-1]="${original/$text/$_xopts_[-1]}"
+    _xopts_[2]="${original/$text/$_xopts_[-1]}"
   fi
 
   # Everything fits.

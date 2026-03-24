@@ -9,13 +9,10 @@
    ══════════════════════════════════════════════════════════════════ */
 /* Título "Notifications" */
 .widget-title > label {
-  font-family: "Mononoki Nerd Font", "JetBrainsMono Nerd Font" !important;
+  font-family: "Mononoki Nerd Font", "JetBrainsMono Nerd Font";
   font-size: 25px;
   /* font-weight: bold; */
   /* posicionar al centro */
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   color: @color13; /* o cambio a @background */
 }
 
@@ -39,7 +36,6 @@
 
 .control-center .widget-mpris-player {
   background: alpha(@background, 0.6);
-  backdrop-filter: blur(20px);
   border-radius: 16px;
   border: 1px solid alpha(@color6, 0.3);
   padding: 3px;
@@ -76,6 +72,8 @@
   font-size: 16px;
   min-width: 32px;
   min-height: 32px;
+  max-width: 32px;
+  max-height: 32px;
   transition: all 200ms ease;
   margin-top: 5px;
 }
@@ -101,17 +99,14 @@
 }
 
 .control-center .widget-buttons-grid > flowbox {
-  min-width: 100%;
 }
 
 .control-center .widget-buttons-grid > flowbox > flowboxchild {
   padding: 3px;
-  min-width: 25%;
 }
 
 .control-center .widget-buttons-grid > flowbox > flowboxchild > button {
   min-height: 44px;
-  min-width: 100%;
   border-radius: 12px;
   border: 2px solid alpha(@color6, 0.2);
   background: alpha(@color7, 0.25);
@@ -170,7 +165,6 @@
 
 .control-center scale trough {
   min-height: 10px;
-  min-width: 100%;
   background: alpha(@color7, 0.25);
   border-radius: 10px;
 }
@@ -210,7 +204,7 @@
   color: @foreground;
   padding: 6px 4px;
   margin-bottom: 6px;
-  background: transparent !important;
+  background: transparent;
 }
 
 .notification-group-icon {
