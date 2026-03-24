@@ -1,0 +1,118 @@
+#!/bin/bash
+#######################################################################################
+# Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
+# Detecta el compositor activo y aplica la rotación correcta con estado persistente.
+#######################################################################################
+
+STATE_FILE="/tmp/monitor-rotation-state"
+MONITORS=(DP-1 DP-2)
+
+# ── Detectar compositor ──────────────────────────────────────────────────────────────
+detect_compositor() {
+  if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
+    echo "niri"
+  elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
+    echo "hyprland"
+  elif pgrep -x cinnamon >/dev/null; then
+    echo "cinnamon"
+  elif pgrep -x plasmashell >/dev/null; then
+    if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+      echo "plasma-wayland"
+    else
+      echo "plasma-x11"
+    fi
+  else
+    echo "unknown"
+  fi
+}
+
+# ── Leer estado actual ───────────────────────────────────────────────────────────────
+current_state() {
+  if [[ -f "$STATE_FILE" ]]; then
+    cat "$STATE_FILE"
+  else
+    echo "horizontal"
+  fi
+}
+
+# ── Aplicar rotación según compositor ───────────────────────────────────────────────
+apply_niri() {
+  local transform="$1" # "normal" | "90"
+  for mon in "${MONITORS[@]}"; do
+    niri msg output "$mon" transform "$transform" 2>/dev/null
+  done
+}
+
+apply_hyprland() {
+  local transform="$1" # "0" | "1"
+  for mon in "${MONITORS[@]}"; do
+    hyprctl keyword monitor "$mon,preferred,auto,auto,transform,$transform" 2>/dev/null
+  done
+}
+
+apply_xrandr() {
+  local rotate="$1" # "normal" | "left"
+  for mon in "${MONITORS[@]}"; do
+    xrandr --output "$mon" --rotate "$rotate" 2>/dev/null
+  done
+}
+
+apply_plasma_wayland() {
+  local rotation="$1" # "none" | "left"
+  for mon in "${MONITORS[@]}"; do
+    kscreen-doctor "output.$mon.rotation.$rotation" 2>/dev/null
+  done
+}
+
+# ── Reiniciar nemo-desktop tras rotar ────────────────────────────────────────────────
+restart_nemo() {
+  local compositor="$1"
+  pkill -x nemo-desktop 2>/dev/null
+  sleep 1
+  case "$compositor" in
+    hyprland)
+      hyprctl dispatch exec "[workspace special:magic] nemo-desktop"
+      sleep 1 && hyprctl dispatch workspace 1
+      ;;
+    niri)
+      nemo-desktop &
+      sleep 1 && niri msg action focus-workspace 1
+      ;;
+    *) nemo-desktop & ;;
+  esac
+}
+
+# ── Main ─────────────────────────────────────────────────────────────────────────────
+COMPOSITOR=$(detect_compositor)
+STATE=$(current_state)
+
+if [[ "$COMPOSITOR" == "unknown" ]]; then
+  notify-send "toggle-monitor-rotation" "Compositor no soportado" --urgency=critical
+  exit 1
+fi
+
+if [[ "$STATE" == "horizontal" ]]; then
+  NEW_STATE="vertical"
+  case "$COMPOSITOR" in
+  niri) apply_niri "90" ;;
+  hyprland) apply_hyprland "1" ;;
+  cinnamon) apply_xrandr "left" ;;
+  plasma-x11) apply_xrandr "left" ;;
+  plasma-wayland) apply_plasma_wayland "left" ;;
+  esac
+  notify-send "  Monitor" "Modo vertical activado"
+else
+  NEW_STATE="horizontal"
+  case "$COMPOSITOR" in
+  niri) apply_niri "normal" ;;
+  hyprland) apply_hyprland "0" ;;
+  cinnamon) apply_xrandr "normal" ;;
+  plasma-x11) apply_xrandr "normal" ;;
+  plasma-wayland) apply_plasma_wayland "none" ;;
+  esac
+  notify-send "  Monitor" "Modo horizontal activado"
+fi
+
+echo "$NEW_STATE" >"$STATE_FILE"
+restart_nemo "$COMPOSITOR"
+

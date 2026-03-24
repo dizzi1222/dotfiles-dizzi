@@ -19,7 +19,9 @@ NC='\033[0m' # No Color
 # Directorios principales
 ORIGEN="/home/diego/.local/share/applications"
 ESCRITORIO="/home/diego/Escritorio"
+DOCS="/home/diego/Documents"
 WINE_DESKTOP="/home/diego/.wine/drive_c/users/diego/Desktop"
+# WINE_DOCUMENTS="/home/diego/.wine/drive_c/users/diego/Documents"
 GDRIVE_ICONS="/home/diego/mi_gdrive/Mi unidad/[Documentos]/[Iconos - Status personalizados DISCORD CustomRP]"
 WINE_CUSTOMRP="/home/diego/.wine/drive_c/CustomRP_Icons"
 
@@ -284,16 +286,31 @@ print_step "Limpiando archivos .crp antiguos..."
 rm -f "$WINE_DESKTOP"/*.crp 2>/dev/null
 echo "  (Desktop de Wine limpiado)"
 
+print_step "Copiando archivos .crp a Documents (Linux)..."
+if [ -d "$GDRIVE_ICONS" ]; then
+  CRP_DOCS_COUNT=0
+  # Buscar y copiar TODOS los archivos .crp [DOCUMENTS]
+
+  while IFS= read -r -d '' crp_file; do
+    if cp "$crp_file" "$DOCS/" 2>/dev/null; then
+      print_success "$(basename "$crp_file") → Documents"
+      ((CRP_DOCS_COUNT++))
+    fi
+  done < <(find "$GDRIVE_ICONS" -type f -name "*.crp" -print0)
+  [ $CRP_DOCS_COUNT -gt 0 ] && print_success "Total copiados a Documents: $CRP_DOCS_COUNT"
+fi
+
 print_step "Copiando archivos .crp a Wine Desktop..."
 if [ -d "$GDRIVE_ICONS" ]; then
   CRP_COUNT=0
-  # Buscar y copiar TODOS los archivos .crp
-  while IFS= read -r -d '' crp_file; do
-    if cp "$crp_file" "$WINE_DESKTOP/" 2>/dev/null; then
-      print_success "$(basename "$crp_file")"
-      ((CRP_COUNT++))
-    fi
-  done < <(find "$GDRIVE_ICONS" -type f -name "*.crp" -print0)
+  # Buscar y copiar TODOS los archivos .crp [DESKTOP]
+
+  # while IFS= read -r -d '' crp_file; do
+  #   if cp "$crp_file" "$WINE_DESKTOP/" 2>/dev/null; then
+  #     print_success "$(basename "$crp_file")"
+  #     ((CRP_COUNT++))
+  #   fi
+  # done < <(find "$GDRIVE_ICONS" -type f -name "*.crp" -print0)
 
   if [ $CRP_COUNT -gt 0 ]; then
     echo ""

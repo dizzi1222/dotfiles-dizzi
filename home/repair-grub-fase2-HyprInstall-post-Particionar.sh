@@ -243,9 +243,9 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: WIFI reparar problemas"
     sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
     # sudo modprobe -r iwlwifi
-    sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
+    # sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
     # sudo modprobe -r iwlwifi
-    sudo modprobe iwlwifi power_save=0
+    # sudo modprobe iwlwifi power_save=0
     # print_status "Recuerda usar:
     ip link show
     nmcli device status

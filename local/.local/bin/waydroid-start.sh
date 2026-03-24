@@ -12,6 +12,7 @@ declare -A PRESETS=(
   [fullscreen]="1920x1080"
   [portrait]="926x809"
   [half]="960x540"
+  [arzopa]="1080x1920"
 )
 
 INPUT="${1:-fullscreen}"
@@ -76,7 +77,9 @@ apply_size() {
   else
     echo "📏 Forzando wm size ${WIDTH}x${HEIGHT}..."
     sudo waydroid shell wm size "${WIDTH}x${HEIGHT}"
-    sudo waydroid shell wm density 240
+    local density=240
+    [[ "$INPUT" == "arzopa" ]] && density=320
+    sudo waydroid shell wm density $density
   fi
 
   echo "✅ Listo: ${WIDTH}x${HEIGHT}"
@@ -106,7 +109,36 @@ if [ -z "$WAYLAND_DISPLAY" ]; then
   exit 0
 fi
 
+# ─── Función: fullscreen Waydroid en monitor específico ───
+focus_on_monitor() {
+  local monitor="$1"
+  echo "🔍 Esperando ventana Waydroid en Hyprland..."
+  local addr=""
+  local tries=0
+  while [[ -z "$addr" && $tries -lt 30 ]]; do
+    sleep 1
+    addr=$(hyprctl clients -j 2>/dev/null |
+      jq -r '[.[] | select(.class | test("waydroid"; "i"))][0].address // empty')
+    ((tries++))
+  done
+
+  if [[ -z "$addr" ]]; then
+    echo "⚠️  No se encontró ventana Waydroid para mover"
+    return
+  fi
+
+  echo "🖥️  Moviendo $addr → $monitor y poniendo fullscreen..."
+  hyprctl dispatch focuswindow "address:$addr"
+  hyprctl dispatch movewindow "mon:$monitor"
+  hyprctl dispatch fullscreen 0
+  echo "✅ Waydroid fullscreen en $monitor"
+}
+
 # ─── Wayland nativo: flujo normal ─────────────────────
 echo "✅ Wayland detectado ($WAYLAND_DISPLAY)"
 waydroid show-full-ui &
 apply_size
+
+if [[ "$INPUT" == "arzopa" ]]; then
+  focus_on_monitor "DP-1"
+fi

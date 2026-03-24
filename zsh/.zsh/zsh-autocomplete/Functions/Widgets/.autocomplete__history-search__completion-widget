@@ -8,7 +8,7 @@ ${0}() {
   autocomplete:_main_complete:new - history-lines _autocomplete__history_lines
 
   unset curcontext
-  (( _lastcomp[nmatches] ))
+  (( compstate[nmatches] ))
 }
 
 ${0}:post() {

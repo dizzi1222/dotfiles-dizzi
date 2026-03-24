@@ -1,4 +1,4 @@
-#!/bin/bash
+#nwg-displays.desktop!/bin/bash
 # fase2-HyprInstall-full.sh
 # Script OPTIMIZADO SIN COMPILACIONES LARGAS
 # Ejecutar como usuario normal después de archinstall
