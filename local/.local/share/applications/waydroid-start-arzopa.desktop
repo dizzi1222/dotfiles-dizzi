@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Waydroid Arzopa Vertical Monitor
+Comment=Inicia Waydroid en 1080x1920 para monitor Arzopa vertical
+Exec=kitty --hold -e /home/diego/.local/bin/waydroid-start.sh arzopa
+Icon=waydroid
+Terminal=false
+Type=Application
+Categories=System;Emulator;

@@ -1,6 +1,9 @@
 // /008 󰫸  envs.kdl
 environment {
     QT_QPA_PLATFORM "wayland"
-    TERMINAL  "kitty"
-    EDITOR "nvim"
+    TERMINAL        "kitty"
+    EDITOR          "nvim"
+    GTK_ICON_THEME  "Gruvbox-Plus-Dark"
+    XCURSOR_THEME   "Kafka"
+    XCURSOR_SIZE    "24"
 }

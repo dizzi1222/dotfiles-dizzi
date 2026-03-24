@@ -2,6 +2,8 @@
 
 if [[ $LBUFFER == *$'\n'* ]]; then
   builtin zle up-line
-else
-  builtin zle history-search-backward -w
+  return
 fi
+
+builtin zle history-search-backward -w
+(( $_lastcomp[nmatches] ))  # WORKAROUND: Widget always beeps otherwise.

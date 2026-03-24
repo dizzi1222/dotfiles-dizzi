@@ -1,65 +1,69 @@
 #autoload
-
 local -a match=() mbegin=() mend=()  # `zstyle` for some reason assigns these.
 
 unset MENUMODE MENUSELECT
 
-if [[ $WIDGETSTYLE != (|*-)menu(|-*) ]]; then
+local -i nmatches
+if [[ $compstate[old_list] == keep ]]; then
+  (( nmatches = _lastcomp[nmatches] ))
+else
+  (( nmatches = compstate[nmatches] ))
+fi
+
+[[ $WIDGETSTYLE == (|*-)menu(|-*) ]]
+local -i is_menu=$(( ! ? ))
+
+if (( is_menu )); then
+  compstate[list]='list force'
+else
   compstate[list]=
   zle -Rc
 fi
 
-if [[ $_completer == _prefix ]]; then
+if  [[ $compstate[old_list] == keep && $_lastcomp[completer] == prefix ]] ||
+    [[ $_completer == prefix ]]; then
   compstate[to_end]=
 else
-  compstate[to_end]='always'
+  compstate[to_end]='match'
 fi
 
 {
   compstate[insert]=
 
-  if _autocomplete__should_insert_unambiguous; then
-    if [[ $WIDGETSTYLE == (|*-)menu(|-*) ]]; then
+  if [[ $compstate[unambiguous] != (|$PREFIX$SUFFIX) ]] && _autocomplete__should_insert_unambiguous
+  then
+    (( is_menu )) &&
       compstate[insert]='automenu-'
-    fi
     compstate[insert]+='unambiguous'
-    unset _autocomplete__unambiguous
-
     return
   fi
 
-  if [[ $WIDGETSTYLE == (|*-)menu(|-*) ]]; then
+  if (( is_menu )); then
     if [[ $WIDGETSTYLE == (|*-)select(|-*) ]]; then
       typeset -gi MENUSELECT=0
+
       if [[ $WIDGET == (|*-)search(|-*) ]]; then
-          typeset -g MENUMODE=search-forward
+        typeset -g MENUMODE=search-forward
       fi
     fi
+
     compstate[insert]='menu:'
   fi
+
   if [[ $WIDGET == (|.)reverse-* || $WIDGETSTYLE == (|.)reverse-menu-complete ]]; then
     compstate[insert]+='0'
   else
     compstate[insert]+='1'
   fi
 
-  local -Pa comptags=()
-  if [[ $compstate[old_list] == keep ]]; then
-    comptags=( $=_lastcomp[tags] )
-  else
-    comptags=( $=_comp_tags )
+  if (( ! is_menu )) && _autocomplete__should_add_space; then
+    compstate[insert]+=' '
   fi
-
-  local -a spacetags=()
-  builtin zstyle -a ":autocomplete:$WIDGET:" add-space spacetags ||
-    spacetags=( executables aliases functions builtins reserved-words commands )
-
-  [[ -n ${comptags:*spacetags} ]] &&
-      compstate[insert]+=' '
-
+  return 0
 } always {
-  unset _autocomplete__inserted
-  [[ -n $compstate[insert] ]] &&
-      typeset -g _autocomplete__inserted
-
+  if [[ -n $compstate[insert] ]]; then
+    typeset -g _autocomplete__inserted
+  else
+    unset _autocomplete__inserted
+  fi
 }

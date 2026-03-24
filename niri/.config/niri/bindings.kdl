@@ -58,7 +58,7 @@ binds {
     
     F1 hotkey-overlay-title="firefox" { spawn "zen-browser"; } 
     // F10 hotkey-overlay-title="brave" { spawn "brave"; }
-    Mod+E hotkey-overlay-title="nemo" { spawn "nemo"; } // Nautilus , thunar, dolphin
+    Mod+E hotkey-overlay-title="Nautilus" { spawn "Nautilus"; } // Nemo , thunar, dolphin
     Super+Alt+M hotkey-overlay-title="yazi" { spawn-sh "kitty --class YaziTerminal -- yazi"; }
     Super+Ctrl+M hotkey-overlay-title="nvim fzf" { spawn-sh "~/.config/hypr/scripts/open_nvim_fzf.sh"; }
     Super+Shift+V hotkey-overlay-title="copyq" { spawn-sh "copyq toggle"; }
@@ -68,8 +68,8 @@ binds {
     Super+Period hotkey-overlay-title="emoji" { spawn-sh "rofimoji --action copy --selector fuzzel --prompt='Emoji:'"; }
     Super+Shift+Period hotkey-overlay-title="nerd font" { spawn-sh "rofimoji --action copy --selector fuzzel --prompt='Nerd Font:' --files nerd_font"; }
     Mod+Shift+C hotkey-overlay-title="color picker" { spawn-sh "~/.config/niri/scripts/niri-colorpicker.sh"; }
-    Ctrl+Shift+Escape hotkey-overlay-title="monitor" { spawn "kitty btop"; }
-    Super+Ctrl+Escape hotkey-overlay-title="btop" { spawn-sh "gnome-system-monitor"; }
+    Ctrl+Shift+Escape hotkey-overlay-title="monitor" { spawn "gnome-system-monitor"; }
+    Super+Ctrl+Escape hotkey-overlay-title="btop" { spawn-sh "kitty -e btop"; }
     Super+Z hotkey-overlay-title="system control" { spawn-sh "sh ~/scripts/system_control.sh"; }
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -167,10 +167,17 @@ binds {
     
     Mod+BracketLeft { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
-    Mod+Comma { consume-window-into-column; }
+    // Mod+Comma { consume-window-into-column; }
     Mod+Period { expel-window-from-column; }
     Mod+Shift+W { toggle-column-tabbed-display; }
-    
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MONITORS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    Mod+Comma hotkey-overlay-title="toggle monitor" { focus-monitor-next; }
+    Mod+Shift+Comma hotkey-overlay-title="toggle monitor rotation" { spawn-sh "~/scripts/toggle-monitor-rotation"; }
+
     // ═══════════════════════════════════════════════════════════════════════
     // WORKSPACES
     // ═══════════════════════════════════════════════════════════════════════
