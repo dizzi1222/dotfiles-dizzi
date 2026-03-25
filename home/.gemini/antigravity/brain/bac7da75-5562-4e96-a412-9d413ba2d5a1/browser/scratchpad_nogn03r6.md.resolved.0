@@ -1,0 +1,9 @@
+# Plan for GentlemanFinancesAI Dashboard Verification
+
+- [ ] Navigate to http://localhost:3000
+- [ ] Perform a hard refresh
+- [ ] Wait for page elements (charts, data) to load
+- [ ] Capture screenshot of top portion (navbar, sidebar, bar chart)
+- [ ] Scroll to bottom portion
+- [ ] Capture screenshot of bottom portion (donut chart, assets table)
+- [ ] Return screenshot paths
