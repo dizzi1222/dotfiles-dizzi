@@ -22,7 +22,7 @@ fi
 CONNECTED=$(bluetoothctl info "$MAC" | grep "Connected: yes")
 if [ -z "$CONNECTED" ]; then
   notify "Conectando..."
-  bluetoothctl connect "$MAC" > /dev/null 2>&1
+  bluetoothctl connect "$MAC" >/dev/null 2>&1
   sleep 3
 fi
 
