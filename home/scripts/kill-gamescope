@@ -8,6 +8,12 @@ sleep 4
 killall hyprland-dialog
 sudo waydroid session stop
 sudo waydroid session start
+sudo systemctl stop waydroid-container
+# Sin admin:
+systemctl stop waydroid-container
+waydroid session stop
+pkill -f "waydroid"
+pkill -f waydroid
 wineserver -k
  
 # notify-send "🎮 Gamescope cerrado"

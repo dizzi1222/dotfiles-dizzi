@@ -2,6 +2,7 @@
     "version": "2.2.0",
     "autoload": {
         "AT Translated Set 2 keyboard": "teclado-classmate",
-        "Compx 2.4G Wireless Receiver": "teclado-Bluetooth"
+        "Compx 2.4G Wireless Receiver": "teclado-Bluetooth",
+        "Logitech G305": "Mouse para ZURDOS kukardos"
     }
 }
