@@ -69,6 +69,12 @@ spawn-at-startup "hypridle"
 
 // Input remapper
 spawn-sh-at-startup "sh ~/scripts/setup-keyboard.sh"
+// spawn-sh-at-startup "input-remapper-control --command start --device 'Logitech G305' --preset 'Mouse para ZURDOS kukardos'"
 
 // DBus
 spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+
+// Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
+// Detecta el compositor activo y aplica la rotación correcta con estado persistente.
+spawn-sh-at-startup "sleep 3; sh /home/diego/scripts/toggle-monitor-rotation"
+spawn-sh-at-startup "sleep 4; sh /home/diego/scripts/toggle-monitor-rotation"

@@ -1,4 +1,4 @@
-#nwg-displays.desktop!/bin/bash
+#!/bin/bash
 # fase2-HyprInstall-full.sh
 # Script OPTIMIZADO SIN COMPILACIONES LARGAS
 # Ejecutar como usuario normal después de archinstall
@@ -232,7 +232,7 @@ sudo pacman -S --needed --noconfirm \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
-  wofi fuzzel polkit-kde-agent polkit-gnome udiskie \
+  wofi fuzzel polkit-kde-agent polkit-gnome udiskie nwg-displays \
   swww hyprpaper hyprshot \
   qt5-wayland qt6-wayland gtk-layer-shell # konsole es mierda
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
