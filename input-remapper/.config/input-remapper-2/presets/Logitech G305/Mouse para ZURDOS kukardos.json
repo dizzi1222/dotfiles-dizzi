@@ -1,0 +1,50 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 276,
+                "origin_hash": "144e04fb08cc2b9fc07e8b4906b50645"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_COPY",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 275,
+                "origin_hash": "144e04fb08cc2b9fc07e8b4906b50645"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_COPY",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 273,
+                "origin_hash": "144e04fb08cc2b9fc07e8b4906b50645"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_LEFT",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 272,
+                "origin_hash": "144e04fb08cc2b9fc07e8b4906b50645"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_RIGHT",
+        "mapping_type": "key_macro"
+    }
+]
