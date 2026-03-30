@@ -78,7 +78,7 @@ binds {
     
     Mod+Q repeat=false hotkey-overlay-title="close" { close-window; }
     Alt+F4 repeat=false hotkey-overlay-title="close" { close-window; }
-    Alt+Q hotkey-overlay-title="kill gamescope" { spawn-sh "~/scripts/kill-gamescope"; }
+    Alt+Q hotkey-overlay-title="kill gamescope" { spawn-sh "kitty -e ~/scripts/kill-gamescope"; }
     Mod+Shift+F hotkey-overlay-title="fullscreen" { fullscreen-window; }
     F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
     Mod+F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
