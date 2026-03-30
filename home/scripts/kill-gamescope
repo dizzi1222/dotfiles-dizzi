@@ -2,8 +2,6 @@
 #!/bin/bash
 killall gamescopereaper 2>/dev/null
 killall gamescope 2>/dev/null
-# killactive # en terminal:
-hyprctl dispatch killactive
 sleep 4
 killall hyprland-dialog
 sudo waydroid session stop
@@ -15,5 +13,7 @@ waydroid session stop
 pkill -f "waydroid"
 pkill -f waydroid
 wineserver -k
+# killactive # en terminal:
+hyprctl dispatch killactive
  
 # notify-send "🎮 Gamescope cerrado"
