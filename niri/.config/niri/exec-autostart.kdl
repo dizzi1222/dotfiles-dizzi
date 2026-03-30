@@ -77,4 +77,3 @@ spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLA
 // Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
 // Detecta el compositor activo y aplica la rotación correcta con estado persistente.
 spawn-sh-at-startup "sleep 3; sh /home/diego/scripts/toggle-monitor-rotation"
-spawn-sh-at-startup "sleep 4; sh /home/diego/scripts/toggle-monitor-rotation"
