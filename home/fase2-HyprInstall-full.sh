@@ -379,7 +379,7 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
 
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron xbox-cloud-gaming geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
+    gfn-electron xbox-cloud-gaming sunshine moonlight-qt geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -435,16 +435,20 @@ sudo pacman -S --needed --noconfirm \
 # 🔴 CORRECCIÓN: Remover linuxconsole antes de instalar joyutils
 sudo pacman -R --noconfirm linuxconsole 2>/dev/null || true
 
-# Ahora instalar joyutils sin conflicto
-sudo pacman -S --needed --noconfirm joyutils
+sudo pacman -S --needed --noconfirm joyutils # Ahora instalar joyutils sin conflicto
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  ds4drv xpadneo-dkms sixpair input-remapper espanso-wayland \
+  xpadneo-dkms input-remapper espanso-wayland \
   2>/dev/null || print_warning "Algunos drivers fallaron"
 
-# Crear grupos
+sudo tee /etc/udev/rules.d/99-8bitdo-xinput.rules << 'EOF'
+ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 310a > /sys/bus/usb/drivers/xpad/new_id'"
+ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", MODE="0666"
+EOF
+sudo udevadm control --reload-rules && sudo systemctl restart dkms # 8bitdo ultimate 2c wireless - bt→xinput (reemplaza aur package roto:8bitdo-ultimate-controller-udev | xboxrdrv )
+
 sudo groupadd uinput 2>/dev/null || true
-sudo usermod -aG input,uinput $USER
+sudo usermod -aG input,uinput $USER # Crear grupos
 
 print_success "Controllers configurados"
 
@@ -459,15 +463,13 @@ read -p "¿Configurar PS3 controller específicamente? [s/N]: " setup_ps3
 if [[ "$setup_ps3" =~ ^[Ss]$ ]]; then
   print_header "Configurando PS3 Controller"
 
-  # Dependencias específicas PS3
   print_installing "Dependencias PS3 (bluez-ps3, sixpair, ds4drv)"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    bluez-ps3 sixpair ds4drv 2>/dev/null || print_warning "Algunas dependencias fallaron"
+    bluez-ps3 sixpair ds4drv 2>/dev/null || print_warning "Algunas dependencias fallaron" # Dependencias específicas PS3
 
-  # Configurar kernel module
   print_status "Configurando módulo hid_sony"
   echo 'hid_sony' | sudo tee /etc/modules-load.d/hid_sony.conf
-  sudo modprobe hid_sony 2>/dev/null || true
+  sudo modprobe hid_sony 2>/dev/null || true # Configurar kernel module
 
   # Script de conexión PS3
   print_status "Creando script de conexión PS3"
@@ -3942,7 +3944,6 @@ print_success "Limpieza completada"
 # RESUMEN
 # ═══════════════════════════════════════════════════════════
 kill $SUDO_PID 2>/dev/null || true
-
 clear
 cat <<"EOF"
 ╔══════════════════════════════════════════════════════════════════════╗
@@ -3959,7 +3960,6 @@ cat <<"EOF"
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
 EOF
-
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
 echo -e "  ${CYAN}1.${NC} ${RED}CERRAR SESIÓN Y VOLVER A ENTRAR${NC} (crucial para grupos)"
 echo -e "  ${CYAN}2.${NC} ${YELLOW}reboot${NC}"
