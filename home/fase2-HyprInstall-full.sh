@@ -180,11 +180,10 @@ print_success "Audio configurado"
 print_step "4/35: Bluetooth"
 print_installing "BlueZ + Blueman + Bluetuith"
 sudo pacman -S --needed --noconfirm \
-  bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO
-# bluez en conflicto con bluez-ps3 lo quite
+  bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO # bluez en conflicto con bluez-ps3 lo quite
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  bluez-ps3 bluetuith 2>/dev/null || true
+  bluez bluetuith 2>/dev/null || true  # necesitas bluez-ps3  para que funcione el bluetooth en wine/bottles PS3 CONTROLLER
 
 sudo systemctl enable --now bluetooth
 print_success "Bluetooth habilitado"
@@ -200,6 +199,7 @@ sudo pacman -S --needed --noconfirm \
   ttf-font-awesome ttf-dejavu ttf-liberation \
   adobe-source-han-sans-otc-fonts \
   adobe-source-han-serif-otc-fonts
+sh ~/.local/bin/MAC-theme🫟🔴🔵🟢 && sh ~/scripts/fix-gtk-fonts-icons.sh
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   ttf-iosevka ttf-mononoki-nerd otf-hermit-nerd 2>/dev/null || true
@@ -225,19 +225,38 @@ fi
 # ═══════════════════════════════════════════════════════════
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
+
+# 🔧 Fix CachyOS: swww se llama awww y necesita symlinks
+if grep -qi "cachyos" /etc/os-release 2>/dev/null; then
+  print_warning "CachyOS detectado: instalando awww en lugar de swww"
+  SWWW_PKG="awww"
+else
+  SWWW_PKG="swww"
+fi
+
 sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot cage \ # Cage = >>> Weston es el puente entre X11 y Wayland
+  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot cage \
   waybar rofi-wayland dunst \
   kitty ghostty thunar nemo \
   grim slurp wl-clipboard cliphist \
   brightnessctl playerctl pamixer \
   swaync hyprlock hypridle hyprpicker \
   wofi fuzzel polkit-kde-agent polkit-gnome udiskie nwg-displays \
-  swww hyprpaper hyprshot \
-  qt5-wayland qt6-wayland gtk-layer-shell # konsole es mierda
+  $SWWW_PKG hyprpaper hyprshot \
+  qt5-wayland qt6-wayland gtk-layer-shell
+
+# 🔧 Fix CachyOS: crear symlinks swww → awww para compatibilidad total
+if [[ "$SWWW_PKG" == "awww" ]]; then
+  print_status "Aplicando fix swww→awww (symlinks)..."
+  sudo ln -sf /usr/bin/awww /usr/local/bin/swww
+  sudo ln -sf /usr/bin/awww-daemon /usr/local/bin/swww-daemon
+  mkdir -p ~/.cache/awww
+  print_success "Symlinks creados: swww → awww"
+fi
+
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
 echo
-echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
+echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
 print_success "Hyprland instalado"
 print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
 [Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
@@ -526,7 +545,6 @@ EOL
 
   print_success "PS3 configurado"
   print_status "Ejecuta: ~/conectar-ps3.sh para conectar tu control"
-
   # Ofrecer conectar ahora
   echo
   read -p "¿Conectar PS3 controller ahora? [s/N]: " connect_now
@@ -670,18 +688,20 @@ case "$editor_choice" in
 
   print_success "Cursor instalado"
   ;;
-3)
-  print_header "Instalando Antigravity"
-  print_installing "antigravity desde yay"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    antigravity \
-    2>/dev/null || print_warning "Antigravity falló"
+  3)
+    print_header "Instalando Antigravity"
+    print_installing "antigravity desde yay"
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      antigravity \
+      2>/dev/null || print_warning "Antigravity falló"
 
-  print_success "Antigravity instalado"
-  ;;
-  bash ~/dotfiles-dizzi/home/Antigravity\ Setup/install\ extensions/install-vscode-extensions.sh
-  print_success "Extensiones de VSCode instaladas"
-*)
+    print_success "Antigravity instalado"
+
+    # Corregido: dentro del case y con comillas
+    bash "$HOME/dotfiles-dizzi/home/Antigravity Setup/install extensions/install-vscode-extensions.sh"
+    print_success "Extensiones de VSCode instaladas"
+    ;;
+  *)
   print_warning "Editor de código omitido"
   ;;
 esac
@@ -732,11 +752,16 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   sudo pacman -S --needed --noconfirm \
     waydroid python-pip git lzip
 
-  # Habilitar KVM + Desinstalar Firewall de EndeavorOS + Permitir UFW.
+  # Habilitar KVM + Desinstalar Firewalls (Solo si existen para evitar errores con set -e)
   print_status "Habilitando KVM..."
-  sudo usermod -aG kvm $USER # no existe python-dbus $USER
-  sudo systemctl disable --now ufw firewalld 2>/dev/null; sudo pacman -Rns --noconfirm ufw firewalld 2>/dev/null; echo "Firewall removido"
-  print_package "Usuario agregado al grupo 'kvm'"
+  sudo usermod -aG kvm $USER 2>/dev/null
+  for fw_pkg in ufw firewalld; do
+    if pacman -Qs $fw_pkg > /dev/null; then
+      sudo systemctl disable --now $fw_pkg 2>/dev/null
+      # sudo pacman -Rns --noconfirm $fw_pkg 2>/dev/null
+    fi
+  done
+  print_package "Configuración de KVM y Red completada"
 
   # ═══════════════════════════════════════════════════════════
   # PASO 2: Inicializar con GApps
@@ -751,9 +776,11 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   echo
   read -p "Presiona Enter para iniciar (esto es IRREVERSIBLE)..."
 
-  sudo waydroid init -s GAPPS -f
+  # Usar || true para evitar que set -e detenga el script si falla la inicialización inicial
+  sudo waydroid init -s GAPPS -f || true
 
-  if [[ $? -ne 0 ]]; then
+  # Comprobar si se creó el directorio de datos para validar el éxito
+  if [ ! -d "/var/lib/waydroid/cells" ]; then
     print_error "Error inicializando Waydroid"
     print_warning "Prueba: sudo rm -rf /var/lib/waydroid && sudo waydroid init -s GAPPS -f"
   else
@@ -1368,7 +1395,7 @@ sudo pacman -S --needed --noconfirm \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code clawdbot gemini-cli-git aichat
+  claude-code postgresql clawdbot gemini-cli-git aichat
 print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
@@ -1618,9 +1645,19 @@ fi
 sudo chsh -s $(which zsh) $USER 2>/dev/null || print_warning "Cambio de shell manual requerido"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 16: DOTFILES
+# PASO 16: OH-MY-POSH
 # ═══════════════════════════════════════════════════════════
-print_step "16/35: Dotfiles dizzi1222"
+print_step "16/35: Oh-My-Posh (Prompt Moderno)"
+print_installing "oh-my-posh desde AUR"
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  oh-my-posh 2>/dev/null || print_warning "oh-my-posh falló"
+
+print_success "Oh-My-Posh instalado"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 17: DOTFILES
+# ═══════════════════════════════════════════════════════════
+print_step "17/35: Dotfiles dizzi1222"
 if [[ ! -d ~/dotfiles-dizzi ]]; then
   print_installing "Clonando dotfiles desde GitHub"
   git clone https://github.com/dizzi1222/dotfiles-dizzi.git ~/dotfiles-dizzi || {
@@ -1662,9 +1699,9 @@ cd  ../../../
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 17: SYMLINKS A /etc
+# PASO 18: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
+print_step "18/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
@@ -1686,6 +1723,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   # TIMESHIFT Snapshots config
   if [[ -f ~/dotfiles-dizzi/etc/timeshift/timeshift.json ]]; then
     print_package "Symlink: Timeshift Snapshots"
+    sudo mkdir -p /etc/timeshift
     sudo ln -sf ~/dotfiles-dizzi/etc/timeshift/timeshift.json /etc/timeshift/timeshift.json
   fi
 
@@ -2747,7 +2785,7 @@ gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
 # ═══════════════════════════════════════════════════════════
 # PASO 26: PYTHON-PYWAL
 # ═══════════════════════════════════════════════════════════
-print_step " 5/35: Python-pywal (Temas Dinámicos)"
+print_step " 26/35: Python-pywal (Temas Dinámicos)"
 print_installing "python-pywal + imagemagick"
 sudo pacman -S --needed --noconfirm python-pywal imagemagick
 
@@ -2761,17 +2799,7 @@ fi
 print_success "Pywal instalado"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 27: OH-MY-POSH
-# ═══════════════════════════════════════════════════════════
-print_step "26/35: Oh-My-Posh (Prompt Moderno)"
-print_installing "oh-my-posh desde AUR"
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  oh-my-posh 2>/dev/null || print_warning "oh-my-posh falló"
-
-print_success "Oh-My-Posh instalado"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 28: OLLAMA + OPENCOMMIT (OCO)
+# PASO 27: OLLAMA + OPENCOMMIT (OCO)
 # ═══════════════════════════════════════════════════════════
 print_step "27/35: Ollama + opencommit (IA Local)"
 
@@ -2807,9 +2835,9 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 28.5: OPEN-WEBUI (CON FALLBACK A DOCKER)
+# PASO 28: OPEN-WEBUI (CON FALLBACK A DOCKER)
 # ═══════════════════════════════════════════════════════════
-print_step "28.5/35: Open-WebUI (Interfaz para Ollama)"
+print_step "28/35: Open-WebUI (Interfaz para Ollama)"
 
 echo
 echo -e "${CYAN}Opciones para acceder a Ollama:${NC}"
@@ -2899,6 +2927,7 @@ sudo pacman -S --needed --noconfirm \
 # Rofimoji para emojis
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   rofimoji 2>/dev/null || print_warning "rofimoji falló"
+sh ~/.local/bin/MAC-theme🫟🔴🔵🟢 && sh ~/scripts/fix-gtk-fonts-icons.sh
 
 print_success "Emojis y Nerd Fonts instalados"
 
@@ -3939,7 +3968,6 @@ nohup waybar >/dev/null 2>&1 & # NOHUP LA SOLUCION PARA QUE NO SE CIERRE AL CERR
 sleep 1
 
 print_success "Limpieza completada"
-
 # ═══════════════════════════════════════════════════════════
 # RESUMEN
 # ═══════════════════════════════════════════════════════════
@@ -3963,38 +3991,10 @@ EOF
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
 echo -e "  ${CYAN}1.${NC} ${RED}CERRAR SESIÓN Y VOLVER A ENTRAR${NC} (crucial para grupos)"
 echo -e "  ${CYAN}2.${NC} ${YELLOW}reboot${NC}"
-echo -e "  ${CYAN}3.${NC} Seleccionar ${YELLOW}Hyprland${NC} en GDM/SDDM"
-echo
-echo -e "${YELLOW}${BOLD}SDDM Astronaut Theme:${NC}"
-echo -e "  ${CYAN}•${NC} Tema activo: ${GREEN}$(grep -A1 '\[Theme\]' /etc/sddm.conf 2>/dev/null | grep Current | cut -d'=' -f2 || echo 'No configurado')${NC}"
-echo -e "  ${CYAN}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
-echo -e "  ${CYAN}•${NC} Probar: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
-echo
 echo -e "${YELLOW}${BOLD}Configuraciones post-instalación:${NC}"
 echo -e "  ${CYAN}•${NC} Neovim: Abre ${YELLOW}nvim${NC} y ejecuta ${YELLOW}:MasonInstall prettier markdownlint-cli2${NC}"
-echo -e "  ${CYAN}•${NC} Copilot: En nvim ejecuta ${YELLOW}:CopilotAuth${NC}"
-echo -e "  ${CYAN}•${NC} Pywal: ${YELLOW}wal -i ~/wallpapers/tu-imagen.jpg${NC}"
-echo -e "  ${CYAN}•${NC} Music Presence: ${YELLOW}source ~/.zshrc && musicpresence${NC}"
 echo -e "  ${CYAN}•${NC} Rclone: ${YELLOW}~/montar_gdrive.sh${NC} (si configuraste)"
-echo
-echo -e "${YELLOW}${BOLD}Instalación manual (si omitiste):${NC}"
-echo -e "  ${CYAN}•${NC} Bottles: ${YELLOW}yay -S bottles${NC} (1+ hora)"
-echo -e "  ${CYAN}•${NC} Caelestia: ${YELLOW}yay -S caelestia-shell${NC} (30min)"
-echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15min)"
-echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
-echo
 echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
 echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
 echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 snapshots (con compresión)"
-echo
-echo -e "${CYAN}💡 TIPS:${NC}"
-echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
-  htop # --> Usa F6 para ordenar por CPU
-  sudo intel_gpu_top # Ver GPU en tiempo real de Intel [latitude 7440]
-
-  # O para ver CPU de otros procesos con grep (busca por nombre)
-  # ...
-  Btw ya parche y mejore los intervalos de waybar, eww, hypr, scripts etc.
-  ps aux --sort=-%cpu | grep -E "eww | hypr | waybar | dunst | swaync | swww | caelestia" | head -20.${NC}"
-echo
 echo -e "${GREEN}¡Disfruta tu setup Hyprland perfeccionado con SDDM Astronaut! 🚀${NC}"

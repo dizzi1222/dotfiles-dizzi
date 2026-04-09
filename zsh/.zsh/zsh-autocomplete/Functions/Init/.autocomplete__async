@@ -150,16 +150,22 @@ ${0}:precmd() {
 }
 
 .autocomplete:async:clear() {
+  # If we exit the ZLE before the last hook widget called, then it won't be able to close the fd.
+  [[
+    -v _autocomplete__async_fd && _autocomplete__async_fd -ge 10 && -t $_autocomplete__async_fd
+  ]] &&
+    exec {_autocomplete_async_fd}<&- &&
+    unset _autocomplete_async_fd
   unset curcontext _autocomplete__isearch
+
   .autocomplete:async:reset-context
   builtin zle -Rc
   return 0
 }
 
 .autocomplete:async:wait() {
-  local fd=
-
-  sysopen -r -o cloexec -u fd <(
+  typeset -g _autocomplete_async_fd=
+  sysopen -r -o cloexec -u _autocomplete_async_fd <(
     local -F seconds=
     builtin zstyle -s :autocomplete: delay seconds ||
         builtin zstyle -s :autocomplete: min-delay seconds ||
@@ -176,50 +182,42 @@ ${0}:precmd() {
 
     print
   )
-  builtin zle -Fw "$fd" .autocomplete:async:wait:fd-widget
+  builtin zle -Fw "$_autocomplete_async_fd" .autocomplete:async:wait:fd-widget
 
   return 0
 }
 
 .autocomplete:async:wait:fd-widget() {
   local -i fd=$1
-  {
-    # Unhook ourselves immediately, so we don't get called more than once.
-    builtin zle -F $fd 2>/dev/null
+  [[ $fd -lt 10 ]] &&
+    return 0
 
-    if [[ -n $_autocomplete__zle_flags ]]; then
-      builtin zle -f $_autocomplete__zle_flags
+  # Unhook ourselves immediately, so we don't get called more than once.
+  builtin zle -F "$fd" 2> /dev/null
+  [[ -t $fd ]] && exec {fd}<&-
 
-      [[ $_autocomplete__zle_flags == yank* ]] &&
-          return 0
-    fi
+  if [[ -n $_autocomplete__zle_flags ]]; then
+    builtin zle -f $_autocomplete__zle_flags
 
-    (( KEYS_QUEUED_COUNT || PENDING )) &&
-        return
+    [[ $_autocomplete__zle_flags == yank* ]] &&
+        return 0
+  fi
 
-    {
-      .autocomplete:async:same-state &&
-          .autocomplete:async:start
-    }
-  } always {
-    { exec {fd}<&- } 2>/dev/null
-  }
+  (( KEYS_QUEUED_COUNT || PENDING )) &&
+      return
+
+  .autocomplete:async:same-state &&
+    .autocomplete:async:start
   return 0
 }
 
 .autocomplete:async:start() {
-  if [[ -v _autocomplete__async_fd && _autocomplete__async_fd -ge 10 ]]; then
-    # Unhook and close the previous fd. (If it no longer exists, then this will fail harmlessly.)
-    builtin zle -F "$_autocomplete__async_fd" 2>/dev/null
-    { exec {_autocomplete__async_fd}<&- } 2>/dev/null
-  fi
-
-  typeset -g _autocomplete__async_fd=
-  sysopen -r -o cloexec -u _autocomplete__async_fd <(
+  typeset -g _autocomplete_async_fd=
+  sysopen -r -o cloexec -u _autocomplete_async_fd <(
     local +h PS4=$_autocomplete__ps4
     .autocomplete:async:start:inner 2>>| $_autocomplete__log
   )
-  builtin zle -Fw "$_autocomplete__async_fd" .autocomplete:async:complete:fd-widget
+  builtin zle -Fw "$_autocomplete_async_fd" .autocomplete:async:complete:fd-widget
 
   # WORKAROUND: https://github.com/zsh-users/zsh-autosuggestions/issues/364
   # There's a weird bug in Zsh < 5.8, where ^C stops working unless we force a fork.
@@ -344,12 +342,14 @@ ${0}:precmd() {
 .autocomplete:async:complete:fd-widget() {
   setopt localoptions NO_banghist
   local -i fd=$1
-
+  [[ $fd -lt 10 ]] &&
+    return 0
   {
-    local +h -F SECONDS=0.0
     {
       # Unhook ourselves immediately, so we don't get called more than once.
-      builtin zle -F $fd 2>/dev/null
+      builtin zle -F "$fd" 2> /dev/null
+
+      local +h -F SECONDS=0.0
 
       if [[ -n $_autocomplete__zle_flags ]]; then
         builtin zle -f $_autocomplete__zle_flags
@@ -365,14 +365,12 @@ ${0}:precmd() {
           return 0
 
       local -a reply=()
-      IFS=$'\0' read -rAu $fd
+      IFS=$'\0' read -rAu "$fd"
       shift -p reply
       (( SECONDS += reply[2] ))
 
     } always {
-      { exec {fd}<&- } 2>/dev/null
-      [[ -v _autocomplete__async_fd && $_autocomplete__async_fd == $fd ]] &&
-          unset _autocomplete__async_fd
+      [[ -t $fd ]] && exec {fd}<&-
     }
 
     [[ -n $curcontext ]] &&
