@@ -1,0 +1,9 @@
+[Unit]
+Description=Montar Google Drive Música al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gdmusica.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
