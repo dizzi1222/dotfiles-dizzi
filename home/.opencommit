@@ -1,6 +1,8 @@
 OCO_ONE_LINE_COMMIT=false
-OCO_MODEL=deepseek-v3.1:671b-cloud
+OCO_MODEL=gemini-3-flash-preview:cloud
 OCO_API_URL=http://localhost:11434/api/chat
+OCO_PROXY=undefined
+OCO_API_KEY=undefined
 OCO_API_CUSTOM_HEADERS=undefined
 OCO_AI_PROVIDER=ollama
 OCO_TOKENS_MAX_INPUT=12000
