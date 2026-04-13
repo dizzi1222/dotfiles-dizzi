@@ -41,5 +41,6 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 animations {
 }
 
-prefer-no-csd
+// Comenta la siguiente línea si prefieres ocultar las decoraciones del lado del cliente (botones de cerrar, minimizar, etc.)
+// prefer-no-csd
 
