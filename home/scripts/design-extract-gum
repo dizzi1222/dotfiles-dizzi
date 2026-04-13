@@ -29,6 +29,7 @@ check_deps() {
     fi
   done
   python3 -c "import requests; from bs4 import BeautifulSoup" 2>/dev/null || pip install requests beautifulsoup4 --quiet
+  python3 -c "from PIL import Image" 2>/dev/null || pip install Pillow --quiet
   return 0
 }
 
@@ -86,6 +87,9 @@ headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 }
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 bp = {
     "meta": {"url": url, "extracted_at": datetime.now().isoformat(), "title": ""},
     "detection": {"category": "general", "mood": [], "tags": []},
@@ -99,7 +103,10 @@ bp = {
 print(f"📡 Conectando a {url}...")
 
 try:
-    r = requests.get(url, headers=headers, timeout=15)
+    try:
+        r = requests.get(url, headers=headers, timeout=15, verify=True)
+    except requests.exceptions.SSLError:
+        r = requests.get(url, headers=headers, timeout=15, verify=False)
     r.raise_for_status()
     soup = BeautifulSoup(r.text, 'html.parser')
     text = r.text.lower()
@@ -258,7 +265,10 @@ try:
     with open(f'{project_dir}/blueprint.json', 'w', encoding='utf-8') as f:
         json.dump(bp, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ Blueprint guardado")
+    if os.path.exists(f'{project_dir}/blueprint.json'):
+        print(f"✅ Blueprint guardado ({os.path.getsize(f'{project_dir}/blueprint.json')} bytes)")
+    else:
+        print(f"❌ Error: No se pudo guardar blueprint.json")
 
 except Exception as e:
     print(f"❌ Error: {e}")
@@ -335,7 +345,10 @@ try:
     with open(f'{project_dir}/palette.json', 'w') as f:
         json.dump(result, f, indent=2)
 
-    print(f"✅ {len(result['palette'])} colores en paleta")
+    if os.path.exists(f'{project_dir}/palette.json'):
+        print(f"✅ {len(result['palette'])} colores en paleta")
+    else:
+        print(f"❌ Error: No se pudo guardar palette.json")
     if result.get('dominant'):
         print(f"🎯 Color dominante: {result['dominant']}")
 
@@ -567,10 +580,10 @@ PYEOF
 view_blueprints() {
   clear
   echo -e "\n${MAGENTA}${BOLD}╔══════════════════════════════════════════════════════════╗${RESET}"
-  echo -e "${MAGENTA}${BOLD}║        📋 BLUEPRINTS GUARDADOS                          ║${RESET}"
+  echo -e "${MAGENTA}${BOLD}║        📋 BLUEPRINTS GUARDADOS                           ║${RESET}"
   echo -e "${MAGENTA}${BOLD}╚══════════════════════════════════════════════════════════╝${RESET}\n"
 
-  local dirs=$(find "$OUTPUT_DIR" -maxdepth 1 -type d 2>/dev/null | grep -v "^$OUTPUT_DIR$" | sort -r)
+  local dirs=$(find "$RAW_DIR" -maxdepth 1 -type d 2>/dev/null | grep -v "^$RAW_DIR$" | sort -r)
 
   if [ -z "$dirs" ]; then
     echo -e "${YELLOW}⚠️  No hay blueprints guardados${RESET}\n"
@@ -593,7 +606,7 @@ view_blueprints() {
 
   local idx=$((sel - 1))
   if [ "$sel" -ge 1 ] && [ "$idx" -lt "${#names[@]}" ]; then
-    local path="$OUTPUT_DIR/${names[$idx]}"
+    local path="$RAW_DIR/${names[$idx]}"
     if [ -f "$path/blueprint.md" ]; then
       cat "$path/blueprint.md" | less
     elif [ -f "$path/blueprint.json" ]; then
@@ -604,77 +617,352 @@ view_blueprints() {
   fi
 }
 
-# ─── Analizar imágenes locales ────────────────────────────────────────
+# ─── Analizar imágenes (archivo, carpeta o URL) ──────────────────────
 analyze_images() {
   clear
   echo -e "\n${BLUE}${BOLD}╔══════════════════════════════════════════════════════════╗${RESET}"
-  echo -e "${BLUE}${BOLD}║        📂 ANALIZAR IMÁGENES LOCALES                     ║${RESET}"
+  echo -e "${BLUE}${BOLD}║        🖼️  ANALIZAR IMÁGENES                             ║${RESET}"
   echo -e "${BLUE}${BOLD}╚══════════════════════════════════════════════════════════╝${RESET}\n"
 
-  printf "📁 Ruta de carpeta: "
-  read -r folder
-  [ ! -d "$folder" ] && echo -e "${RED}❌ Carpeta no existe${RESET}" && return 1
+  echo -e "${DIM}Acepta: archivo local, carpeta o URL de imagen${RESET}\n"
 
-  local images=$(find "$folder" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) 2>/dev/null | head -30)
+  printf "🖼️  Ruta/URL: "
+  read -r input_path
 
-  if [ -z "$images" ]; then
-    echo -e "${YELLOW}⚠️  Sin imágenes en la carpeta${RESET}"
+  [[ -z "$input_path" ]] && echo -e "${RED}Entrada requerida${RESET}" && return 1
+
+  printf "📁 Nombre proyecto: "
+  read -r project_name
+  [[ -z "$project_name" ]] && project_name="image-$(date +%Y%m%d-%H%M%S)"
+
+  project_dir="$RAW_DIR/$project_name"
+  mkdir -p "$project_dir"
+
+  echo -e "\n${YELLOW}🔄 Analizando...${RESET}\n"
+
+  python3 - "$input_path" "$project_dir" "$project_name" <<'PYEOF'
+import os
+import sys
+import json
+import colorsys
+import requests
+import urllib3
+from PIL import Image
+from io import BytesIO
+from datetime import datetime
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+input_path = sys.argv[1]
+project_dir = sys.argv[2]
+project_name = sys.argv[3]
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+}
+
+images_data = []
+
+def analyze_image(img_source, source_type):
+    """Analiza una imagen y retorna sus colores."""
+    try:
+        img = Image.open(img_source).convert('RGB')
+        width, height = img.size
+        
+        # Muestreo más fino
+        img_small = img.resize((100, 100))
+        colors = img_small.getcolors(10000)
+
+        palette = []
+        backgrounds = []
+        
+        if colors:
+            colors.sort(reverse=True)
+            for cnt, (r, g, b) in colors[:64]: # Revisar más colores
+                h, s, l = colorsys.rgb_to_hls(r/255, g/255, b/255)
+                hex_color = '#%02x%02x%02x' % (r, g, b)
+                hex_color = hex_color.upper()
+                
+                # Clasificación inteligente
+                ctype = "gray" if s < 0.15 else "red" if h < 0.08 else "orange" if h < 0.17 else "yellow" if h < 0.36 else "green" if h < 0.52 else "cyan" if h < 0.67 else "blue" if h < 0.82 else "purple" if h < 0.92 else "pink"
+                
+                color_obj = {
+                    "hex": hex_color,
+                    "rgb": [r, g, b],
+                    "type": ctype,
+                    "hsl": [round(h*360), round(s*100), round(l*100)],
+                    "count": cnt,
+                    "is_vibrant": s > 0.3 and 0.3 < l < 0.8
+                }
+
+                # Si es muy frecuente y baja saturación, es fondo/base
+                if s < 0.2 or l < 0.15 or l > 0.85:
+                    if len(backgrounds) < 5:
+                        backgrounds.append(color_obj)
+                else:
+                    if len(palette) < 12:
+                        palette.append(color_obj)
+
+        # Unir y priorizar vibrantes
+        final_palette = palette + backgrounds
+        
+        # Clasificación por colores (Heurística)
+        dominant = final_palette[0] if final_palette else None
+        is_dark = (dominant['hsl'][2] < 40) if dominant else True
+        
+        moods = []
+        if is_dark: moods.append("dark")
+        if any(c['is_vibrant'] for c in final_palette): moods.append("vibrant")
+        if len(palette) < 5: moods.append("minimalist")
+        
+        # Intentar detectar Glassmorphism (Heurística: bordes claros en fondos oscuros)
+        has_glass = False
+        if is_dark and any(c['hsl'][2] > 80 and c['count'] < 50 for c in backgrounds):
+            has_glass = True
+            moods.append("glassmorphism")
+
+        return {
+            "source": source_type,
+            "path": str(img_source) if source_type == "local" else input_path,
+            "width": width,
+            "height": height,
+            "palette": final_palette,
+            "dominant": dominant,
+            "is_dark": is_dark,
+            "moods": moods,
+            "has_glass": has_glass,
+            "category": "dashboard" if is_dark and len(palette) > 3 else "landing"
+        }
+    except Exception as e:
+        return {"error": str(e), "source": source_type}
+
+try:
+    if input_path.startswith('http://') or input_path.startswith('https://'):
+        print(f"🌐 Descargando imagen desde URL...")
+        r = requests.get(input_path, headers=headers, timeout=30, verify=False)
+        r.raise_for_status()
+        img_data = analyze_image(BytesIO(r.content), "url")
+        images_data.append(img_data)
+        print(f"✅ Imagen descargada: {img_data.get('width', '?')}x{img_data.get('height', '?')}")
+    elif os.path.isfile(input_path):
+        if input_path.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp')):
+            print(f"📁 Analizando archivo local...")
+            img_data = analyze_image(input_path, "local")
+            images_data.append(img_data)
+            print(f"✅ {img_data.get('width', '?')}x{img_data.get('height', '?')}")
+        else:
+            print(f"⚠️  No es imagen válida")
+    elif os.path.isdir(input_path):
+        print(f"📂 Buscando imágenes en carpeta...")
+        files = []
+        for ext in ('*.png', '*.jpg', '*.jpeg', '*.webp', '*.gif'):
+            files.extend([f for f in input_path.split('\n')[0].strip() if False])
+        files = []
+        for root, dirs, filenames in os.walk(input_path):
+            for fname in filenames:
+                if fname.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp')):
+                    files.append(os.path.join(root, fname))
+                    if len(files) >= 20:
+                        break
+            if len(files) >= 20:
+                break
+        
+        if not files:
+            print("⚠️  No se encontraron imágenes")
+            sys.exit(1)
+        
+        print(f"📸 {len(files)} imágenes encontradas\n")
+        for f in files:
+            img_data = analyze_image(f, "local")
+            if "error" not in img_data:
+                images_data.append(img_data)
+                palette_str = ' '.join([c['hex'] for c in img_data['palette'][:4]])
+                print(f"  📷 {os.path.basename(f)[:35]}")
+                print(f"     🎨 {palette_str}")
+    else:
+        print(f"❌ Ruta no encontrada: {input_path}")
+        sys.exit(1)
+
+    if images_data:
+        total_colors = sum(len(img.get('palette', [])) for img in images_data)
+        first_img = images_data[0]
+        dominant_data = first_img.get('dominant') if first_img else None
+        dominant_color = dominant_data.get('hex', '#000000') if dominant_data else '#000000'
+        
+        palette_md = ""
+        unique_colors = []
+        seen_hex = set()
+        
+        # Primero acentos, luego bases
+        all_potential = []
+        for img in images_data:
+            all_potential.extend(img.get('palette', []))
+            
+        all_potential.sort(key=lambda x: (x['is_vibrant'], x['count']), reverse=True)
+        
+        for c in all_potential:
+            if c['hex'] not in seen_hex:
+                seen_hex.add(c['hex'])
+                unique_colors.append(c)
+                if len(unique_colors) >= 15: break
+
+        for i, c in enumerate(unique_colors, 1):
+            vibrant_tag = "🌟" if c.get('is_vibrant') else "🌑"
+            palette_md += f"| {i} | `{c['hex']}` | {vibrant_tag} {c['type']} | {c['hsl'][1]}% | {c['hsl'][2]}% |\n"
+
+        bp = {
+            "meta": {
+                "source": "image_analysis",
+                "input": input_path,
+                "extracted_at": datetime.now().isoformat(),
+                "project_name": project_name,
+                "theme": "dark" if images_data[0].get('is_dark') else "light"
+            },
+            "colors": {"hex": [c['hex'] for c in unique_colors], "dominant": dominant_color},
+            "palette": unique_colors,
+            "images": images_data
+        }
+
+        with open(f'{project_dir}/blueprint.json', 'w', encoding='utf-8') as f:
+            json.dump(bp, f, indent=2, ensure_ascii=False)
+
+        # Heurística de estructura y descripción
+        main_img = images_data[0]
+        category = main_img.get('category', 'web-design')
+        moods_str = ', '.join(main_img.get('moods', []))
+        
+        md = f"""# 🎨 Blueprint: {project_name}
+
+> **Tipo:** Análisis Visual de Imagen 📸
+> **Mood:** `{moods_str}`
+> **Estilo Predominante:** {"Dark Mode" if main_img.get('is_dark') else "Light Mode"}
+> **Extraído:** {datetime.now().strftime('%Y-%m-%d %H:%M')}
+
+---
+
+## 🏷️ Clasificación Sugerida
+
+| Atributo | Valor |
+|----------|-------|
+| **Categoría** | `{category}` |
+| **UX Pattern** | {"Sidebar + Main Content" if category == "dashboard" else "Hero + Sections"} |
+| **Glassmorphism** | {"Activado ✅" if main_img.get('has_glass') else "No detectado"} |
+
+---
+
+## 🎨 Paleta de Colores
+
+| # | Hex | Tipo | Saturación | Luminosidad |
+|---|-----|------|------------|-------------|
+{palette_md}
+
+---
+
+## 🛠️ Esqueleto Técnico (Sugerido)
+
+### Variables CSS
+```css
+:root {{
+  --bg-primary: {unique_colors[-1]['hex'] if unique_colors else '#000000'};
+  --accent-primary: {unique_colors[0]['hex'] if unique_colors else '#3b82f6'};
+  --text-main: {unique_colors[-2]['hex'] if len(unique_colors) > 2 else '#ffffff'};
+  --radius-main: 16px;
+}}
+```
+
+### Estilo de Componentes
+"""
+        if main_img.get('has_glass'):
+            md += """
+#### 🪟 Efecto Glass (Detectado)
+```css
+.card-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-main);
+}
+```
+"""
+        if category == "dashboard":
+            md += """
+#### 📊 Layout Dashboard
+- **Sidebar:** Ancho 260px, color base oscuro.
+- **Cards:** Bordes suaves (12px-16px), sombras sutiles.
+- **Inputs:** Estilo minimalista con bordes focus en color acento.
+"""
+
+        md += f"""
+---
+
+## 🎬 Animaciones Sugeridas
+- `fade-in`: Para la carga de componentes.
+- `scale-up`: Para hover en botones y cards.
+- `pulse`: Para estados activos en indicadores.
+
+---
+
+## 🖼️ Imágenes Analizadas
+"""
+        for img in images_data:
+            palette_str = ' '.join([c['hex'] for c in img.get('palette', [])[:5]])
+            md += f"""
+### {img.get('path', 'Unknown').split('/')[-1]}
+- **Resolución:** {img.get('width', '?')}x{img.get('height', '?')}
+- **Colores Clave:** {palette_str}
+"""
+
+        md += """
+---
+_Generado por Blueprint Utility 🏗️ (Modo Heurístico Visual)_
+"""
+
+        with open(f'{project_dir}/blueprint.md', 'w', encoding='utf-8') as f:
+            f.write(md)
+
+        print(f"\n✅ Análisis completo")
+        print(f"   📁 {project_dir}")
+        print(f"   🎨 {len(unique_colors)} colores extraídos")
+
+except Exception as e:
+    print(f"❌ Error: {e}")
+    import traceback
+    traceback.print_exc()
+PYEOF
+}
+
+# ─── Gestionar blueprints con ncdu ─────────────────────────────────────
+manage_blueprints() {
+  clear
+  echo -e "\n${YELLOW}${BOLD}╔══════════════════════════════════════════════════════════╗${RESET}"
+  echo -e "${YELLOW}${BOLD}║        🗂️  GESTIONAR BLUEPRINTS                          ║${RESET}"
+  echo -e "${YELLOW}${BOLD}╚══════════════════════════════════════════════════════════╝${RESET}\n"
+
+  if ! command -v ncdu &>/dev/null; then
+    echo -e "${RED}❌ ncdu no está instalado${RESET}"
+    echo -e "${DIM}Instálalo con: sudo pacman -S ncdu${RESET}\n"
     return 1
   fi
 
-  local count=$(echo "$images" | wc -l)
-  echo -e "\n${CYAN}📸 $count imágenes encontradas${RESET}\n"
+  echo -e "${CYAN}Abriendo ncdu en $RAW_DIR${RESET}"
+  echo -e "${DIM}q=salir | d=borrar | R=recargar${RESET}\n"
 
-  echo "$images" | python3 - <<'PYEOF'
-import sys
-import colorsys
-from PIL import Image
-
-try:
-    import colorsys
-except:
-    colorsys = None
-
-images = [l.strip() for l in sys.stdin if l.strip()]
-results = []
-
-for path in images:
-    try:
-        img = Image.open(path).convert('RGB')
-        small = img.resize((20, 20))
-        colors = small.getcolors(400)
-
-        if colors:
-            colors.sort(reverse=True)
-            palette = []
-            for cnt, (r, g, b) in colors[:5]:
-                h, s, l = colorsys.rgb_to_hls(r/255, g/255, b/255) if colorsys else (0, 0, 0.5)
-                if s > 0.35 and 0.2 < l < 0.8:
-                    palette.append('#{:02x}{:02x}{:02x}'.format(r, g, b).upper())
-
-            if palette:
-                name = path.split('/')[-1][:40]
-                print(f"📷 {name}")
-                print(f"   🎨 {' '.join(palette[:4])}")
-                results.append({"file": path, "palette": palette})
-    except: pass
-
-print(f"\n✅ {len(results)} imágenes analizadas")
-PYEOF
+  ncdu "$RAW_DIR"
 }
 
 # ─── Menú principal ───────────────────────────────────────────────────
 main_menu() {
   clear
   echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════════════════╗${RESET}"
-  echo -e "${CYAN}${BOLD}║        🏗️  BLUEPRINT UTILITY                              ║${RESET}"
+  echo -e "${CYAN}${BOLD}║        🏗️  BLUEPRINT UTILITY                             ║${RESET}"
   echo -e "${CYAN}${BOLD}║        Extrae y documenta diseño de páginas web          ║${RESET}"
   echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════╝${RESET}\n"
 
   echo -e "${DIM}─────────────────────────────────────────────────────────${RESET}"
   echo -e "${YELLOW}1)${RESET} 🌐 Extraer por URL      - Analiza una página web completa"
-  echo -e "${YELLOW}2)${RESET} 📂 Analizar imágenes     - Extrae paletas de carpeta local"
+  echo -e "${YELLOW}2)${RESET} 🖼️ Analizar imágenes     - Archivo, carpeta o URL"
   echo -e "${YELLOW}3)${RESET} 📋 Ver blueprints        - Revisa extracciones anteriores"
+  echo -e "${YELLOW}4)${RESET} 🗂️ Gestionar blueprints  - Borrar con ncdu"
   echo -e "${RED}0)${RESET} ❌ Salir"
   echo -e "${DIM}─────────────────────────────────────────────────────────${RESET}\n"
 }
@@ -693,6 +981,7 @@ main() {
     1) extract_url ;;
     2) analyze_images ;;
     3) view_blueprints ;;
+    4) manage_blueprints ;;
     0 | *)
       echo -e "${GREEN}👋 ¡Hasta luego!${RESET}\n"
       exit 0
