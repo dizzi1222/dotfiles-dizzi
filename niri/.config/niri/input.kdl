@@ -28,7 +28,7 @@ input {
         scroll-factor 2.0
         // 🔧 Si quieres scroll "natural" en el mouse, descomenta:
         // natural-scroll
-        left-handed  // Descomenta esta línea para invertir
+        // left-handed  // Descomenta esta línea para invertir
     }
 }
 
