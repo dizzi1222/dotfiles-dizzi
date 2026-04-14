@@ -128,7 +128,7 @@
   "editor.lightbulb.enabled": "off",
   // Hover nativo VSCODE: Estas son sugerencias para mejorar la experencia, peor rendimiento
   // tambien permite acceder al color mas facilmente
-  "editor.hover.enabled": true,
+  "editor.hover.enabled": "on",
   // Desactiva Documentacion solo lo pesado, mantiene lo útil:
   /*  "editor.hover.documentation": false,
   "editor.hover.references": false, */
