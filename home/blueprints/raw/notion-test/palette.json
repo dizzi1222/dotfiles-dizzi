@@ -1,0 +1,66 @@
+{
+  "palette": [
+    {
+      "hex": "#AD6DED",
+      "rgb": [
+        173,
+        109,
+        237
+      ],
+      "type": "purple",
+      "hsl": [
+        270,
+        68,
+        78
+      ],
+      "brightness": 0.56
+    },
+    {
+      "hex": "#2537B1",
+      "rgb": [
+        37,
+        55,
+        177
+      ],
+      "type": "blue",
+      "hsl": [
+        232,
+        42,
+        65
+      ],
+      "brightness": 0.25
+    },
+    {
+      "hex": "#1AAE39",
+      "rgb": [
+        26,
+        174,
+        57
+      ],
+      "type": "cyan",
+      "hsl": [
+        133,
+        39,
+        74
+      ],
+      "brightness": 0.46
+    },
+    {
+      "hex": "#2A9D99",
+      "rgb": [
+        42,
+        157,
+        153
+      ],
+      "type": "cyan",
+      "hsl": [
+        178,
+        39,
+        58
+      ],
+      "brightness": 0.48
+    }
+  ],
+  "total_analyzed": 11,
+  "dominant": "#AD6DED"
+}

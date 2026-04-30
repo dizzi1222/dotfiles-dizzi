@@ -3,6 +3,7 @@ Version=1.0
 Name=Geforce Now Web
 Comment=Open Geforce Now Web in your browser (brave, firefox, chromium, zen-browser, opera, etc)
 Exec=brave --app="https://play.geforcenow.com"
+# Exec=zen-browser --new-window --kiosk "https://play.geforcenow.com"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Geforce_Now.png
