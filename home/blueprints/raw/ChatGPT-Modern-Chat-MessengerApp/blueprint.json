@@ -1,0 +1,575 @@
+{
+  "meta": {
+    "source": "image_analysis",
+    "input": "/home/diego/Escritorio/55eb1dc76d181276a9dbd5bb9c0f6406.png",
+    "extracted_at": "2026-04-12T22:20:45.558186",
+    "project_name": "/ChatGPT-Modern-Chat-MessengerApp",
+    "theme": "dark"
+  },
+  "colors": {
+    "hex": [
+      "#E8EAEC",
+      "#202737",
+      "#1C1C25",
+      "#ECEEF0",
+      "#292939",
+      "#F1F3F6",
+      "#2B2940",
+      "#2B2A3E",
+      "#2C294A",
+      "#2B2942",
+      "#F0F2F5",
+      "#2C2948",
+      "#2B2844",
+      "#F1F3F5",
+      "#2C2A46"
+    ],
+    "dominant": "#F1F3F6"
+  },
+  "palette": [
+    {
+      "hex": "#E8EAEC",
+      "rgb": [
+        232,
+        234,
+        236
+      ],
+      "type": "cyan",
+      "hsl": [
+        210,
+        92,
+        10
+      ],
+      "count": 2259,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#202737",
+      "rgb": [
+        32,
+        39,
+        55
+      ],
+      "type": "cyan",
+      "hsl": [
+        222,
+        17,
+        26
+      ],
+      "count": 589,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#1C1C25",
+      "rgb": [
+        28,
+        28,
+        37
+      ],
+      "type": "gray",
+      "hsl": [
+        240,
+        13,
+        14
+      ],
+      "count": 551,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#ECEEF0",
+      "rgb": [
+        236,
+        238,
+        240
+      ],
+      "type": "cyan",
+      "hsl": [
+        210,
+        93,
+        12
+      ],
+      "count": 157,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#292939",
+      "rgb": [
+        41,
+        41,
+        57
+      ],
+      "type": "cyan",
+      "hsl": [
+        240,
+        19,
+        16
+      ],
+      "count": 90,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#F1F3F6",
+      "rgb": [
+        241,
+        243,
+        246
+      ],
+      "type": "cyan",
+      "hsl": [
+        216,
+        95,
+        22
+      ],
+      "count": 82,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2B2940",
+      "rgb": [
+        43,
+        41,
+        64
+      ],
+      "type": "blue",
+      "hsl": [
+        245,
+        21,
+        22
+      ],
+      "count": 71,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2B2A3E",
+      "rgb": [
+        43,
+        42,
+        62
+      ],
+      "type": "blue",
+      "hsl": [
+        243,
+        20,
+        19
+      ],
+      "count": 66,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2C294A",
+      "rgb": [
+        44,
+        41,
+        74
+      ],
+      "type": "blue",
+      "hsl": [
+        245,
+        23,
+        29
+      ],
+      "count": 62,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2B2942",
+      "rgb": [
+        43,
+        41,
+        66
+      ],
+      "type": "blue",
+      "hsl": [
+        245,
+        21,
+        23
+      ],
+      "count": 55,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#F0F2F5",
+      "rgb": [
+        240,
+        242,
+        245
+      ],
+      "type": "cyan",
+      "hsl": [
+        216,
+        95,
+        20
+      ],
+      "count": 45,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2C2948",
+      "rgb": [
+        44,
+        41,
+        72
+      ],
+      "type": "blue",
+      "hsl": [
+        246,
+        22,
+        27
+      ],
+      "count": 35,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2B2844",
+      "rgb": [
+        43,
+        40,
+        68
+      ],
+      "type": "blue",
+      "hsl": [
+        246,
+        21,
+        26
+      ],
+      "count": 33,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#F1F3F5",
+      "rgb": [
+        241,
+        243,
+        245
+      ],
+      "type": "cyan",
+      "hsl": [
+        210,
+        95,
+        17
+      ],
+      "count": 31,
+      "is_vibrant": false
+    },
+    {
+      "hex": "#2C2A46",
+      "rgb": [
+        44,
+        42,
+        70
+      ],
+      "type": "blue",
+      "hsl": [
+        244,
+        22,
+        25
+      ],
+      "count": 29,
+      "is_vibrant": false
+    }
+  ],
+  "images": [
+    {
+      "source": "local",
+      "path": "/home/diego/Escritorio/55eb1dc76d181276a9dbd5bb9c0f6406.png",
+      "width": 1024,
+      "height": 768,
+      "palette": [
+        {
+          "hex": "#F1F3F6",
+          "rgb": [
+            241,
+            243,
+            246
+          ],
+          "type": "cyan",
+          "hsl": [
+            216,
+            95,
+            22
+          ],
+          "count": 82,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2B2940",
+          "rgb": [
+            43,
+            41,
+            64
+          ],
+          "type": "blue",
+          "hsl": [
+            245,
+            21,
+            22
+          ],
+          "count": 71,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2B2A3E",
+          "rgb": [
+            43,
+            42,
+            62
+          ],
+          "type": "blue",
+          "hsl": [
+            243,
+            20,
+            19
+          ],
+          "count": 66,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2C294A",
+          "rgb": [
+            44,
+            41,
+            74
+          ],
+          "type": "blue",
+          "hsl": [
+            245,
+            23,
+            29
+          ],
+          "count": 62,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2B2942",
+          "rgb": [
+            43,
+            41,
+            66
+          ],
+          "type": "blue",
+          "hsl": [
+            245,
+            21,
+            23
+          ],
+          "count": 55,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#F0F2F5",
+          "rgb": [
+            240,
+            242,
+            245
+          ],
+          "type": "cyan",
+          "hsl": [
+            216,
+            95,
+            20
+          ],
+          "count": 45,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2C2948",
+          "rgb": [
+            44,
+            41,
+            72
+          ],
+          "type": "blue",
+          "hsl": [
+            246,
+            22,
+            27
+          ],
+          "count": 35,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2B2844",
+          "rgb": [
+            43,
+            40,
+            68
+          ],
+          "type": "blue",
+          "hsl": [
+            246,
+            21,
+            26
+          ],
+          "count": 33,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#F1F3F5",
+          "rgb": [
+            241,
+            243,
+            245
+          ],
+          "type": "cyan",
+          "hsl": [
+            210,
+            95,
+            17
+          ],
+          "count": 31,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2C2A46",
+          "rgb": [
+            44,
+            42,
+            70
+          ],
+          "type": "blue",
+          "hsl": [
+            244,
+            22,
+            25
+          ],
+          "count": 29,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2C2949",
+          "rgb": [
+            44,
+            41,
+            73
+          ],
+          "type": "blue",
+          "hsl": [
+            246,
+            22,
+            28
+          ],
+          "count": 29,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#2B2941",
+          "rgb": [
+            43,
+            41,
+            65
+          ],
+          "type": "blue",
+          "hsl": [
+            245,
+            21,
+            23
+          ],
+          "count": 29,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#E8EAEC",
+          "rgb": [
+            232,
+            234,
+            236
+          ],
+          "type": "cyan",
+          "hsl": [
+            210,
+            92,
+            10
+          ],
+          "count": 2259,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#202737",
+          "rgb": [
+            32,
+            39,
+            55
+          ],
+          "type": "cyan",
+          "hsl": [
+            222,
+            17,
+            26
+          ],
+          "count": 589,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#1C1C25",
+          "rgb": [
+            28,
+            28,
+            37
+          ],
+          "type": "gray",
+          "hsl": [
+            240,
+            13,
+            14
+          ],
+          "count": 551,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#ECEEF0",
+          "rgb": [
+            236,
+            238,
+            240
+          ],
+          "type": "cyan",
+          "hsl": [
+            210,
+            93,
+            12
+          ],
+          "count": 157,
+          "is_vibrant": false
+        },
+        {
+          "hex": "#292939",
+          "rgb": [
+            41,
+            41,
+            57
+          ],
+          "type": "cyan",
+          "hsl": [
+            240,
+            19,
+            16
+          ],
+          "count": 90,
+          "is_vibrant": false
+        }
+      ],
+      "dominant": {
+        "hex": "#F1F3F6",
+        "rgb": [
+          241,
+          243,
+          246
+        ],
+        "type": "cyan",
+        "hsl": [
+          216,
+          95,
+          22
+        ],
+        "count": 82,
+        "is_vibrant": false
+      },
+      "is_dark": true,
+      "moods": [
+        "dark"
+      ],
+      "has_glass": false,
+      "category": "dashboard"
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "meta": {
+    "url": "https://stripe.com",
+    "extracted_at": "2026-04-08T23:06:38.528362"
+  },
+  "detection": {
+    "category": "general",
+    "mood": [
+      "gradient"
+    ]
+  },
+  "structure": {
+    "sections": [
+      {
+        "name": "section-container navigation__layout",
+        "count": 66
+      },
+      {
+        "name": "hds-navigation-menu__content navigation-menu-conte",
+        "count": 25
+      },
+      {
+        "name": "hds-color-mode hero-section-container",
+        "count": 343
+      },
+      {
+        "name": "section-container hero-section__layout",
+        "count": 54
+      },
+      {
+        "name": "hero-section__layout-grid",
+        "count": 53
+      },
+      {
+        "name": "hero-section__eyebrow",
+        "count": 35
+      },
+      {
+        "name": "hds-button-group hero-section__actions",
+        "count": 10
+      },
+      {
+        "name": "section-background hero-section__background",
+        "count": 11
+      },
+      {
+        "name": "hero-wave-animation__contents",
+        "count": 6
+      },
+      {
+        "name": "section-container hero-logo-section",
+        "count": 275
+      },
+      {
+        "name": "logo-carousel__marquee-container",
+        "count": 273
+      },
+      {
+        "name": "hds-color-mode section",
+        "count": 189
+      }
+    ],
+    "navigation": [
+      [
+        "Pricing",
+        "Sign in",
+        "Start now",
+        "Contact sales",
+        "Sign inSign in",
+        "Contact sales"
+      ]
+    ]
+  },
+  "colors": {
+    "hex": [
+      "#ed5153",
+      "#0090da",
+      "#003478",
+      "#873eff",
+      "#ffad00",
+      "#294546",
+      "#ffd100",
+      "#980389",
+      "#fbbc04",
+      "#a4ce4e",
+      "#1a171b",
+      "#55544f",
+      "#d6d5d2",
+      "#ffd748",
+      "#95bf47",
+      "#ffcb48",
+      "#0aad0a",
+      "#ff671a",
+      "#194756",
+      "#a11d2b",
+      "#ea4335",
+      "#76b900",
+      "#34a853",
+      "#2d2d2d",
+      "#4285f4",
+      "#fafbfd",
+      "#0061a0",
+      "#061b31",
+      "#ff6201",
+      "#181818"
+    ],
+    "gradients": []
+  },
+  "components": {
+    "buttons": [
+      {
+        "text": "Products",
+        "primary": false
+      },
+      {
+        "text": "Solutions",
+        "primary": false
+      },
+      {
+        "text": "Developers",
+        "primary": false
+      },
+      {
+        "text": "Resources",
+        "primary": false
+      },
+      {
+        "text": "Pricing",
+        "primary": false
+      },
+      {
+        "text": "Sign in",
+        "primary": false
+      },
+      {
+        "text": "Start now",
+        "primary": true
+      },
+      {
+        "text": "Contact sales",
+        "primary": false
+      },
+      {
+        "text": "Back",
+        "primary": false
+      },
+      {
+        "text": "",
+        "primary": false
+      }
+    ],
+    "images": [
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/115d4Vd5LVAsqFGDR1ClAv/0ceb2c44a7a7182cd624262420af7544",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/vYmk6v8n7oDAwbDpwhjV6/846f9b3e214549b8f14e2b8c8cfe9343/",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/m9HBEK464p46FeNIhs2PV/f5054a93c8a0a6aabdd1c47675d610ae/",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/1j4wM9h2bBsyRFvTv6Wsn0/07f4b9b1e1e17fdc509d9087454dd8bc",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/43eqkFV1GG5GqcbNNeEzVp/8f4705b1b80a4c835c2960ed8055d649",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/5cRV5XgALGMWv62qKuH0Rw/f0429f90b5731f51c44c47b187626bbd",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/35tlu4t30wzqruDDASosxG/2ea30264594d8cb34463669716279117",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/63zO5Z4CABvFl3pLLhnu3l/a9c12c883f820dc29d29fa0b9dcb0814",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/24BNV3GGtvCprFLrYovyaa/b2eac20a1d5ec75e4bff3888b998d163",
+        "alt": "Aerial view of a street intersection whe"
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/37wKFanVluouT2iEZUbD0H/f75e77141e1330ad81ea18c6aea65f0c",
+        "alt": "Exterior view of a clothing boutique wit"
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/1v5hJ2NWvKpQfVbMqOzCpE/c900b9ed4c288f7cf0a0dced5f4983f2",
+        "alt": "Overhead view of a door stoop with a gro"
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/5AQ9A87KzwpPy4CD3uPz5C/4afd1a1e9d6e1d698c4c7c74a4868822",
+        "alt": "Street view of a traditional Parisian ne"
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/1CBkJePR5Cwf2QNIVCia1I/c0a702cec7a3814c69f21f86b89ed718",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/6fpvaTP1TZWXKWVMewABjV/4412b9ca2940d89d3834ac65c1fc329d",
+        "alt": ""
+      },
+      {
+        "src": "https://images.stripeassets.com/fzn2n1nzq965/7fM8bvEbivprOMM1zyow9N/3cad3cc826f96e4038b4ea88d81ebe3b",
+        "alt": ""
+      }
+    ]
+  },
+  "typography": {
+    "fonts": []
+  }
+}
