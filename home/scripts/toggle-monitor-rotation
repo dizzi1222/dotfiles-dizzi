@@ -4,7 +4,6 @@
 # Detecta el compositor activo y aplica la rotación correcta con estado persistente.
 #######################################################################################
 
-STATE_FILE="/tmp/monitor-rotation-state"
 MONITORS=(DP-1 DP-2 HDMI-A-1)
 
 # ── Detectar compositor ──────────────────────────────────────────────────────────────
@@ -23,15 +22,6 @@ detect_compositor() {
     fi
   else
     echo "unknown"
-  fi
-}
-
-# ── Leer estado actual ───────────────────────────────────────────────────────────────
-current_state() {
-  if [[ -f "$STATE_FILE" ]]; then
-    cat "$STATE_FILE"
-  else
-    echo "horizontal"
   fi
 }
 
@@ -89,26 +79,19 @@ restart_nemo() {
 ' | xargs -I{} hyprctl dispatch movetoworkspacesilent "9,address:{}"
 }
 
+# ── Selección con rofi ──────────────────────────────────────────────────────────────
+CHOICE=$(echo -e "󰍹 󰯎  Vertical\n󰍹 󰯍  Horizontal" | rofi -dmenu -p "Rotación del monitor" -selected-row 1 -timeout 10 -theme-str 'window {width: 300px;}' 2>/dev/null)
+
 # ── Main ─────────────────────────────────────────────────────────────────────────────
 COMPOSITOR=$(detect_compositor)
-STATE=$(current_state)
 
 if [[ "$COMPOSITOR" == "unknown" ]]; then
   notify-send "toggle-monitor-rotation" "Compositor no soportado" --urgency=critical
   exit 1
 fi
 
-if [[ "$STATE" == "horizontal" ]]; then
-  NEW_STATE="vertical"
-  case "$COMPOSITOR" in
-  niri) apply_niri "90" ;;
-  hyprland) apply_hyprland "1" ;;
-  cinnamon) apply_xrandr "left" ;;
-  plasma-x11) apply_xrandr "left" ;;
-  plasma-wayland) apply_plasma_wayland "left" ;;
-  esac
-  notify-send "  Monitor" "Modo vertical activado"
-else
+# Default: horizontal si no eligió nada o eligió horizontal
+if [[ -z "$CHOICE" ]] || [[ "$CHOICE" == *"Horizontal"* ]]; then
   NEW_STATE="horizontal"
   case "$COMPOSITOR" in
   niri) apply_niri "normal" ;;
@@ -118,9 +101,18 @@ else
   plasma-wayland) apply_plasma_wayland "none" ;;
   esac
   notify-send "  Monitor" "Modo horizontal activado"
+else
+  NEW_STATE="vertical"
+  case "$COMPOSITOR" in
+  niri) apply_niri "90" ;;
+  hyprland) apply_hyprland "1" ;;
+  cinnamon) apply_xrandr "left" ;;
+  plasma-x11) apply_xrandr "left" ;;
+  plasma-wayland) apply_plasma_wayland "left" ;;
+  esac
+  notify-send "  Monitor" "Modo vertical activado"
 fi
 
-echo "$NEW_STATE" >"$STATE_FILE"
 restart_nemo "$COMPOSITOR"
 # Para ocultar Nemo al final de la rotación
 sleep 2 && hyprctl dispatch workspace 2

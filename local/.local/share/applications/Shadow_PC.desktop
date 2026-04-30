@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Shadow PC
+Comment=Open Shadow PC
+# Exec=brave --app="https://pc.shadow.tech/home/launch"
+Exec=firefox --new-window --kiosk "https://pc.shadow.tech/home/launch"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Shadow_PC.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Shadow_PC

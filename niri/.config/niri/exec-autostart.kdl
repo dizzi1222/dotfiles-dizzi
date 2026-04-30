@@ -69,7 +69,12 @@ spawn-at-startup "hypridle"
 
 // Input remapper
 spawn-sh-at-startup "sh ~/scripts/setup-keyboard.sh"
-// spawn-sh-at-startup "input-remapper-control --command start --device 'Logitech G305' --preset 'Mouse para ZURDOS kukardos'"
+// Para Logitetch G305 gaming mouse con preset "Mouse para ZURDOS kukardos"
+spawn-sh-at-startup "input-remapper-control --command start --device 'Logitech G305' --preset 'Mouse para ZURDOS kukardos'"
+// Para Compx 2.4G Wireless Receiver con preset "teclado-Bluetooth"
+spawn-sh-at-startup "input-remapper-control --command start --device 'Compx 2.4G Wireless Receiver' --preset 'teclado-Bluetooth'"
+// Para AT Translated Set 2 keyboard con preset "teclado-classmate"
+spawn-sh-at-startup "input-remapper-control --command start --device 'AT Translated Set 2 keyboard' --preset 'teclado-classmate'"
 
 // DBus
 spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"

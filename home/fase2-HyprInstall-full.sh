@@ -399,6 +399,7 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
     gfn-electron xbox-cloud-gaming sunshine moonlight-qt geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
+  pacman -Qs appimagelauncher >/dev/null && { [[ -f ~/Applications/Shadow*.AppImage ]] || { print_status "Shadow PC no encontrado => Descargando..."; mkdir -p ~/Applications && wget -q --show-progress -O ~/Applications/Shadow.AppImage https://update.shadow.tech/launcher/linux/shadow.AppImage && chmod +x ~/Applications/Shadow.AppImage && print_success "Shadow PC descargado"; }; }
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -625,7 +626,7 @@ esac
 # ═══════════════════════════════════════════════════════════
 print_installing "Aplicaciones extra y de Música/OCIO, Youtube Music [pear-desktop], Discord, Soundbound (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  brave-bin zen-browser-bin spotify pear-desktop-bin soundbound-app-bin \
+  brave-bin firefox zen-browser-bin spotify pear-desktop-bin soundbound-app-bin \
   vencord-bin telegram-desktop-bin bitwarden gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
@@ -1395,7 +1396,7 @@ sudo pacman -S --needed --noconfirm \
   llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code n8n postgresql clawdbot gemini-cli-git aichat
+  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat
 print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
@@ -3803,145 +3804,117 @@ echo
 print_success "Configuración de backups completada"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 34.5: DISPLAY MANAGER (GDM O SDDM) - MEJORADO
+# PASO 34.5: DISPLAY MANAGER UNIFICADO (GDM / SDDM / LIGHTDM)
 # ═══════════════════════════════════════════════════════════
-print_step "34.5/35: Display Manager (GDM o SDDM)"
-
+print_step "34.5/35: Display Manager (GDM, SDDM o LightDM)"
 echo
 echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
-echo
-echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
-echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
-echo
-echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
-echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
-echo
-echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
-echo
-read -p "Seleccionar Display Manager [1=GDM, 2=SDDM, 3=Ninguno]: " dm_choice
+echo -e "${BOLD}${GREEN}1. GDM${NC} | ${MAGENTA}•${NC} Interfaz limpia y moderna"
+echo -e "${BOLD}${GREEN}2. SDDM${NC} + Astronaut | ${MAGENTA}•${NC} 10 temas visuales"
+echo -e "${BOLD}${GREEN}3. LightDM${NC} + WebKit2 | ${MAGENTA}•${NC} Glorious / Aether"
+echo -e "${BOLD}${GREEN}4. Ninguno${NC} (mantener actual)"
+read -p "Seleccionar [1=GDM, 2=SDDM, 3=LightDM, 4=Ninguno]: " dm_choice
 
-if [[ "$dm_choice" == "2" ]]; then
-  print_header "🚀 Instalando SDDM + Astronaut Theme (Versión Mejorada)"
-
-  # Paso 1: Instalar SDDM y dependencias
-  print_installing "SDDM + Dependencias Qt6"
-  sudo pacman -S --needed --noconfirm \
-    sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
-  # Fix 1 - graphical target
+if [[ "$dm_choice" == "1" ]]; then
+  print_header "Instalando GDM"
+  sudo pacman -Sy --needed --noconfirm gdm
   sudo systemctl set-default graphical.target
-  sudo reboot
-  # Fix 2 - restaurar desktop files
-  sudo pacman -S hyprland  # reinstalación restauró hyprland.desktop
-  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
-  #  Fix 3 - restaurar sddm.service
+  sudo systemctl disable sddm lightdm 2>/dev/null || true
+  sudo systemctl enable gdm
   sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
+  print_success "GDM habilitado"
+elif [[ "$dm_choice" == "2" ]]; then
+  print_header "Instalando SDDM + Astronaut Theme"
+  sudo pacman -Sy --needed --noconfirm sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
+  sudo systemctl set-default graphical.target
+  sudo systemctl disable gdm lightdm 2>/dev/null || true
   print_success "SDDM instalado"
-  # Paso 2: Limpiar instalación anterior si existe
-  print_status "Limpiando instalaciones previas del tema..."
-  sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
-  rm -rf /tmp/sddm-astronaut-theme
-
-  # Paso 3: Clonar tema en /tmp
-  print_installing "Clonando tema Astronaut"
-  cd /tmp
-  git clone --depth 1 https://github.com/keyitdev/sddm-astronaut-theme.git
-  cd sddm-astronaut-theme
-
+  print_status "Limpiando instalaciones previas..."
+  sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme /tmp/sddm-astronaut-theme
+  print_installing "Clonando tema Astronaut..."
+  cd /tmp && git clone --depth 1 https://github.com/keyitdev/sddm-astronaut-theme.git && cd sddm-astronaut-theme
   print_success "Tema clonado"
-
-  # Paso 4: Verificar que setup.sh existe
-  if [[ ! -f "setup.sh" ]]; then
-    print_error "Error: setup.sh no encontrado"
-    print_warning "Instalando tema manualmente..."
-
-    # Fallback: instalación manual
-    sudo cp -r /tmp/sddm-astronaut-theme /usr/share/sddm/themes/
-
-    if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
-      sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
-      fc-cache -fv >/dev/null
-    fi
-  else
-    # Paso 5: Hacer setup.sh ejecutable
-    chmod +x setup.sh
-
-    # Paso 6: Ejecutar setup.sh INTERACTIVO
-    print_status "Iniciando configuración interactiva del tema..."
-    echo
-    echo -e "${CYAN}╔═══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║  ${BOLD}CONFIGURACIÓN INTERACTIVA DEL TEMA ASTRONAUT${NC}${CYAN}    ║${NC}"
-    echo -e "${CYAN}╠═══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${CYAN}║  Podrás elegir:                                       ║${NC}"
-    echo -e "${CYAN}║  • Uno de los 10 temas visuales disponibles           ║${NC}"
-    echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
-    echo
-    read -p ""
-
-    # Ejecutar setup.sh con sudo (necesario para copiar a /usr/share)
-    sudo bash setup.sh
-
-    print_success "Tema configurado mediante setup.sh"
-  fi
-
-  # Paso 7: Configurar SDDM para usar el tema
-  print_status "Configurando SDDM..."
-
+  # Copiar primero como root, dar permisos al usuario para ejecutar setup.sh
+  sudo cp -r /tmp/sddm-astronaut-theme /usr/share/sddm/themes/
+  sudo chown -R $USER:$USER /usr/share/sddm/themes/sddm-astronaut-theme/
+  [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]] && sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null && fc-cache -fv >/dev/null
+  echo -e "${CYAN}Elige uno de los 10 temas disponibles...${NC}"
+  bash setup.sh
+  sudo chown -R root:root /usr/share/sddm/themes/sddm-astronaut-theme/
+  cd ~
   sudo tee /etc/sddm.conf >/dev/null <<EOF
 [Theme]
 Current=sddm-astronaut-theme
-
 [General]
 InputMethod=qtvirtualkeyboard
 EOF
-
-  # Paso 8: Configurar teclado virtual en conf.d
   sudo mkdir -p /etc/sddm.conf.d
   sudo tee /etc/sddm.conf.d/virtualkbd.conf >/dev/null <<EOF
 [General]
 InputMethod=qtvirtualkeyboard
 EOF
-
-  print_success "Configuración de SDDM completada"
-
-  # Paso 9: Copiar fuentes si existen
-  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
-    print_status "Instalando fuentes del tema..."
-    sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
-    fc-cache -fv >/dev/null
-    print_success "Fuentes instaladas"
-  fi
-
-  # Paso 10: Habilitar servicio SDDM
-  print_status "Habilitando servicio SDDM..."
+  [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]] && sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null && fc-cache -fv >/dev/null
   sudo systemctl enable sddm
-  print_success "SDDM habilitado"
-
-  # Resumen final
-  echo
-  echo -e "${GREEN}${BOLD}✨ SDDM + Astronaut Theme instalado correctamente ✨${NC}"
-  echo
-  echo -e "${CYAN}Comandos útiles:${NC}"
-  echo -e "  ${YELLOW}•${NC} Probar tema: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
-  echo -e "  ${YELLOW}•${NC} Editar config: ${YELLOW}sudo nano /etc/sddm.conf${NC}"
-  echo -e "  ${YELLOW}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
-  echo
-
-elif [[ "$dm_choice" == "1" ]]; then
-  print_header "Instalando GDM"
-  print_installing "GDM (GNOME Display Manager)"
-  sudo pacman -S --needed --noconfirm gdm
-  sudo systemctl enable gdm
+  sudo ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
+  cd ~
+  print_success "SDDM + Astronaut Theme habilitado"
+elif [[ "$dm_choice" == "3" ]]; then
+  print_header "Instalando LightDM + WebKit2 Theme"
+  BACKUP_DIR=~/lightdm-backup-$(date +%Y%m%d_%H%M%S)
+  mkdir -p "$BACKUP_DIR"
+  sudo cp /etc/lightdm/lightdm.conf "$BACKUP_DIR/" 2>/dev/null || true
+  sudo cp /etc/lightdm/lightdm-webkit2-greeter.conf "$BACKUP_DIR/" 2>/dev/null || true
+  print_success "Backup en: $BACKUP_DIR"
+  echo -e "${BOLD}${GREEN}Temas: 1.${NC} Glorious  ${BOLD}${GREEN}2.${NC} Aether"
+  read -p "Seleccionar [1/2]: " webkit_choice
+  sudo pacman -Sy --needed --noconfirm lightdm lightdm-webkit2-greeter wget
   sudo systemctl set-default graphical.target
-  sudo reboot
-  sudo pacman -S hyprland  # reinstalación restauró hyprland.desktop
-  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
-  #  Fix 4 - restaurar gdm.service
-  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
-  print_success "GDM habilitado"
+  sudo systemctl disable gdm sddm 2>/dev/null || true
+  print_success "Dependencias instaladas"
+  sudo sed -i 's/^#*greeter-session=.*/greeter-session=lightdm-webkit2-greeter/' /etc/lightdm/lightdm.conf
+  grep -q "^greeter-session=lightdm-webkit2-greeter" /etc/lightdm/lightdm.conf || sudo sed -i '/^\[Seat:\*\]/a greeter-session=lightdm-webkit2-greeter' /etc/lightdm/lightdm.conf
+  THEMES_DIR="/usr/share/lightdm-webkit/themes"
+  sudo mkdir -p "$THEMES_DIR"
+  if [[ "$webkit_choice" == "1" ]]; then
+    THEME_NAME="glorious"
+    cd /tmp
+    wget -q git.io/webkit2 -O theme.tar.gz 2>/dev/null || wget -q https://github.com/manilarome/lightdm-webkit2-theme-glorious/releases/download/v2.0.0/lightdm-webkit2-theme-glorious-2.0.0.tar.gz -O theme.tar.gz 2>/dev/null
+    mkdir -p /tmp/glorious_theme && tar -xzf theme.tar.gz -C /tmp/glorious_theme/ 2>/dev/null
+    sudo mv /tmp/glorious_theme "$THEMES_DIR/glorious" 2>/dev/null || sudo cp -r /tmp/glorious_theme/* "$THEMES_DIR/glorious/" 2>/dev/null
+    rm -rf /tmp/glorious_theme theme.tar.gz && cd ~
+  else
+    THEME_NAME="aether"
+    git clone --depth 1 https://github.com/NoiSek/Aether.git /tmp/aether_theme 2>/dev/null || {
+      THEME_NAME="glorious"
+      cd /tmp && wget -q git.io/webkit2 -O theme.tar.gz 2>/dev/null
+      mkdir -p /tmp/glorious_theme && tar -xzf theme.tar.gz -C /tmp/glorious_theme/ 2>/dev/null
+      sudo mv /tmp/glorious_theme "$THEMES_DIR/glorious" 2>/dev/null
+      rm -rf theme.tar.gz && cd ~
+    }
+    [[ -d /tmp/aether_theme ]] && sudo cp -r /tmp/aether_theme "$THEMES_DIR/aether" && rm -rf /tmp/aether_theme
+  fi
+  WEBKIT_CONF="/etc/lightdm/lightdm-webkit2-greeter.conf"
+  if [[ ! -f "$WEBKIT_CONF" ]]; then
+    sudo tee "$WEBKIT_CONF" > /dev/null <<EOF
+[greeter]
+debug_mode          = false
+detect_theme_errors = true
+screensaver_timeout = 300
+secure_mode         = true
+time_format         = LT
+time_language       = auto
+webkit_theme        = $THEME_NAME
+EOF
+  else
+    sudo sed -i "s/^webkit_theme.*/webkit_theme        = $THEME_NAME/" "$WEBKIT_CONF"
+    sudo sed -i "s/^debug_mode.*/debug_mode          = true/" "$WEBKIT_CONF"
+  fi
+  sudo systemctl enable lightdm
+  sudo ln -sf /usr/lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
+  print_success "LightDM habilitado"
 else
   print_warning "Display Manager omitido (manteniendo actual)"
 fi
