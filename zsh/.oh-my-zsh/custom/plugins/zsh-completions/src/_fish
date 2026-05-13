@@ -1,6 +1,6 @@
-#compdef rev
+#compdef fish
 # ------------------------------------------------------------------------------
-# Copyright (c) 2025 Github zsh-users - https://github.com/zsh-users
+# Copyright (c) 2026 Github zsh-users - https://github.com/zsh-users
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -24,7 +24,7 @@
 # Description
 # -----------
 #
-#  Completion script for rev v2.41 (https://github.com/util-linux/util-linux)
+#  Completion script for fish 4.6.0 (https://fishshell.com/)
 #
 # ------------------------------------------------------------------------------
 # Authors
@@ -34,10 +34,27 @@
 #
 # ------------------------------------------------------------------------------
 
-_arguments \
-  '(- *)'{-h,--help}'[display help]' \
-  '(- *)'{-V,--version}'[display version]' \
-  '(-0 --zero)'{-0,--zero}'[use the nul character as line separator]'
+_fish_debug_categories() {
+  local -a categories=(${(f)"$(fish --print-debug-categories | awk '{n=$1;$1="";printf("%s[%s]\n",n,substr($0,2)) }')"})
+  _values -s ',' categories $categories
+}
+
+_arguments -s \
+  '(-c --command)'{-c,--command=}'[Evaluate the specified commands instead of reading from the commandline]:command' \
+  '(-C --init-command)'{-C,--init-command=}'[Evaluate specified commands after reading the configuration]:command' \
+  '(-d --debug)'{-d,--debug=}'[Enable debug output and specify a pattern for matching categories]:categories:_fish_debug_categories' \
+  '(-i --interactive)'{-i,--interactive}'[The shell is interactive]' \
+  '(-l --login)'{-l,--login}'[Act as if invoked as a login shell]' \
+  '(-N --no-config)'{-N,--no-config}'[Do not read configuration files]' \
+  '(-n --no-execute)'{-n,--no-execute}'[Do not execute any commands, only perform syntax checking]' \
+  '(-p --profile)'{-p,--profile=}'[Output timing information on all executed commands to the specified file]:file:_files' \
+  '--profile-startup=[Write timing for fish startup to specified file]:file:_files' \
+  '(-P --private)'{-P,--private}'[Enable private mode]' \
+  '--print-rusage-self[When fish exits, output stats from getrusage]' \
+  '(- *)--print-debug-categories[Print all debug categories, and then exit]' \
+  '(- *)'{-v,--version}'[Print version and exit]' \
+  '(-f --features)'{-f,--features}'[Enable one or more comma-separated feature flags]:features' \
+  '*:: :_files'
 
 # Local Variables:
 # mode: Shell-Script
