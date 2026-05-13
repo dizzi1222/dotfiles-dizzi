@@ -18,6 +18,12 @@ ollama pull deepseek-v3.2:cloud
 ollama pull qwen3-next:80b-cloud
 ollama pull gemini-3-flash-preview:cloud
 ollama pull mistral-large-3:675b-cloud
+echo ""
+echo -e "${BLUE}🤖 Descargando modelos local para Ollama...${NC}"
+ollama pull llama3.2:1b
+ollama pull llama3.2:3b
+ollama pull phi3:mini
+ollama pull qwen2.5:3b
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 echo -e "${CYAN}📋 TODO INSTALADO, recuerda logearte${NC}"

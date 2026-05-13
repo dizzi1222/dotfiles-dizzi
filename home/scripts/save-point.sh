@@ -4,7 +4,7 @@
 # ================================================================================
 
 SAVE_BRANCH="main"
-SAVE_COMMIT="ca3ded6"
+SAVE_COMMIT="7f29444"
 SAVE_MSG="feat(dotfiles): add design-extract blueprint tool, arzopa vertical fix & hypr/niri sync.mejorar el cierre de waydroid y añadir soporte para HDMI-A-1 en rotación de monitores ✨ (input-remapper): añadir configuración para mouse Logitech G305 zurdo y actualizar mapeo de teclas ♻️ (hypr/niri): centralizar configuración de teclados en script setup-keyboard.sh y añadir rotación automática de monitores 📝 (nvim): actualizar subproyecto de configuración de Neovim ➕ (local): añadir lanzador de escritorio para Geforce Now Web"
 
 # ── Verificar dependencia ────────────────────────────────────────────────────────

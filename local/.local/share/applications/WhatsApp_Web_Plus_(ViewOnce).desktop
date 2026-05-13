@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=WhatsApp Web Plus (ViewOnce)
+Comment=Open WhatsApp Web Plus (ViewOnce)
+Exec=brave --app="https://web.whatsapp.com/"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/WhatsApp_Web_Plus_(ViewOnce).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=WhatsApp_Web_Plus_(ViewOnce)
