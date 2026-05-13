@@ -116,3 +116,5 @@ fi
 restart_nemo "$COMPOSITOR"
 # Para ocultar Nemo al final de la rotación
 sleep 2 && hyprctl dispatch workspace 2
+# Para cerrar hyprpaper y que no se quede con el fondo sin actualizar (PANTALLA NEGRA - BLACK SCREEN)
+killall hyprpaper
