@@ -4,17 +4,21 @@
     name = dizzi1222
     email = diegosamuel042@gmail.com
 [credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+helper = 
+helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+helper = 
+helper = !/usr/bin/gh auth git-credential
 
 [core]
-	editor = nvim
-	filemode = true
+editor = nvim
+filemode = true
 	quotepath = false
 	precomposeunicode = true
 [i18n]
 	commitencoding = utf-8
 	logoutputencoding = utf-8
+
+# Author: dhardi007 | Committer: dizzi1222
+[alias]
+    commitd = "!f() { GIT_AUTHOR_NAME=\"dhardi007\" GIT_AUTHOR_EMAIL=\"dhardi@cinnnatus.edu.do\" git commit \"$@\"; }; f"

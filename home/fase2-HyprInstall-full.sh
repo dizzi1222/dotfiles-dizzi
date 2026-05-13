@@ -128,1472 +128,7 @@ done 2>/dev/null) &
 SUDO_PID=$!
 trap "kill $SUDO_PID 2>/dev/null" EXIT
 
-# ═══════════════════════════════════════════════════════════
-# PASO 1: YAY
-# ═══════════════════════════════════════════════════════════
-print_step "1/35: YAY (AUR Helper)"
-
-if ! command -v yay &>/dev/null; then
-  print_installing "yay (AUR helper)"
-
-  sudo pacman -S --needed --noconfirm git base-devel
-  rm -rf ~/yay-tmp
-
-  cd ~
-  git clone https://aur.archlinux.org/yay.git ~/yay-tmp
-  cd ~/yay-tmp
-  makepkg -si --noconfirm
-  cd ~
-  rm -rf ~/yay-tmp
-
-  print_success "yay instalado"
-else
-  print_success "yay ya instalado"
-fi
-
-if ! command -v yay &>/dev/null; then
-  print_error "yay no se instaló. Abortando."
-  exit 1
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 2: ACTUALIZAR SISTEMA
-# ═══════════════════════════════════════════════════════════
-print_step "2/35: Actualizar Sistema"
-print_installing "Actualizando paquetes del sistema"
-sudo pacman -Syu --noconfirm
-print_success "Sistema actualizado"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 3: AUDIO
-# ═══════════════════════════════════════════════════════════
-print_step "3/35: Audio (PipeWire)"
-print_installing "PipeWire + EasyEffects + Pavucontrol"
-sudo pacman -S --needed --noconfirm \
-  pipewire pipewire-pulse pipewire-alsa pipewire-jack \
-  wireplumber pavucontrol easyeffects
-print_success "Audio configurado"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 4: BLUETOOTH
-# ═══════════════════════════════════════════════════════════
-print_step "4/35: Bluetooth"
-print_installing "BlueZ + Blueman + Bluetuith"
-sudo pacman -S --needed --noconfirm \
-  bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO # bluez en conflicto con bluez-ps3 lo quite
-
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  bluez bluetuith 2>/dev/null || true  # necesitas bluez-ps3  para que funcione el bluetooth en wine/bottles PS3 CONTROLLER
-
-sudo systemctl enable --now bluetooth
-print_success "Bluetooth habilitado"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 5: FONTS
-# ═══════════════════════════════════════════════════════════
-print_step "5/35: Fuentes"
-print_installing "Noto Fonts + Nerd Fonts + Adobe Source Han"
-sudo pacman -S --needed --noconfirm \
-  noto-fonts noto-fonts-emoji noto-fonts-cjk \
-  ttf-jetbrains-mono-nerd ttf-firacode-nerd \
-  ttf-font-awesome ttf-dejavu ttf-liberation \
-  adobe-source-han-sans-otc-fonts \
-  adobe-source-han-serif-otc-fonts
-sh ~/.local/bin/MAC-theme🫟🔴🔵🟢 && sh ~/scripts/fix-gtk-fonts-icons.sh
-
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  ttf-iosevka ttf-mononoki-nerd otf-hermit-nerd 2>/dev/null || true
-
-fc-cache -fv >/dev/null
-print_success "Fuentes instaladas"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 6: HABILITAR MULTILIB
-# ═══════════════════════════════════════════════════════════
-print_step "6/35: Multilib (soporte 32-bit)"
-if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
-  print_status "Habilitando repositorio multilib..."
-  sudo sed -i '/\[multilib\]/,/Include/s/^#//' /etc/pacman.conf
-  sudo pacman -Sy
-  print_success "Multilib habilitado"
-else
-  print_success "Multilib ya habilitado"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 7: HYPRLAND
-# ═══════════════════════════════════════════════════════════
-print_step "7/35: Hyprland Ecosystem"
-print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
-
-# 🔧 Fix CachyOS: swww se llama awww y necesita symlinks
-if grep -qi "cachyos" /etc/os-release 2>/dev/null; then
-  print_warning "CachyOS detectado: instalando awww en lugar de swww"
-  SWWW_PKG="awww"
-else
-  SWWW_PKG="swww"
-fi
-
-sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot cage \
-  waybar rofi-wayland dunst \
-  kitty ghostty thunar nemo \
-  grim slurp wl-clipboard cliphist \
-  brightnessctl playerctl pamixer \
-  swaync hyprlock hypridle hyprpicker \
-  wofi fuzzel polkit-kde-agent polkit-gnome udiskie nwg-displays \
-  $SWWW_PKG hyprpaper hyprshot \
-  qt5-wayland qt6-wayland gtk-layer-shell
-
-# 🔧 Fix CachyOS: crear symlinks swww → awww para compatibilidad total
-if [[ "$SWWW_PKG" == "awww" ]]; then
-  print_status "Aplicando fix swww→awww (symlinks)..."
-  sudo ln -sf /usr/bin/awww /usr/local/bin/swww
-  sudo ln -sf /usr/bin/awww-daemon /usr/local/bin/swww-daemon
-  mkdir -p ~/.cache/awww
-  print_success "Symlinks creados: swww → awww"
-fi
-
-yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
-echo
-echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
-print_success "Hyprland instalado"
-print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
-[Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 8: DRIVERS
-# ═══════════════════════════════════════════════════════════
-print_step "8/35: Drivers Gráficos"
-print_installing "Mesa + Vulkan + Drivers 32-bit"
-sudo pacman -S --needed --noconfirm \
-  mesa vulkan-icd-loader vulkan-intel intel-gpu-tools \
-  lib32-mesa lib32-vulkan-icd-loader lib32-vulkan-intel \
-  xf86-input-libinput xf86-input-synaptics
-print_success "Drivers instalados"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 9: CODECS
-# ═══════════════════════════════════════════════════════════
-print_step "9/35: Codecs Multimedia"
-print_installing "FFmpeg + GStreamer + NTFS"
-sudo pacman -S --needed --noconfirm \
-  gst-plugins-base gst-plugins-good \
-  gst-plugins-bad gst-plugins-ugly \
-  gst-libav ffmpeg ntfs-3g exfatprogs
-print_success "Codecs instalados"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 10: UTILIDADES
-# ═══════════════════════════════════════════════════════════
-print_step "10/35: Utilidades del Sistema"
-print_installing "Neovim + Zsh + Tmux + Yazi + Btop + Fastfetch"
-sudo pacman -S --needed --noconfirm \
-  neovim zsh zsh-autosuggestions zsh-syntax-highlighting \
-  zsh-history-substring-search zsh-completions starship tmux zellij bat eza dust fd ripgrep fzf \
-  htop btop bottom ncdu tree jq socat \
-  yazi stow ranger imagemagick \
-  inotify-tools acpi power-profiles-daemon cpupower \
-  gparted partitionmanager udiskie \
-  tig git-filter-repo man-db fastfetch bluetui impala networkmanager-dmenu gedit hyprsunset rsync gnome-calculator gnome-system-monitor
-
-print_installing "Utilidades extra AUR (pokemon-colorscripts, cava, zoxide)"
-print_installing "Interfaces: bluetui, impala. Para gestionar el Bluetooth y Wifi [mismos devs]"
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  pokemon-colorscripts cmatrix cava zoxide thefuck \
-  2>/dev/null || print_warning "Algunas utilidades AUR fallaron"
-
-print_success "Utilidades instaladas"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 10.5: INSTALAR KEW MUSIC PLAYER (OPCIONAL)
-# ═══════════════════════════════════════════════════════════
-print_step "10.5/25: Kew Music Player (OPCIONAL)"
-echo
-read -p "¿Instalar Kew Music Player? (compila 2-3 min) [s/N]: " install_kew
-
-if [[ "$install_kew" =~ ^[Ss]$ ]]; then
-  print_installing "Dependencias para Kew Music Player"
-  sudo pacman -S --needed --noconfirm \
-    pkg-config faad2 taglib fftw gcc make chafa glib2 opus opusfile libvorbis libogg
-
-  print_installing "Clonando y compilando Kew (2-3 min)"
-
-  if [[ -d ~/kew ]]; then
-    rm -rf ~/kew
-  fi
-
-  cd ~
-  git clone https://github.com/ravachol/kew.git
-  cd kew
-  make -j$(nproc)
-  sudo make install
-  cd ~
-
-  # Crear .desktop
-  mkdir -p ~/.local/share/applications
-  cat >~/.local/share/applications/kew.desktop <<'EOL'
-[Desktop Entry]
-Name=Kew Music Player
-Comment=Terminal music player
-Exec=kitty kew
-Icon=audio-x-generic
-Terminal=false
-Type=Application
-Categories=AudioVideo;Audio;Player;
-EOL
-
-  print_success "Kew instalado. Usa: kew en la terminal"
-else
-  print_warning "Kew omitido"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 11: GAMING (INTERACTIVO) - SOLO -BIN
-# ═══════════════════════════════════════════════════════════
-print_step "11/35: Gaming (Optimizado - Solo binarios)"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎮 CONFIGURACIÓN DE GAMING 🎮                    ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Se instalará en 3 categorías (SOLO BINARIOS):${NC}"
-echo
-echo -e "${BOLD}${GREEN}Categoría 1: Plataformas Base${NC} (~2GB)"
-echo -e "  ${MAGENTA}•${NC} Steam"
-echo -e "  ${MAGENTA}•${NC} Lutris"
-echo -e "  ${MAGENTA}•${NC} Wine-staging + Winetricks"
-echo -e "  ${MAGENTA}•${NC} GameMode"
-echo -e "  ${MAGENTA}•${NC} Bottles para Juegos [Wine-GE]"
-echo -e "  ${MAGENTA}•${NC} Geforce Experience, Infinitty, Now"
-echo -e "  ${RED}•${NC} ${RED}Bottles (compila 1+ hora)${NC}"
-echo
-echo -e "${BOLD}${GREEN}Categoría 2: Compatibilidad Windows${NC} (~500MB)"
-echo -e "  ${MAGENTA}•${NC} Proton-GE-bin (precompilado)"
-echo -e "  ${MAGENTA}•${NC} VKD3D (DirectX 12 → Vulkan)"
-echo -e "  ${MAGENTA}•${NC} DXVK-bin (precompilado)"
-echo -e "  ${MAGENTA}•${NC} Wine-GE Custom"
-echo
-echo -e "${BOLD}${GREEN}Categoría 3: Emuladores${NC} (~1.5GB)"
-echo -e "  ${MAGENTA}•${NC} Ryujinx-bin (precompilado)"
-echo -e "  ${MAGENTA}•${NC} Dolphin (GameCube/Wii)"
-echo -e "  ${MAGENTA}•${NC} SNES9x (Super Nintendo)"
-echo
-read -p "¿Instalar Plataformas Base (Steam, Lutris, Wine) y Geforce Experience? [S/n]: " install_base
-read -p "¿Instalar Compatibilidad Windows (Proton-GE, VKD3D, DXVK)? [S/n]: " install_compat
-read -p "¿Instalar Emuladores? [S/n]: " install_emu
-
-# ═══════════════════════════════════════════════════════════
-# Categoría 1: Plataformas Base
-# ═══════════════════════════════════════════════════════════
-if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
-  echo
-  print_header "Instalando Plataformas Base de Gaming"
-
-  print_installing "Steam + Lutris + GameMode + Wine-staging"
-  sudo pacman -S --needed --noconfirm \
-    gamescope steam lutris wine-staging winetricks \
-    gamemode lib32-gamemode && sudo usermod -aG gamemode $(whoami)
-
-  print_installing "Geforce Experience"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gfn-electron xbox-cloud-gaming sunshine moonlight-qt geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
-  pacman -Qs appimagelauncher >/dev/null && { [[ -f ~/Applications/Shadow*.AppImage ]] || { print_status "Shadow PC no encontrado => Descargando..."; mkdir -p ~/Applications && wget -q --show-progress -O ~/Applications/Shadow.AppImage https://update.shadow.tech/launcher/linux/shadow.AppImage && chmod +x ~/Applications/Shadow.AppImage && print_success "Shadow PC descargado"; }; }
-
-  print_success "Plataformas base instaladas"
-  print_warning "Bottles omitido (instalar después con: yay -S bottles)"
-else
-  print_warning "Plataformas base omitidas"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# Categoría 2: Compatibilidad Windows
-# ═══════════════════════════════════════════════════════════
-if [[ ! "$install_compat" =~ ^[Nn]$ ]]; then
-  echo
-  print_header "Instalando Compatibilidad Windows"
-
-  print_installing "Proton-GE-bin + VKD3D + DXVK-bin + Wine-GE"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    proton-ge-custom-bin vkd3d-proton dxvk-bin wine-ge-custom \
-    2>/dev/null || print_warning "Algunos paquetes fallaron"
-
-  print_success "Compatibilidad Windows instalada"
-else
-  print_warning "Compatibilidad Windows omitida"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# Categoría 3: Emuladores
-# ═══════════════════════════════════════════════════════════
-if [[ ! "$install_emu" =~ ^[Nn]$ ]]; then
-  echo
-  print_header "Instalando Emuladores"
-
-  print_installing "Ryujinx-bin + Dolphin + SNES9x"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    ryujinx-bin dolphin-emu snes9x-gtk \
-    2>/dev/null || print_warning "Algunos emuladores fallaron"
-
-  print_success "Emuladores instalados"
-else
-  print_warning "Emuladores omitidos"
-fi
-
-print_success "Gaming configurado (sin compilaciones)"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 12: CONTROLLERS (CORREGIDO - Conflicto joyutils)
-# ═══════════════════════════════════════════════════════════
-print_step "12/35: Controllers (PS3/PS4/PS5/Xbox)"
-print_installing "Drivers para controles + Input Remapper"
-sudo pacman -S --needed --noconfirm \
-  evtest android-udev \
-  libusb-compat xorg-xinput
-
-# 🔴 CORRECCIÓN: Remover linuxconsole antes de instalar joyutils
-sudo pacman -R --noconfirm linuxconsole 2>/dev/null || true
-
-sudo pacman -S --needed --noconfirm joyutils # Ahora instalar joyutils sin conflicto
-
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  xpadneo-dkms input-remapper espanso-wayland \
-  2>/dev/null || print_warning "Algunos drivers fallaron"
-
-sudo tee /etc/udev/rules.d/99-8bitdo-xinput.rules << 'EOF'
-ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 310a > /sys/bus/usb/drivers/xpad/new_id'"
-ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", MODE="0666"
-EOF
-sudo udevadm control --reload-rules && sudo systemctl restart dkms # 8bitdo ultimate 2c wireless - bt→xinput (reemplaza aur package roto:8bitdo-ultimate-controller-udev | xboxrdrv )
-
-sudo groupadd uinput 2>/dev/null || true
-sudo usermod -aG input,uinput $USER # Crear grupos
-
-print_success "Controllers configurados"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 12.5: CONFIGURACIÓN ESPECÍFICA PS3 (INTERACTIVO)
-# ═══════════════════════════════════════════════════════════
-print_step "12.5/35: Configuración PS3 Controller (Interactivo)"
-
-echo
-read -p "¿Configurar PS3 controller específicamente? [s/N]: " setup_ps3
-
-if [[ "$setup_ps3" =~ ^[Ss]$ ]]; then
-  print_header "Configurando PS3 Controller"
-
-  print_installing "Dependencias PS3 (bluez-ps3, sixpair, ds4drv)"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    bluez-ps3 sixpair ds4drv 2>/dev/null || print_warning "Algunas dependencias fallaron" # Dependencias específicas PS3
-
-  print_status "Configurando módulo hid_sony"
-  echo 'hid_sony' | sudo tee /etc/modules-load.d/hid_sony.conf
-  sudo modprobe hid_sony 2>/dev/null || true # Configurar kernel module
-
-  # Script de conexión PS3
-  print_status "Creando script de conexión PS3"
-  cat >~/conectar-ps3.sh <<'EOL'
-#!/bin/bash
-# Script para conectar PS3 controller
-
-echo "🎮 Configurando PS3 Controller"
-echo
-
-# Verificar bluetooth
-if ! systemctl is-active --quiet bluetooth; then
-    echo "❌ Bluetooth no activo. Iniciando..."
-    sudo systemctl start bluetooth
-    sleep 2
-fi
-
-# Desbloquear RF
-sudo rfkill unblock bluetooth
-
-echo "✅ Bluetooth activo"
-echo
-echo "📋 INSTRUCCIONES:"
-echo "  1. Conecta el mando por USB"
-echo "  2. Presiona el botón PS durante 10 segundos"
-echo "  3. Desconecta el USB"
-echo "  4. Presiona PS nuevamente para emparejar"
-echo
-read -p "Presiona Enter cuando hayas conectado el mando por USB..."
-
-# Ejecutar sixpair si está disponible
-if command -v sixpair &>/dev/null; then
-    echo "🔧 Ejecutando sixpair..."
-    sudo sixpair
-fi
-
-echo
-echo "🔵 Iniciando bluetoothctl..."
-echo
-echo "Comandos a ejecutar:"
-echo "  1. default-agent"
-echo "  2. power on"
-echo "  3. scan on"
-echo "Si tienes caelestia puedes usar su interfaz bluetooth para:"
-echo "  4. trust [MAC_DEL_CONTROL]"
-echo "  5. pair [MAC_DEL_CONTROL]"
-echo "  6. connect [MAC_DEL_CONTROL]"
-echo "desconecta el control Y Prende bluetooth"
-echo
-bluetoothctl
-EOL
-
-  chmod +x ~/conectar-ps3.sh
-
-  print_success "PS3 configurado"
-  print_status "Ejecuta: ~/conectar-ps3.sh para conectar tu control"
-  # Ofrecer conectar ahora
-  echo
-  read -p "¿Conectar PS3 controller ahora? [s/N]: " connect_now
-
-  if [[ "$connect_now" =~ ^[Ss]$ ]]; then
-    ~/conectar-ps3.sh
-  fi
-else
-  print_warning "Configuración PS3 omitida"
-fi
-# ═══════════════════════════════════════════════════════════
-# PASO 13: APLICACIONES (SOLO -BIN)
-# ═══════════════════════════════════════════════════════════
-print_step "13/35: Aplicaciones (Solo binarios precompilados)"
-print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
-sudo pacman -S --needed --noconfirm \
-  satty vlc vlc-plugins-all mpv \
-  gimp inkscape krita \
-  libreoffice-fresh okular filezilla transmission-gtk \
-  pavucontrol loupe \
-  scrcpy android-file-transfer \
-  gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN, obs-studio funciona mejor en flatpak
-
-echo "user_allow_other" | sudo tee -a /etc/fuse.conf && printf 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2717", RUN+="/usr/bin/su diego -c /usr/bin/simple-mtpfs /home/diego/cel"\n' | sudo tee /etc/udev/rules.d/99-xiaomi-mtp.rules && sudo udevadm control --reload-rules && mkdir -p ~/cel && print_success "Fix MTP Xiaomi aplicado" && print_status "Uso: conecta el cel en modo Transferencia de archivos → archivos en ~/cel"
-
-yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  open-fuse-iso swappy 
-print_success "Aplicaciones de gestión de discos instaladas [ISO]"
-
-# ═══════════════════════════════════════════════════════════
-# Kdenlive - Selección interactiva
-# ═══════════════════════════════════════════════════════════
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          🎬 KDENLIVE (EDITOR DE VIDEO) 🎬                 ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Opciones disponibles:${NC}"
-echo
-echo -e "${BOLD}${GREEN}1. Solo Kdenlive${NC} (~150MB)"
-echo -e "  ${MAGENTA}•${NC} Editor de video profesional (como Filmora)"
-echo -e "  ${MAGENTA}•${NC} Compresor de video integrado (Ctrl+Enter)"
-echo -e "  ${MAGENTA}•${NC} Sin dependencias extras de KDE"
-echo
-echo -e "${BOLD}${GREEN}2. Kdenlive + Dependencias Completas${NC} (~350MB)"
-echo -e "  ${MAGENTA}•${NC} Kdenlive completo"
-echo -e "  ${MAGENTA}•${NC} qt6-imageformats (mejor soporte de imágenes)"
-echo -e "  ${MAGENTA}•${NC} kimageformats (formatos adicionales)"
-echo -e "  ${MAGENTA}•${NC} recordmydesktop (grabación de pantalla)"
-echo -e "  ${MAGENTA}•${NC} plasma-desktop (integración KDE)"
-echo
-echo -e "${BOLD}${GREEN}3. Ninguno${NC}"
-echo -e "  ${MAGENTA}•${NC} Omitir instalación de Kdenlive"
-echo
-read -p "Seleccionar opción [1=Solo Kdenlive, 2=Con dependencias, 3=Ninguno]: " kdenlive_choice
-case "$kdenlive_choice" in
-1)
-  print_header "Instalando Kdenlive (Solo)"
-  print_installing "kdenlive"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    kdenlive \
-    2>/dev/null || print_warning "Kdenlive falló"
-  print_success "Kdenlive instalado"
-  ;;
-2)
-  print_header "Instalando Kdenlive + Dependencias"
-  print_installing "kdenlive + qt6-imageformats + kimageformats + recordmydesktop + plasma-desktop"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    kdenlive qt6-imageformats kimageformats recordmydesktop \
-    2>/dev/null || print_warning "Algunas dependencias de Kdenlive fallaron"
-  print_success "Kdenlive + dependencias instalado"
-  ;;
-*)
-  print_warning "Kdenlive omitido"
-  ;;
-esac
-# ═══════════════════════════════════════════════════════════
-# Aplicaciones de música y ocio
-# ═══════════════════════════════════════════════════════════
-print_installing "Aplicaciones extra y de Música/OCIO, Youtube Music [pear-desktop], Discord, Soundbound (solo binarios precompilados)"
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  brave-bin firefox zen-browser-bin spotify pear-desktop-bin soundbound-app-bin \
-  vencord-bin telegram-desktop-bin bitwarden gyazo-bin discord-screenaudio-bin \
-  2>/dev/null || print_warning "Algunas apps fallaron"
-# Youtube Music cambió de nombre a Pear Desktop
-
-# ═══════════════════════════════════════════════════════════
-# Selección interactiva de editor de código
-# ═══════════════════════════════════════════════════════════
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          💻 SELECCIONAR EDITOR DE CÓDIGO 💻               ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Opciones disponibles:${NC}"
-echo
-echo -e "${BOLD}${GREEN}1. Visual Studio Code${NC} (vscode-bin + code-features)"
-echo -e "  ${MAGENTA}•${NC} Editor más popular"
-echo -e "  ${MAGENTA}•${NC} Incluye code-features para mejor integración"
-echo
-echo -e "${BOLD}${GREEN}2. Cursor${NC} (cursor-bin)"
-echo -e "  ${MAGENTA}•${NC} Fork de VSCode con IA integrada"
-echo
-echo -e "${BOLD}${GREEN}3. Antigravity${NC} (yay)"
-echo -e "  ${MAGENTA}•${NC} Editor experimental, Excelente"
-echo
-echo -e "${BOLD}${GREEN}4. Ninguno${NC}"
-echo -e "  ${MAGENTA}•${NC} Omitir instalación de editor"
-echo
-read -p "Seleccionar editor [1=VSCode, 2=Cursor, 3=Antigravity, 4=Ninguno]: " editor_choice
-
-case "$editor_choice" in
-1)
-  print_header "Instalando Visual Studio Code"
-  print_installing "visual-studio-code-bin + code-features"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    visual-studio-code-bin code-features \
-    2>/dev/null || print_warning "VSCode falló"
-
-  # Aplicar dotfiles de vscode si existen
-  if [[ -d ~/dotfiles-dizzi/vscode ]]; then
-    cd ~/dotfiles-dizzi
-    stow vscode 2>/dev/null || print_warning "Stow vscode falló"
-    cd ~
-  fi
-
-  print_success "Visual Studio Code instalado"
-  ;;
-2)
-  print_header "Instalando Cursor"
-  print_installing "cursor-bin"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    cursor-bin \
-    2>/dev/null || print_warning "Cursor falló"
-
-  # Aplicar dotfiles de cursor si existen
-  if [[ -d ~/dotfiles-dizzi/cursor ]]; then
-    cd ~/dotfiles-dizzi
-    stow cursor 2>/dev/null || print_warning "Stow cursor falló"
-    cd ~
-  fi
-
-  print_success "Cursor instalado"
-  ;;
-  3)
-    print_header "Instalando Antigravity"
-    print_installing "antigravity desde yay"
-    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-      antigravity \
-      2>/dev/null || print_warning "Antigravity falló"
-
-    print_success "Antigravity instalado"
-
-    # Corregido: dentro del case y con comillas
-    bash "$HOME/dotfiles-dizzi/home/Antigravity Setup/install extensions/install-vscode-extensions.sh"
-    print_success "Extensiones de VSCode instaladas"
-    ;;
-  *)
-  print_warning "Editor de código omitido"
-  ;;
-esac
-
-# ═══════════════════════════════════════════════════════════
-# Extras
-# ═══════════════════════════════════════════════════════════
-print_installing "Extras (SOLO -bin, sin compilar)"
-print_installing "Las Mejores VPN (No esta Urban)"
-sudo pacman -S proton-vpn-gtk-app --needed --noconfirm
-yay -S --needed --noconfirm \ 
-  stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
-  appimagelauncher music-presence-bin pamac-aur \
-  2>/dev/null || print_warning "Algunos extras fallaron"
-
-print_success "Aplicaciones instaladas (solo binarios)"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 13.2: WAYDROID + MAGISTV + ALTERNATIVAS TV (CORREGIDO)
-# ═══════════════════════════════════════════════════════════
-# INSERTAR DESPUÉS DE "PASO 13: APLICACIONES" Y ANTES DE "PASO 13.5: STREMIO"
-# ═══════════════════════════════════════════════════════════
-
-print_step "13.2/35: Waydroid + MagisTV + Alternativas TV"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║        📱 WAYDROID + MAGISTV + ALTERNATIVAS TV 📱         ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Waydroid permite ejecutar Android en Linux (Wayland native).${NC}"
-echo -e "${CYAN}Se incluye MagisTV con firma ya configurada.$NC}"
-echo
-echo -e "${BOLD}${GREEN}Requisitos:$NC}"
-echo -e "  ${MAGENTA}•$NC} 5GB+ de espacio libre"
-echo -e "  ${MAGENTA}•$NC} CPU con soporte para virtualización (KVM)"
-echo -e "  ${MAGENTA}•$NC} RAM: 4GB+ recomendado"
-echo
-read -p "¿Instalar Waydroid + MagisTV? [S/n]: " install_waydroid
-
-if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
-  print_header "Instalando Waydroid + MagisTV"
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 1: Instalar Waydroid
-  # ═══════════════════════════════════════════════════════════
-  print_installing "Waydroid + Dependencias"
-  sudo pacman -S --needed --noconfirm \
-    waydroid python-pip git lzip
-
-  # Habilitar KVM + Desinstalar Firewalls (Solo si existen para evitar errores con set -e)
-  print_status "Habilitando KVM..."
-  sudo usermod -aG kvm $USER 2>/dev/null
-  for fw_pkg in ufw firewalld; do
-    if pacman -Qs $fw_pkg > /dev/null; then
-      sudo systemctl disable --now $fw_pkg 2>/dev/null
-      # sudo pacman -Rns --noconfirm $fw_pkg 2>/dev/null
-    fi
-  done
-  print_package "Configuración de KVM y Red completada"
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 2: Inicializar con GApps
-  # ═══════════════════════════════════════════════════════════
-  print_header "Inicializando Waydroid con Google Apps (~1.2GB)"
-  print_warning "IMPORTANTE: NO CANCELES LA DESCARGA"
-  echo
-  echo -e "${CYAN}Esto descargará:$NC}"
-  echo -e "  ${MAGENTA}•$NC} Sistema Android 13"
-  echo -e "  ${MAGENTA}•$NC} Google Apps (Play Store, Gmail, etc.)"
-  echo -e "  ${MAGENTA}•$NC} Duración estimada: 10-20 minutos"
-  echo
-  read -p "Presiona Enter para iniciar (esto es IRREVERSIBLE)..."
-
-  # Usar || true para evitar que set -e detenga el script si falla la inicialización inicial
-  sudo waydroid init -s GAPPS -f || true
-
-  # Comprobar si se creó el directorio de datos para validar el éxito
-  if [ ! -d "/var/lib/waydroid/cells" ]; then
-    print_error "Error inicializando Waydroid"
-    print_warning "Prueba: sudo rm -rf /var/lib/waydroid && sudo waydroid init -s GAPPS -f"
-  else
-    print_success "Waydroid inicializado"
-  fi
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 3: Iniciar Waydroid por primera vez
-  # ═══════════════════════════════════════════════════════════
-  print_header "Iniciando servicios de Waydroid"
-
-  print_status "Iniciando contenedor..."
-  sudo systemctl start waydroid-container
-  sleep 10
-
-  print_status "Iniciando sesión..."
-  waydroid session start
-  sleep 5
-
-  # Verificar estado
-  WAYDROID_STATUS=$(waydroid status 2>&1)
-  if echo "$WAYDROID_STATUS" | grep -q "Container:.*RUNNING"; then
-    print_success "Waydroid corriendo correctamente"
-  else
-    print_error "Error: Waydroid no se inició correctamente"
-    print_warning "Estado: $WAYDROID_STATUS"
-  fi
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 4: Instalar libhoudini (ARM Translation) - CLAVE
-  # ═══════════════════════════════════════════════════════════
-  print_header "Instalando libhoudini (ARM Translation) - CRUCIAL"
-
-  echo
-  echo -e "${BOLD}${CYAN}¿Por qué necesitas libhoudini?$NC}"
-  echo -e "  ${MAGENTA}•$NC} La mayoría de apps Android (incluida MagisTV) son ARM"
-  echo -e "  ${MAGENTA}•$NC} Tu PC es x86_64 (Intel/AMD)"
-  echo -e "  ${MAGENTA}•$NC} libhoudini traduce ARM → x86_64"
-  echo -e "  ${MAGENTA}•$NC} Sin esto: error 'App not compatible'"
-  echo -e "  ${MAGENTA}•$NC} Para más detalles ver: https://github.com/waydroid/waydroid/wiki/Installing-libhoudini O consulta la imagen abajo"
-  # O en heredoc
-cat <<"EOF"
-Instrucciones en: 
-https://raw.githubusercontent.com/casualsnek/waydroid_script/main/assets/img/README/image-20230430013148814.png
-EOF
-  echo -e "  ${MAGENTA}•$NC} La imagen muestra otras dependencias aparte que te pueden servir. Y seleciona android 13 90% de ocasiones."
-  echo
-  read -p "¿Instalar libhoudini? [S/n]: " install_libhoudini
-
-  if [[ ! "$install_libhoudini" =~ ^[Nn]$ ]]; then
-    print_installing "waydroid_script (necesario para libhoudini)"
-
-    # Clonar y configurar script
-    if [[ ! -d ~/waydroid_script ]]; then
-      cd ~
-      git clone https://github.com/casualsnek/waydroid_script.git
-      cd waydroid_script
-    else
-      cd ~/waydroid_script
-      git pull
-    fi
-
-    # Setup Python venv
-    python -m venv venv
-    source venv/bin/activate
-    pip install -q -r requirements.txt 2>/dev/null
-
-    print_status "Instalando libhoudini (esto toma 5-10 minutos)..."
-    echo
-    echo -e "${CYAN}Sigue estos pasos en el menú interactivo:$NC}"
-    echo -e "  ${MAGENTA}1.$NC} Versión: ${YELLOW}Android 13${NC}"
-    echo -e "  ${MAGENTA}2.$NC} Acción: ${YELLOW}Install$NC}"
-    echo -e "  ${MAGENTA}3.$NC} Marca ${YELLOW}libhoudini$NC} con ESPACIO"
-    echo -e "  ${MAGENTA}4.$NC} Presiona ENTER"
-    echo
-
-    # Ejecutar script interactivo
-    sudo venv/bin/python main.py
-
-    deactivate
-
-    # Reiniciar Waydroid
-    print_status "Reiniciando Waydroid..."
-    waydroid session stop
-    sudo systemctl restart waydroid-container
-    sleep 10
-    waydroid session start
-
-    print_success "libhoudini instalado y Waydroid reiniciado"
-    print_warning "IMPORTANTE: Cierra sesión y vuelve a entrar para KVM"
-  else
-    print_warning "libhoudini omitido (MagisTV PROBABLEMENTE NO FUNCIONARÁ)"
-  fi
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 5: Certificación de Google Play (OPCIONAL pero recomendado)
-  # ═══════════════════════════════════════════════════════════
-  print_header "Certificación de Google Play (Opcional)"
-
-  echo
-  echo -e "${BOLD}${CYAN}¿Por qué certificar?$NC}"
-  echo -e "  ${MAGENTA}•$NC} Acceder a Play Store premium"
-  echo -e "  ${MAGENTA}•$NC} Instalar apps que requieren certificación"
-  echo -e "  ${MAGENTA}•$NC} NO es necesario para MagisTV (ya tiene firma)"
-  echo
-  read -p "¿Obtener Android ID para certificación? [s/N]: " get_device_id
-
-  if [[ "$get_device_id" =~ ^[Ss]$ ]]; then
-    echo
-    echo -e "${YELLOW}Opción A (Automática - Recomendada):$NC}"
-    echo -e "  cd ~/waydroid_script"
-    echo -e "  source venv/bin/activate"
-    echo -e "  sudo venv/bin/python main.py"
-    echo -e "  → ${CYAN}Get Google Device ID to Get Certified$NC}"
-    echo
-    echo -e "${YELLOW}Opción B (Manual):$NC}"
-    echo -e "  waydroid show-full-ui"
-    echo -e "  Settings → About phone → Copia Android ID"
-    echo
-    read -p "¿Usar automática (A) o manual (B)? [A/b]: " id_method
-
-    if [[ ! "$id_method" =~ ^[Bb]$ ]]; then
-      print_status "Abriendo herramienta automática..."
-      cd ~/waydroid_script 2>/dev/null && {
-        source venv/bin/activate 2>/dev/null
-        echo -e "${CYAN}Selecciona la opción de Device ID$NC}"
-        sudo venv/bin/python main.py
-        deactivate
-      } || print_warning "waydroid_script no encontrado, usa método B"
-    else
-      print_status "Abriendo interfaz Android..."
-      waydroid show-full-ui &
-      sleep 3
-    fi
-
-    echo
-    echo -e "${BOLD}${YELLOW}PASOS PARA CERTIFICAR:$NC}"
-    echo -e "  ${MAGENTA}1.$NC} Obtén el Android ID (arriba)"
-    echo -e "  ${MAGENTA}2.$NC} Abre: ${CYAN}https://www.google.com/android/uncertified/$NC}"
-    echo -e "  ${MAGENTA}3.$NC} Pega el ID"
-    echo -e "  ${MAGENTA}4.$NC} Registra"
-    echo -e "  ${RED}5.$NC} ${RED}ESPERA 10-20 MINUTOS$NC} (a veces 1-2 horas)"
-    echo -e "  ${MAGENTA}6.$NC} Verifica: Play Store → Tu perfil → Play Protection"
-    echo -e "  ${MAGENTA}7.$NC} Debe decir: ${GREEN}Device is certified$NC}"
-    echo
-
-    read -p "¿Ya certificaste? [s/N]: " certified
-
-    if [[ "$certified" =~ ^[Ss]$ ]]; then
-      print_success "Dispositivo certificado"
-    else
-      print_warning "Certificación pendiente (espera 20+ minutos)"
-    fi
-  else
-    print_warning "Certificación omitida (no es necesaria para MagisTV)"
-  fi
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 6: Instalar MagisTV
-  # ═══════════════════════════════════════════════════════════
-  print_header "Instalando MagisTV"
-
-  echo
-  echo -e "${CYAN}MagisTV viene con firma ya configurada.$NC}"
-  echo -e "${CYAN}Se instala directamente sin necesidad de setup adicional.$NC}"
-  echo
-  read -p "¿Instalar MagisTV ahora? [S/n]: " install_magistv_app
-
-  if [[ ! "$install_magistv_app" =~ ^[Nn]$ ]]; then
-    MAGISTV_APK=""
-
-    # Buscar APK en múltiples ubicaciones
-    if [[ -f ~/Descargas/MAGIS*.apk ]]; then
-      MAGISTV_APK=$(ls ~/Descargas/MAGIS*.apk 2>/dev/null | head -1)
-    elif [[ -f ~/MAGIS*.apk ]]; then
-      MAGISTV_APK=$(ls ~/MAGIS*.apk 2>/dev/null | head -1)
-    fi
-
-    if [[ -z "$MAGISTV_APK" ]]; then
-      print_warning "APK de MagisTV no encontrado"
-      echo
-      echo -e "${CYAN}Descargalo desde:$NC}"
-      echo -e "  ${YELLOW}linktr.ee/MagisReddit$NC}"
-      echo -e "  (Selecciona versión Android)"
-      echo
-      echo -e "${CYAN}Guarda como:$NC}"
-      echo -e "  ${YELLOW}~/Descargas/MAGIS_6.4.2.apk$NC}"
-      echo
-      read -p "Presiona Enter cuando tengas el APK..."
-
-      if [[ -f ~/Descargas/MAGIS*.apk ]]; then
-        MAGISTV_APK=$(ls ~/Descargas/MAGIS*.apk | head -1)
-      fi
-    fi
-
-    if [[ -n "$MAGISTV_APK" && -f "$MAGISTV_APK" ]]; then
-      print_installing "Instalando $MAGISTV_APK"
-
-      if waydroid app install "$MAGISTV_APK" 2>&1 | tee /tmp/magistv_install.log; then
-        print_success "MagisTV instalado"
-
-        # Obtener package name automáticamente
-        MAGISTV_PACKAGE=$(waydroid app list 2>/dev/null | grep -iE "magis|iptv" | grep -v "google" | awk '{print $1}' | head -1)
-
-        if [[ -z "$MAGISTV_PACKAGE" ]]; then
-          # Fallback: obtener del instalador
-          MAGISTV_PACKAGE=$(grep -oE "com\.gsetech\.[a-zA-Z0-9._]*" /tmp/magistv_install.log | head -1)
-        fi
-
-        if [[ -n "$MAGISTV_PACKAGE" ]]; then
-          print_success "Package detectado: $MAGISTV_PACKAGE"
-
-          # Crear launcher .desktop
-          mkdir -p ~/.local/share/applications
-          cat >~/.local/share/applications/magistv.desktop <<EOF
-[Desktop Entry]
-Name=MagisTV
-Comment=IPTV Application
-Exec=waydroid app launch $MAGISTV_PACKAGE
-Icon=media-video-player
-Terminal=false
-Type=Application
-Categories=AudioVideo;Video;
-Keywords=iptv;tv;streaming;
-StartupNotify=true
-EOF
-
-          update-desktop-database ~/.local/share/applications 2>/dev/null
-
-          print_success "MagisTV disponible en launcher"
-          print_status "Ejecuta: waydroid app launch $MAGISTV_PACKAGE"
-        else
-          print_warning "No se detectó automáticamente el package"
-          print_status "Obtén manualmente: waydroid app list | grep -i magis"
-        fi
-      else
-        print_error "Error instalando MagisTV"
-        print_warning "Error log guardado en: /tmp/magistv_install.log"
-      fi
-    else
-      print_error "APK de MagisTV no encontrado y no se descargó"
-    fi
-  else
-    print_warning "MagisTV no instalado"
-    print_status "Puedes instalarlo después: waydroid app install ~/Descargas/MAGIS.apk"
-  fi
-
-  # ═══════════════════════════════════════════════════════════
-  # PASO 7: Magisk Root (OPCIONAL)
-  # ═══════════════════════════════════════════════════════════
-  print_step "13.2.1/35: Magisk Root (Opcional)"
-
-  echo
-  read -p "¿Instalar Magisk para root en Waydroid? [s/N]: " install_magisk
-
-  if [[ "$install_magisk" =~ ^[Ss]$ ]]; then
-    print_header "Instalando Magisk"
-
-    if [[ -d ~/waydroid_script ]]; then
-      cd ~/waydroid_script
-      source venv/bin/activate 2>/dev/null
-      echo -e "${CYAN}Selecciona en el menú: Install → magisk$NC}"
-      sudo venv/bin/python main.py
-      deactivate
-      cd ~
-
-      waydroid session stop
-      sudo systemctl restart waydroid-container
-      sleep 10
-      waydroid session start
-
-      print_success "Magisk instalado"
-    else
-      print_error "waydroid_script no encontrado"
-      print_status "Instala libhoudini primero (paso 4)"
-    fi
-  else
-    print_warning "Magisk omitido"
-  fi
-
-  print_success "Waydroid + MagisTV configurado"
-
-else
-  print_warning "Waydroid omitido"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 13.3: ALTERNATIVAS TV (YUKI-IPTV, HYPNOTIX)
-# ═══════════════════════════════════════════════════════════
-print_step "13.3/35: Alternativas TV en Desktop"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${YELLOW}║          📺 ALTERNATIVAS TV PARA DESKTOP 📺               ║${NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
-echo
-echo -e "${CYAN}Alternativas nativas a MagisTV (sin necesidad de Waydroid):$NC}"
-echo
-echo -e "${BOLD}${GREEN}1. Yuki-IPTV$NC}"
-echo -e "  ${MAGENTA}•$NC} Cliente IPTV con M3U support"
-echo -e "  ${MAGENTA}•$NC} Recomendado si tienes lista M3U"
-echo
-echo -e "${BOLD}${GREEN}2. Hypnotix$NC}"
-echo -e "  ${MAGENTA}•$NC} Reproductor IPTV avanzado"
-echo -e "  ${MAGENTA}•$NC} Requiere configuración de servidor"
-echo
-echo -e "${YELLOW}⚠️  IMPORTANTE - SEGURIDAD CON VPN:$NC}"
-echo -e "  ${RED}•$NC} ${RED}NUNCA usar IPTV sin VPN$NC}"
-echo -e "  ${RED}•$NC} ${RED}Se expone tu IP real al servidor IPTV$NC}"
-echo -e "  ${RED}•$NC} ${RED}Algunos proveedores bloquean sin VPN$NC}"
-echo -e "  ${GREEN}•$NC} ${GREEN}RECOMENDACIÓN: Activa VPN ANTES de usar$NC}"
-echo
-read -p "¿Instalar Yuki-IPTV? [s/N]: " install_yuki
-read -p "¿Instalar Hypnotix? [s/N]: " install_hypnotix
-read -p "¿Necesitas ayuda con VPN? [s/N]: " setup_vpn
-
-# Yuki-IPTV
-if [[ "$install_yuki" =~ ^[Ss]$ ]]; then
-  print_installing "Yuki-IPTV"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    yuki-iptv 2>/dev/null || print_warning "Yuki-IPTV falló"
-
-  if command -v yuki-iptv &>/dev/null; then
-    print_success "Yuki-IPTV instalado"
-    print_status "Uso: yuki-iptv (o busca en launcher)"
-    print_status "Configura tu lista M3U en: Settings → Playlists"
-  else
-    print_warning "Error instalando Yuki-IPTV"
-  fi
-fi
-
-# Hypnotix
-if [[ "$install_hypnotix" =~ ^[Ss]$ ]]; then
-  print_installing "Hypnotix"
-  sudo pacman -S --needed --noconfirm hypnotix 2>/dev/null || {
-    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-      hypnotix 2>/dev/null || print_warning "Hypnotix falló"
-  }
-
-  if command -v hypnotix &>/dev/null; then
-    print_success "Hypnotix instalado"
-    print_status "Uso: hypnotix (o busca en launcher)"
-    print_status "Configura servidor: File → Settings → XTREAM URL"
-  else
-    print_warning "Error instalando Hypnotix"
-  fi
-fi
-
-# VPN Setup
-if [[ "$setup_vpn" =~ ^[Ss]$ ]]; then
-  print_header "Configuración de VPN"
-
-  echo
-  echo -e "${CYAN}¿Cuál es tu proveedor VPN?$NC}"
-  echo -e "  ${MAGENTA}1.$NC} ProtonVPN (Recomendado + Gratuito)"
-  echo -e "  ${MAGENTA}2.$NC} Windscribe"
-  echo -e "  ${MAGENTA}3.$NC} Otro / No instalar"
-  echo
-  read -p "Selecciona [1-3]: " vpn_choice
-
-  case "$vpn_choice" in
-  1)
-    print_installing "ProtonVPN"
-    sudo pacman -S --needed --noconfirm proton-vpn-gtk-app
-
-    # Script de conveniencia
-    mkdir -p ~/.local/bin
-    cat >~/.local/bin/yuki-with-vpn.sh <<'EOL'
-#!/bin/bash
-echo "🔒 Conectando a ProtonVPN..."
-proton-vpn-gtk-app --connect rapid &
-sleep 5
-echo "▶️  Iniciando Yuki-IPTV..."
-yuki-iptv
-EOF
-    chmod +x ~/.local/bin/yuki-with-vpn.sh
-
-    print_success "ProtonVPN instalado"
-    print_status "Usa: yuki-with-vpn.sh para conectar automáticamente"
-    print_status "O abre ProtonVPN manualmente antes de Yuki"
-    ;;
-  2)
-    print_installing "Windscribe"
-    yay -S --needed --noconfirm windscribe-v2-bin 2>/dev/null || print_warning "Windscribe falló"
-    ;;
-  *)
-    print_warning "VPN no configurada"
-    echo -e "${YELLOW}Recuerda: SIEMPRE usa VPN antes de IPTV$NC}"
-    ;;
-  esac
-fi
-
-print_success "Alternativas TV configuradas"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 13.4: ANDROID EMULATOR (SDK AVD - ÚLTIMO RECURSO)
-# ═══════════════════════════════════════════════════════════
-print_step "13.4/35: Android Emulator (SDK AVD - Último Recurso)"
-
-echo
-echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗$NC}"
-echo -e "${BOLD}${YELLOW}║       🤖 ANDROID EMULATOR (ÚLTIMO RECURSO) 🤖             ║$NC}"
-echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝$NC}"
-echo
-echo -e "${YELLOW}⚠️  NOTA:$NC} Usa ${RED}SOLO si Waydroid no funciona$NC}"
-echo
-echo -e "${CYAN}Características:$NC}"
-echo -e "  ${MAGENTA}•$NC} ${RED}Mucho más lento$NC} que Waydroid (~5-10x)"
-echo -e "  ${MAGENTA}•$NC} ${RED}Más pesado$NC} (consume más RAM/CPU)"
-echo -e "  ${MAGENTA}•$NC} ${GREEN}Mejor compatibilidad$NC} en algunos casos raros"
-echo
-read -p "¿Instalar Android Emulator (SDK)? [s/N]: " install_android_studio
-
-if [[ "$install_android_studio" =~ ^[Ss]$ ]]; then
-  print_header "Instalando Android Studio + Emulator"
-
-  print_installing "Android Studio (esto toma tiempo)"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    android-studio 2>/dev/null || print_warning "Android Studio falló"
-
-  if [[ -d /opt/android-studio ]]; then
-    print_success "Android Studio instalado en /opt/android-studio"
-
-    echo
-    echo -e "${CYAN}Pasos para usar:$NC}"
-    echo -e "  ${MAGENTA}1.$NC} Ejecuta: ${YELLOW}/opt/android-studio/bin/studio.sh$NC}"
-    echo -e "  ${MAGENTA}2.$NC} Selecciona: ${YELLOW}AVD Manager$NC}"
-    echo -e "  ${MAGENTA}3.$NC} Crea: ${YELLOW}Pixel 2$NC} (recomendado)"
-    echo -e "  ${MAGENTA}4.$NC} Lanza y espera (${RED}LENTO$NC})"
-    echo -e "  ${MAGENTA}5.$NC} Instala MagisTV desde APK"
-    echo
-
-    print_warning "${RED}Esto es MUCHO MÁS LENTO que Waydroid$NC}"
-    print_status "Solo usa si Waydroid falla"
-  else
-    print_error "Android Studio no se instaló correctamente"
-  fi
-else
-  print_warning "Android Emulator omitido"
-fi
-
-print_success "Alternativas de Android completadas"
-
-# ═══════════════════════════════════════════════════════════
-# COMANDOS ÚTILES PARA WAYDROID
-# ═══════════════════════════════════════════════════════════
-
-cat >~/.local/bin/waydroid-helpers.sh <<'EOL'
-#!/bin/bash
-# Comandos útiles para Waydroid
-
-case "$1" in
-  status)
-    echo "📊 Estado de Waydroid:"
-    waydroid status
-    ;;
-  restart)
-    echo "🔄 Reiniciando Waydroid..."
-    waydroid session stop
-    sudo systemctl restart waydroid-container
-    sleep 10
-    waydroid session start
-    echo "✅ Reiniciado"
-    ;;
-  open)
-    if [[ -z "$2" ]]; then
-      waydroid show-full-ui
-    else
-      waydroid app launch "$2"
-    fi
-    ;;
-  logcat)
-    waydroid logcat "$@"
-    ;;
-  adb)
-    waydroid adb enable
-    adb connect 192.168.240.112:5555
-    ;;
-  *)
-    echo "Uso: waydroid-helpers.sh [status|restart|open|logcat|adb]"
-    ;;
-esac
-EOL
-
-chmod +x ~/.local/bin/waydroid-helpers.sh
-
-print_success "Helpers de Waydroid creados: waydroid-helpers.sh"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 13.5: STREMIO (AUR vs FLATPAK)
-# ═══════════════════════════════════════════════════════════
-print_step "13.5/35: Stremio (Opción: AUR o Flatpak+Server)"
-
-echo
-echo -e "${CYAN}Opciones de Stremio:${NC}"
-echo -e "  ${MAGENTA}1.${NC} Compilar desde AUR (~10-15 min, nativo)"
-echo -e "  ${MAGENTA}2.${NC} Omitir compilación"
-echo
-read -p "¿Intentar compilar Stremio nativo? [s/N]: " install_stremio_aur
-
-# Variable para saber si ya se instaló Stremio
-STREMIO_INSTALLED=false
-
-if [[ "$install_stremio_aur" =~ ^[Ss]$ ]]; then
-  print_header "Instalando Stremio Nativo (~10-15 minutos)"
-
-  if yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake stremio stremio-service-bin 2>/dev/null; then
-    print_success "Stremio (AUR) instalado"
-    STREMIO_INSTALLED=true
-  else
-    print_error "Stremio (AUR) falló"
-  fi
-else
-  print_warning "Compilación nativa omitida"
-fi
-
-# Si no se instaló la versión AUR (porque se omitió o falló), ofrecer Flatpak
-if [[ "$STREMIO_INSTALLED" == false ]]; then
-  echo
-  echo -e "${YELLOW}¿Instalar Stremio Service (Browser) via Flatpak? (Recomendado)${NC}"
-  echo -e "  ${CYAN}•${NC} Instalación instantánea (sin compilar)"
-  echo -e "  ${CYAN}•${NC} Incluye Stremio Server (funciona en navegador)"
-  echo -e "  ${CYAN}•${NC} Aislado y seguro"
-  echo
-  read -p "¿Instalar Stremio WEB + Flatpak setup? [S/n]: " install_stremio_flatpak
-
-  if [[ ! "$install_stremio_flatpak" =~ ^[Nn]$ ]]; then
-    # ═══════════════════════════════════════════════════════════
-    # SETUP FLATPAK
-    # ═══════════════════════════════════════════════════════════
-    print_installing "Configurando entorno Flatpak..."
-
-    # Instalar Flatpak si no está
-    if ! command -v flatpak &>/dev/null; then
-      sudo pacman -S --needed --noconfirm flatpak && read -rp "¿Instalar PokeMMO? [s/N]: " r && [[ "$r" =~ ^[sS]$ ]] && flatpak install flathub com.pokemmo.PokeMMO
-    fi
-
-    # Agregar Flathub
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-    # CRÍTICO: Configurar XDG_DATA_DIRS para que las apps aparezcan en rofi/wofi
-    print_status "Configurando visibilidad de apps Flatpak..."
-
-    FLATPAK_EXPORTS='
-# Flatpak exports para que apps aparezcan en launcher
-export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/$USER/.local/share/flatpak/exports/share"'
-
-    # Agregar a .zshrc
-    if [[ -f ~/.zshrc ]]; then
-      if ! grep -q "flatpak/exports/share" ~/.zshrc; then
-        echo "$FLATPAK_EXPORTS" >>~/.zshrc
-        print_success "XDG_DATA_DIRS agregado a .zshrc"
-      fi
-    fi
-
-    # Agregar a .bashrc
-    if [[ -f ~/.bashrc ]]; then
-      if ! grep -q "flatpak/exports/share" ~/.bashrc; then
-        echo "$FLATPAK_EXPORTS" >>~/.bashrc
-        print_success "XDG_DATA_DIRS agregado a .bashrc"
-      fi
-    fi
-
-    # Agregar a hyprland.conf (CRUCIAL para Wayland launch)
-    if [[ -f ~/.config/hypr/hyprland.conf ]]; then
-      if ! grep -q "XDG_DATA_DIRS.*flatpak" ~/.config/hypr/hyprland.conf; then
-        echo "" >>~/.config/hypr/hyprland.conf
-        echo "# Flatpak apps visibility" >>~/.config/hypr/hyprland.conf
-        echo 'env = XDG_DATA_DIRS,$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/diego/.local/share/flatpak/exports/share' >>~/.config/hypr/hyprland.conf
-        print_success "Env vars agregadas a Hyprland config"
-      fi
-    fi
-
-    # Instalar Stremio Flatpak
-    print_installing "Stremio (Flatpak)"
-    flatpak install -y flathub com.stremio.Stremio
-    print_success "Stremio Flatpak instalado"
-
-    # Instalación de Stremio Server (Docker o binario) - Opcional, pero Stremio Flatpak ya trae lo básico
-    # Si quieres el server standalone para navegador:
-    # print_installing "Stremio Server"
-    # ... (lógica server server si es necesaria, pero usualmente el cliente basta o se usa web)
-
-    # Opcional: Instalar otras apps Flatpak ya que estamos aquí
-    echo
-    read -p "¿Aprovechar Flatpak para Discord/OBS/Telegram? [s/N]: " install_more_flatpaks
-
-    if [[ "$install_more_flatpaks" =~ ^[Ss]$ ]]; then
-      read -p "  ¿Instalar Discord? [s/N]: " f_discord
-      read -p "  ¿Instalar OBS Studio? [s/N]: " f_obs
-      read -p "  ¿Instalar Telegram? [s/N]: " f_telegram
-
-      [[ "$f_discord" =~ ^[Ss]$ ]] && flatpak install -y flathub com.discordapp.Discord
-      [[ "$f_obs" =~ ^[Ss]$ ]] && flatpak install -y flathub com.obsproject.Studio
-      [[ "$f_telegram" =~ ^[Ss]$ ]] && flatpak install -y flathub org.telegram.desktop
-    fi
-
-    print_warning "IMPORTANTE: Cierre sesión para ver las apps Flatpak en el menú"
-  else
-    print_warning "Stremio (Flatpak) omitido"
-  fi
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 14: DEV TOOLS
-# ═══════════════════════════════════════════════════════════
-print_step "14/35: Herramientas de Desarrollo"
-print_installing "Docker + Node.js + Python + Rust (repos)"
-sudo pacman -S --needed --noconfirm \
-  nodejs npm python python-pip python-gobject python-pipx pyenv \
-  docker rust \
-  llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
-
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat
-print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
-
-print_installing "Python LSP + Neovim support"
-python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
-
-print_installing "Node packages (neovim)"
-npm install -g neovim 2>/dev/null || true
-
-# ═══════════════════════════════════════════════════════════
-# DOCKER SETUP (FUNCIONAL Y ROBUSTO)
-# ═══════════════════════════════════════════════════════════
-print_header "Configurando Docker"
-
-# 1. Habilitar Docker service
-print_status "Habilitando servicios de Docker..."
-sudo systemctl daemon-reload
-sudo systemctl enable docker.socket 2>/dev/null || true
-sudo systemctl enable docker 2>/dev/null || true
-sudo systemctl start docker.socket 2>/dev/null || true
-sudo systemctl start docker 2>/dev/null || true
-
-# 2. Agregar usuario a grupo docker
-sudo usermod -aG docker $USER 2>/dev/null || true
-print_success "Docker CLI configurado"
-
-# 3. Verificar instalación básica
-if command -v docker &>/dev/null; then
-  print_success "Docker disponible: $(docker --version)"
-else
-  print_warning "Docker CLI no disponible en PATH"
-fi
-
-# ═══════════════════════════════════════════════════════════
-# DOCKER DESKTOP (OPCIONAL - FALLBACK INTELIGENTE)
-# ═══════════════════════════════════════════════════════════
-echo
-echo -e "${CYAN}Opciones de Docker:${NC}"
-echo -e "  ${MAGENTA}1.${NC} (OMITIR) Docker CLI (ya instalado - suficiente)"
-echo -e "  ${MAGENTA}2.${NC} Docker Desktop (binarios estáticos+GUI - recomendado si necesitas GUI)"
-echo -e "  ${MAGENTA}BTW.${NC} La realidad es que docker-compose entraba en conflicto con docker-desktop"
-echo
-read -p "Selecciona [1=(OMITIR) CLI solamente, 2=Agregar Desktop]: " docker_choice
-
-if [[ "$docker_choice" == "2" ]]; then
-  print_header "Instalando Docker Desktop (Binarios Estáticos)"
-  
-  # Crear directorio temporal
-  DOCKER_TEMP="/tmp/docker-desktop-install-$$"
-  mkdir -p "$DOCKER_TEMP"
-  cd "$DOCKER_TEMP"
-  
-  # DESCARGA CORRECTA
-  print_status "Descargando Docker binarios estáticos v29.1.4..."
-  if wget -q --show-progress https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz 2>/dev/null; then
-    wget -q --show-progress https://desktop.docker.com/linux/main/amd64/214940/docker-desktop-x86_64.pkg.tar.zst
-    sudo pacman -U ./docker-desktop-x86_64.pkg.tar.zst
-    print_success "GUI => Descarga completada [Pacman -U para instalaciones Locales] + Binario Estático"
-    
-    # EXTRACCIÓN CORRECTA (sin errores de sintaxis)
-    print_status "Extrayendo archivos..."
-    if tar -xzf docker-29.1.4.tgz 2>/dev/null; then
-      print_success "Extracción completada"
-      
-      # INSTALACIÓN CORRECTA
-      print_installing "Instalando binarios en /usr/local/bin/"
-      if sudo cp -rp docker/* /usr/local/bin/ && rm -rf docker; then
-        print_success "Binarios instalados"
-        
-        # CREAR SERVICIO SYSTEMD (para docker daemon)
-        print_status "Creando servicio Docker daemon..."
-        sudo tee /etc/systemd/system/docker.service >/dev/null <<'DOCKERSVC'
-[Unit]
-Description=Docker Application Container Engine
-Documentation=https://docs.docker.com
-After=network-online.target docker.socket
-Wants=network-online.target
-
-[Service]
-Type=notify
-ExecStart=/usr/local/bin/dockerd -H fd://
-ExecReload=/bin/kill -s HUP $MAINPID
-RestartSec=5
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-DOCKERSVC
-
-        # Habilitar servicios
-        sudo systemctl daemon-reload
-        sudo systemctl enable docker docker.socket 2>/dev/null || true
-        sudo systemctl restart docker 2>/dev/null || true
-        
-        print_success "Docker daemon configurado"
-        
-        # Verificación
-        sleep 2
-        if docker --version &>/dev/null; then
-          print_success "✅ Docker funcional: $(docker --version)"
-          
-          # Prueba rápida (sin descargar imagen)
-          print_status "Verificando conectividad..."
-          if docker ps &>/dev/null; then
-            print_success "✅ Docker listo para usar"
-          fi
-        else
-          print_warning "⚠️  Docker instalado pero no disponible en PATH"
-          print_status "Intenta: /usr/local/bin/docker --version"
-        fi
-      else
-        print_error "❌ Error al copiar binarios"
-      fi
-    else
-      print_error "❌ Error al extraer archivo tar"
-    fi
-  else
-    print_error "❌ Error descargando Docker (sin internet o servidor caído)"
-    print_status "Descarga manual: https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz"
-  fi
-  
-  # Limpiar
-  cd ~
-  rm -rf "$DOCKER_TEMP"
-
-  # ── GPG / pass para Docker Desktop Login ──────────────────────────
-  echo
-  echo -e "${CYAN}Docker Desktop requiere GPG + pass para iniciar sesión.${NC}"
-  read -p "¿Configurar GPG/pass ahora? [s/N]: " gpg_choice
-  if [[ "$gpg_choice" =~ ^[sS]$ ]]; then
-    print_header "Configurando GPG + pass para Docker Desktop"
-
-    # Instalar dependencias si faltan
-    for pkg in gnupg pass; do
-      if ! command -v "$pkg" &>/dev/null; then
-        print_status "Instalando $pkg..."
-        sudo pacman -S --noconfirm "$pkg"
-      fi
-    done
-
-    echo
-    print_status "Generando clave GPG (sigue las instrucciones en pantalla)..."
-    gpg --generate-key
-
-    echo
-    echo -e "${CYAN}Busca la línea 'pub' en la salida anterior y copia el ID (ej: 3ABCD1234EF56G78)${NC}"
-    read -p "Pega tu GPG ID aquí: " gpg_id
-
-    if [[ -n "$gpg_id" ]]; then
-      pass init "$gpg_id"
-      print_success "✅ pass inicializado con GPG ID: $gpg_id"
-      echo -e "${CYAN}Ahora puedes iniciar sesión en Docker Desktop desde la GUI.${NC}"
-    else
-      print_warning "⚠️  GPG ID vacío — omitiendo pass init. Puedes hacerlo manualmente: pass init <TU_GPG_ID>"
-    fi
-  else
-    print_warning "GPG/pass omitido — necesario para iniciar sesión en Docker Desktop"
-    print_status "Manual: gpg --generate-key && pass init <GPG_ID>"
-  fi
-
-elif [[ "$docker_choice" == "1" ]]; then
-  print_success "Usando Docker CLI (suficiente para la mayoría)"
-else
-  print_warning "Docker Desktop omitido"
-fi
-
-print_success "Docker configurado"
-
-# ═══════════════════════════════════════════════════════════
-# PYTHON + NODE SUPPORT
-# ═══════════════════════════════════════════════════════════
-print_installing "Python LSP + Neovim support"
-python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
-
-print_installing "Node packages (neovim)"
-npm install -g neovim 2>/dev/null || true
-
-# ═══════════════════════════════════════════════════════════
-# GEMINI CLI (OPCIONAL)
-# ═══════════════════════════════════════════════════════════
-
-# Gemini CLI - Interactivo
-echo
-read -p "¿Instalar Gemini CLI? (omitir si ya lo tienes configurado) [s/N]: " install_gemini
-
-if [[ "$install_gemini" =~ ^[Ss]$ ]]; then
-  print_installing "Gemini CLI"
-  pipx install google-generativeai 2>/dev/null || true
-  npm install -g @google/gemini-cli 2>/dev/null || true
-  print_success "Gemini CLI instalado"
-  print_status "Configura con: gemini-cli setup"
-else
-  print_warning "Gemini CLI omitido"
-fi
-
-print_success "Dev tools instalados"
-
-# ═══════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════
 # PASO 15: ZSH + OH-MY-ZSH
 # ═══════════════════════════════════════════════════════════
 print_step "15/35: Zsh + Oh-My-Zsh"
@@ -1681,20 +216,20 @@ if [[ -d ~/dotfiles-dizzi ]]; then
     fi
   done # PROCEDO A APLICAR CONFIG DE CINNAMON.
 
-[[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ < ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
-print_status "Aplicando Submodulos [NVIM]    ."
+  [[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ <~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
+  print_status "Aplicando Submodulos [NVIM]    ."
 
-echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
-# Verificar submodules
-git submodule update --init --recursive
-rm -rf nvim
+  echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+  # Verificar submodules
+  git submodule update --init --recursive
+  rm -rf nvim
 
-# Recuperar cada submódulo
-git submodule update --init --recursive nvim
+  # Recuperar cada submódulo
+  git submodule update --init --recursive nvim
 
-echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
-cd  nvim/.config/nvim  && git checkout main
-cd  ../../../
+  echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
+  cd nvim/.config/nvim && git checkout main
+  cd ../../../
 
   print_success "Dotfiles aplicados"
 fi
@@ -1775,7 +310,11 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
   # Para SDDM THEME
-  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && { print_package "Symlink: SDDM Theme de Jake"; sudo pacman -S sddm --needed --noconfirm; sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf; }
+  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && {
+    print_package "Symlink: SDDM Theme de Jake"
+    sudo pacman -S sddm --needed --noconfirm
+    sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf
+  }
 
   # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
@@ -2861,7 +1400,7 @@ if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
   else
     # Fallback: Docker
     print_warning "Compilación AUR falló, usando Docker..."
-    
+
     if ! command -v docker &>/dev/null; then
       print_status "Instalando Docker..."
       sudo pacman -S --needed --noconfirm docker
@@ -2873,15 +1412,15 @@ if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
     fi
 
     print_installing "Open-WebUI via Docker"
-    # EXTRAIDO DE: 
-    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/ 
+    # EXTRAIDO DE:
+    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/
 
     # I’m going to choose the option to install Open WebUI with Bundled Ollama Support and select the container that utilizes a GPU:
     # if [[ -f /etc/arch-release ]]; then # esto esta MAL, usa:
-      if command -v nvidia-smi &> /dev/null; then
+    if command -v nvidia-smi &>/dev/null; then
       print_status "Detectado Arch Linux"
       print_installing "Open-WebUI via Docker (GPU)"
-      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama  2>/dev/null
+      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama 2>/dev/null
     else
       print_status "Detectado Debian/Ubuntu"
       print_installing "Open-WebUI via Docker (CPU)"
@@ -3352,11 +1891,11 @@ function configure_swap() {
   # Calcular swap recomendado
   local RECOMMENDED_SWAP
   if [[ $TOTAL_RAM_GB -le 8 ]]; then
-    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2))  # 2x RAM si ≤8GB
+    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2)) # 2x RAM si ≤8GB
   elif [[ $TOTAL_RAM_GB -le 16 ]]; then
-    RECOMMENDED_SWAP=$TOTAL_RAM_GB          # 1x RAM si ≤16GB
+    RECOMMENDED_SWAP=$TOTAL_RAM_GB # 1x RAM si ≤16GB
   else
-    RECOMMENDED_SWAP=16                     # Máximo 16GB si >16GB RAM
+    RECOMMENDED_SWAP=16 # Máximo 16GB si >16GB RAM
   fi
 
   echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
@@ -3377,7 +1916,7 @@ function configure_swap() {
   fi
 
   # Verificar espacio suficiente
-  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2))  # +2GB de margen
+  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2)) # +2GB de margen
   if [[ $FREE_SPACE_GB -lt $REQUIRED_SPACE ]]; then
     echo
     echo -e "${RED}⚠️  Espacio insuficiente:${NC}"
@@ -3393,17 +1932,17 @@ function configure_swap() {
     fi
   fi
 
-echo
-echo -e "${CYAN}Opciones de swap:${NC}"
-echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
-echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
-echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
-echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
-echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
-echo
-read -p "Seleccionar opción [1-5]: " swap_choice
+  echo
+  echo -e "${CYAN}Opciones de swap:${NC}"
+  echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
+  echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
+  echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
+  echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
+  echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
+  echo
+  read -p "Seleccionar opción [1-5]: " swap_choice
 
-case "$swap_choice" in
+  case "$swap_choice" in
   4)
     print_header "Eliminando Swap Completamente"
     echo
@@ -3454,7 +1993,7 @@ case "$swap_choice" in
       print_warning "Eliminación cancelada"
     fi
     ;;
-  1|3)
+  1 | 3)
     print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
     # Verificar si ya existe swapfile
     if [[ -f /swapfile ]]; then
@@ -3476,21 +2015,21 @@ case "$swap_choice" in
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
-    
+
     # Agregar a /etc/fstab si no existe
     if ! grep -q "/swapfile" /etc/fstab; then
       echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
       print_success "Swapfile agregado a /etc/fstab"
     fi
-    
+
     print_success "Swapfile de ${RECOMMENDED_SWAP}GB configurado"
     ;;
-esac
+  esac
 
-case "$swap_choice" in
-  2|3)
+  case "$swap_choice" in
+  2 | 3)
     print_header "Configurando Zswap (Compresión en RAM)"
-    
+
     # Verificar soporte del kernel
     if [[ ! -f /sys/module/zswap/parameters/enabled ]]; then
       print_warning "Zswap no soportado por el kernel actual"
@@ -3498,14 +2037,14 @@ case "$swap_choice" in
       # Habilitar zswap
       print_installing "Habilitando zswap"
       echo 1 | sudo tee /sys/module/zswap/parameters/enabled
-      
+
       # Configurar algoritmo de compresión (lz4 es más rápido)
       echo lz4 | sudo tee /sys/module/zswap/parameters/compressor 2>/dev/null || true
       echo zbud | sudo tee /sys/module/zswap/parameters/zpool 2>/dev/null || true
-      
+
       # Configurar porcentaje de RAM para zswap (20% por defecto)
       echo 20 | sudo tee /sys/module/zswap/parameters/max_pool_percent
-      
+
       # Hacer permanente agregando a kernel parameters
       if [[ -f /etc/default/grub ]]; then
         if ! grep -q "zswap.enabled=1" /etc/default/grub; then
@@ -3514,54 +2053,54 @@ case "$swap_choice" in
           print_warning "Ejecuta 'sudo grub-mkconfig -o /boot/grub/grub.cfg' después del reinicio"
         fi
       fi
-      
+
       print_success "Zswap configurado (20% RAM, compresión lz4)"
     fi
     ;;
-esac
+  esac
 
-if [[ "$swap_choice" == "5" ]]; then
-  print_warning "Configuración de swap omitida"
-else
-  # Configurar swappiness (agresividad del swap)
-  print_status "Configurando swappiness..."
-  
-  # Swappiness recomendado según RAM
-  if [[ $TOTAL_RAM_GB -ge 16 ]]; then
-    SWAPPINESS=10  # Menos agresivo con mucha RAM
-  elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
-    SWAPPINESS=20  # Moderado con RAM media
+  if [[ "$swap_choice" == "5" ]]; then
+    print_warning "Configuración de swap omitida"
   else
-    SWAPPINESS=60  # Más agresivo con poca RAM
-  fi
-  
-  echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
-  sudo sysctl vm.swappiness=$SWAPPINESS
-  
-  print_success "Swappiness configurado a $SWAPPINESS"
-  
-  # Mostrar estado final
-  echo
-  echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
-  echo
-  NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
-  NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
-  echo -e "${CYAN}Estado actual:${NC}"
-  echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
-  echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
-  echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
-  
-  if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
-    ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
-    echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
-  fi
-  
-  echo
-  echo -e "${YELLOW}Comandos útiles:${NC}"
-  echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
-  echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
-  echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
-  echo
+    # Configurar swappiness (agresividad del swap)
+    print_status "Configurando swappiness..."
+
+    # Swappiness recomendado según RAM
+    if [[ $TOTAL_RAM_GB -ge 16 ]]; then
+      SWAPPINESS=10 # Menos agresivo con mucha RAM
+    elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
+      SWAPPINESS=20 # Moderado con RAM media
+    else
+      SWAPPINESS=60 # Más agresivo con poca RAM
+    fi
+
+    echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
+    sudo sysctl vm.swappiness=$SWAPPINESS
+
+    print_success "Swappiness configurado a $SWAPPINESS"
+
+    # Mostrar estado final
+    echo
+    echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
+    echo
+    NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+    NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
+    echo -e "${CYAN}Estado actual:${NC}"
+    echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
+
+    if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
+      ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
+      echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
+    fi
+
+    echo
+    echo -e "${YELLOW}Comandos útiles:${NC}"
+    echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
+    echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
+    echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
+    echo
   fi
 }
 
@@ -3898,7 +2437,7 @@ elif [[ "$dm_choice" == "3" ]]; then
   fi
   WEBKIT_CONF="/etc/lightdm/lightdm-webkit2-greeter.conf"
   if [[ ! -f "$WEBKIT_CONF" ]]; then
-    sudo tee "$WEBKIT_CONF" > /dev/null <<EOF
+    sudo tee "$WEBKIT_CONF" >/dev/null <<EOF
 [greeter]
 debug_mode          = false
 detect_theme_errors = true

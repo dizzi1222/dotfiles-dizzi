@@ -14,3 +14,29 @@
 - Usa 2 espacios para la indentación.
 - Prefija los nombres de interfaz con `I` (por ejemplo, `IUserService`).
 - Siempre usa igualdad estricta (`===` y `!==`).
+
+## Conexión a Base de Datos Local (pgAdmin4)
+
+### Prerrequisitos
+1. GCloud CLI instalado y autenticado: `gcloud auth application-default login`
+2. Cloud SQL Proxy descargado en `~/cloud-sql-proxy`
+
+### Pasos para conectar
+
+1. **Iniciar el proxy** (mantener corriendo en una terminal):
+   ```sh
+   ~/cloud-sql-proxy --port 5433 cic-ptd-dev:us-east1:cic-ptd-dev
+   ```
+   Esperar a que muestre: `The proxy has started successfully and is ready for new connections!`
+
+2. **Configurar pgAdmin4** con estos valores exactos:
+   - Host: `127.0.0.1` (NUNCA el nombre de la BD)
+   - Port: `5433` (el del proxy, no el del .env)
+   - Database: `talento-dev`
+   - Username: `talento-dev`
+   - Password: `EHE1iabBFVYl^QJN`
+
+3. **Errores comunes:**
+   - "failed to resolve host 'talento-dev'" → se puso `talento-dev` como Host en vez de `127.0.0.1`
+   - "Connection refused on port 5432" → se usó el puerto 5432 del .env en vez del 5433 del proxy
+   - "Connection refused" en general → el proxy no está corriendo

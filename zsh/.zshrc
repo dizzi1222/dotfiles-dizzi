@@ -851,3 +851,9 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/$USER/
 alias WifiHotspot_Tether_Share_Internet_Compartir='am start -n com.android.settings/.TetherSettings'
 # Si da error de permisos usar: hotspot2
 alias Hotspot_Wifi='am start -a android.intent.action.MAIN -n com.android.settings/.TetherSettings'
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/tmp/google-cloud-sdk/path.zsh.inc' ]; then . '/tmp/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/tmp/google-cloud-sdk/completion.zsh.inc' ]; then . '/tmp/google-cloud-sdk/completion.zsh.inc'; fi
