@@ -38,7 +38,7 @@ case "$ICON" in
   pactl set-sink-mute @DEFAULT_SINK@ toggle
   ;;
 "󰺐")
-  kitty -e /usr/bin/scrcpy
+  kitty -e ~/scripts/scrcpy-connect.sh
   ;;
 "")
   sh ~/scripts/power_management.sh
