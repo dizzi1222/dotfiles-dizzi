@@ -32,6 +32,7 @@ spawn-sh-at-startup "nm-applet & volctl & blueman-applet"
 
 // Notification center
 spawn-at-startup "swaync"
+spawn-at-startup "swaync-client --dnd-off"
 spawn-at-startup "dunst -config ~/.config/dunstrc"
 // -- Si no funciona ninguno usa: mako
 

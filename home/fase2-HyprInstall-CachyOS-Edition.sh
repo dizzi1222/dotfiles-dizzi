@@ -1590,7 +1590,74 @@ else
   print_warning "Gemini CLI omitido"
 fi
 
-print_success "Dev tools instalados"
+# ═══════════════════════════════════════════════════════════
+# GCLOUD CLI + CLOUD SQL AUTH PROXY
+# ═══════════════════════════════════════════════════════════
+
+print_header "Google Cloud CLI + Cloud SQL Auth Proxy"
+print_installing "gcloud CLI"
+
+if ! command -v gcloud &>/dev/null; then
+  GCLOUD_VERSION="523.0.0"
+  GCLOUD_TAR="/tmp/google-cloud-cli-${GCLOUD_VERSION}-linux-x86_64.tar.gz"
+
+  print_status "Descargando Google Cloud CLI ${GCLOUD_VERSION}..."
+  wget -q --show-progress -O "$GCLOUD_TAR" \
+    "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_VERSION}-linux-x86_64.tar.gz"
+
+  print_status "Extrayendo..."
+  tar -xf "$GCLOUD_TAR" -C /tmp/
+
+  print_status "Instalando gcloud CLI..."
+  cd /tmp/google-cloud-sdk
+  ./install.sh --quiet --path-update=true --command-completion=true --usage-reporting=false
+  cd ~
+
+  rm -f "$GCLOUD_TAR"
+  print_success "gcloud CLI instalado (reinicia terminal o ejecuta: source ~/.bashrc)"
+else
+  print_success "gcloud CLI ya instalado: $(gcloud version 2>/dev/null | head -1)"
+fi
+
+print_installing "Cloud SQL Auth Proxy"
+if [[ ! -f ~/cloud-sql-proxy ]]; then
+  print_status "Descargando Cloud SQL Auth Proxy v2.21.3..."
+  curl -#Lo ~/cloud-sql-proxy \
+    https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.21.3/cloud-sql-proxy.linux.amd64
+  chmod +x ~/cloud-sql-proxy
+  print_success "cloud-sql-proxy descargado en ~/cloud-sql-proxy"
+else
+  print_success "cloud-sql-proxy ya descargado en ~/cloud-sql-proxy"
+fi
+
+print_header "Configuracion manual: pgAdmin4 + conexion a GCP"
+echo
+echo -e "${BOLD}Pasos para conectar a la BD del PTD:${NC}"
+echo
+echo -e "  ${GREEN}1.${NC} Autenticate con tu cuenta CIC (abre navegador):"
+echo -e "     ${CYAN}gcloud auth application-default login${NC}"
+echo
+echo -e "  ${GREEN}2.${NC} Inicia el proxy (en OTRA terminal, mantener corriendo):"
+echo -e "     ${CYAN}~/cloud-sql-proxy --port 5433 cic-ptd-dev:us-east1:cic-ptd-dev${NC}"
+echo
+echo -e "  ${GREEN}3.${NC} Abre pgAdmin4 y crea nueva conexion con:"
+echo -e "     - ${BOLD}Host:${NC}     ${YELLOW}127.0.0.1${NC} (NUNCA el nombre de la BD)"
+echo -e "     - ${BOLD}Port:${NC}     ${YELLOW}5433${NC} (el del proxy, no 5432)"
+echo -e "     - ${BOLD}Database:${NC} ${YELLOW}talento-dev${NC}"
+echo -e "     - ${BOLD}Username:${NC} ${YELLOW}talento-dev${NC}"
+echo -e "     - ${BOLD}Password:${NC} ${YELLOW}EHE1iabBFVYl^QJN${NC}"
+echo
+echo -e "  ${GREEN}4.${NC} Conexion via psql (alternativa):"
+echo -e "     ${CYAN}psql -h 127.0.0.1 -p 5433 -U talento-dev -d talento-dev${NC}"
+echo
+echo -e "  ${YELLOW}Errores comunes:${NC}"
+echo -e "     - ${RED}failed to resolve host${NC} → pusiste 'talento-dev' como Host (debe ser 127.0.0.1)"
+echo -e "     - ${RED}Connection refused port 5432${NC} → usa puerto 5433 (del proxy) no 5432"
+echo -e "     - ${RED}Connection refused${NC} → el proxy no esta corriendo"
+echo
+read -rp "$(echo -e ${YELLOW}Presiona Enter cuando hayas configurado pgAdmin4 o para continuar...${NC})" </dev/tty
+
+print_success "GCloud + Cloud SQL Proxy listos"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 15: ZSH + OH-MY-ZSH
