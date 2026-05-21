@@ -1,4 +1,4 @@
-> **MANUAL DE LA SIRENA, MI DIARIO**
+> **MAGNUAL DE LA SIRENA, MI DIARIO**
 > Grupo Ramos | 1965, Av. Mella, Sto. Dgo.
 > 82+ tiendas, +8,000 empleados.
 > Marcas propias: Wala, Zerca, BuenHorno,
@@ -427,6 +427,240 @@ REGLA 15-15:
 
 ---
 
+````markdown
+---
+
+# ANOTACIONES: Seguridad y Salud en el Trabajo (SST) — 5° Taller ©
+
+## Marco Legal - República Dominicana
+
+```text
+CONSTITUCIÓN RD
+• Art. 62, Párrafo 8: Obligación del empleador
+  de garantizar a sus trabajadores condiciones
+  de Seguridad, Salubridad, Higiene y Ambiente
+  de Trabajo adecuadas.
+
+LEYES NACIONALES:
+• Código de Trabajo 16-92
+• Ley 64-00 Medio Ambiente
+• Ley 87-01 Ley de Seguridad Social
+• Reglamento 522-06 Seguridad y Salud en el Trabajo
+
+DOCUMENTOS APLICABLES:
+→ Reglamento de Seguridad y Salud en el Trabajo (DGHSI)
+```
+````
+
+---
+
+## Accidentes e Incidentes
+
+```text
+DIFERENCIAS CLAVE:
+
+CUASI-ACCIDENTE (Incidente):
+├─ Situación peligrosa que NO resultó en daño
+├─ Ejemplo: Carga suspendida se balancea pero no cae
+└─ Oportunidad de PREVENIR accidente real
+
+ACCIDENTE:
+├─ Evento que CAUSÓ daño, lesión o pérdida
+├─ Ejemplo: Carga cae y lesiona a trabajador
+└─ Requiere investigación y reporte obligatorio
+```
+
+**Importancia de Reportar Incidentes:**
+
+- Identificar riesgos antes de que causen daño
+- Implementar medidas correctivas
+- Evitar accidentes futuros
+
+---
+
+## ¿Por Qué Ocurren los Accidentes?
+
+### Causas Técnicas (Instalaciones, Equipos, Procesos)
+
+```text
+⚠️ Zonas de trabajo poco seguras
+   → Pisos mojados, iluminación deficiente,
+      obstrucciones en pasillos
+
+⚙️ Equipos en mal estado
+   → Maquinaria sin mantenimiento,
+      cables expuestos, frenos defectuosos
+
+🔧 Uso de herramientas inadecuadas o defectuosas
+   → Herramientas improvisadas, desgastadas,
+      no aptas para la tarea
+
+💪 Esfuerzos repetitivos o sobre-esfuerzos
+   → Levantamiento incorrecto de cargas,
+      movimientos repetitivos sin descanso
+```
+
+### Causas Humanas (Comportamiento)
+
+```text
+👤 Error humano
+   → Distracción, fatiga, falta de capacitación
+   → No seguir procedimientos establecidos
+
+🦺 Uso incorrecto de EPPs
+   → No usar equipo de protección
+   → Usar EPPs dañados o inadecuados
+   → Quitarse protección antes de tiempo
+```
+
+---
+
+## Prevención y Cultura de Seguridad
+
+```text
+PRINCIPIOS BÁSICOS:
+✓ Identificar riesgos ANTES de trabajar
+✓ Usar siempre EPPs apropiados
+✓ Reportar condiciones inseguras
+✓ Mantener áreas limpias y organizadas (LOSE)
+✓ Seguir procedimientos de seguridad
+✓ Pedir ayuda cuando sea necesario
+
+EPPs COMUNES EN RETAIL:
+• Calzado antideslizante
+• Guantes (según tarea)
+• Faja lumbar (manejo de cargas)
+• Casco (almacén/carga)
+• Chaleco reflectivo
+```
+
+---
+
+````markdown
+## Prácticas de Seguridad en Almacén/Bodega
+
+```text
+SEÑALIZACIÓN DE PISO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟨 Líneas amarillas → Zonas peatonales
+🔵 Señales azules   → Rutas de montacargas
+🔴 Zonas rojas      → Áreas restringidas
+
+BUENAS PRÁCTICAS:
+✓ Respetar pasillos marcados
+✓ Usar chaleco reflectivo
+✓ Mantener carga estable en montacargas
+✓ Estanterías organizadas (LOSE)
+✓ Señalización visible
+✓ Caminar por zonas peatonales
+✓ Comunicación entre operadores
+
+PRÁCTICAS INSEGURAS COMUNES:
+✗ Cruzar zonas de montacargas sin mirar
+✗ Apilar cajas inestables
+✗ Bloquear salidas de emergencia
+✗ Exceso de carga en estanterías
+✗ No usar EPPs (casco, chaleco, calzado)
+✗ Montacargas sin inspector/certificación
+✗ Transitar con carga elevada
+✗ Dejar materiales en pasillos
+```
+````
+
+---
+
+## Sistema de Reportes y Mural de Seguridad
+
+### Mural de Seguridad y Salud en el Trabajo CD01
+
+```text
+SISTEMA DE SEMÁFORO SST:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟢 SEMÁFORO VERDE
+   → Situación controlada
+   → Cumplimiento de protocolos
+
+🟡 ALERTA AMARILLO
+   → Condiciones por mejorar
+   → Requiere acción preventiva
+
+🔴 ALTO ROJO
+   → Riesgo inminente
+   → Acción inmediata obligatoria
+
+INDICADORES DE SST:
+┌──────────────────────────────┐
+│ Respuestas          → 3      │
+│ Acción Asignada     → 1      │
+│ Aceptado/Resolver   → 3      │
+│ No Aceptado         → 0      │
+│ Cantidad Total      → 7      │
+└──────────────────────────────┘
+
+MÉTRICAS CLAVE:
+• [X] DÍAS SIN ACCIDENTE
+• [X] DÍAS SIN INCIDENTE
+• Estado: INVESTIGADO / RESUELTO
+```
+
+### Reporte de Actos y Condiciones Inseguras
+
+```text
+¿QUÉ REPORTAR?
+
+ACTOS INSEGUROS:
+• Trabajador sin EPPs
+• No seguir procedimientos
+• Usar equipo de forma incorrecta
+• Tomar atajos peligrosos
+
+CONDICIONES INSEGURAS:
+• Piso mojado sin señalizar
+• Equipo dañado o defectuoso
+• Iluminación deficiente
+• Cables expuestos
+• Obstrucciones en pasillos
+• Escaleras sin barandal
+
+CÓMO REPORTAR:
+1. Identificar la situación
+2. Documentar con foto (si es posible)
+3. Reportar al supervisor inmediato
+4. Llenar formato de reporte SST
+5. Seguimiento en Mural de Seguridad
+
+CONCEPTOS SST APLICABLES:
+→ Sistema visual en cada centro de distribución
+→ Comité de Seguridad con fotos y contactos
+→ Actualización diaria de métricas
+→ Investigación de incidentes en 24-48h
+```
+
+### Cultura "Somos Todos"
+
+```text
+RESPONSABILIDAD COMPARTIDA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+No es solo del supervisor o gerente.
+TODOS somos responsables de:
+
+• Identificar riesgos
+• Reportar condiciones inseguras
+• Cuidarnos entre compañeros
+• Cumplir protocolos
+• Sugerir mejoras
+
+⚠️ CERO TOLERANCIA:
+   - Ignorar reportes de seguridad
+   - Trabajar bajo influencia
+   - Sabotear EPPs o señalización
+```
+
+---
+
+**Recuerda:** La seguridad es responsabilidad de TODOS.
+"Somos Todos" → Cultura de prevención colectiva.
+
 # Eslóganes y Diccionario
 
 - **LOSE**: Limpieza, Organización, Surtidos, Etiquetado
@@ -435,3 +669,29 @@ REGLA 15-15:
 - **PAS/3S**: Proteger, Avisar, Socorrer
 - **P.A.S.S.**: Jalar, Apuntar, Apretar, Barrer
 - **NIQ**: Nielsen IQ (plataforma Spaceman)
+- **SST**: Seguridad y Salud en el Trabajo
+- **EPPs**: Equipos de Protección Personal
+- **DGHSI**: Dirección General de Higiene y Seguridad Industrial
+
+- trak177
+- track02
+
+## PowerK, Traker
+
+- User: Vreyes
+- Password: Condimentosmc14.
+
+Frandia:
+
+- User: frabreu
+- Password: Frandia0101010101.
+
+Lucas (mmg):
+
+- User: lupaulino
+- Password: Centro0101010101.
+
+Mayelin:
+
+- User: mgonzalez
+- Password: Comunicacion23.
