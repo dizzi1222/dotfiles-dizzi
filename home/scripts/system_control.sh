@@ -48,6 +48,14 @@ case "$ICON" in
 "󰺐")
   kitty -e ~/scripts/scrcpy-connect.sh
   ;;
+"󰗃")
+  # Exportar canciones de Soundbound desde Waydroid
+  kitty --hold -e sh -c "
+    sudo cp -r /home/diego/.local/share/waydroid/data/media/0/Soundbound /home/diego/Soundbound_Exportada
+    sudo chown -R diego:diego /home/diego/Soundbound_Exportada
+    echo '✅ Canciones exportadas a /home/diego/Soundbound_Exportada'
+  "
+  ;;
 "")
   sh ~/scripts/power_management.sh
   ;;
