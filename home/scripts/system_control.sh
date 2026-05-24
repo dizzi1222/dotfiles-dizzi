@@ -21,10 +21,9 @@ case "$ICON" in
   kitty -e ~/scripts/save-point.sh
   ;;
 "󱛍")
-  for path in "~/mi_gdrive/Mi unidad/[Documentos]/wifi.docx" "~/Descargas/wifi.docx" "~/Downloads/wifi.docx"; do
-    eval expanded="$path"
-    if [ -f "$expanded" ]; then
-      libreoffice "$expanded"
+  for path in "$HOME/mi_gdrive/Mi unidad/[Documentos]/wifi.docx" "$HOME/Descargas/wifi.docx" "$HOME/Downloads/wifi.docx"; do
+    if [ -f "$path" ]; then
+      libreoffice "$path"
       break
     fi
   done
