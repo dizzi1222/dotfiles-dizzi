@@ -3,7 +3,7 @@
 
 allowNotifications=1
 
-repeatState=1
+repeatState=0
 
 shuffleEnabled=0
 
