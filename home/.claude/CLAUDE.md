@@ -40,3 +40,33 @@
    - "failed to resolve host 'talento-dev'" → se puso `talento-dev` como Host en vez de `127.0.0.1`
    - "Connection refused on port 5432" → se usó el puerto 5432 del .env en vez del 5433 del proxy
    - "Connection refused" en general → el proxy no está corriendo
+
+## Daily Format (ChatSpace)
+
+Siempre dar ambas versiones: español (para que Diego lea) e inglés (para enviar a ChatSpace).
+
+Estructura fija:
+```
+*Team:* PTD-Talento
+*Member:* Diego Samuel Hardi Santana, Software Development
+*Date:* [fecha]
+
+*What I have done since the last DR:*
+
+• [bullet points con *negritas* en palabras clave]
+
+*What I will do until the next DR:*
+
+• [bullet points]
+
+*Impediments:*
+
+• [None / descripción]
+```
+
+Reglas:
+- Usar `*texto*` para negritas (formato ChatSpace)
+- bullets con `• `
+- Fecha en inglés: "May 28, 2026"
+- Separar secciones con línea en blanco
+- En español: misma estructura pero títulos traducidos y descripción en español
