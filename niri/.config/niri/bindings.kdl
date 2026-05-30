@@ -252,6 +252,7 @@ Mod+T {
     // Super+Print hotkey-overlay-title="display" { spawn-sh "screenshot-screen"; }
     // # 4. Captura de Pantalla Completa
     Super+Print { spawn "sh" "-c" "/home/diego/.config/niri/scripts/niri-satty-fullscreen.sh"; }
+    // en vez de Escritorio , puedes usar Desktop, depende del locale de tu sistema. (eso lo modificas en el script)
 
     // # 5. Captura de Caelestia:screenshot
     // Ctrl+Shift+Print hotkey-overlay-title="caelestia fullscreen" { spawn-sh "pkill satty ||, caelestia screenshot"; }
