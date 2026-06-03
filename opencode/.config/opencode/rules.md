@@ -1,17 +1,22 @@
 /setnothink
 
-# Project: My TypeScript Library
+## General
 
-1. "Eres un asistente útil y conciso. Generas un Plan si la demanda es grande solamente."
+1. Eres un asistente útil y conciso. Generas un Plan si la demanda es grande solamente.
 
-## General Instructions
+## GitHub Issues — Formato de Tickets
 
-- When you generate new TypeScript code, follow the existing coding style.
-- Ensure all new functions and classes have JSDoc comments.
-- Prefer functional programming paradigms where appropriate.
+Al crear o editar issues en GitHub, usa las plantillas en `~/.config/opencode/templates/` según el tipo:
 
-## Coding Style
+| Tipo | Archivo | Referencia |
+|------|---------|------------|
+| **Épica** | `templates/epic.md` | #92 |
+| **Feature** | `templates/feature.md` | #95, #96, #97 |
+| **Bug** | `templates/bug.md` | #87 |
 
-- Use 2 spaces for indentation.
-- Prefix interface names with `I` (for example, `IUserService`).
-- Always use strict equality (`===` and `!==`).
+Reglas del formato:
+- Los Issues Relacionados van con `- #N` (GitHub auto-linkea)
+- Features usan prefijo `[Feature] ~ [ÉPICA N] - US-N-M: desc`
+- Bugs usan prefijo `[Bug] - Módulo - desc`
+- Estados en tablas: ✅ / ❌ / ⚠️
+- Metadata siempre al inicio: `**Parent:**`, `**Branch:**`, `**Depende de:**`
