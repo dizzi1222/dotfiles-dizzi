@@ -45,6 +45,9 @@
             "net.lutris.neovim-124": {
                "enabled": false
             },
+            "vim": {
+               "enabled": false
+            },
             "wine.Programs.Shadow PC": {
                "enabled": false
             }
