@@ -317,52 +317,60 @@ aicommit-toggle() {
   fi
 }
 
+# Wrapper para oco: resuelve OCO_API_KEY desde variable de entorno
+oco() {
+  local config="$HOME/.opencommit"
+  if [ -f "$config" ] && grep -q '^OCO_API_KEY=OPEN_ROUTER_API_KEY$' "$config" 2>/dev/null; then
+    OCO_API_KEY="$OPEN_ROUTER_API_KEY" command oco "$@"
+  else
+    command oco "$@"
+  fi
+}
+
 # Comando para reconfigurar opencommit fácilmente
 # Función dinámica para configurar opencommit
 aicommitconfig() {
-  echo "📦 Configurando opencommit con Ollama..."
-  
-  # Detectar entorno
-  if grep -qi microsoft /proc/version 2>/dev/null; then
-    local WINDOWS_HOST=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
-    local OLLAMA_URL="http://${WINDOWS_HOST}:11434"
-    echo "🪟 WSL detectado, usando Windows host: ${WINDOWS_HOST}"
-  else
-    local OLLAMA_URL="http://localhost:11434"
-    echo "🐧 Linux nativo detectado, usando localhost"
-  fi
-  
-  # Verificar conexión
-  if ! curl -s "${OLLAMA_URL}/api/tags" &>/dev/null; then
-    echo "❌ Ollama no responde"
+  echo "📦 Configurando opencommit con OpenRouter..."
+  echo ""
+
+  # Verificar API key
+  if [[ -z "$OPEN_ROUTER_API_KEY" ]]; then
+    echo "❌ OPEN_ROUTER_API_KEY no está definida"
+    echo "   Agrégala en ~/.api-keys.sh"
     return 1
   fi
-  
-  echo "✅ Ollama detectado en ${OLLAMA_URL}"
-  echo ""
-  
-  # Obtener modelos
-  local models=($(ollama list | tail -n +2 | awk '{print $1}'))
-  
+
+  # Obtener modelos gratis de OpenRouter
+  echo "🔍 Obteniendo modelos gratis desde OpenRouter..."
+  local models=($(curl -s -H "Authorization: Bearer $OPEN_ROUTER_API_KEY" \
+    https://openrouter.ai/api/v1/models | \
+    python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for m in data.get('data', []):
+    pid = m.get('id', '')
+    p = m.get('pricing', {})
+    prom = float(p.get('prompt', 0))
+    comp = float(p.get('completion', 0))
+    if prom == 0 and comp == 0 and ':free' in pid:
+        print(pid)
+" 2>/dev/null))
+
   if [[ ${#models[@]} -eq 0 ]]; then
-    echo "❌ No hay modelos"
+    echo "❌ No se pudieron obtener modelos. Verifica tu conexión y API key."
     return 1
   fi
-  
-  echo "Modelos disponibles:"
-  echo "💡 Tip: Esta configuración usa /api/chat (optimizado para modelos cloud)"
-  echo ""
-  
+
+  echo "Modelos gratis disponibles:"
   select model in "${models[@]}" "❌ Cancelar"; do
     [[ "$model" == "❌ Cancelar" ]] && return 0
     
     if [[ -n "$model" ]]; then
-      # Configurar
-      oco config set OCO_AI_PROVIDER=ollama
+      # Configurar opencommit con OpenRouter
+      oco config set OCO_AI_PROVIDER=openai
       oco config set OCO_MODEL="$model"
-      oco config set OCO_API_URL="${OLLAMA_URL}/api/chat"  # 🔥 Usa variable en vez de hardcodear
-      # oco config set OCO_API_KEY="ANTHROPIC_API_KEY" # ESTO ENTRA EN CONFLICTO CON Ollama y afecta el Git push:
-      # oco config set OCO_GITPUSH=false      
+      oco config set OCO_API_URL="https://openrouter.ai/api/v1"
+      oco config set OCO_API_KEY="$OPEN_ROUTER_API_KEY"
       oco config set OCO_LANGUAGE=es_ES
       oco config set OCO_TOKENS_MAX_INPUT=12000
       oco config set OCO_TOKENS_MAX_OUTPUT=500
@@ -370,11 +378,10 @@ aicommitconfig() {
       
       echo ""
       echo "✅ opencommit configurado correctamente:"
-      echo "   • Provider: ollama"
-      echo "   • URL: ${OLLAMA_URL}/api/chat"  # 🔥 Muestra URL correcta
+      echo "   • Provider: openai (OpenRouter)"
+      echo "   • URL: https://openrouter.ai/api/v1"
       echo "   • Modelo: $model"
       echo "   • Idioma: es_ES"
-      echo "   • Recomendación: Para modelos locales, quita /api/chat manualmente"
       
       if oco --version &>/dev/null; then
         echo "✅ opencommit funcional"
