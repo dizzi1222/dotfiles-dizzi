@@ -395,6 +395,16 @@ aicommit-toggle() {
   fi
 }
 
+# Wrapper para oco: resuelve OCO_API_KEY desde variable de entorno
+oco() {
+  local config="$HOME/.opencommit"
+  if [ -f "$config" ] && grep -q '^OCO_API_KEY=OPEN_ROUTER_API_KEY$' "$config" 2>/dev/null; then
+    OCO_API_KEY="$OPEN_ROUTER_API_KEY" command oco "$@"
+  else
+    command oco "$@"
+  fi
+}
+
 # Comando para reconfigurar opencommit fácilmente
 # Función dinámica para configurar opencommit
 aicommitconfig() {
