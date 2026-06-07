@@ -67,6 +67,8 @@ Estructura fija:
 Reglas:
 - Usar `*texto*` para negritas (formato ChatSpace)
 - bullets con `• `
-- Fecha en inglés: "May 28, 2026"
+- Fecha en inglés: "June 5, 2026"
 - Separar secciones con línea en blanco
 - En español: misma estructura pero títulos traducidos y descripción en español
+- **Siempre enlazar tickets mencionados** con su URL completa de GitHub, ej: https://github.com/Cincinnatus-Institute-of-Craftsmanship/ptd-talento-back/issues/94
+- Si mencionas un *épica tracker*, lista sus features entre paréntesis, ej: *ÉPICA 03 Tracker* (#92) con Features (US-03-01, US-03-02, US-03-03)
