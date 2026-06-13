@@ -686,6 +686,11 @@ Frandia:
 - User: frabreu
 - Password: Frandia0101010101.
 
+Jhon:
+
+- User: jhortiz
+- Password: Fresco0101010101.
+
 Lucas (mmg):
 
 - User: lupaulino
