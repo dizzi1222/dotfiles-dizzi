@@ -80,7 +80,7 @@ case "$opcion" in
   IP="10.0.0.6"
   echo ""
   if [[ "$TIPO" =~ ^[Rr] ]]; then
-    read -p "Puerto de depuración (ej: 40775): " DEBUG_PORT
+    read -p "Puerto de depuración (ej la mia: 39781): " DEBUG_PORT
     echo "▶ Conectando a $IP:$DEBUG_PORT ..."
     adb connect "$IP:$DEBUG_PORT"
   else
