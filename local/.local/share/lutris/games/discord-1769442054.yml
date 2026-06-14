@@ -1,0 +1,3 @@
+game:
+  exe: /home/diego/.wine/drive_c/portapps/discord-portable/discord-portable.exe
+  working_dir: /usr/bin/
