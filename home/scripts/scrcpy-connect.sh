@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+CONFIG_FILE="$HOME/.config/scrcpy-connect.conf"
+
+load_last_port() {
+  if [ -f "$CONFIG_FILE" ]; then
+    grep "last_debug_port=" "$CONFIG_FILE" | cut -d= -f2
+  fi
+}
+
+save_last_port() {
+  mkdir -p "$(dirname "$CONFIG_FILE")" 2>/dev/null
+  echo "last_debug_port=$1" > "$CONFIG_FILE"
+}
+
+LAST_PORT=$(load_last_port)
+: "${LAST_PORT:=39781}"
+
 clear
 echo "󰺐  Scrcpy Connect - Android Screen Mirror"
 echo "============================================"
@@ -80,7 +96,10 @@ case "$opcion" in
   IP="10.0.0.6"
   echo ""
   if [[ "$TIPO" =~ ^[Rr] ]]; then
-    read -p "Puerto de depuración (ej la mia: 39781): " DEBUG_PORT
+    read -p "Puerto de depuración [${LAST_PORT}]: " DEBUG_PORT
+    DEBUG_PORT="${DEBUG_PORT:-$LAST_PORT}"
+    save_last_port "$DEBUG_PORT"
+    echo "   ✓ Puerto guardado: $DEBUG_PORT"
     echo "▶ Conectando a $IP:$DEBUG_PORT ..."
     adb connect "$IP:$DEBUG_PORT"
   else
@@ -91,7 +110,10 @@ case "$opcion" in
     echo "$CODE" | adb pair "$IP:$PAIR_PORT"
     [ $? -ne 0 ] && echo "❌ Falló." && read -p "Presiona Enter..." && exit 1
     sleep 1
-    read -p "Puerto de depuración (ej: 40775): " DEBUG_PORT
+    read -p "Puerto de depuración [${LAST_PORT}]: " DEBUG_PORT
+    DEBUG_PORT="${DEBUG_PORT:-$LAST_PORT}"
+    save_last_port "$DEBUG_PORT"
+    echo "   ✓ Puerto guardado: $DEBUG_PORT"
     echo "▶ Conectando a $IP:$DEBUG_PORT ..."
     adb connect "$IP:$DEBUG_PORT"
   fi
