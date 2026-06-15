@@ -85,8 +85,9 @@ case "$opcion" in
   ;;
 3)
   echo ""
-  echo "▶ Activa en tu teléfono:"
-  echo "   Developer Options > Depuración Inalámbrica"
+  echo "▶ Requisitos:"
+  echo "   • Misma red WiFi que el teléfono (IP: 10.0.0.6)"
+  echo "   • Depuración Inalámbrica activada en Developer Options"
   echo ""
   echo "   Opciones:"
   echo "   E) Emparejar por primera vez (necesitas código)"
@@ -96,11 +97,10 @@ case "$opcion" in
   IP="10.0.0.6"
   echo ""
   if [[ "$TIPO" =~ ^[Rr] ]]; then
-    read -p "Puerto de depuración [${LAST_PORT}]: " DEBUG_PORT
+    read -p "Puerto de depuración (ej la mia: $LAST_PORT): " DEBUG_PORT
     DEBUG_PORT="${DEBUG_PORT:-$LAST_PORT}"
     save_last_port "$DEBUG_PORT"
     echo "   ✓ Puerto guardado: $DEBUG_PORT"
-    echo "▶ Conectando a $IP:$DEBUG_PORT ..."
     adb connect "$IP:$DEBUG_PORT"
   else
     echo "   Presiona 'Emparejar dispositivo con código de emparejamiento'"
@@ -110,11 +110,10 @@ case "$opcion" in
     echo "$CODE" | adb pair "$IP:$PAIR_PORT"
     [ $? -ne 0 ] && echo "❌ Falló." && read -p "Presiona Enter..." && exit 1
     sleep 1
-    read -p "Puerto de depuración [${LAST_PORT}]: " DEBUG_PORT
+    read -p "Puerto de depuración (ej la mia: $LAST_PORT): " DEBUG_PORT
     DEBUG_PORT="${DEBUG_PORT:-$LAST_PORT}"
     save_last_port "$DEBUG_PORT"
     echo "   ✓ Puerto guardado: $DEBUG_PORT"
-    echo "▶ Conectando a $IP:$DEBUG_PORT ..."
     adb connect "$IP:$DEBUG_PORT"
   fi
   sleep 1
