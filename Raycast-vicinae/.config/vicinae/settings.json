@@ -22,6 +22,7 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
+      "applications:pokemmo",
       "clipboard:history",
       "applications:waydroid-start-sd",
       "applications:Stremio_Web"
@@ -46,6 +47,9 @@
                "enabled": false
             },
             "vim": {
+               "enabled": false
+            },
+            "wine.Programs.CustomRP.CustomRP": {
                "enabled": false
             },
             "wine.Programs.Shadow PC": {
