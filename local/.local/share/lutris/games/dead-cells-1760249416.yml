@@ -1,4 +1,6 @@
 game:
   args: ''
-  exe: /run/media/diego/ext.Fp 2/Games/Dead Cells (2018)/Dead Cells/deadcells.exe
-  working_dir: /run/media/diego/0828-67C1/Games/Dead Cells (2018)
+  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Dead Cells (2018)/Dead
+    Cells/deadcells.exe
+  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Dead
+    Cells (2018)/Dead Cells/
