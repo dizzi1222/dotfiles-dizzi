@@ -1,0 +1,9 @@
+[Desktop Entry]
+Exec=bottles-cli run -p Blasphemous -b 'gaming' -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Comment=Launch Blasphemous using Bottles.
+StartupWMClass=Blasphemous
+Name=Blasphemous
+Icon=/home/diego/.local/share/xdg-desktop-portal/icons/256x256/com.usebottles.bottles.App_2b666db613fdcf2ab78c4ebea13f556e23bd621b.png
