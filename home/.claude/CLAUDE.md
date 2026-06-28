@@ -34,7 +34,7 @@
    - Port: `5433` (el del proxy, no el del .env)
    - Database: `talento-dev`
    - Username: `talento-dev`
-   - Password: `EHE1iabBFVYl^QJN`
+   - Password: **Ver en 1Password / Vault del equipo**
 
 3. **Errores comunes:**
    - "failed to resolve host 'talento-dev'" → se puso `talento-dev` como Host en vez de `127.0.0.1`
@@ -80,11 +80,21 @@ Usar esta plantilla en el body de todos los PRs:
 ```markdown
 ## QA Testing Information
 
+### Código y Ramas afectadas
+⚠️ Nota: Dependiendo del alcance del ticket, es posible que este Pull Request solo incluya una de las siguientes ramas (no es obligatorio que estén ambas).
+- **Rama Backend:**
+- **Rama Frontend:**
+
 ### Objetivo del cambio
-¿Qué problema resuelve este PR?
+¿Qué problema resuelve o añade este PR?
 
 ### Flujo funcional afectado
 Describir brevemente qué flujo del sistema cambia.
+Ejemplo:
+- Registro de asistencia
+- Login con Google
+- Salida de laptops
+- Gestión de campus
 
 ### Comportamiento esperado
 ¿Qué debe ocurrir después del cambio?
@@ -99,17 +109,51 @@ Describir brevemente qué flujo del sistema cambia.
 
 ### Evidencia sugerida para validación
 ¿Cómo confirmar que el cambio funciona correctamente?
+Ejemplo:
+- Respuesta esperada de API
+- Registro en base de datos
+- Cambio visible en interfaz
+- Log esperado
+- Estado esperado en sistema externo
 
 ### Ambiente o configuración requerida
-Indicar cualquier requisito necesario para ejecutar y validar el cambio:
-- Variables de entorno requeridas
-- Tokens o credenciales necesarias
-- Usuario(s) de prueba y sus permisos o roles
-- Datos de prueba específicos
-- Servicios externos necesarios
-- Configuración especial del ambiente (si aplica)
-- Pasos previos para preparar el escenario de prueba (si aplica)
+Indicar cualquier requisito necesario para ejecutar y validar el cambio. Es fundamental puntualizar detalladamente las siguientes secciones para que QA pueda levantar el entorno y ejecutar las pruebas sin fricciones:
+- **URL Base / Puerto:** (Indicar en qué puerto corre localmente o la URL del ambiente de pruebas)
+- **Pasos previos para preparar el escenario de prueba (si aplica):** (Comandos como npm install, correr migraciones, etc.)
+- **Variables de entorno requeridas**
+- **Tokens o credenciales necesarias**
+- **Usuario(s) de prueba y sus permisos o roles**
+- **Datos de prueba específicos**
+- **Servicios externos necesarios**
+- **Configuración especial del ambiente (si aplica)**
 
 ### Observaciones adicionales
 Revisar los comentarios de Gemini Code Assist (o la herramienta de code review utilizada) durante la preparación del PR y antes de solicitar validación de QA. Los hallazgos del code review pueden ayudar a identificar validaciones faltantes, escenarios de error, riesgos potenciales, cambios de comportamiento o información adicional que debería incluirse en la descripción del PR para facilitar un proceso de pruebas más claro y reducir el intercambio de preguntas entre Desarrollo y QA.
+```
+
+## PR Conclusion Template (QA Update)
+
+Usar esta plantilla cuando se actualiza un PR ya existente:
+
+```markdown
+🔄 **PR Update / Commit Information for QA** 🛠️
+
+### ¿Qué cambió en esta actualización?
+(Describe de forma breve y directa qué cambios o correcciones introduce este nuevo commit)
+
+### ⚠ ¿Afecta al "QA Testing Information" principal?
+(Marca con una X la opción que aplique)
+
+- [ ] **NO.** El objetivo del cambio, los pre-requisitos, las variables y los casos de prueba siguen siendo exactamente los mismos que se describieron en el mensaje principal del PR.
+- [ ] **SÍ.** Esta actualización modifica o añade elementos a la estrategia de pruebas original. (Especifica los cambios abajo):
+
+**Nuevo flujo/caso afectado:**
+**Nueva variable/configuración requerida:**
+**Cambio en el comportamiento esperado:**
+
+### 🎯 Foco de Re-testing (Sugerencia para QA)
+(¿Qué debería priorizar QA al revisar este nuevo commit? Ej: "Enfocarse solo en validar el flujo de error 401 que antes fallaba" o "Volver a correr el flujo completo")
+
+### 📝 Notas adicionales / Evidencia (Opcional)
+(Cualquier dato extra, logs, capturas de pantalla o comentarios que el desarrollador considere útiles para QA)
 ```
