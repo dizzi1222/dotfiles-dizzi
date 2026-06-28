@@ -1645,7 +1645,7 @@ echo -e "     - ${BOLD}Host:${NC}     ${YELLOW}127.0.0.1${NC} (NUNCA el nombre d
 echo -e "     - ${BOLD}Port:${NC}     ${YELLOW}5433${NC} (el del proxy, no 5432)"
 echo -e "     - ${BOLD}Database:${NC} ${YELLOW}talento-dev${NC}"
 echo -e "     - ${BOLD}Username:${NC} ${YELLOW}talento-dev${NC}"
-echo -e "     - ${BOLD}Password:${NC} ${YELLOW}EHE1iabBFVYl^QJN${NC}"
+echo -e "     - ${BOLD}Password:${NC} ${YELLOW}**** (ver .env o 1Password)${NC}"
 echo
 echo -e "  ${GREEN}4.${NC} Conexion via psql (alternativa):"
 echo -e "     ${CYAN}psql -h 127.0.0.1 -p 5433 -U talento-dev -d talento-dev${NC}"
