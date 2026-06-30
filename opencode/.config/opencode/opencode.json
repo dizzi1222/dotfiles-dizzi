@@ -3,7 +3,7 @@
   "mcp": {
     "engram": {
       "command": [
-        "/home/diego/dotfiles-dizzi/local/.local/bin/engram",
+        "/home/diego/.local/bin/engram",
         "mcp",
         "--tools=agent"
       ],
