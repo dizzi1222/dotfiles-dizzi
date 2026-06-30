@@ -203,3 +203,86 @@ Usar esta plantilla cuando se actualiza un PR ya existente:
 - GitHub templates: `/home/diego/dotfiles-dizzi/.github/`
 - CLAUDE.md dotfiles: `/home/diego/dotfiles-dizzi/home/.claude/CLAUDE.md`
 - Scripts install: `/home/diego/dotfiles-dizzi/home/fase2-HyprInstall-full.sh`, `/home/diego/dotfiles-dizzi/home/fase2-HyprInstall-CachyOS-Edition.sh`
+- Engram bin: `/home/diego/dotfiles-dizzi/home/.local/bin/engram`
+- jscamp-memory helper: `/home/diego/dotfiles-dizzi/home/.local/bin/jscamp-memory`
+- Keymaps Neovim: `/home/diego/dotfiles-dizzi/nvim/.config/nvim/lua/config/keymaps.lua`
+
+## Engram - Memoria Persistente para Agentes IA
+
+### Instalación (CachyOS)
+```bash
+# Binario precompilado
+curl -L https://github.com/Gentleman-Programming/engram/releases/latest/download/engram_1.17.0_linux_amd64.tar.gz | tar xz -C /tmp
+mv /tmp/engram ~/.local/bin/engram
+chmod +x ~/.local/bin/engram
+```
+
+### Configuración para OpenCode
+```bash
+engram setup opencode
+# Reinicia OpenCode
+```
+
+### Uso en OpenCode (herramientas MCP)
+- `mem_save` — Guardar memoria (title, msg, type, project)
+- `mem_search` — Buscar memorias
+- `mem_context` — Contexto reciente de sesión
+- `mem_timeline` — Contexto cronológico
+- `mem_session_start/end/summary` — Ciclo de sesión
+
+### Proyecto JSCamp
+```bash
+# Guardar lección
+engram save "Lección: Filtrado resultados" "Usar event.target.classList.contains y .is-hidden" --type lesson --project jscamp
+
+# Guardar patrón
+engram save "Patrón: Delegación eventos" "click en .jobs-listings → event.target.button-apply-job" --type pattern --project jscamp
+
+# Contexto antes de continuar
+engram context --project jscamp
+```
+
+### Keymaps Neovim (Engram)
+- `<leader>ems` — Guardar memoria
+- `<leader>eml` — Guardar lección
+- `<leader>emp` — Guardar patrón
+- `<leader>emsess` — Guardar resumen sesión
+- `<leader>emc` — Mostrar contexto
+- `<leader>emf` — Buscar memoria
+
+### Helper jscamp-memory
+```bash
+jscamp-memory save "Título" "Mensaje" [--type TYPE]
+jscamp-memory lesson "Título" "Contenido"
+jscamp-memory pattern "Título" "Descripción"
+jscamp-memory session "Resumen de la sesión"
+jscamp-memory search "query"
+jscamp-memory context
+```
+
+### JSCamp - Bootcamp midudev
+
+**Repo:** `dizzi1222/jscamp` (fork de `midudev/jscamp`)
+**Submódulo:** `workspace/jscamp` → `dizzi1222/jscamp`
+**Rama actual:** `ejercicio-filtrando` (commit `9646b6b` - punto exacto del ejercicio)
+
+**Estructura:**
+- `01-javascript/empleos.html` — Página con filtros (tecnología, ubicación, experiencia)
+- `01-javascript/script.js` — Ejercicio implementado (filtrado por tecnología)
+- `01-javascript/styles.css` — Design system completo (dark theme, vars CSS)
+
+**Workflow ramas:**
+```bash
+cd workspace/jscamp
+git checkout -b leccion-fetch-json ejercicio-filtrando
+# programas...
+git commit -am "feat: implement fetch from data.json"
+git push origin leccion-fetch-json
+```
+
+**Arrancar:**
+```bash
+cd workspace/jscamp/01-javascript
+python3 -m http.server 8083
+# → http://localhost:8083/empleos.html
+```
