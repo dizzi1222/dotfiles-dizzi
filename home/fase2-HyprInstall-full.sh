@@ -1406,6 +1406,26 @@ print_installing "Node packages (neovim)"
 npm install -g neovim 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════════
+# ENGRAM - Memoria persistente para agentes IA
+# ═══════════════════════════════════════════════════════════
+print_step "14b: Engram - Memoria persistente IA"
+print_installing "Engram (memoria persistente para OpenCode/Claude/Gemini)"
+if ! command -v engram &>/dev/null; then
+  curl -L https://github.com/Gentleman-Programming/engram/releases/latest/download/engram_1.17.0_linux_amd64.tar.gz | tar xz -C /tmp 2>/dev/null || true
+  mv /tmp/engram ~/.local/bin/engram 2>/dev/null || true
+  chmod +x ~/.local/bin/engram 2>/dev/null || true
+  print_success "Engram instalado en ~/.local/bin/engram"
+else
+  print_status "Engram ya instalado"
+fi
+
+# Configurar para OpenCode
+if command -v engram &>/dev/null; then
+  engram setup opencode 2>/dev/null || true
+  print_success "Engram configurado para OpenCode"
+fi
+
+# ═══════════════════════════════════════════════════════════
 # DOCKER SETUP (FUNCIONAL Y ROBUSTO)
 # ═══════════════════════════════════════════════════════════
 print_header "Configurando Docker"
