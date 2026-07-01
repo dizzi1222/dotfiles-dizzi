@@ -11,7 +11,8 @@
 spawn-sh-at-startup "qs"
 
 // Power management
-spawn-sh-at-startup "powerprofilesctl set balanced"
+spawn-sh-at-startup "powerprofilesctl set performance" // Usa balanced si quieres ahorrar batería
+spawn-sh-at-startup "sh ~/.config/eww/scripts/toggle-game-mode.sh"
 
 // Desktop environment
 spawn-sh-at-startup "vicinae server"
