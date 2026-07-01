@@ -79,7 +79,9 @@ Reglas:
 - Si mencionas un _épica tracker_, lista sus features entre paréntesis, ej: _ÉPICA 03 Tracker_ (#92) con Features (US-03-01, US-03-02, US-03-03)
 
 ### Plantilla Issue: Daily Report
-Ubicación: `/home/diego/workspace/ptd-talento-back/.github/ISSUE_TEMPLATE/4-dailly-report.md`
+Ubicaciones:
+- **Backend:** `/home/diego/workspace/ptd-talento-back/.github/ISSUE_TEMPLATE/4-dailly-report.md`
+- **Dotfiles:** `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/4-dailly-report.md`
 - Formato ESP/ENG integrado
 - Labels: `daily`, `diego`
 - Usar para crear issue diario de avances
@@ -186,6 +188,60 @@ Usar esta plantilla cuando se actualiza un PR ya existente:
 (Cualquier dato extra, logs, capturas de pantalla o comentarios que el desarrollador considere útiles para QA)
 ```
 
+## Estándar de Nomenclatura de Ramas (PTD-Talento)
+
+Formato oficial: `tipo-rama/sigla-modulo-[codigo-us]-funcionalidad`
+
+### Siglas de Módulos
+| Sigla | Módulo |
+|---|---|
+| `m1-aut` | Autenticación y Control de Acceso |
+| `m2-per` | Perfil de Talento (Estudiante) |
+| `m3-cat` | Catálogo y Búsqueda de Talentos |
+| `m4-lis` | Lista de Candidatos (Watch List) |
+| `m5-sol` | Solicitudes |
+| `m6-not` | Notificaciones |
+| `m7-adm` | Administración y Gestión de Usuarios |
+| `m8-aud` | Historial de Acciones (Auditoría) |
+
+### Ejemplos para Épica 03 (Catálogo)
+- Rama integración: `feat/m3-cat-hub` (renombrada desde `e3-hub`)
+- US-03-01: `feat/m3-cat-us0301-ver-talentos`
+- US-03-02: `feat/m3-cat-us0302-buscar-nombre`
+- US-03-03: `feat/m3-cat-us0303-filtrar-path`
+- US-03-04: `feat/m3-cat-us0304-filtrar-campus`
+- US-03-05: `feat/m3-cat-us0305-ver-detalle`
+- Hotfix: `hotfix/m3-cat-fix-descripcion`
+
+Regla: minúsculas estrictas, prefijo `feat/` o `hotfix/`, sigla módulo de 5 chars, código US con 4 dígitos si aplica.
+
+## Estándar de Nomenclatura de Ramas (PTD-Talento)
+
+Formato oficial: `tipo-rama/sigla-modulo-[codigo-us]-funcionalidad`
+
+### Siglas de Módulos
+| Sigla | Módulo |
+|---|---|
+| `m1-aut` | Autenticación y Control de Acceso |
+| `m2-per` | Perfil de Talento (Estudiante) |
+| `m3-cat` | Catálogo y Búsqueda de Talentos |
+| `m4-lis` | Lista de Candidatos (Watch List) |
+| `m5-sol` | Solicitudes |
+| `m6-not` | Notificaciones |
+| `m7-adm` | Administración y Gestión de Usuarios |
+| `m8-aud` | Historial de Acciones (Auditoría) |
+
+### Ejemplos para Épica 03 (Catálogo)
+- Rama integración: `feat/m3-cat-hub` (renombrada desde `e3-hub`)
+- US-03-01: `feat/m3-cat-us0301-ver-talentos`
+- US-03-02: `feat/m3-cat-us0302-buscar-nombre`
+- US-03-03: `feat/m3-cat-us0303-filtrar-path`
+- US-03-04: `feat/m3-cat-us0304-filtrar-campus`
+- US-03-05: `feat/m3-cat-us0305-ver-detalle`
+- Hotfix: `hotfix/m3-cat-fix-descripcion`
+
+Regla: minúsculas estrictas, prefijo `feat/` o `hotfix/`, sigla módulo de 5 chars, código US con 4 dígitos si aplica.
+
 ## Referencias dotfiles-dizzi
 
 ### Plantillas GitHub (dotfiles-dizzi)
@@ -196,6 +252,7 @@ Usar esta plantilla cuando se actualiza un PR ya existente:
   - `1-epic.md` — Épicas
   - `2-feature.md` — Features
   - `3-bug.md` — Bugs
+  - `4-dailly-report.md` — Daily Report (ESP/ENG integrado)
 
 ### Rutas absolutas de referencia
 
