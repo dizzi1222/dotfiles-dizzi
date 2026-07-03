@@ -215,32 +215,19 @@ Formato oficial: `tipo-rama/sigla-modulo-[codigo-us]-funcionalidad`
 
 Regla: minúsculas estrictas, prefijo `feat/` o `hotfix/`, sigla módulo de 5 chars, código US con 4 dígitos si aplica.
 
-## Estándar de Nomenclatura de Ramas (PTD-Talento)
+## Modus Operandi — PTD-Talento
 
-Formato oficial: `tipo-rama/sigla-modulo-[codigo-us]-funcionalidad`
+Separación de responsabilidades en ramas:
 
-### Siglas de Módulos
-| Sigla | Módulo |
-|---|---|
-| `m1-aut` | Autenticación y Control de Acceso |
-| `m2-per` | Perfil de Talento (Estudiante) |
-| `m3-cat` | Catálogo y Búsqueda de Talentos |
-| `m4-lis` | Lista de Candidatos (Watch List) |
-| `m5-sol` | Solicitudes |
-| `m6-not` | Notificaciones |
-| `m7-adm` | Administración y Gestión de Usuarios |
-| `m8-aud` | Historial de Acciones (Auditoría) |
+| Rama | Contenido | Base | Merge a |
+|---|---|---|---|
+| `feat/m3-cat-hub` (frontend) | Marketplace: cards, filtros, catálogo, búsqueda | `dev` | `dev` |
+| `feat/m3-cat-ui-global` (frontend) | Componentes globales: NavBar, SideBar, Layout, modals, theme.ts, animations, UIX | `feat/m3-cat-hub` | `feat/m3-cat-hub` → `dev` |
 
-### Ejemplos para Épica 03 (Catálogo)
-- Rama integración: `feat/m3-cat-hub` (renombrada desde `e3-hub`)
-- US-03-01: `feat/m3-cat-us0301-ver-talentos`
-- US-03-02: `feat/m3-cat-us0302-buscar-nombre`
-- US-03-03: `feat/m3-cat-us0303-filtrar-path`
-- US-03-04: `feat/m3-cat-us0304-filtrar-campus`
-- US-03-05: `feat/m3-cat-us0305-ver-detalle`
-- Hotfix: `hotfix/m3-cat-fix-descripcion`
+> **UI** = componentes visuales (botón, navbar, card, modal).  
+> **UIX** = interacción + experiencia (micro-animaciones, skeletons, loading/error/empty states, transiciones).
 
-Regla: minúsculas estrictas, prefijo `feat/` o `hotfix/`, sigla módulo de 5 chars, código US con 4 dígitos si aplica.
+Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` con formato QA.
 
 ## Referencias dotfiles-dizzi
 
