@@ -1,3 +1,5 @@
 {
-  "model": "haiku"
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true
+  }
 }
