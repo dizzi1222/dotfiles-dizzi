@@ -1,0 +1,73 @@
+---
+---
+
+<section id="servicios" class="py-24 px-4 relative overflow-hidden">
+  <div class="absolute inset-0 section-bg-1 opacity-60"></div>
+  <div class="absolute top-40 right-20 w-80 h-80" style="background:rgba(0,217,255,0.05);border-radius:50%;filter:blur(80px)"></div>
+  <div class="max-w-5xl mx-auto relative z-10 section-in">
+    <h2 class="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">
+      <span class="gradient-text">/</span> <span data-i18n="servicios.heading">Servicios</span>
+    </h2>
+    <div class="w-16 h-1 bg-[#e94560] mx-auto mb-4 rounded-full"></div>
+    <p class="text-subtle text-center mb-12" data-i18n="servicios.subtitle">Lo que puedo hacer por ti</p>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#e94560]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#e94560]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s1.title">Full-Stack MVP</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s1.desc">Construyo MVPs completos con MERN: desde la base de datos hasta el frontend, listos para producción.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#00d9ff]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s2.title">Design Systems</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s2.desc">Componentes reutilizables con Tailwind, Storybook y principios de diseño atómico. Consistencia visual garantizada.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#e94560]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#e94560]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s3.title">Auth & Security</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s3.desc">JWT, OAuth2, RBAC, protección de rutas y autenticación segura desde el backend hasta el frontend.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#00d9ff]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s4.title">Real-time Features</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s4.desc">WebSockets, SSE, notificaciones en vivo y actualizaciones en tiempo real para apps interactivas.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#e94560]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#e94560]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s5.title">Database Design</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s5.desc">Modelado de datos con MongoDB/Mongoose, esquemas eficientes, índices y consultas optimizadas.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#00d9ff]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s6.title">Admin Panels</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s6.desc">Paneles de administración con dashboards, auditoría, logs y gestión completa de usuarios y roles.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#e94560]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#e94560]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s7.title">API Design</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s7.desc">APIs RESTful con Express, documentación con Swagger, validación y middleware modular.</p>
+      </div>
+      <div class="stagger-child bg-secondary border border-custom rounded-xl p-5 hover:border-[#00d9ff]/30 transition-all group">
+        <div class="w-10 h-10 rounded-lg bg-[#00d9ff]/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-sm text-primary mb-1" data-i18n="servicios.s8.title">DevOps</h3>
+        <p class="text-xs text-muted leading-relaxed" data-i18n="servicios.s8.desc">Docker, CI/CD con GitHub Actions, despliegues automatizados y entornos reproducibles.</p>
+      </div>
+    </div>
+  </div>
+</section>
