@@ -1,0 +1,47 @@
+Lockfile is up to date, resolution step is skipped
+Already up to date
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild@0.28.1
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[ERROR] Command failed with exit code 1: pnpm install
+
+pnpm: Command failed with exit code 1: pnpm install
+    at getFinalError (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:29357:14)
+    at makeError (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:31664:21)
+    at getSyncResult (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:33508:10)
+    at spawnSubprocessSync (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:33468:14)
+    at execaCoreSync (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:33398:23)
+    at callBoundExeca (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:35926:23)
+    at boundExeca (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:35903:49)
+    at sync (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:36058:14)
+    at runPnpmCli (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:212641:5)
+    at runDepsStatusCheck (file:///home/diego/.npm-global/lib/node_modules/pnpm/dist/pnpm.mjs:214345:7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,80 @@
+---
+import BreadCrumb from "./BreadCrumb.astro";
+import ButtonPrimary from "./ButtonPrimary.astro";
+import ButtonSecondary from "./ButtonSecondary.astro";
+import IconGithub from "./icons/IconGithub.astro";
+import IconLink from "./icons/IconLink.astro";
+import { skills } from "../lib/skills.ts";
+import type { Project } from "../lib/projects.ts";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+
+function getSkillColor(name: string): string {
+  const found = skills.find(s => s.name === name);
+  return found?.color || "#888";
+}
+---
+
+<article
+  class="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:scale-[1.03] hover:shadow-2xl hover:shadow-brand/20"
+  style="background: var(--bg-secondary); border: 1px solid var(--border-color);"
+>
+  <!-- Image -->
+  <div class="relative h-48 overflow-hidden sm:h-56" transition:name={`project-img-${project.id}`}>
+    {project.image ? (
+      <img
+        src={project.image}
+        alt={project.title}
+        class="h-full w-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:translate-y-2"
+        style="transform-origin: center center; will-change: transform;"
+        loading="lazy"
+      />
+    ) : (
+      <div class="flex h-full items-center justify-center text-sm" style="color: var(--text-muted); background: var(--bg-secondary);">
+        {project.title}
+      </div>
+    )}
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="space-y-3 p-5">
+    <h3 class="text-lg font-bold transition-colors duration-300 group-hover:text-brand flex items-center gap-2" style="color: var(--text-primary);" transition:name={`project-title-${project.id}`}>
+      {project.title}
+      {project.private && <span class="text-[10px] font-medium px-2 py-0.5 rounded-full" style="background: rgba(233,69,96,0.15); color: var(--color-brand); border: 1px solid rgba(233,69,96,0.3);">Privado</span>}
+    </h3>
+    <p class="line-clamp-3 text-sm leading-relaxed" style="color: var(--text-muted);">
+      {project.description}
+    </p>
+
+    <!-- Tech badges -->
+    <div class="flex flex-wrap gap-1.5">
+      {project.technologies.slice(0, 5).map(tech => (
+        <BreadCrumb name={tech} color={getSkillColor(tech)} />
+      ))}
+      {project.technologies.length > 5 && (
+        <span class="text-xs" style="color: var(--text-muted);">+{project.technologies.length - 5}</span>
+      )}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3 pt-2">
+      <a href={`/ProyectDetail/${project.id}`} class="btn-detail">
+        <span>Ver detalles</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-detail-arrow"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href={project.github} target="_blank" class="btn-icon" aria-label="GitHub">
+        <IconGithub size={18} />
+      </a>
+      {project.live && project.live !== project.github && (
+        <a href={project.live} target="_blank" class="btn-icon" aria-label="Live">
+          <IconLink size={18} />
+        </a>
+      )}
+    </div>
+  </div>
+</article>
