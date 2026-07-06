@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "plugins": {
+    "lua-lsp@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/diego/.claude/plugins/cache/claude-plugins-official/lua-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-07-06T20:12:24.246Z",
+        "lastUpdated": "2026-07-06T20:12:24.246Z"
+      }
+    ]
+  }
+}
