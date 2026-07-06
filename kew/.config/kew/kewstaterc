@@ -3,7 +3,7 @@
 
 allowNotifications=1
 
-repeatState=0
+repeatState=2
 
 shuffleEnabled=0
 
@@ -23,7 +23,7 @@ chromaPreset=-1
 
 [colors]
 
-colorMode=1
+colorMode=2
 
-theme=
+theme=ravachol
 
