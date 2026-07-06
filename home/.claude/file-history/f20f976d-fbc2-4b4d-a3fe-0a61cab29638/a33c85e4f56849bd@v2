@@ -1,0 +1,58 @@
+---
+import "../styles/global.css";
+import Background from "../components/Background.astro";
+import Footer from "../components/Footer.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = "Diego Härdi | DevOps & Software Engineer",
+  description = "DevOps & Software Engineer · Dominicano con pasaporte suizo. Construyendo full-stack desde Jarabacoa, RD.",
+  image = "/avatar.png",
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e94560" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="canonical" href="https://dhardi.dev" />
+    <title>{title}</title>
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('dhardi-theme');
+        if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <Background />
+    <slot />
+    <Footer />
+    <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none cursor-pointer" style="background: var(--color-brand); color: white; box-shadow: 0 4px 16px rgba(233,69,96,0.4);" aria-label="Scroll to top">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+    <script is:inline>
+      window.addEventListener('scroll', function() {
+        var btn = document.getElementById('scroll-top');
+        if (window.scrollY > 400) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+        else { btn.style.opacity = '0'; btn.style.pointerEvents = 'none'; }
+      }, { passive: true });
+    </script>
+  </body>
+</html>

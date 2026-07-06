@@ -1,0 +1,632 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import SectionExperience from "../components/SectionExperience.astro";
+import SectionProyects from "../components/SectionProyects.astro";
+import SectionServicios from "../components/SectionServicios.astro";
+import SectionSetup from "../components/SectionSetup.astro";
+import AboutMe from "../components/AboutMe.astro";
+import SectionSkills from "../components/SectionSkills.astro";
+import SectionTechStack from "../components/SectionTechStack.astro";
+import SectionCertification from "../components/SectionCertification.astro";
+import SectionContact from "../components/SectionContact.astro";
+---
+
+<Layout>
+  <Header />
+
+  <!-- HERO -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center pt-16 px-4 overflow-hidden">
+    <div class="bg-slideshow" id="bg-slideshow">
+      <div class="bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1540202404-a2f29016b523?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/92/Pico_Duarte.jpg')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1920&q=80')"></div>
+      <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1920&q=80')"></div>
+    </div>
+
+    <div id="hero-overlay" class="absolute inset-0 z-[1] transition-all duration-1000" style="background: linear-gradient(135deg, rgba(5,5,25,0.88) 0%, rgba(5,5,5,0.8) 50%, rgba(25,10,5,0.85) 100%);"></div>
+
+    <button onclick="prevSlide()" class="slide-nav prev" aria-label="Previous slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button onclick="nextSlide()" class="slide-nav next" aria-label="Next slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+
+    <div class="max-w-6xl mx-auto text-center relative z-10">
+      <div id="vibe-indicator" class="mb-6 inline-flex items-center gap-3 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full border border-white/10 text-xs font-semibold tracking-wider uppercase animate-fade-in-up">
+        <span id="vibe-icon" class="text-lg">❄️</span>
+        <span id="vibe-label" class="text-muted">Swiss Alps</span>
+        <span class="text-subtle">·</span>
+        <span id="vibe-counter" class="text-subtle">1/8</span>
+      </div>
+
+      <div class="animate-float inline-block mb-6">
+        <div class="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-full border-4 border-[#e94560] overflow-hidden glow">
+          <img src="/avatar.png" alt="Diego Härdi" class="w-full h-full object-cover" />
+        </div>
+      </div>
+
+      <div class="flex justify-center mb-4 animate-fade-in-up">
+        <span class="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-medium">
+          <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-soft"></span>
+          <span data-i18n="hero.available">Disponible</span>
+        </span>
+      </div>
+
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl font-extrabold mb-3 animate-fade-in-up">
+        Diego <span class="gradient-text">Härdi</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-secondary mb-2 animate-fade-in-up animate-delay-1" data-i18n="hero.title">
+        DevOps &amp; Software Engineer
+      </p>
+
+      <p class="text-sm sm:text-base text-secondary mb-6 animate-fade-in-up animate-delay-1 font-medium">
+        <span class="text-[#00d9ff]" data-i18n="hero.born">🇩🇴 Born in San Pedro de Macorís</span>
+        <span class="text-subtle mx-2">·</span>
+        <span class="text-[#e94560]" data-i18n="hero.passport">🇨🇭 Swiss passport</span>
+        <span class="text-subtle mx-2">·</span>
+        <span class="text-[#00d9ff]" data-i18n="hero.lives">🏔️ Lives in Jarabacoa</span>
+      </p>
+      <p class="text-xs sm:text-sm text-tertiary mb-6 animate-fade-in-up animate-delay-1" data-i18n="hero.tagline">
+        Building full-stack · Arch Linux · Neovim
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-4 animate-fade-in-up animate-delay-2">
+        <a href="#contact" class="px-8 py-3 bg-[#e94560] text-white font-semibold rounded-lg hover:bg-[#d91a3a] transition-all hover-glow" data-i18n="hero.getInTouch">Get in touch</a>
+        <button onclick="openCVModal()" class="px-8 py-3 border border-[#e94560] text-[#e94560] font-semibold rounded-lg hover:bg-[#e94560] hover:text-white transition-all cursor-pointer" data-i18n="hero.previewCv">Preview CV</button>
+      </div>
+
+      <div class="mt-8 flex justify-center gap-5 animate-fade-in-up animate-delay-3">
+        <a href="https://github.com/dizzi1222" target="_blank" class="hover:scale-110 transition-transform" aria-label="GitHub">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-muted hover:fill-[#e94560] transition-colors"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/dizzi-%C5%8Dkami-0b77093a1/" target="_blank" class="hover:scale-110 transition-transform" aria-label="LinkedIn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-muted hover:fill-[#e94560] transition-colors"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://x.com/dizzi_ds" target="_blank" class="hover:scale-110 transition-transform" aria-label="X">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-muted hover:fill-[#e94560] transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://dev.to/dizzi1222" target="_blank" class="hover:scale-110 transition-transform" aria-label="Dev.to">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-muted hover:fill-[#e94560] transition-colors"><path d="M7.5 2C4.462 2 2 4.462 2 7.5v9C2 19.538 4.462 22 7.5 22h9c3.038 0 5.5-2.462 5.5-5.5v-9C22 4.538 19.538 2 16.5 2h-9zM6 8h1.5v5.25c0 .713.287 1 .938 1h.562v1.312h-.75c-1.275 0-1.988-.525-1.988-1.688V8h1.738zm5.25 0h1.5v1.5h-1.5V8zm0 2.25h1.5v5.25h-1.5v-5.25zM15 8h1.875c1.313 0 2.063.75 2.063 2.063 0 1.237-.525 1.874-1.5 1.874.975 0 1.5.638 1.5 1.875 0 1.312-.75 2.063-2.063 2.063H15V8zm1.5 1.5v1.125h.375c.338 0 .563-.187.563-.563 0-.337-.225-.562-.563-.562H16.5zm0 2.625v1.5h.563c.337 0 .562-.225.562-.563 0-.337-.225-.562-.563-.562H16.5z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/diego.sam042/" target="_blank" class="hover:scale-110 transition-transform" aria-label="Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="text-muted hover:fill-[#e94560] transition-colors"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 0 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-pulse-soft cursor-pointer hover:opacity-70 transition-opacity">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+    </div>
+  </section>
+
+  <main>
+    <SectionExperience />
+    <SectionProyects />
+    <SectionServicios />
+    <SectionSetup />
+    <SectionTechStack />
+    <SectionCertification />
+    <SectionContact />
+  </main>
+
+  <!-- Scroll Progress Dots -->
+  <nav id="scroll-dots" class="scroll-dots" aria-label="Section navigation">
+    <a href="#hero" class="scroll-dot active" data-section="hero"><span class="scroll-dot-tooltip">Home</span></a>
+    <a href="#experience" class="scroll-dot" data-section="experience"><span class="scroll-dot-tooltip" data-i18n="nav.experience">Experiencia</span></a>
+    <a href="#projects" class="scroll-dot" data-section="projects"><span class="scroll-dot-tooltip" data-i18n="nav.projects">Proyectos</span></a>
+    <a href="#servicios" class="scroll-dot" data-section="servicios"><span class="scroll-dot-tooltip" data-i18n="nav.servicios">Servicios</span></a>
+    <a href="#setup" class="scroll-dot" data-section="setup"><span class="scroll-dot-tooltip" data-i18n="nav.setup">Setup</span></a>
+    <a href="#stack" class="scroll-dot" data-section="stack"><span class="scroll-dot-tooltip">Tech Stack</span></a>
+    <a href="#certifications" class="scroll-dot" data-section="certifications"><span class="scroll-dot-tooltip" data-i18n="nav.certifications">Certificaciones</span></a>
+    <a href="#contact" class="scroll-dot" data-section="contact"><span class="scroll-dot-tooltip" data-i18n="nav.contact">Contacto</span></a>
+  </nav>
+
+  <!-- Project/CV Modal -->
+  <div id="modal" class="modal-overlay">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title" class="font-display text-xl font-bold text-primary"></h3>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+      </div>
+      <div id="modal-image" class="modal-image"></div>
+      <p id="modal-description" class="mt-4 text-sm text-muted leading-relaxed"></p>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Cert Overlay -->
+  <div id="cert-overlay" class="cert-overlay">
+    <div class="cert-backdrop" onclick="closeCertModal()"></div>
+    <div class="cert-content">
+      <div class="cert-header">
+        <h3 class="font-display text-xl font-bold text-primary">🎓 <span data-i18n="certs.heading">Certificaciones</span></h3>
+        <button onclick="closeCertModal()" class="cert-close">&times;</button>
+      </div>
+      <div class="cert-body">
+        <div class="flex items-center justify-between mb-6">
+          <span class="font-mono text-xs text-faint bg-badge px-3 py-1 rounded">cic_cert_download.sh</span>
+          <span id="cert-status" class="font-mono text-xs text-[#00d9ff]">loading...</span>
+        </div>
+        <div class="grid gap-4">
+          <div class="cert-card">
+            <div class="flex items-center gap-4 mb-3">
+              <span class="text-3xl" id="cert-spinner">◴</span>
+              <div>
+                <p class="font-display font-bold text-[#00d9ff]" data-i18n="certs.item1Title">CIC Associate Developer</p>
+                <p class="text-xs text-muted font-mono" data-i18n="certs.item1Desc">Certificación oficial · Bootcamp Cincinnatus</p>
+              </div>
+            </div>
+            <div class="cert-bar-track">
+              <div id="cert-bar" class="cert-bar-fill" style="width:42%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-faint font-mono mt-1">
+              <span data-i18n="certs.progressLabel">Progreso</span>
+              <span id="cert-text">Cap. Interna ✓ — Esperando fecha de examen oficial</span>
+            </div>
+          </div>
+          <div class="cert-card opacity-70">
+            <div class="flex items-center gap-4">
+              <span class="text-2xl">🔜</span>
+              <div>
+                <p class="font-display font-bold text-primary">AWS Cloud Practitioner</p>
+                <p class="text-xs text-muted font-mono">En planificación</p>
+              </div>
+            </div>
+          </div>
+          <div class="cert-card opacity-50">
+            <div class="flex items-center gap-4">
+              <span class="text-2xl">🔜</span>
+              <div>
+                <p class="font-display font-bold text-primary">Google Cloud Associate</p>
+                <p class="text-xs text-muted font-mono">En planificación</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 text-center">
+          <p class="text-xs text-faint font-mono">※ placeholder — actualizar al recibir certificación oficial <span style="animation:blink 1s step-end infinite">_</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  // ===== i18n =====
+  const i18n = {
+    es: {
+      nav: { experience: 'Experiencia', projects: 'Proyectos', servicios: 'Servicios', setup: 'Setup', certifications: 'Certificaciones', contact: 'Contacto', available: 'Disponible', resume: 'CV' },
+      hero: { available: 'Disponible para oportunidades', title: 'DevOps & Software Engineer', born: '🇩🇴 Nacido en San Pedro de Macorís', passport: '🇨🇭 Pasaporte suizo', lives: '🏔️ Vive en Jarabacoa', tagline: 'Full-Stack · Arch Linux · Neovim', getInTouch: 'Contáctame', previewCv: 'Vista previa CV' },
+      exp: { heading: 'Experiencia', subtitle: 'Mi trayectoria profesional',
+        job1: { badge: 'Retail', title: 'Asistente / Cajero', company: 'La Sirena · República Dominicana', period: '2025 — 2026', desc: 'Mi primer contacto con el mundo laboral formal. Trabajar en uno de los supermercados más grandes del país me enseñó cómo funciona realmente un negocio desde adentro: logística, inventario, atención al cliente bajo presión. Pero también vi de cerca lo peor del trabajo físico sin futuro — el agotamiento, la falta de oportunidades reales, el nepotismo. Esa experiencia fue el combustible que encendió mi decisión de salir de ahí y construir una carrera en tecnología.' },
+        job2: { badge: 'Educación', title: 'Bootcamp Full-Stack', company: 'Cincinnatus · República Dominicana', period: '2024 — 2026', desc: 'El motor de arranque de mi carrera como programador. Cincinnatus fue el punto de inflexión donde pasé de ser un curioso autodidacta a un desarrollador en formación. Aprendí los fundamentos del desarrollo web full-stack, trabajé en proyectos reales en equipo, y descubrí que la programación no era solo un trabajo — era mi vocación.' },
+        job3: { badge: 'Actual', title: 'MERN Stack Developer · DevOps', company: 'Freelance / Proyectos Propios · Arch Linux · Neovim', period: '2024 — Presente', desc: 'Desarrollo full-stack con el stack MERN (MongoDB, Express, React, Node.js). Arquitecturas limpias, APIs RESTful, despliegues con Docker y automatización de flujos. Mi entorno: Arch Linux con Hyprland, Neovim (LazyVim) como editor principal.' }
+      },
+      proyectos: { heading: 'Proyectos', subtitle: 'Cosas que he construido', code: 'Código', preview: 'Vista previa' },
+      servicios: {
+        heading: 'Servicios', subtitle: 'Lo que puedo hacer por ti',
+        s1: { title: 'Full-Stack MVP', desc: 'Construyo MVPs completos con MERN: desde la base de datos hasta el frontend, listos para producción.' },
+        s2: { title: 'Design Systems', desc: 'Componentes reutilizables con Tailwind, Storybook y principios de diseño atómico. Consistencia visual garantizada.' },
+        s3: { title: 'Auth & Security', desc: 'JWT, OAuth2, RBAC, protección de rutas y autenticación segura desde el backend hasta el frontend.' },
+        s4: { title: 'Real-time Features', desc: 'WebSockets, SSE, notificaciones en vivo y actualizaciones en tiempo real para apps interactivas.' },
+        s5: { title: 'Database Design', desc: 'Modelado de datos con MongoDB/Mongoose, esquemas eficientes, índices y consultas optimizadas.' },
+        s6: { title: 'Admin Panels', desc: 'Paneles de administración con dashboards, auditoría, logs y gestión completa de usuarios y roles.' },
+        s7: { title: 'API Design', desc: 'APIs RESTful con Express, documentación con Swagger, validación y middleware modular.' },
+        s8: { title: 'DevOps', desc: 'Docker, CI/CD con GitHub Actions, despliegues automatizados y entornos reproducibles.' }
+      },
+      setup: {
+        heading: 'My Setup', subtitle: 'Scripts · Blueprints · Automation',
+        scriptsCardTitle: 'System Control', scriptsCardDesc: 'Menú Rofi con 30+ herramientas: gestión de red, bluetooth, audio, power management, screen capture, modo juego, night mode, fixes de XDG Portal y más.',
+        blueprintTitle: 'Blueprints & Tokens', blueprintDesc: 'Extractor de design tokens desde imágenes: paletas de colores, CSS custom properties, prompts para IA.',
+        scriptsTitle: 'Scripts & Automation', scriptsDesc: '50+ scripts propios: save-point system, scrcpy connect, widget launcher, power modes, Omarchy Package Install, LimpiarCache, Gitaliases y más.',
+        galleryTitle: 'Galería del Setup', galleryDesc: 'Screenshots del desktop: Waybar con widgets EWW, Rofi System Control, Wofi Clipboard, Fastfetch, y el ecosistema visual completo.',
+        galleryCta: 'Ver repositorio de dotfiles →'
+      },
+      about: {
+        heading: 'Sobre mí', subtitle: 'De San Pedro al Mundo',
+        desc1: 'DevOps & Software Engineer con pasaporte suizo, nacido en San Pedro de Macorís y viviendo en Jarabacoa, RD. Construyo aplicaciones full-stack con el stack MERN y administro infraestructura en la nube.',
+        desc2: 'Por el día desarrollo soluciones escalables. Por la noche estoy sumergido en configuraciones de Neovim, optimizando mi Arch Linux Hyprland o automatizando flujos que no deberían existir.',
+        desc3: 'Hablo TypeScript, JavaScript, Lua, Python y el idioma de los sistemas limpios y mantenibles.',
+        label: { lives: 'Jarabacoa, RD', languages: 'ES · EN · DE (A2)', os: 'Arch Linux · Hyprland', editor: 'Neovim · LazyVim' }
+      },
+      stack: { heading: 'Tech Stack', subtitle: 'Tools of the trade', hint: 'Click on any tool above to learn more' },
+      certs: { heading: 'Certificaciones', subtitle: 'Credenciales oficiales', placeholderTitle: 'CIC Associate Developer', placeholderDesc: 'Certificación oficial del bootcamp Cincinnatus. En proceso — programa oficial próximamente.', cta: 'Ver detalles', item1Title: 'CIC Associate Developer', item1Desc: 'Certificación oficial · Bootcamp Cincinnatus', progressLabel: 'Progreso' },
+      contact: { heading: 'Contacto', subtitle: 'Construyamos algo juntos', downloadResume: 'Descargar CV (PDF)' },
+      footer: { terminal: '🖥️ Versión Terminal', backToTop: 'Volver arriba ↑', subtitle: '🇩🇴 San Pedro de Macorís → Jarabacoa · 🇨🇭 Suizo' },
+      modal: { cvTitle: 'Diego Härdi · CV', cvPlaceholder: '📄 Placeholder — CV', cvDesc: 'Descarga mi CV para ver experiencia completa, educación y habilidades técnicas.', downloadCv: 'Descargar CV (PDF)', viewCode: 'Ver código', livePreview: 'Live Preview', screenshotPrefix: '🖼️ Screenshot —', private: 'Privado' },
+      vibe: ['Matterhorn · Suiza ❄️', 'Punta Cana · República Dominicana ☀️', 'Alpes Suizos ⛰️', 'Pico Duarte · Jarabacoa 🏔️', 'Zürich · Suiza 🏙️', 'Atardecer Tropical · Caribe 🌅', 'Pueblo Alpino Suizo 🏡', 'Costa Dominicana 🌊'],
+      tech: { 'Node.js': 'Runtime JS del lado del servidor. Construyo APIs RESTful y backends escalables con Express.', 'Express': 'Framework minimalista para Node.js. Mi elección para servidores, middleware y APIs limpias.', 'React': 'Librería declarativa de UI. Interfaces interactivas con componentes reutilizables y hooks.', 'MongoDB': 'Base de datos NoSQL. Almacenamiento primario en proyectos MERN con Mongoose.', 'PostgreSQL': 'Base de datos relacional open-source. Para proyectos con esquemas estructurados e integridad referencial.', 'Git': 'Control de versiones esencial. Workflow con ramas, rebase interactivo y commits semánticos.', 'Arch': 'Mi daily driver. Arch Linux + Hyprland, todo configurado desde cero con mis dotfiles.', 'Neovim': 'Editor principal con LazyVim. Plugins personalizados, LSP y flujo 100% teclado.', 'TypeScript': 'Tipado estático para JS. Lo uso en backend y frontend para código más robusto.', 'Docker': 'Contenedores para desarrollo y producción. Entornos reproducibles y deploys consistentes.', 'JavaScript': 'Lenguaje de programación del lado del cliente. Manipulación del DOM, patrones asíncronos y closures.', 'Python': 'Lenguaje de propósito general. Lo uso para scripting, automatización y backend.', 'Tailwind CSS': 'Framework CSS utility-first. Desarrollo rápido con diseño consistente y componentes responsive.', 'Render': 'Plataforma de despliegue cloud. Deploys automáticos desde Git, SSL nativo y escalado sin configuración.', 'Vercel': 'Plataforma de despliegue frontend serverless. Deploys instantáneos desde Git y rendimiento global.', 'Google Cloud': 'Plataforma cloud de Google. Cómputo, almacenamiento y servicios gestionados para apps escalables.', 'Material UI': 'Biblioteca de componentes React basada en Material Design. UI profesional con temas, grids y accesibilidad.', 'Svelte': 'Framework reactivo que compila a JS vanilla. Sin virtual DOM, máximo rendimiento y sintaxis elegante.', 'Astro': 'Framework web para sitios con contenido. Islands Architecture, zero JS por defecto y rendimiento extremo.', 'HTML': 'Lenguaje de marcado para la estructura web. Semántica, accesibilidad y SEO desde la base.', 'CSS': 'Hojas de estilo en cascada. Layouts con Grid/Flexbox, animaciones, variables custom y responsive design.', 'Figma': 'Herramienta de diseño colaborativo. Prototipado, design tokens, auto-layout y sistemas de componentes.', 'Bootstrap': 'Framework CSS con componentes predefinidos. Grid system, utilidades responsive y tema personalizable.', 'Railway': 'Plataforma cloud moderna. Deploy automático, bases de datos gestionadas y escalado sin configuración.' }
+    },
+    en: {
+      nav: { experience: 'Experience', projects: 'Projects', servicios: 'Services', setup: 'Setup', certifications: 'Certifications', contact: 'Contact', available: 'Available for work', resume: 'Resume' },
+      hero: { available: 'Available for opportunities', title: 'DevOps & Software Engineer', born: '🇩🇴 Born in San Pedro de Macorís', passport: '🇨🇭 Swiss passport', lives: '🏔️ Lives in Jarabacoa', tagline: 'Full-Stack · Arch Linux · Neovim', getInTouch: 'Get in touch', previewCv: 'Preview CV' },
+      exp: { heading: 'Experience', subtitle: 'My professional journey',
+        job1: { badge: 'Retail', title: 'Assistant / Cashier', company: 'La Sirena · Dominican Republic', period: '2025 — 2026', desc: 'My first contact with the formal working world. Working at one of the largest supermarkets in the country taught me how a business really works from the inside: logistics, inventory, customer service under pressure.' },
+        job2: { badge: 'Education', title: 'Full-Stack Bootcamp', company: 'Cincinnatus · Dominican Republic', period: '2024 — 2026', desc: 'The starting engine of my programming career. Cincinnatus was the turning point where I went from a curious self-taught learner to a developer in training. I learned the fundamentals of full-stack web development.' },
+        job3: { badge: 'Current', title: 'MERN Stack Developer · DevOps', company: 'Freelance / Own Projects · Arch Linux · Neovim', period: '2024 — Present', desc: 'Full-stack development with the MERN stack (MongoDB, Express, React, Node.js). Clean architectures, RESTful APIs, Docker deployments and workflow automation.' }
+      },
+      proyectos: { heading: 'Projects', subtitle: 'Things I\'ve built', code: 'Code', preview: 'Preview' },
+      servicios: {
+        heading: 'Services', subtitle: 'What I can do for you',
+        s1: { title: 'Full-Stack MVP', desc: 'I build complete MVPs with MERN: from database to frontend, production-ready.' },
+        s2: { title: 'Design Systems', desc: 'Reusable components with Tailwind, Storybook and atomic design principles. Visual consistency guaranteed.' },
+        s3: { title: 'Auth & Security', desc: 'JWT, OAuth2, RBAC, route protection and secure authentication from backend to frontend.' },
+        s4: { title: 'Real-time Features', desc: 'WebSockets, SSE, live notifications and real-time updates for interactive apps.' },
+        s5: { title: 'Database Design', desc: 'Data modeling with MongoDB/Mongoose, efficient schemas, indexes and optimized queries.' },
+        s6: { title: 'Admin Panels', desc: 'Admin dashboards with audit logs, user management and full role control.' },
+        s7: { title: 'API Design', desc: 'RESTful APIs with Express, Swagger documentation, validation and modular middleware.' },
+        s8: { title: 'DevOps', desc: 'Docker, CI/CD with GitHub Actions, automated deployments and reproducible environments.' }
+      },
+      setup: {
+        heading: 'My Setup', subtitle: 'Scripts · Blueprints · Automation',
+        scriptsCardTitle: 'System Control', scriptsCardDesc: 'Rofi menu with 30+ tools: network management, bluetooth, audio, power management, screen capture, game mode, night mode, XDG Portal fixes and more.',
+        blueprintTitle: 'Blueprints & Tokens', blueprintDesc: 'Design token extraction from images: color palettes, CSS custom properties, AI prompts.',
+        scriptsTitle: 'Scripts & Automation', scriptsDesc: '50+ custom scripts: save-point system, scrcpy connect, widget launcher, power modes, LimpiarCache, Gitaliases and more.',
+        galleryTitle: 'Setup Gallery', galleryDesc: 'Desktop screenshots: Waybar with EWW widgets, Rofi System Control, Wofi Clipboard, Fastfetch, and the complete visual ecosystem.',
+        galleryCta: 'View dotfiles repository →'
+      },
+      about: {
+        heading: 'About Me', subtitle: 'From San Pedro to the World',
+        desc1: 'DevOps & Software Engineer with a Swiss passport, born in San Pedro de Macorís and living in Jarabacoa, DR. I build full-stack applications with the MERN stack and manage cloud infrastructure.',
+        desc2: 'By day I develop scalable solutions. By night I\'m immersed in Neovim configurations, optimizing my Arch Linux Hyprland or automating workflows that shouldn\'t exist.',
+        desc3: 'I speak TypeScript, JavaScript, Lua, Python and the language of clean, maintainable systems.',
+        label: { lives: 'Jarabacoa, DR', languages: 'ES · EN · DE (A2)', os: 'Arch Linux · Hyprland', editor: 'Neovim · LazyVim' }
+      },
+      stack: { heading: 'Tech Stack', subtitle: 'Tools of the trade', hint: 'Click on any tool above to learn more' },
+      certs: { heading: 'Certifications', subtitle: 'Official credentials', placeholderTitle: 'CIC Associate Developer', placeholderDesc: 'Official certification from Cincinnatus bootcamp.', cta: 'View details', item1Title: 'CIC Associate Developer', item1Desc: 'Official certification · Cincinnatus Bootcamp', progressLabel: 'Progress' },
+      contact: { heading: 'Contact', subtitle: 'Let\'s build something together', downloadResume: 'Download Resume (PDF)' },
+      footer: { terminal: '🖥️ Terminal Version', backToTop: 'Back to top ↑', subtitle: '🇩🇴 San Pedro de Macorís → Jarabacoa · 🇨🇭 Swiss' },
+      modal: { cvTitle: 'Diego Härdi · CV', cvPlaceholder: '📄 Placeholder — CV', cvDesc: 'Download my resume to see my complete experience, education and technical skills.', downloadCv: 'Download CV (PDF)', viewCode: 'View Code', livePreview: 'Live Preview', screenshotPrefix: '🖼️ Screenshot —', private: 'Private' },
+      vibe: ['Matterhorn · Switzerland ❄️', 'Punta Cana · Dominican Republic ☀️', 'Swiss Alps ⛰️', 'Pico Duarte · Jarabacoa 🏔️', 'Zürich · Switzerland 🏙️', 'Tropical Sunset · Caribbean 🌅', 'Swiss Alps Village 🏡', 'Dominican Republic Coast 🌊'],
+      tech: { 'Node.js': 'Server-side JS runtime for RESTful APIs and scalable backends with Express.', 'Express': 'Minimalist Node.js framework for servers and clean APIs.', 'React': 'Declarative UI library for interactive interfaces with reusable components.', 'MongoDB': 'NoSQL database for MERN projects with Mongoose.', 'PostgreSQL': 'Open-source relational database for structured schemas.', 'Git': 'Version control with feature branches and semantic commits.', 'Arch': 'Daily driver. Arch Linux + Hyprland configured from scratch.', 'Neovim': 'Main editor with LazyVim, custom plugins and LSP.', 'TypeScript': 'Static typing for JS for more robust code.', 'Docker': 'Containers for development and production environments.', 'JavaScript': 'Client-side programming language for DOM and async patterns.', 'Python': 'General-purpose language for scripting and automation.', 'Tailwind CSS': 'Utility-first CSS framework for rapid development.', 'Render': 'Cloud deployment platform with auto deploys from Git.', 'Vercel': 'Serverless frontend deployment platform.', 'Google Cloud': 'Google cloud platform for scalable applications.', 'Material UI': 'React component library based on Material Design. Professional UI with themes, grids and accessibility.', 'Svelte': 'Reactive framework that compiles to vanilla JS. No virtual DOM, maximum performance.', 'Astro': 'Web framework for content-driven sites. Islands Architecture, zero JS by default.', 'HTML': 'Markup language for web structure. Semantics, accessibility and SEO from the ground up.', 'CSS': 'Cascading style sheets. Grid/Flexbox layouts, animations, custom properties and responsive design.', 'Figma': 'Collaborative design tool. Prototyping, design tokens, auto-layout and component systems.', 'Bootstrap': 'CSS framework with pre-built components. Grid system, responsive utilities and theming.', 'Railway': 'Modern cloud platform. Auto deploy, managed databases and zero-config scaling.' }
+    },
+    de: {
+      nav: { experience: 'Erfahrung', projects: 'Projekte', servicios: 'Services', setup: 'Setup', certifications: 'Zertifikate', contact: 'Kontakt', available: 'Verfügbar', resume: 'Lebenslauf' },
+      hero: { available: 'Verfügbar für Arbeit', title: 'DevOps & Software Engineer', born: '🇩🇴 Geboren in San Pedro de Macorís', passport: '🇨🇭 Schweizer Pass', lives: '🏔️ Lebt in Jarabacoa', tagline: 'Full-Stack · Arch Linux · Neovim', getInTouch: 'Kontakt aufnehmen', previewCv: 'CV Vorschau' },
+      exp: { heading: 'Erfahrung', subtitle: 'Mein beruflicher Werdegang',
+        job1: { badge: 'Einzelhandel', title: 'Assistent / Kassierer', company: 'La Sirena · Dominikanische Republik', period: '2025 — 2026', desc: 'Mein erster Kontakt mit der formalen Arbeitswelt. Die Arbeit in einem der größten Supermärkte des Landes lehrte mich, wie ein Unternehmen wirklich von innen funktioniert.' },
+        job2: { badge: 'Bildung', title: 'Full-Stack Bootcamp', company: 'Cincinnatus · Dominikanische Republik', period: '2024 — 2026', desc: 'Der Startschuss für meine Programmierkarriere. Cincinnatus war der Wendepunkt, an dem ich vom neugierigen Autodidakten zum angehenden Entwickler wurde.' },
+        job3: { badge: 'Aktuell', title: 'MERN Stack Developer · DevOps', company: 'Freiberuflich / Eigene Projekte', period: '2024 — Heute', desc: 'Full-Stack-Entwicklung mit dem MERN-Stack. Saubere Architekturen, RESTful APIs, Docker-Deployments.' }
+      },
+      proyectos: { heading: 'Projekte', subtitle: 'Dinge, die ich gebaut habe', code: 'Code', preview: 'Vorschau' },
+      servicios: {
+        heading: 'Services', subtitle: 'Was ich für dich tun kann',
+        s1: { title: 'Full-Stack MVP', desc: 'Komplette MVPs mit MERN: von der Datenbank bis zum Frontend.' },
+        s2: { title: 'Design Systems', desc: 'Wiederverwendbare Komponenten mit Tailwind und Storybook.' },
+        s3: { title: 'Auth & Security', desc: 'JWT, OAuth2, RBAC und sichere Authentifizierung.' },
+        s4: { title: 'Real-time Features', desc: 'WebSockets, SSE und Live-Benachrichtigungen.' },
+        s5: { title: 'Database Design', desc: 'Datenmodellierung mit MongoDB/Mongoose.' },
+        s6: { title: 'Admin Panels', desc: 'Admin-Dashboards mit Audit-Logs.' },
+        s7: { title: 'API Design', desc: 'RESTful-APIs mit Express und Swagger.' },
+        s8: { title: 'DevOps', desc: 'Docker, CI/CD und automatisierte Deployments.' }
+      },
+      setup: {
+        heading: 'My Setup', subtitle: 'Scripts · Blueprints · Automation',
+        scriptsCardTitle: 'System Control', scriptsCardDesc: 'Rofi-Menü mit 30+ Tools für Systemverwaltung.',
+        blueprintTitle: 'Blueprints & Tokens', blueprintDesc: 'Design-Token-Extraktion aus Bildern und KI-Prompts.',
+        scriptsTitle: 'Skripte & Automatisierung', scriptsDesc: '50+ eigene Skripte für Systemautomatisierung.',
+        galleryTitle: 'Setup-Galerie', galleryDesc: 'Desktop-Screenshots und visuelles Ökosystem.',
+        galleryCta: 'Dotfiles-Repository anzeigen →'
+      },
+      about: {
+        heading: 'Über mich', subtitle: 'Von San Pedro in die Welt',
+        desc1: 'DevOps & Software Engineer mit Schweizer Pass, geboren in San Pedro de Macorís und wohnhaft in Jarabacoa, DR. Ich entwickle Full-Stack-Anwendungen mit dem MERN-Stack und verwalte Cloud-Infrastruktur.',
+        desc2: 'Tagsüber entwickle ich skalierbare Lösungen. Nachts bin ich in Neovim-Konfigurationen vertieft, optimiere mein Arch Linux Hyprland oder automatisiere Workflows.',
+        desc3: 'Ich spreche TypeScript, JavaScript, Lua, Python und die Sprache sauberer, wartbarer Systeme.',
+        label: { lives: 'Jarabacoa, DR', languages: 'ES · EN · DE (A2)', os: 'Arch Linux · Hyprland', editor: 'Neovim · LazyVim' }
+      },
+      stack: { heading: 'Tech-Stack', subtitle: 'Werkzeuge des Handwerks', hint: 'Klicke auf ein Tool, um mehr zu erfahren' },
+      certs: { heading: 'Zertifikate', subtitle: 'Offizielle Nachweise', placeholderTitle: 'CIC Associate Developer', placeholderDesc: 'Offizielle Zertifizierung vom Cincinnatus Bootcamp.', cta: 'Details anzeigen', item1Title: 'CIC Associate Developer', item1Desc: 'Offizielle Zertifizierung · Cincinnatus Bootcamp', progressLabel: 'Fortschritt' },
+      contact: { heading: 'Kontakt', subtitle: 'Lass uns etwas gemeinsam bauen', downloadResume: 'Lebenslauf herunterladen (PDF)' },
+      footer: { terminal: '🖥️ Terminal-Version', backToTop: 'Zurück nach oben ↑', subtitle: '🇩🇴 San Pedro de Macorís → Jarabacoa · 🇨🇭 Schweizer' },
+      modal: { cvTitle: 'Diego Härdi · Lebenslauf', cvPlaceholder: '📄 Platzhalter — CV', cvDesc: 'Meinen Lebenslauf herunterladen.', downloadCv: 'CV herunterladen (PDF)', viewCode: 'Code ansehen', livePreview: 'Live-Vorschau', screenshotPrefix: '🖼️ Screenshot —', private: 'Privat' },
+      vibe: ['Matterhorn · Schweiz ❄️', 'Punta Cana · Dominikanische Republik ☀️', 'Schweizer Alpen ⛰️', 'Pico Duarte · Jarabacoa 🏔️', 'Zürich · Schweiz 🏙️', 'Tropischer Sonnenuntergang 🌅', 'Schweizer Alpendorf 🏡', 'Dominikanische Küste 🌊'],
+      tech: { 'Node.js': 'Server-JS-Laufzeit für skalierbare Backends.', 'Express': 'Minimalistisches Framework für saubere APIs.', 'React': 'Deklarative UI-Bibliothek mit Hooks.', 'MongoDB': 'NoSQL-Datenbank für MERN-Projekte.', 'PostgreSQL': 'Relationale Open-Source-Datenbank.', 'Git': 'Versionskontrolle mit Feature-Branches.', 'Arch': 'Arch Linux + Hyprland von Grund auf konfiguriert.', 'Neovim': 'Haupteditor mit LazyVim und LSP.', 'TypeScript': 'Statische Typisierung für robusten Code.', 'Docker': 'Container für Entwicklung und Produktion.', 'JavaScript': 'Clientseitige Programmiersprache.', 'Python': 'Allzwecksprache für Scripting.', 'Tailwind CSS': 'Utility-first CSS-Framework.', 'Render': 'Cloud-Deployment-Plattform.', 'Vercel': 'Serverless-Frontend-Plattform.', 'Google Cloud': 'Google-Cloud-Plattform.', 'Material UI': 'React-Komponentenbibliothek basierend auf Material Design. Professionelle UI mit Themes und Zugänglichkeit.', 'Svelte': 'Reaktives Framework, kompiliert zu Vanilla-JS. Kein Virtual DOM, maximale Leistung.', 'Astro': 'Web-Framework für inhaltsgesteuerte Seiten. Islands Architecture, kein JS standardmäßig.', 'HTML': 'Auszeichnungssprache für Webstruktur. Semantik, Barrierefreiheit und SEO.', 'CSS': 'Cascading Style Sheets. Grid/Flexbox-Layouts, Animationen und responsive Design.', 'Figma': 'Kollaboratives Design-Tool. Prototyping, Design-Tokens und Komponentensysteme.', 'Bootstrap': 'CSS-Framework mit vorgefertigten Komponenten. Grid-System und responsive Utilities.', 'Railway': 'Moderne Cloud-Plattform. Auto-Deploy und verwaltete Datenbanken.' }
+    }
+  };
+
+  function switchLanguage(lang) {
+    localStorage.setItem('dhardi-lang', lang);
+    document.documentElement.lang = lang === 'es' ? 'es' : lang === 'de' ? 'de' : 'en';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const keys = el.getAttribute('data-i18n').split('.');
+      let val = i18n[lang];
+      for (const k of keys) { if (val && typeof val === 'object') val = val[k]; else { val = null; break; } }
+      if (val && typeof val === 'string') el.textContent = val;
+    });
+    if (typeof updateVibe === 'function') updateVibe();
+    const techDesc = document.getElementById('tech-desc');
+    if (techDesc && techDesc.dataset.i18n === 'stack.hint') {
+      techDesc.textContent = i18n[lang].stack.hint;
+    }
+    document.getElementById('current-lang-label').textContent = lang.toUpperCase();
+    document.querySelectorAll('.lang-dropdown-item').forEach(item => {
+      const itemLang = item.textContent.toLowerCase().trim().charAt(0) + item.textContent.toLowerCase().trim().charAt(1);
+      const lg = item.getAttribute('onclick')?.match(/'(.*)'/)?.[1] || '';
+      if (lg === lang) {
+        item.innerHTML = `${lang.toUpperCase()} ✓`;
+        item.style.color = 'var(--text-primary)';
+        item.style.fontWeight = '600';
+      } else {
+        item.textContent = lg.toUpperCase();
+        item.style.color = 'var(--text-muted)';
+        item.style.fontWeight = '';
+      }
+    });
+    closeLangDropdown();
+  }
+
+  function toggleLangDropdown() { document.getElementById('lang-dropdown-menu').classList.toggle('hidden'); }
+  function closeLangDropdown() { document.getElementById('lang-dropdown-menu').classList.add('hidden'); }
+
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLangDropdown(); });
+  document.addEventListener('click', (e) => {
+    const dd = document.getElementById('lang-dropdown');
+    if (dd && !dd.contains(e.target)) document.getElementById('lang-dropdown-menu').classList.add('hidden');
+  });
+
+  function switchTheme(theme) {
+    localStorage.setItem('dhardi-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('#theme-dark-btn, #theme-light-btn').forEach(btn => {
+      const btnTheme = btn.id.replace('theme-', '').replace('-btn', '');
+      if (btnTheme === theme) {
+        btn.style.background = 'var(--bg-secondary)';
+        btn.style.color = 'var(--text-primary)';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-muted)';
+      }
+    });
+  }
+
+  function openCVModal() {
+    const lang = localStorage.getItem('dhardi-lang') || 'es';
+    const t = i18n[lang];
+    document.getElementById('modal-title').textContent = t.modal.cvTitle;
+    document.getElementById('modal-image').innerHTML = `<iframe src="/cv.pdf" style="width:100%;height:500px;border:none;border-radius:0.75rem;background:var(--bg-secondary);"></iframe>`;
+    document.getElementById('modal-description').textContent = t.modal.cvDesc;
+    document.getElementById('modal-footer').innerHTML = `<a href="/cv.pdf" target="_blank" class="px-5 py-2 bg-[#e94560] text-white text-sm font-semibold rounded-lg hover:bg-[#d91a3a] transition-all">${t.modal.downloadCv}</a>`;
+    document.getElementById('modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function openProjectModal(project) {
+    if (typeof project === 'string') project = JSON.parse(project);
+    const lang = localStorage.getItem('dhardi-lang') || 'es';
+    const t = i18n[lang];
+    document.getElementById('modal-title').textContent = project.title;
+    if (project.image) {
+      document.getElementById('modal-image').innerHTML = `<img src="${project.image}" alt="${project.title}" style="width:100%;border-radius:0.75rem;object-fit:cover;max-height:400px;" />`;
+    } else {
+      document.getElementById('modal-image').innerHTML = '';
+    }
+    document.getElementById('modal-description').textContent = project.description || '';
+    var footer = '';
+    if (project.github && !project.private) {
+      footer += `<a href="${project.github}" target="_blank" class="px-5 py-2 bg-[#333] text-white text-sm font-semibold rounded-lg hover:bg-[#555] transition-all inline-flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>${t.modal.viewCode}</a>`;
+    }
+    if (project.live) {
+      footer += `<a href="${project.live}" target="_blank" class="px-5 py-2 bg-[#e94560] text-white text-sm font-semibold rounded-lg hover:bg-[#d91a3a] transition-all inline-flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>${t.modal.livePreview}</a>`;
+    }
+    if (project.private) {
+      footer += `<span class="px-4 py-2 text-sm font-medium rounded-lg inline-flex items-center gap-2" style="background:rgba(233,69,96,0.1);color:var(--color-brand);border:1px solid rgba(233,69,96,0.3);">🔒 ${t.modal.private}</span>`;
+    }
+    document.getElementById('modal-footer').innerHTML = footer;
+    document.getElementById('modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function closeCertModal() {
+    document.getElementById('cert-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function openCertModal() {
+    document.getElementById('cert-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeCertModal(); } });
+
+  function toggleMobileNav() {
+    document.getElementById('mobile-nav-menu').classList.toggle('open');
+    document.getElementById('mobile-nav-backdrop').classList.toggle('open');
+    document.getElementById('mobile-nav-toggle').classList.toggle('open');
+  }
+  function closeMobileNav() {
+    document.getElementById('mobile-nav-menu').classList.remove('open');
+    document.getElementById('mobile-nav-backdrop').classList.remove('open');
+    document.getElementById('mobile-nav-toggle').classList.remove('open');
+  }
+  document.addEventListener('scroll', closeMobileNav, { passive: true });
+  window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeMobileNav(); });
+
+  // ===== Slideshow =====
+  const slides = document.querySelectorAll('.bg-slide');
+  const totalSlides = slides.length;
+  let current = 0;
+  let interval;
+
+  function getVibeLabels() {
+    const lang = localStorage.getItem('dhardi-lang') || 'es';
+    const t = i18n[lang];
+    return t.vibe || ['Matterhorn · Switzerland ❄️', 'Punta Cana · Dominican Republic ☀️', 'Swiss Alps ⛰️', 'Pico Duarte · Jarabacoa 🏔️', 'Zürich · Switzerland 🏙️', 'Tropical Sunset · Caribbean 🌅', 'Swiss Alps Village 🏡', 'Dominican Republic Coast 🌊'];
+  }
+
+  const vibeEl = document.getElementById('vibe-label');
+  const vibeIcon = document.getElementById('vibe-icon');
+  const vibeCounter = document.getElementById('vibe-counter');
+  const overlay = document.getElementById('hero-overlay');
+
+  function goToSlide(index) {
+    slides[current].classList.remove('active', 'kenburns');
+    current = (index + totalSlides) % totalSlides;
+    slides[current].classList.add('active', 'kenburns');
+    updateVibe();
+  }
+
+  function nextSlide() { goToSlide(current + 1); }
+  function prevSlide() { goToSlide(current - 1); }
+
+  function updateVibe() {
+    vibeCounter.textContent = `${current + 1}/${totalSlides}`;
+    const isSwiss = current === 0 || current === 2 || current === 4 || current === 6;
+    vibeIcon.textContent = isSwiss ? '❄️' : '☀️';
+    vibeEl.textContent = getVibeLabels()[current];
+    overlay.style.background = isSwiss
+      ? 'linear-gradient(135deg, rgba(5,5,30,0.88) 0%, rgba(5,5,20,0.8) 50%, rgba(15,10,25,0.85) 100%)'
+      : 'linear-gradient(135deg, rgba(30,10,5,0.85) 0%, rgba(5,5,5,0.8) 50%, rgba(25,15,5,0.85) 100%)';
+  }
+
+  function startSlideshow() { clearInterval(interval); interval = setInterval(nextSlide, 6000); }
+  function stopSlideshow() { clearInterval(interval); }
+
+  slides[0].classList.add('active', 'kenburns');
+  startSlideshow();
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') { stopSlideshow(); prevSlide(); startSlideshow(); }
+    if (e.key === 'ArrowRight') { stopSlideshow(); nextSlide(); startSlideshow(); }
+  });
+
+  // Drag
+  let isDragging = false;
+  let dragStartX = 0;
+  const bgSlideshow = document.getElementById('bg-slideshow');
+  bgSlideshow.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.screenX; bgSlideshow.style.cursor = 'grabbing'; });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const diff = dragStartX - e.screenX;
+    if (Math.abs(diff) > 80) {
+      stopSlideshow();
+      if (diff > 0) nextSlide(); else prevSlide();
+      startSlideshow();
+      isDragging = false;
+      bgSlideshow.style.cursor = 'grab';
+    }
+  });
+  document.addEventListener('mouseup', () => { isDragging = false; bgSlideshow.style.cursor = 'grab'; });
+
+  // Touch swipe
+  const hero = document.getElementById('hero');
+  let touchStartX = 0;
+  hero.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+  hero.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      stopSlideshow();
+      if (diff > 0) nextSlide(); else prevSlide();
+      startSlideshow();
+    }
+  }, { passive: true });
+
+  hero.addEventListener('mouseenter', stopSlideshow);
+  hero.addEventListener('mouseleave', startSlideshow);
+
+  // ===== Cert Spinner =====
+  const certFrames = ['◴', '◷', '◶', '◵'];
+  let certIdx = 0;
+  setInterval(() => { const el = document.getElementById('cert-spinner'); if (el) el.textContent = certFrames[certIdx++ % certFrames.length]; }, 400);
+  setInterval(() => {
+    const el = document.getElementById('cert-bar');
+    if (!el) return;
+    const w = parseInt(el.style.width) || 42;
+    el.style.width = Math.min(99, w + (Math.random() > 0.7 ? 1 : 0)) + '%';
+  }, 3000);
+
+  // ===== Scroll reveal =====
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.section-in').forEach(el => revealObserver.observe(el));
+
+  // ===== Scroll spy =====
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+  const spySections = document.querySelectorAll('section[id]');
+  const spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.remove('text-primary');
+          link.classList.add('text-muted');
+          if (link.getAttribute('href') === '#' + id) {
+            link.classList.remove('text-muted');
+            link.classList.add('text-primary');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '0px 0px -100px 0px' });
+  spySections.forEach(s => spyObserver.observe(s));
+
+  // ===== Tech Stack interaction =====
+  const techPopup = document.getElementById('tech-popup');
+  const techDesc = document.getElementById('tech-desc');
+
+  document.querySelectorAll('#tech-grid > div').forEach(el => {
+    const label = el.querySelector('span:last-child')?.textContent.trim();
+    el.addEventListener('click', () => {
+      const lang = localStorage.getItem('dhardi-lang') || 'es';
+      const techInfo = i18n[lang].tech || {};
+      if (!techInfo[label]) return;
+      techDesc.textContent = `${label} — ${techInfo[label]}`;
+      techPopup.innerHTML = `<span class="tp-label">${label}</span> — ${techInfo[label]}`;
+      const rect = el.getBoundingClientRect();
+      const pw = techPopup.offsetWidth || 280;
+      const ph = techPopup.offsetHeight || 80;
+      let left = rect.left + rect.width / 2 - pw / 2;
+      left = Math.max(16, Math.min(left, window.innerWidth - pw - 16));
+      techPopup.style.left = left + 'px';
+      if (rect.bottom + ph + 8 > window.innerHeight) {
+        techPopup.style.top = Math.max(8, rect.top - ph - 8) + 'px';
+      } else {
+        techPopup.style.top = rect.bottom + 8 + 'px';
+      }
+      techPopup.classList.add('show');
+      clearTimeout(techPopup._hide);
+      techPopup._hide = setTimeout(() => techPopup.classList.remove('show'), 2500);
+    });
+  });
+
+  // ===== Header scroll =====
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) header.classList.add('inMoved'); else header.classList.remove('inMoved');
+  }, { passive: true });
+
+  // ===== Scroll dots =====
+  const scrollDots = document.querySelectorAll('.scroll-dot');
+  const dotSections = document.querySelectorAll('section[id]');
+  const dotObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        scrollDots.forEach(dot => dot.classList.remove('active'));
+        const activeDot = document.querySelector(`.scroll-dot[data-section="${entry.target.id}"]`);
+        if (activeDot) activeDot.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '0px 0px -20% 0px' });
+  dotSections.forEach(s => dotObserver.observe(s));
+
+  // ===== Initialize =====
+  (function init() {
+    const savedLang = localStorage.getItem('dhardi-lang') || 'es';
+    const savedTheme = localStorage.getItem('dhardi-theme') || 'dark';
+    switchLanguage(savedLang);
+    switchTheme(savedTheme);
+  })();
+</script>

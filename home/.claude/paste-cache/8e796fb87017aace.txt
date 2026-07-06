@@ -1,0 +1,65 @@
+Plan Definitivo: Lo que queda por hacer
+Terminal Portfolio (8 cambios)
+#Cambio
+1Eliminar Canvas de TechStack grid (solo en Design)
+2Agregar Material UI como tech skill (SVG, i18n ES/EN/DE, color #007fff)
+3Fix "Versión Comercial" link: github.io → dhardidev.vercel.app
+4Material UI badge SVG en proyectos
+5Hover "View Code" = estilo "Live Preview" (texto raro actual)
+6README: npm → pnpm
+7Dotfiles: enlace a dotfiles-wsl-dizzi + hover bonito
+8Nvim: enlace a branch termux + hover bonito
+9Push al repo
+dhardi.dev (18 cambios)
+#Cambio
+1Material UI tech skill + icono SVG
+2VoltBuilder a SectionTechStack grid
+3CV Modal: placeholder → preview real
+4AboutMe i18n: ES hardcodeado → data-i18n
+5Eliminar ButtonToggleTheme.jsx (muerto)
+6i18n descriptions techs faltantes
+7404 page + canonical URL + scroll-to-top
+8Fix interactivos: i18n toggle, theme toggle, nav links no clickan (migración Astro)
+9Colores badges en // Projects
+10Eliminar "Sobre mi" del nav bar
+11Nav bar dinámico estilo Sergio
+12Hover tooltip dots background (repo Sergio)
+13/ Servicios interesante: animaciones/conceptos abstractos (estilo Eric)
+14Detalle proyecto: transición modal maximizado (sin navegar HTML, reactivo como Sergio)
+15Certificaciones: consolidar bajo "CIC Associate Developer" + hover expand fila
+16Nav bar: agregar "Certificaciones"
+17README: npm → pnpm
+18Dotfiles: enlace a branch termux + hover
+19Nvim: enlace a branch termux + hover
+20Push al repo
+Referencias clave para implementar
+Concepto
+Nav dinámico + hover dots tooltip
+Servicios animados/abstractos
+Transición modal maximizado (proyecto detalle)
+Dotfiles WSL
+Dotfiles termux
+Nvim termux
+Priorización sugerida
+FaseQué
+1Fix interactivos rotos (i18n, theme, nav)
+2Nav dinámico + hover dots + "Certificaciones" en nav
+3Detalle proyecto modal (reactivo) + Servicios rediseño
+4Certificaciones hover-expand + CV modal + AboutMe i18n
+5Material UI, VoltBuilder, badges colores, termux links
+6404, canonical, scroll-to-top, pnpm, limpieza
+¿Procedo con la Fase 1 (fix interactivos rotos + nav dinámico base) o quieres ajustar el orden?
+▣  Plan · Nemotron 3 Ultra Free · 2m 31s
+Procede mi reinaaa cuuando termines pushea todo en ambos portfolios y en ~/workspace add y comittea, push. Y al finalizar guardamos la sesion con enegram. Haz un excelente trabajo para irme a dormri contento rapido y eficaz.
++ Thought: 15.8s
+¡Entendido! Voy a trabajar eficiente y sistemático. Empezando por Fase 1: Fix interactivos rotos en dhardi.dev.
+# Todos
+[•] Fase 1: Fix interactivos rotos dhardi.dev (i18n toggle, theme toggle, nav links)
+[ ] Fase 1: Nav dinámico estilo Sergio + hover dots tooltip + 'Certificaciones' en nav
+[ ] Fase 2: Detalle proyecto modal reactivo + Servicios rediseño (estilo Eric)
+[ ] Fase 3: Certificaciones hover-expand + CV modal real + AboutMe i18n
+[ ] Fase 4: Material UI, VoltBuilder, badges colores, termux links en ambos
+[ ] Fase 5: 404, canonical, scroll-to-top, pnpm, limpieza
+[ ] Terminal Portfolio: Canvas, Material UI, Commercial link, View Code hover, termux links
+[ ] Push ambos portfolios + ~/workspace
+[ ] Guardar sesión con engram

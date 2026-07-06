@@ -1,0 +1,78 @@
+
+
+                   -o\
+                  :ooo:
+                 .ooooo.                        diego@cachyos-x8664
+                 ooooooo.
+                +oooooooo.                        CachyOS x86_64
+               -oooooooooo.                       Linux 6.18.20-1-cachyos-lts
+              --:-+oooooooo.                      1905 (pacman)
+             yooo+=+sooooooo.                     bash 5.3.9
+            yoooooosooooooooo.                    nvim
+           y+ooooooooooooooooo.                   Hyprland 0.54.3 (Wayland)
+          yoooooooooooooooooooo`                  16 hours, 20 mins
+         yoooooo+oo=  :oo++ooooo`               PU  Intel(R) Core(TM) i7-6650U (4) @ 3.40 GHz
+        :oooooo.           +ooooo-              󰍛  11.85 GiB / 15.49 GiB (76%)
+       -ooooooo.   .::.    +ooosoo=             󰍹  1920x1080 in 16", 60 Hz [External]
+      -oooooo`    .oooo`     +os-=o=            󰍹  1920x1080 in 14", 60 Hz [Built-in]
+     =ooooooo=:    `oo+    :=ooo=--`.           󰌵  Colloid-Pink-Dark [GTK2/3/4]
+    +ooooooooos.          .=sooooooo+-          󰋥  Gruvbox-Plus-Dark [GTK2/3/4]
+  .+osossos+-`              `-+osososs+.          Noto Sans (10pt) [GTK2], Mononoki Nerd Font (11pt) [GTK3], Noto Sans (10pt) [GTK4]
+ :sss+=-:`                     `:-=+ssss:         Kafka (24px)
+:=-:`                                `-=+:      󰍸  Intel Iris Graphics 540 @ 1.05 GHz [Integrated]
+                                                󰋊  208.19 GiB / 449.63 GiB (46%) - ext4
+                                                󰛿  10.0.0.252/24
+                                                󰁹  100% [AC Connected]
+                                                󰇫  es_DO.UTF-8
+
+                                                                        
+                                                                        
+
+
+ npm run dev
+
+> dhardi-dev@1.0.0 dev
+> astro dev
+
+06:13:37 [WARN] [vite] warning: `esbuild` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `oxc` instead.
+06:13:37 [WARN] [vite] warning: `optimizeDeps.esbuildOptions` option was specified by "vite:react-babel" plugin. This option is deprecated, please use `optimizeDeps.rolldownOptions` instead.
+06:13:37 [WARN] [vite] You or a plugin you are using have set `optimizeDeps.esbuildOptions` but this option is now deprecated. Vite now uses Rolldown to optimize the dependencies. Please use `optimizeDeps.rolldownOptions` instead.
+06:13:37 [vite] connected.
+06:13:42 [types] Generated 3ms
+06:13:42 [vite] connected.
+ astro  v7.0.6 ready in 7774 ms
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+06:13:42 watching for file changes...
+06:24:58 [200] / 301ms
+06:24:58 [200] / 301ms
+06:25:04 [watch] src/pages/index.astro
+06:25:10 [200] / 141ms
+06:25:12 [watch] src/pages/index.astro
+06:25:15 [200] / 121ms
+06:25:22 [watch] src/pages/index.astro
+06:25:23 [200] / 139ms
+06:25:30 [watch] src/pages/index.astro
+06:25:31 [200] / 182ms
+06:26:09 [watch] /src/styles/global.css
+06:26:10 [200] / 118ms
+06:26:24 [watch] /src/styles/global.css
+06:26:25 [200] / 172ms
+06:26:43 [watch] /src/styles/global.css
+06:26:44 [200] / 277ms
+06:26:52 [vite] program reload
+06:26:52 [ERROR] [vite] An error happened during full reload
+Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+Error: Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+    at loadAndTransform (file:///home/diego/workspace/dhardi.dev/node_modules/.pnpm/vite@8.1.3_esbuild@0.28.1_jiti@2.7.0/node_modules/vite/dist/node/chunks/node.js:19718:31)
+06:26:53 [200] / 183ms
+06:26:53 [vite] program reload
+06:26:54 [vite] program reload
+06:26:56 [200] / 59ms
+06:33:27 [200] / 88ms
+06:33:37 [200] / 35ms
+06:34:06 [200] /ProyectDetail/3 69ms
+06:34:08 [200] / 11ms
+06:34:32 [200] HEAD / 27ms
+06:36:21 [200] HEAD / 54ms
+^[^[^[^[^[^[
