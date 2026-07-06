@@ -1,0 +1,57 @@
+---
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 nav-blur nav-bg border-b transition-all duration-300" style="border-color:var(--nav-border)" id="header">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <a href="/" class="font-display font-bold text-xl tracking-tight flex items-center gap-2">
+      <span><span style="color:#e94560">d</span><span style="color:#00d9ff">h</span><span style="color:#e94560">.</span></span>
+      <span class="text-primary">Dhardi</span>
+    </a>
+    <div class="hidden md:flex items-center gap-1">
+      <a href="#experience" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.experience">Experience</a>
+      <a href="#projects" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.projects">Projects</a>
+      <a href="#servicios" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.servicios">Services</a>
+      <a href="#setup" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.setup">Setup</a>
+      <a href="#certifications" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.certifications">Certifications</a>
+      <a href="#contact" class="px-4 py-2 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.contact">Contact</a>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-0.5 bg-badge rounded-lg p-0.5">
+        <button onclick="switchTheme('dark')" id="theme-dark-btn" class="px-1.5 py-1 text-xs rounded-md transition-all cursor-pointer" style="background:var(--bg-secondary);color:var(--text-primary)">🌙</button>
+        <button onclick="switchTheme('light')" id="theme-light-btn" class="px-1.5 py-1 text-xs rounded-md transition-all cursor-pointer" style="color:var(--text-muted)">☀️</button>
+      </div>
+      <div class="relative" id="lang-dropdown">
+        <button onclick="toggleLangDropdown()" id="lang-current-btn" class="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-badge hover:bg-secondary transition-all cursor-pointer" style="color:var(--text-primary)">
+          <span id="current-lang-label">ES</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div id="lang-dropdown-menu" class="absolute right-0 mt-1 bg-secondary border border-custom rounded-lg py-1 shadow-lg hidden" style="min-width:56px;z-index:100">
+          <button onclick="switchLanguage('es')" class="lang-dropdown-item block w-full text-left px-3 py-1.5 text-xs hover:bg-badge transition-colors cursor-pointer" style="color:var(--text-muted)">ES</button>
+          <button onclick="switchLanguage('en')" class="lang-dropdown-item block w-full text-left px-3 py-1.5 text-xs hover:bg-badge transition-colors cursor-pointer" style="color:var(--text-muted)">EN</button>
+          <button onclick="switchLanguage('de')" class="lang-dropdown-item block w-full text-left px-3 py-1.5 text-xs hover:bg-badge transition-colors cursor-pointer" style="color:var(--text-muted)">DE</button>
+        </div>
+      </div>
+      <button id="mobile-nav-toggle" onclick="toggleMobileNav()" class="md:hidden flex flex-col items-center justify-center w-9 h-9 rounded-lg bg-badge hover:bg-secondary transition-all cursor-pointer" aria-label="Toggle navigation">
+        <span style="width:16px;height:2px;background:var(--text-primary);border-radius:1px;transition:all 0.25s ease;transform-origin:center;display:block"></span>
+        <span style="width:16px;height:2px;background:var(--text-primary);border-radius:1px;transition:all 0.25s ease;margin:4px 0;display:block"></span>
+        <span style="width:16px;height:2px;background:var(--text-primary);border-radius:1px;transition:all 0.25s ease;transform-origin:center;display:block"></span>
+      </button>
+      <span class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-xs font-medium">
+        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-soft"></span>
+        <span data-i18n="nav.available">Disponible</span>
+      </span>
+      <button onclick="openCVModal()" class="px-5 py-2 bg-[#e94560] text-white text-sm font-semibold rounded-lg hover:bg-[#d91a3a] transition-all hover-glow cursor-pointer"><span data-i18n="nav.resume">Resume</span></button>
+    </div>
+  </div>
+  <div id="mobile-nav-menu" class="md:hidden fixed left-0 right-0 nav-blur nav-bg border-b hidden" style="top:64px;border-color:var(--nav-border);z-index:49">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-1">
+      <a href="#experience" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.experience">Experience</a>
+      <a href="#projects" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.projects">Projects</a>
+      <a href="#servicios" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.servicios">Services</a>
+      <a href="#setup" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.setup">Setup</a>
+      <a href="#certifications" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.certifications">Certifications</a>
+      <a href="#contact" onclick="closeMobileNav()" class="mobile-nav-link px-4 py-3 text-sm text-muted hover:text-primary hover-subtle rounded-lg transition-all" data-i18n="nav.contact">Contact</a>
+    </div>
+  </div>
+  <div id="mobile-nav-backdrop" class="md:hidden fixed inset-0 hidden" style="z-index:48;background:rgba(0,0,0,0.5)" onclick="closeMobileNav()"></div>
+</nav>

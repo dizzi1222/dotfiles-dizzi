@@ -1,0 +1,36 @@
+export interface Skill {
+  name: string;
+  icon: string;
+  color: string;
+  category: string;
+  description: string;
+  tags: string[];
+}
+
+export const skills: Skill[] = [
+  { name: 'Node.js', icon: 'IconNode', color: '#339933', category: 'Backend', description: 'Runtime JS del lado del servidor. APIs RESTful con Express.', tags: ['Runtime', 'Backend', 'JavaScript'] },
+  { name: 'Express', icon: 'IconExpress', color: '#000000', category: 'Backend', description: 'Framework minimalista para Node.js. APIs limpias y escalables.', tags: ['Framework', 'Backend', 'Node.js'] },
+  { name: 'React', icon: 'IconReact', color: '#61DAFB', category: 'Frontend', description: 'Biblioteca declarativa de UI. Componentes reutilizables y hooks.', tags: ['Library', 'Frontend', 'SPA'] },
+  { name: 'MongoDB', icon: 'IconMongoDB', color: '#47A248', category: 'Database', description: 'Base de datos NoSQL. Almacenamiento principal en proyectos MERN.', tags: ['Database', 'NoSQL', 'MERN'] },
+  { name: 'PostgreSQL', icon: 'IconPostgreSQL', color: '#4169E1', category: 'Database', description: 'BD relacional open-source. Consultas SQL avanzadas y schemas.', tags: ['Database', 'SQL', 'Relational'] },
+  { name: 'Python', icon: 'IconPython', color: '#3776AB', category: 'Scripting', description: 'Lenguaje multipropósito. Automatización y scripting.', tags: ['Language', 'Automation', 'Scripting'] },
+  { name: 'TypeScript', icon: 'IconTypeScript', color: '#3178C6', category: 'Language', description: 'Tipado estático para JS. Código robusto y mantenible.', tags: ['Language', 'Typed', 'JavaScript'] },
+  { name: 'JavaScript', icon: 'IconJavaScript', color: '#F7DF1E', category: 'Language', description: 'Lenguaje del navegador y backend. Lógica interactiva y APIs.', tags: ['Language', 'Frontend', 'Backend'] },
+  { name: 'Docker', icon: 'IconDocker', color: '#2496ED', category: 'DevOps', description: 'Contenedores para dev y prod. Entornos reproducibles.', tags: ['Container', 'DevOps', 'Deploy'] },
+  { name: 'Git', icon: 'IconGit', color: '#F05032', category: 'DevOps', description: 'Control de versiones. Feature branches, rebase y commits semánticos.', tags: ['VCS', 'DevOps', 'Collaboration'] },
+  { name: 'Tailwind CSS', icon: 'IconTailwind', color: '#06B6D4', category: 'Frontend', description: 'CSS utility-first. Prototipado rápido y consistencia visual.', tags: ['CSS', 'Framework', 'Frontend'] },
+  { name: 'Svelte', icon: 'IconSvelte', color: '#FF3E00', category: 'Frontend', description: 'Framework reactivo. Compila a JS optimizado, sin virtual DOM.', tags: ['Framework', 'Frontend', 'Compiler'] },
+  { name: 'Astro', icon: 'IconAstro', color: '#BC52EE', category: 'Frontend', description: 'Static site generator. Islands architecture, cero JS por defecto.', tags: ['Framework', 'SSG', 'Frontend'] },
+  { name: 'Figma', icon: 'IconFigma', color: '#F24E1E', category: 'Design', description: 'Diseño de interfaces y prototipado. Design systems y componentes.', tags: ['Design', 'UI', 'Prototyping'] },
+  { name: 'Arch Linux', icon: 'IconArch', color: '#1793D1', category: 'System', description: 'Daily driver. Arch + Hyprland, configuración desde cero.', tags: ['Linux', 'OS', 'System'] },
+  { name: 'Neovim', icon: 'IconNeovim', color: '#57A143', category: 'System', description: 'Editor principal con LazyVim. LSP, 100% teclado.', tags: ['Editor', 'Lua', 'Productivity'] },
+  { name: 'Render', icon: 'IconRender', color: '#46E3B7', category: 'DevOps', description: 'Cloud hosting. Full-stack apps con deploy continuo desde Git.', tags: ['Cloud', 'Hosting', 'Deploy'] },
+  { name: 'Vercel', icon: 'IconVercel', color: '#000000', category: 'DevOps', description: 'Cloud platform para frontends. Serverless functions.', tags: ['Cloud', 'Hosting', 'Deploy'] },
+  { name: 'Google Cloud', icon: 'IconGCloud', color: '#4285F4', category: 'DevOps', description: 'Cloud Run para backends serverless, App Engine para frontends con dominios personalizados .com. Cloud SQL con proxy local y socket Unix. gcloud CLI, service accounts y despliegue con domains RUN.app / APPSPOT.com.', tags: ['Cloud', 'Infra', 'GCP'] },
+  { name: 'HTML', icon: 'IconHTML', color: '#E34F26', category: 'Language', description: 'Lenguaje de marcado web. Estructura semántica y accesible.', tags: ['Language', 'Frontend', 'Markup'] },
+  { name: 'CSS', icon: 'IconCSS', color: '#1572B6', category: 'Frontend', description: 'Estilos web modernos. Flexbox, Grid, animaciones y variables.', tags: ['CSS', 'Frontend', 'Styling'] },
+  { name: 'Bootstrap', icon: 'IconBootstrap', color: '#7952B3', category: 'Frontend', description: 'Framework CSS responsive. Componentes y grid system.', tags: ['CSS', 'Framework', 'Frontend'] },
+  { name: 'Canvas', icon: 'IconCanvas', color: '#E04E1F', category: 'Design', description: 'Diseño y prototipado visual. Mockups y wireframes interactivos.', tags: ['Design', 'UI', 'Mockup'] },
+  { name: 'Railway', icon: 'IconRailway', color: '#7E3AF2', category: 'DevOps', description: 'Plataforma cloud para backends. Deploy rápido con PostgreSQL integrado.', tags: ['Cloud', 'Hosting', 'Deploy'] },
+  { name: 'VoltBuilder', icon: 'IconVoltBuilder', color: '#7C3AED', category: 'DevOps', description: 'Build service para apps nativas Android/iOS desde web apps (Cordova/Capacitor). No requiere Mac. APK y IPA sin SDKs locales.', tags: ['Mobile', 'Build', 'Android', 'iOS'] },
+];
