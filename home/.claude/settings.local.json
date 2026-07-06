@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(astro|tsx?|css\\)$\")",
+      "Bash(xargs cat:*)",
+      "Bash(find . -name \"*.css\" -exec cat {} \\\\;)",
+      "Bash(npm list:*)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "Bash(pnpm build:*)",
+      "WebFetch(domain:www.devcoming.dev)"
+    ]
+  }
+}
