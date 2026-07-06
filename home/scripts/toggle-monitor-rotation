@@ -70,13 +70,13 @@ restart_nemo() {
     ;;
   *) nemo-desktop & ;;
   esac
-  # Mover duplicado (stableID menor = "Escritorio") al workspace 9
+  # Mover duplicado (stableID menor = "Escritorio") al workspace 10
   sleep 1
   hyprctl clients -j | jq -r '
   [.[] | select(.class == "Nemo-desktop")] |
   sort_by(.stableID) |
   .[1].address
-' | xargs -I{} hyprctl dispatch movetoworkspacesilent "9,address:{}"
+' | xargs -I{} hyprctl dispatch movetoworkspacesilent "10,address:{}"
 }
 
 # ── Selección con rofi ──────────────────────────────────────────────────────────────
