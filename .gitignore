@@ -3,6 +3,21 @@
 
 home/clawd/.git/
 
+# ═══════════════════════════════════════════════════════════
+# CLAUDE CODE - Datos efímeros y sensibles
+# ═══════════════════════════════════════════════════════════
+home/.claude/.credentials.json
+home/.claude/backups/
+home/.claude/history.jsonl
+home/.claude/ide/
+home/.claude/mcp-needs-auth-cache.json
+home/.claude/paste-cache/
+home/.claude/projects/
+home/.claude/sessions/
+home/.claude/shell-snapshots/
+home/.claude/file-history/
+home/.claude/settings.local.json
+
 # Antigravity - ignorar todo EXCEPTO settings y keybindings
 Antigravity/.config/Antigravity/*
 !Antigravity/.config/Antigravity/User/

@@ -22,6 +22,7 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
+      "applications:display-setup",
       "applications:pokemmo",
       "clipboard:history",
       "applications:waydroid-start-sd",
