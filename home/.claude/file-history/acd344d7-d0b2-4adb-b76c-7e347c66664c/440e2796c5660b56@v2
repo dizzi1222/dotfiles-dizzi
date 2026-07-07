@@ -1,0 +1,259 @@
+# Añadir esto a tu .gitignore actual
+# cat >> .gitignore << 'EOF'
+
+home/clawd/.git/
+
+# ═══════════════════════════════════════════════════════════
+# CLAUDE CODE - Datos efímeros y sensibles
+# ═══════════════════════════════════════════════════════════
+home/.claude/.credentials.json
+home/.claude/backups/
+home/.claude/history.jsonl
+home/.claude/ide/
+home/.claude/mcp-needs-auth-cache.json
+home/.claude/paste-cache/
+home/.claude/projects/
+home/.claude/sessions/
+home/.claude/shell-snapshots/
+
+# Antigravity - ignorar todo EXCEPTO settings y keybindings
+Antigravity/.config/Antigravity/*
+!Antigravity/.config/Antigravity/User/
+Antigravity/.config/Antigravity/User/*
+!Antigravity/.config/Antigravity/User/settings.json
+!Antigravity/.config/Antigravity/User/keybindings.json
+
+# MCP específico
+.mcp-global.json.local
+mcp-config.local.json
+*.mcp-local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Entornos virtuales
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs
+*.log
+logs/
+
+# Temporales
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ============================================
+# .gitignore para dotfiles
+# ============================================
+
+# Archivos comprimidos
+*.tar.gz
+*.tar.xz
+*.tar.bz2
+*.zip
+*.rar
+*.7z
+
+# Runtime y binarios
+*.so
+*.so.*
+*.dll
+*.exe
+*.AppImage
+
+# Aplicaciones completas
+home/musicpresence/
+**/musicpresence/
+
+# ═══════════════════════════════════════════════════════════
+# LUTRIS - Mantener estructura, ignorar runtime pesado
+# ═══════════════════════════════════════════════════════════
+# Ignorar runtime (51.4 MiB) pero mantener todo lo demás
+**/local/.local/share/lutris/runtime/
+
+# Mantener: coverart, banners, games, pga.db, runners, lutris.conf, system.yml
+# (no necesitas excluirlos explícitamente si solo ignoras runtime/)
+
+# ═══════════════════════════════════════════════════════════
+# FIREFOX - SOLO mantener perfiles con CSS importantes
+# ═══════════════════════════════════════════════════════════
+# Ignorar TODO de .mozilla EXCEPTO 2 perfiles específicos
+firefox/.mozilla/**
+
+# Permitir SOLO estos 2 perfiles (con CSS importantes)
+!firefox/.mozilla/firefox/1lz1qhvp.default-release/
+!firefox/.mozilla/firefox/1lz1qhvp.default-release/**
+!firefox/.mozilla/firefox/tes3ta6p.default-release/
+!firefox/.mozilla/firefox/tes3ta6p.default-release/**
+
+# Dentro de esos perfiles, ignorar caches y temporales
+firefox/.mozilla/firefox/*/cache*/
+firefox/.mozilla/firefox/*/Cache*/
+firefox/.mozilla/firefox/*/storage/
+firefox/.mozilla/firefox/*/startupCache/
+firefox/.mozilla/firefox/*/thumbnails/
+firefox/.mozilla/firefox/*/*.sqlite*
+firefox/.mozilla/firefox/*/*.json-*
+firefox/.mozilla/firefox/*/sessionstore*
+firefox/.mozilla/firefox/*/crashes/
+
+# ═══════════════════════════════════════════════════════════
+# NAVEGADORES - SECRETOS Y DATOS SENSIBLES
+# ═══════════════════════════════════════════════════════════
+**/chrome/
+**/chromium/
+**/.config/google-chrome/
+**/.config/BraveSoftware/
+
+# ═══════════════════════════════════════════════════════════
+# EXTENSIONES DE EDITORES (muy pesadas)
+# ═══════════════════════════════════════════════════════════
+**/.cursor/extensions/
+**/.vscode/extensions/
+**/cursor/.cursor/extensions/
+**/vscode/.vscode/extensions/
+
+# ═══════════════════════════════════════════════════════════
+# CACHES Y TEMPORALES
+# ═══════════════════════════════════════════════════════════
+**/.cache/
+**/cache/
+**/__pycache__/
+*.pyc
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ═══════════════════════════════════════════════════════════
+# DATOS DE APPS (pesados)
+# ═══════════════════════════════════════════════════════════
+**/.local/share/Steam/
+**/.wine/
+**/.steam/
+
+# ═══════════════════════════════════════════════════════════
+# LOGS Y DATABASES
+# ═══════════════════════════════════════════════════════════
+*.log
+*.sqlite
+*.sqlite-*
+*.db
+
+# ═══════════════════════════════════════════════════════════
+# ARCHIVOS ESPECÍFICOS
+# ═══════════════════════════════════════════════════════════
+# Spell files (muy grandes)
+**/nvim/spell/*.txt
+
+# Wallpapers duplicados
+# wallpapers/wallpapers/
+
+# CopyQ locks
+copyq/.config/copyq/*.lock*
+
+# Lutris iconos generados
+local/.local/share/icons/hicolor/128x128/apps/lutris_*.png
+
+# ═══════════════════════════════════════════════════════════
+# THEMES - Bloquear todos excepto los que necesitas
+# ═══════════════════════════════════════════════════════════
+themes/.themes/*
+# Si quieres mantener Gruvbox descomenta:
+# !themes/.themes/Gruvbox-Plus-Dark/
+local/.local/share/lutris/runtime/
+*:Zone.Identifier
+
+# ═══════════════════════════════════════════════════════════
+# PYTHON - VENV Y REQUIREMENTS (MUY PESADOS)
+# ═══════════════════════════════════════════════════════════
+**/venv/
+**/.venv/
+**/.venvs/
+**/.virtualenvs/
+**/.virtualenv/
+**/.virtualenvs/
+**/.virtualenv/
+home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.2/venv/
+home/dotfiles-dizzi/home/LinuxPyMacroRecord/PyMacroRecord-1.4.1/venv/
+
+
+# ═══════════════════════════════════════════════════════════
+# NVIM GITIGNORE - API KEYS Y ARCHIVOS SENSIBLES
+# ═══════════════════════════════════════════════════════════
+
+# API Keys (MUY IMPORTANTE - NO SUBIR)
+api-keys.sh
+api-keys.ps1
+.env
+*.key
+
+# Logs y cachés de plugins
+lazy-lock.json
+plugin/
+spell/
+.luarc.json
+
+# Archivos de sesión
+Session.vim
+.netrwhist
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Avante history (opcional, puede tener info sensible)
+.avante_chat_history
+
+# Copilot chat history
+copilot-chat-history/
+home/.opencommit
