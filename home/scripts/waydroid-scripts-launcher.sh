@@ -130,7 +130,9 @@ echo -e "  ${YELLOW}2)${RESET} 🔄  Reiniciar container"
 echo -e "  ${YELLOW}3)${RESET} 🆔 Obtener Android ID"
 echo -e "  ${YELLOW}4)${RESET} 💥 RESET COMPLETO - Borrar datos y generar nuevo ID"
 echo -e "  ${YELLOW}5)${RESET} 📦 Instalar libhoudini ${RED}(necesario para MagisTV/ARM)${RESET}"
-echo -e "  ${YELLOW}6)${RESET} ❌ Salir"
+echo -e "  ${YELLOW}6)${RESET} ⌨️  Instalar waydroid-helper (keymapper para juegos)"
+echo -e "  ${YELLOW}7)${RESET} 🎮 Instalar XtMapper + cage-xtmapper (keymapper moderno para juegos)"
+echo -e "  ${YELLOW}8)${RESET} ❌ Salir"
 echo ""
 
 printf "Selecciona opción: "
@@ -268,6 +270,86 @@ case "$option" in
 5)
   # ── Instalar libhoudini ───────────────────────────────────
   install_libhoudini_auto
+  ;;
+
+6)
+  # ── Instalar waydroid-helper (keymapper) ─────────────────
+  echo -e "${CYAN}Instalando waydroid-helper desde AUR...${RESET}"
+  if command -v yay &>/dev/null; then
+    yay -S waydroid-helper
+  elif command -v paru &>/dev/null; then
+    paru -S waydroid-helper
+  elif command -v pacman &>/dev/null; then
+    git clone https://aur.archlinux.org/waydroid-helper.git /tmp/waydroid-helper
+    cd /tmp/waydroid-helper && makepkg -si
+  else
+    echo -e "${RED}✗ No se encontró yay/paru/makepkg. Instálalo manualmente desde AUR.${RESET}"
+  fi
+  echo ""
+  echo -e "${GREEN}✅ Listo. Ejecútalo con: ${YELLOW}waydroid-helper${RESET}"
+  echo -e "${CYAN}📖 Guía: pestaña Key Mapper → Edit Mode → clic derecho → asignar teclas${RESET}"
+  ;;
+
+7)
+  # ── Instalar XtMapper + cage-xtmapper ───────────────────
+  XTMAPPER_TAR="/tmp/cage-xtmapper-v0.2.0.tar"
+  echo -e "${CYAN}⬇️  Descargando cage-xtmapper v0.2.0...${RESET}"
+  curl -fL --retry 3 --retry-delay 3 -o "$XTMAPPER_TAR" "https://github.com/Xtr126/cage-xtmapper/releases/latest/download/cage-xtmapper-v0.2.0.tar"
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}✗ Error al descargar.${RESET}"
+    exit 1
+  fi
+
+  echo -e "${CYAN}📦 Extrayendo...${RESET}"
+  tar xvf "$XTMAPPER_TAR" -C /tmp/
+
+  echo -e "${CYAN}🔧 Instalando binarios...${RESET}"
+  sudo install -Dm755 /tmp/usr/local/bin/cage_xtmapper /usr/local/bin/
+  sudo install -Dm755 /tmp/usr/local/bin/cage_xtmapper.sh /usr/local/bin/
+  echo -e "${GREEN}✅ cage-xtmapper instalado.${RESET}"
+
+  echo ""
+  echo -e "${CYAN}📱 Instala XtMapper APK en Waydroid:${RESET}"
+  echo -e "  ${YELLOW}1)${RESET} Abre https://github.com/Xtr126/XtMapper/releases en Waydroid"
+  echo -e "  ${YELLOW}2)${RESET} Descarga e instala el APK"
+  echo ""
+  echo -e "${CYAN}📡 Activando ADB en Waydroid...${RESET}"
+
+  # Activar ADB TCP/IP dentro del container
+  sudo waydroid shell setprop service.adb.tcp.port 5555
+  sudo waydroid shell stop adbd
+  sudo waydroid shell start adbd
+  sleep 2
+
+  # Detectar IP real del container
+  WAYDROID_IP=$(sudo waydroid shell ip addr show eth0 2>/dev/null | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
+
+  if [ -z "$WAYDROID_IP" ]; then
+    echo -e "${YELLOW}⚠️  No se pudo detectar IP automáticamente, usando 192.168.240.1${RESET}"
+    WAYDROID_IP="192.168.240.1"
+  else
+    echo -e "${GREEN}✅ IP detectada: ${YELLOW}$WAYDROID_IP${RESET}"
+  fi
+
+  echo ""
+  echo -e "${CYAN}🔌 Conectando ADB a $WAYDROID_IP:5555...${RESET}"
+
+  # Matar server previo y reconectar
+  adb kill-server 2>/dev/null
+  adb start-server 2>/dev/null
+  adb connect "$WAYDROID_IP:5555"
+
+  echo ""
+  echo -e "${CYAN}🎯 Ejecuta este comando para conceder permisos a XtMapper:${RESET}"
+  echo -e "  ${YELLOW}adb shell sh /sdcard/Android/data/io.xtr126.xtmapper/files/xtmapper-adb.sh${RESET}"
+  echo ""
+  echo -e "${CYAN}📖 Para usar cage-xtmapper:${RESET}"
+  echo -e "  ${YELLOW}cage_xtmapper.sh${RESET}  (abre waydroid con soporte XtMapper)"
+  echo -e "${CYAN}🔑 F10 para toggle entre XtMapper y Waydroid${RESET}"
+  echo -e "${CYAN}🐭 Cursor invisible:${RESET}"
+  echo -e "  ${YELLOW}waydroid prop set persist.waydroid.cursor_on_subsurface true${RESET}"
+  echo ""
+  echo -e "${GREEN}✅ Instalación completada.${RESET}"
   ;;
 
 *)
