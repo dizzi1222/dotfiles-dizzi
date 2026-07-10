@@ -132,7 +132,8 @@ echo -e "  ${YELLOW}4)${RESET} 💥 RESET COMPLETO - Borrar datos y generar nuev
 echo -e "  ${YELLOW}5)${RESET} 📦 Instalar libhoudini ${RED}(necesario para MagisTV/ARM)${RESET}"
 echo -e "  ${YELLOW}6)${RESET} ⌨️  Instalar waydroid-helper (keymapper para juegos)"
 echo -e "  ${YELLOW}7)${RESET} 🎮 Instalar XtMapper + cage-xtmapper (keymapper moderno para juegos)"
-echo -e "  ${YELLOW}8)${RESET} ❌ Salir"
+echo -e "  ${YELLOW}8)${RESET} 👻 Instalar Phantom (keymapper real en Rust - inyección táctil nativa)"
+echo -e "  ${YELLOW}9)${RESET} ❌ Salir"
 echo ""
 
 printf "Selecciona opción: "
@@ -350,6 +351,46 @@ case "$option" in
   echo -e "  ${YELLOW}waydroid prop set persist.waydroid.cursor_on_subsurface true${RESET}"
   echo ""
   echo -e "${GREEN}✅ Instalación completada.${RESET}"
+  ;;
+
+8)
+  # ── Instalar Phantom (keymapper Rust) ────────────────────
+  PHANTOM_DIR="$HOME/phantom"
+  if [ -d "$PHANTOM_DIR" ]; then
+    echo -e "${CYAN}🔄 Phantom ya clonado, actualizando...${RESET}"
+    cd "$PHANTOM_DIR" && git pull
+  else
+    echo -e "${CYAN}⬇️  Clonando Phantom...${RESET}"
+    git clone https://github.com/oliviermugishak/phantom "$PHANTOM_DIR"
+  fi
+
+  cd "$PHANTOM_DIR"
+
+  echo -e "${CYAN}🔧 Instalando dependencias Rust...${RESET}"
+  if ! command -v cargo &>/dev/null; then
+    echo -e "${YELLOW}⚠️  Rust no instalado. Instalando rustup...${RESET}"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    . "$HOME/.cargo/env"
+  fi
+
+  echo -e "${CYAN}🏗️  Compilando e instalando Phantom...${RESET}"
+  ./install.sh
+
+  echo ""
+  echo -e "${GREEN}✅ Phantom instalado.${RESET}"
+  echo ""
+  echo -e "${CYAN}📖 Para usarlo:${RESET}"
+  echo -e "  ${YELLOW}1)${RESET} Activar Waydroid (si no está corriendo)"
+  echo -e "  ${YELLOW}2)${RESET} Ejecutar: ${GREEN}sudo phantom --daemon${RESET}"
+  echo -e "  ${YELLOW}3)${RESET} Cargar perfil: ${GREEN}phantom load ~/.config/phantom/profiles/pubg.json${RESET}"
+  echo -e "     O usa la GUI para crear tu perfil para Brown Dust 2"
+  echo -e "  ${YELLOW}4)${RESET} Activar captura: ${GREEN}phantom enter-capture${RESET}"
+  echo ""
+  echo -e "${CYAN}Teclas:${RESET}"
+  echo -e "  ${YELLOW}F1${RESET} toggle apuntar/menú"
+  echo -e "  ${YELLOW}F8${RESET} toggle captura"
+  echo -e "  ${YELLOW}F9${RESET} pausa"
+  echo -e "  ${YELLOW}F2${RESET} cerrar"
   ;;
 
 *)
