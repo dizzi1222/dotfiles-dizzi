@@ -132,7 +132,8 @@ echo -e "  ${YELLOW}4)${RESET} 💥 RESET COMPLETO - Borrar datos y generar nuev
 echo -e "  ${YELLOW}5)${RESET} 📦 Instalar libhoudini ${RED}(necesario para MagisTV/ARM)${RESET}"
 echo -e "  ${YELLOW}6)${RESET} ⌨️  Instalar waydroid-helper (keymapper para juegos)"
 echo -e "  ${YELLOW}7)${RESET} 🎮 Instalar XtMapper + cage-xtmapper (keymapper moderno para juegos)"
-echo -e "  ${YELLOW}8)${RESET} ❌ Salir"
+echo -e "  ${YELLOW}8)${RESET} 👻 Instalar Phantom (keymapper real en Rust - inyección táctil nativa)"
+echo -e "  ${YELLOW}9)${RESET} ❌ Salir"
 echo ""
 
 printf "Selecciona opción: "
@@ -350,6 +351,104 @@ case "$option" in
   echo -e "  ${YELLOW}waydroid prop set persist.waydroid.cursor_on_subsurface true${RESET}"
   echo ""
   echo -e "${GREEN}✅ Instalación completada.${RESET}"
+  ;;
+
+8)
+  # ── Instalar Phantom (keymapper Rust) + lanzador ──────
+  PHANTOM_VERSION="v1.0.0"
+  BIN_DIR="$HOME/.local/bin"
+  DATA_DIR="$HOME/.local/share/phantom/android"
+  CONFIG_DIR="$HOME/.config/phantom"
+  PROFILE_DIR="$CONFIG_DIR/profiles"
+
+  echo -e "${CYAN}⬇️  Descargando Phantom $PHANTOM_VERSION release...${RESET}"
+  curl -fL -o /tmp/phantom.tar.gz \
+    "https://github.com/oliviermugishak/phantom/releases/download/$PHANTOM_VERSION/phantom-$PHANTOM_VERSION-linux-x86_64.tar.gz"
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}✗ Error al descargar.${RESET}"
+    exit 1
+  fi
+
+  echo -e "${CYAN}📦 Extrayendo...${RESET}"
+  tar xzf /tmp/phantom.tar.gz -C /tmp/
+  EXTRACT_DIR="/tmp/phantom-$PHANTOM_VERSION-linux-x86_64"
+  mkdir -p "$BIN_DIR" "$DATA_DIR" "$CONFIG_DIR" "$PROFILE_DIR"
+
+  echo -e "${CYAN}🔧 Instalando binarios...${RESET}"
+  install -m755 "$EXTRACT_DIR/bin/phantom" "$BIN_DIR/phantom"
+  install -m755 "$EXTRACT_DIR/bin/phantom-gui" "$BIN_DIR/phantom-gui"
+  install -m644 "$EXTRACT_DIR/lib/phantom/phantom-server.jar" "$DATA_DIR/phantom-server.jar"
+  for profile in "$EXTRACT_DIR"/share/phantom/profiles/*.json; do
+    name=$(basename "$profile")
+    [ ! -f "$PROFILE_DIR/$name" ] && cp "$profile" "$PROFILE_DIR/$name"
+  done
+  if [ ! -f "$CONFIG_DIR/config.toml" ]; then
+    cp "$EXTRACT_DIR/share/phantom/config.example.toml" "$CONFIG_DIR/config.toml"
+    sed -i "s|/absolute/path/to/phantom-server.jar|$DATA_DIR/phantom-server.jar|g" "$CONFIG_DIR/config.toml"
+  fi
+
+  # Wrapper sudo-visible
+  echo '#!/bin/bash' | sudo tee /usr/local/bin/phantom > /dev/null
+  echo "exec $BIN_DIR/phantom \"\$@\"" | sudo tee -a /usr/local/bin/phantom > /dev/null
+  sudo chmod 755 /usr/local/bin/phantom
+
+  # Crear script lanzador ~/scripts/waydroid-bd2.sh
+  mkdir -p "$HOME/scripts"
+  cat > "$HOME/scripts/waydroid-bd2.sh" << 'BD2EOF'
+#!/bin/bash
+# waydroid-bd2.sh — Lanza Waydroid + Phantom para Brown Dust 2
+PHANTOM_PROFILE="$HOME/.config/phantom/profiles/brown-dust-2.json"
+echo "🎮 Brown Dust 2 - Waydroid Launcher"
+echo ""
+
+sudo waydroid status 2>/dev/null | grep -q "RUNNING" || {
+  echo "Iniciando Waydroid..."
+  waydroid show-full-ui &
+  sleep 12
+}
+
+sudo killall phantom 2>/dev/null
+sudo phantom --daemon &
+sleep 3
+
+[ -f "$PHANTOM_PROFILE" ] && {
+  phantom load "$PHANTOM_PROFILE"
+  phantom enter-capture 2>/dev/null
+  echo "✅ Perfil cargado"
+}
+
+echo "Controles: F1=menú/apuntar  F8=captura  F2=salir"
+echo ""
+read -rp "Presiona Enter para salir..."
+phantom exit-capture 2>/dev/null
+phantom shutdown 2>/dev/null
+sudo killall phantom 2>/dev/null
+BD2EOF
+  chmod +x "$HOME/scripts/waydroid-bd2.sh"
+
+  # Crear .desktop
+  mkdir -p "$HOME/.local/share/applications"
+  cat > "$HOME/.local/share/applications/waydroid-bd2.desktop" << DESKEOF
+[Desktop Entry]
+Name=Brown Dust 2 (Waydroid)
+Comment=Waydroid + Phantom para Brown Dust 2
+Exec=bash -c "\$HOME/scripts/waydroid-bd2.sh"
+Icon=waydroid
+Type=Application
+Categories=Game;
+Terminal=true
+DESKEOF
+
+  # PATH
+  case ":$PATH:" in *":$BIN_DIR:"*) ;; *)
+    echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.zshrc"
+  ;; esac
+
+  rm -rf /tmp/phantom.tar.gz "$EXTRACT_DIR"
+  echo ""
+  echo -e "${GREEN}✅ Phantom + lanzador instalado.${RESET}"
+  echo -e "${CYAN}📌 Encuéntralo en el menú como 'Brown Dust 2 (Waydroid)'${RESET}"
+  echo -e "${CYAN}   O ejecuta: ${YELLOW}~/scripts/waydroid-bd2.sh${RESET}"
   ;;
 
 *)
