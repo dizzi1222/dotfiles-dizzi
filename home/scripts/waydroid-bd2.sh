@@ -44,7 +44,7 @@ fi
 
 echo -e "${GREEN}[3/3] ✅ Todo listo. Brown Dust 2 debería responder.${RESET}"
 echo ""
-echo -e "${CYAN}Controles:  F1=menú/apuntar  F8=captura  F2=salir${RESET}"
+echo -e "${CYAN}Controles:  F1=menú/apuntar  F8=captura  F10=overlay  F2=salir${RESET}"
 echo -e "${YELLOW}Cierra esta terminal cuando termines de jugar.${RESET}"
 echo ""
 read -rp "Presiona Enter para salir y limpiar..."

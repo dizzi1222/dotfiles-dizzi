@@ -432,11 +432,10 @@ BD2EOF
 [Desktop Entry]
 Name=Brown Dust 2 (Waydroid)
 Comment=Waydroid + Phantom para Brown Dust 2
-Exec=bash -c "\$HOME/scripts/waydroid-bd2.sh"
+Exec=kitty --hold -e /home/diego/scripts/waydroid-bd2.sh
 Icon=waydroid
 Type=Application
 Categories=Game;
-Terminal=true
 DESKEOF
 
   # PATH
