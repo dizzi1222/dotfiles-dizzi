@@ -15,6 +15,23 @@
 - Prefija los nombres de interfaz con `I` (por ejemplo, `IUserService`).
 - Siempre usa igualdad estricta (`===` y `!==`).
 
+## Comentarios Seccionales (Section Headers)
+
+Usar comentarios tipo `//SectionTitle` para dividir archivos largos en bloques lógicos.
+
+### Reglas
+
+| Regla          | Descripción                                                     |
+| -------------- | --------------------------------------------------------------- |
+| **Formato**    | `//SectionTitle` — sin punto final, mayúscula inicial           |
+| **Frecuencia** | Máximo 1 comentario cada ~50 líneas                             |
+| **Necesidad**  | Solo donde aporte claridad, nunca en obviedades                 |
+| **Referencia** | Estilo `app.ts`: `//Settings`, `//session Settings`, `//routes` |
+
+### Archivos que NO necesitan
+
+Scripts, migraciones, archivos < 40 líneas autoexplicativos, configs.
+
 ## Conexión a Base de Datos Local (pgAdmin4)
 
 ### Prerrequisitos
@@ -79,12 +96,41 @@ Reglas:
 - Si mencionas un _épica tracker_, lista sus features entre paréntesis, ej: _ÉPICA 03 Tracker_ (#92) con Features (US-03-01, US-03-02, US-03-03)
 
 ### Plantilla Issue: Daily Report
+
 Ubicaciones:
+
 - **Backend:** `/home/diego/workspace/ptd-talento-back/.github/ISSUE_TEMPLATE/4-dailly-report.md`
 - **Dotfiles:** `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/4-dailly-report.md`
 - Formato ESP/ENG integrado
 - Labels: `daily`, `diego`
 - Usar para crear issue diario de avances
+
+### Plantilla Issue: Investigación (INV)
+
+Ubicaciones:
+
+- **Dotfiles:** `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/5-investigacion.md`
+- Labels: `investigation`
+- Usar para analizar comportamientos extraños, inconsistencias o bugs no confirmados
+- Incluir: módulo afectado, comportamiento observado, hipótesis, pasos para reproducir, evidencias
+
+### Plantilla Issue: Investigación Técnica (SPIKE)
+
+Ubicaciones:
+
+- **Dotfiles:** `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/6-spike.md`
+- Labels: `spike`
+- Usar para aprendizaje técnico, exploración de enfoques y POCs antes de implementar
+- Incluir: objetivo, preguntas a resolver, actividades, entregables, recomendación final
+
+### Plantilla Issue: Comentarios Seccionales
+
+Ubicaciones:
+
+- **Dotfiles:** `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/7-comentarios-seccionales.md`
+- Labels: `documentation`
+- Usar para estandarizar `//SectionTitle` en archivos que necesiten orientación de lectura
+- Incluir: archivos afectados, reglas de formato, checklist de validación
 
 ## PR Template (QA Format)
 
@@ -193,18 +239,20 @@ Usar esta plantilla cuando se actualiza un PR ya existente:
 Formato oficial: `tipo-rama/sigla-modulo-[codigo-us]-funcionalidad`
 
 ### Siglas de Módulos
-| Sigla | Módulo |
-|---|---|
-| `m1-aut` | Autenticación y Control de Acceso |
-| `m2-per` | Perfil de Talento (Estudiante) |
-| `m3-cat` | Catálogo y Búsqueda de Talentos |
-| `m4-lis` | Lista de Candidatos (Watch List) |
-| `m5-sol` | Solicitudes |
-| `m6-not` | Notificaciones |
+
+| Sigla    | Módulo                               |
+| -------- | ------------------------------------ |
+| `m1-aut` | Autenticación y Control de Acceso    |
+| `m2-per` | Perfil de Talento (Estudiante)       |
+| `m3-cat` | Catálogo y Búsqueda de Talentos      |
+| `m4-lis` | Lista de Candidatos (Watch List)     |
+| `m5-sol` | Solicitudes                          |
+| `m6-not` | Notificaciones                       |
 | `m7-adm` | Administración y Gestión de Usuarios |
-| `m8-aud` | Historial de Acciones (Auditoría) |
+| `m8-aud` | Historial de Acciones (Auditoría)    |
 
 ### Ejemplos para Épica 03 (Catálogo)
+
 - Rama integración: `feat/m3-cat-hub` (renombrada desde `e3-hub`)
 - US-03-01: `feat/m3-cat-us0301-ver-talentos`
 - US-03-02: `feat/m3-cat-us0302-buscar-nombre`
@@ -219,9 +267,9 @@ Regla: minúsculas estrictas, prefijo `feat/` o `hotfix/`, sigla módulo de 5 ch
 
 Separación de responsabilidades en ramas:
 
-| Rama | Contenido | Base | Merge a |
-|---|---|---|---|
-| `feat/m3-cat-hub` (frontend) | Marketplace: cards, filtros, catálogo, búsqueda | `dev` | `dev` |
+| Rama                               | Contenido                                                                        | Base              | Merge a                   |
+| ---------------------------------- | -------------------------------------------------------------------------------- | ----------------- | ------------------------- |
+| `feat/m3-cat-hub` (frontend)       | Marketplace: cards, filtros, catálogo, búsqueda                                  | `dev`             | `dev`                     |
 | `feat/m3-cat-ui-global` (frontend) | Componentes globales: NavBar, SideBar, Layout, modals, theme.ts, animations, UIX | `feat/m3-cat-hub` | `feat/m3-cat-hub` → `dev` |
 
 > **UI** = componentes visuales (botón, navbar, card, modal).  
@@ -240,6 +288,10 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
   - `2-feature.md` — Features
   - `3-bug.md` — Bugs
   - `4-dailly-report.md` — Daily Report (ESP/ENG integrado)
+  - `5-investigacion.md` — Investigación (INV): comportamiento inusual, inconsistencias, bugs no confirmados
+  - `6-spike.md` — Investigación Técnica (SPIKE): aprendizaje, exploración de enfoques, POCs
+    - `7-comentarios-seccionales.md` — Comentarios Seccionales: estandarizar //SectionTitle en archivos
+    - `8-refactor-metodologia.md` — Refactorización: tomar código de otros devs, corregirlo y mergearlo a dev cuando sea requerido para modulos especificos.
 
 ### Rutas absolutas de referencia
 
@@ -253,7 +305,10 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
 
 ## Engram - Memoria Persistente para Agentes IA
 
+> **Regla fija:** Siempre guardar memorias en proyecto `dotfiles-dizzi` por defecto. Usar `project: "dotfiles-dizzi"` con `project_choice_reason: "user_selected_after_ambiguous_project"` y el recovery token correspondiente cuando haya ambigüedad.
+
 ### Instalación (CachyOS)
+
 ```bash
 # Binario precompilado
 curl -L https://github.com/Gentleman-Programming/engram/releases/latest/download/engram_1.17.0_linux_amd64.tar.gz | tar xz -C /tmp
@@ -262,12 +317,14 @@ chmod +x ~/.local/bin/engram
 ```
 
 ### Configuración para OpenCode
+
 ```bash
 engram setup opencode
 # Reinicia OpenCode
 ```
 
 ### Uso en OpenCode (herramientas MCP)
+
 - `mem_save` — Guardar memoria (title, msg, type, project)
 - `mem_search` — Buscar memorias
 - `mem_context` — Contexto reciente de sesión
@@ -275,6 +332,7 @@ engram setup opencode
 - `mem_session_start/end/summary` — Ciclo de sesión
 
 ### Proyecto JSCamp
+
 ```bash
 # Guardar lección
 engram save "Lección: Filtrado resultados" "Usar event.target.classList.contains y .is-hidden" --type lesson --project jscamp
@@ -287,6 +345,7 @@ engram context --project jscamp
 ```
 
 ### Keymaps Neovim (Engram)
+
 - `<leader>ems` — Guardar memoria
 - `<leader>eml` — Guardar lección
 - `<leader>emp` — Guardar patrón
@@ -295,6 +354,7 @@ engram context --project jscamp
 - `<leader>emf` — Buscar memoria
 
 ### Helper jscamp-memory
+
 ```bash
 jscamp-memory save "Título" "Mensaje" [--type TYPE]
 jscamp-memory lesson "Título" "Contenido"
@@ -311,11 +371,13 @@ jscamp-memory context
 **Rama actual:** `ejercicio-filtrando` (commit `9646b6b` - punto exacto del ejercicio)
 
 **Estructura:**
+
 - `01-javascript/empleos.html` — Página con filtros (tecnología, ubicación, experiencia)
 - `01-javascript/script.js` — Ejercicio implementado (filtrado por tecnología)
 - `01-javascript/styles.css` — Design system completo (dark theme, vars CSS)
 
 **Workflow ramas:**
+
 ```bash
 cd workspace/jscamp
 git checkout -b leccion-fetch-json ejercicio-filtrando
@@ -325,6 +387,7 @@ git push origin leccion-fetch-json
 ```
 
 **Arrancar:**
+
 ```bash
 cd workspace/jscamp/01-javascript
 python3 -m http.server 8083
