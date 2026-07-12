@@ -740,7 +740,7 @@ echo -e "  ${MAGENTA}•$NC} 5GB+ de espacio libre"
 echo -e "  ${MAGENTA}•$NC} CPU con soporte para virtualización (KVM)"
 echo -e "  ${MAGENTA}•$NC} RAM: 4GB+ recomendado"
 echo
-read -p "¿Instalar Waydroid + MagisTV? [S/n]: " install_waydroid
+read -p "¿Instalar Waydroid + MagisTV? + Tachiyomi en PC (Suwayomi) [S/n]: " install_waydroid
 
 if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   print_header "Instalando Waydroid + MagisTV"
@@ -751,6 +751,11 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   print_installing "Waydroid + Dependencias"
   sudo pacman -S --needed --noconfirm \
     waydroid python-pip git lzip
+
+  print_installing "Tachiyomi Manga READER, Manhwa, +18.. AUR (suwayomi-jui-bin)"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    suwayomi-jui-bin \
+    2>/dev/null || print_warning "Suwayomi falló"
 
   # Habilitar KVM + Desinstalar Firewalls (Solo si existen para evitar errores con set -e)
   print_status "Habilitando KVM..."
