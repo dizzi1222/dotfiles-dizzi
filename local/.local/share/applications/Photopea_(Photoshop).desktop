@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Photopea (Photoshop)
+Comment=Open Photopea (Photoshop)
+Exec=zen-browser --new-window --kiosk https://www.photopea.com/
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Photopea_(Photoshop).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Photopea_(Photoshop)
