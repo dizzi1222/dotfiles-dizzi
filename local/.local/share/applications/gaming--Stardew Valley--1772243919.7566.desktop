@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Stardew Valley
 # Exec=bottles-cli run -p "Stardew Valley" -b "gaming" -- %u
-Exec=kitty -e wine "/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe"
+Exec=wine "/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe"
 Type=Application
 Terminal=false
 Categories=Application;
