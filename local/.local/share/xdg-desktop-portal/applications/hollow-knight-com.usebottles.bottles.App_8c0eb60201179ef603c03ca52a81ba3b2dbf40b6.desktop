@@ -6,5 +6,5 @@ Terminal=false
 Categories=Application;
 Comment=Launch Hollow Knight using Bottles.
 StartupWMClass=Hollow Knight
-Name=Hollow Knight
+Name=Hollow Knight/home/diego/.local/share/bottles/bottles/gaming/icons
 Icon=/home/diego/.local/share/xdg-desktop-portal/icons/256x256/com.usebottles.bottles.App_8c0eb60201179ef603c03ca52a81ba3b2dbf40b6.png
