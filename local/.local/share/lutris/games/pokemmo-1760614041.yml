@@ -1,3 +1,4 @@
 game:
-  exe: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/PokeMMO/PokeMMO.exe
-  working_dir: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/PokeMMO/
+  args: ''
+  exe: pokemmo-launcher
+  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/PokeMMO/
