@@ -752,9 +752,9 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   sudo pacman -S --needed --noconfirm \
     waydroid python-pip git lzip
 
-  print_installing "Tachiyomi Manga READER, Manhwa, +18.. AUR (suwayomi-jui-bin)"
+  print_installing "Genymotion (Mejor que Waydroid para NVIDIA GPUS RTX) Tachiyomi Manga READER, Manhwa, +18.. AUR (suwayomi-jui-bin)"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    suwayomi-jui-bin \
+    suwayomi-jui-bin genymotion \
     2>/dev/null || print_warning "Suwayomi falló"
 
   # Habilitar KVM + Desinstalar Firewalls (Solo si existen para evitar errores con set -e)
