@@ -2,7 +2,7 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "lutris lutris:rungameid/132",
+            "cmd": "wine \"/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
@@ -126,7 +126,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/77",
+            "cmd": "local/.local/bin/juegos/pokeone.sh",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
