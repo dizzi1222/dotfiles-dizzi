@@ -115,11 +115,12 @@ home/musicpresence/
 # ═══════════════════════════════════════════════════════════
 # LUTRIS - Mantener estructura, ignorar runtime pesado
 # ═══════════════════════════════════════════════════════════
-# Ignorar runtime (51.4 MiB) pero mantener todo lo demás
 **/local/.local/share/lutris/runtime/
-
-# Mantener: coverart, banners, games, pga.db, runners, lutris.conf, system.yml
-# (no necesitas excluirlos explícitamente si solo ignoras runtime/)
+**/local/.local/share/lutris/runners/
+**/local/.local/share/lutris/pga.db
+**/local/.local/share/fonts/**/.uuid
+**/local/.local/share/icons/hicolor/.icon-theme.cache
+**/local/.local/share/applications/gaming--*.desktop
 
 # ═══════════════════════════════════════════════════════════
 # FIREFOX - SOLO mantener perfiles con CSS importantes
