@@ -1,0 +1,155 @@
+{
+    "apps": [
+        {
+            "auto-detach": true,
+            "cmd": "lutris lutris:rungameid/132",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/stardew-valley.png",
+            "name": " Stardew Valley",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/85",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/blasphemous.png",
+            "name": "Blasphemous",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/131",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/cuphead.png",
+            "name": "Cuphead",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/46",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/dead-cells.png",
+            "name": "Dead Cells",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "image-path": "desktop.png",
+            "name": "Desktop"
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/79",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/geometry-dash.png",
+            "name": "Geometry Dash",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/75",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/hades.png",
+            "name": "Hades",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/47",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight.png",
+            "name": "Hollow Knight",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight-silksong.png",
+            "name": "Hollow Knight Silksong",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "image-path": "desktop.png",
+            "name": "Low Res Desktop",
+            "prep-cmd": [
+                {
+                    "do": "xrandr --output HDMI-1 --mode 1920x1080",
+                    "undo": "xrandr --output HDMI-1 --mode 1920x1200"
+                }
+            ]
+        },
+        {
+            "auto-detach": true,
+            "cmd": "curseforge",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/minecraft.png",
+            "name": "Minecraft Launcher",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "pokemmo-launcher",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/pokemmo.png",
+            "name": "PokeMMO",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/77",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/pokeone.png",
+            "name": "PokeOne",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "detached": [
+                "setsid steam steam://open/bigpicture"
+            ],
+            "image-path": "steam.png",
+            "name": "Steam Big Picture",
+            "prep-cmd": [
+                {
+                    "do": "",
+                    "undo": "setsid steam steam://close/bigpicture"
+                }
+            ]
+        }
+    ],
+    "env": {
+        "PATH": "$(PATH):$(HOME)/.local/bin"
+    }
+}

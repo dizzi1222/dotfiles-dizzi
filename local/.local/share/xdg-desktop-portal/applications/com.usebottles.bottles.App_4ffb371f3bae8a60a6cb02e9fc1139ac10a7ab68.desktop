@@ -1,9 +1,0 @@
-[Desktop Entry]
-Exec=bottles-cli run -p GeometryDash -b 'gaming' -- %u
-Type=Application
-Terminal=false
-Categories=Application;
-Comment=Launch GeometryDash using Bottles.
-StartupWMClass=GeometryDash
-Name=GeometryDash
-Icon=/home/diego/.local/share/xdg-desktop-portal/icons/256x256/com.usebottles.bottles.App_4ffb371f3bae8a60a6cb02e9fc1139ac10a7ab68.png

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Exec=bottles-cli run -p PokeMMO -b 'gaming' -- %u
-Type=Application
-Terminal=false
-Categories=Application;
-Comment=Launch PokeMMO using Bottles.
-StartupWMClass=PokeMMO
-Name=PokeMMO
-Icon=/home/diego/.local/share/xdg-desktop-portal/icons/scalable/com.usebottles.bottles.App_e34347b74e8366de70a8968df45fc8f09ba3b8c3.svg
