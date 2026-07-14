@@ -833,3 +833,11 @@ echo ""
 echo "Recuerda desactivar 'desconectar dispositivos automaticamente' en Wifi, si quieres mantener tu relacion 💕"
 echo "🎂¡De esta forma aprovechas el Ahorro de Energia de Xiaomi [70h]+!!! 󰂏"
 echo ""
+
+# pnpm
+export PNPM_HOME="/home/diego/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
