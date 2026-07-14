@@ -2,7 +2,7 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 script -e -q -c \"wine '/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe'\" /dev/null",
+            "cmd": "/home/diego/dotfiles-dizzi/local/.local/bin/juegos/stardew.sh",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
@@ -137,7 +137,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.wine/drive_c/Games/KONAMI/Pro Evolution Soccer 6/PES6.exe\"",
+            "cmd": "/home/diego/dotfiles-dizzi/local/.local/bin/juegos/pes6.sh",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
