@@ -1,0 +1,5 @@
+game:
+  exe: /home/diego/.local/bin/juegos/stardew.sh
+system:
+  env:
+    WINEDEBUG: -all
