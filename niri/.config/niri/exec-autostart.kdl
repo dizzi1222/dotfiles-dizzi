@@ -3,6 +3,9 @@
 // STARTUP PROGRAMS (MIGRADO DESDE exec-autostart.conf)
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Steam Big Picture Mode
+spawn-sh-at-startup "steam -bigpicture"
+
 // Caelestia quickshell
 // spawn-sh-at-startup "caelestia shell -d"
 // spwan-sh-at-startup "qs -c caelestia"

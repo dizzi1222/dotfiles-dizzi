@@ -1,4 +1,4 @@
 game:
   args: ''
   exe: curseforge
-  working_dir: /usr/bin/minecraft-launcher.sh
+  working_dir: ''
