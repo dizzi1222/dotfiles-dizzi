@@ -3,3 +3,6 @@ game:
     Silksong/Hollow Knight Silksong.exe
   working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow
     Knight Silksong/
+system:
+  env:
+    WINEDEBUG: -all
