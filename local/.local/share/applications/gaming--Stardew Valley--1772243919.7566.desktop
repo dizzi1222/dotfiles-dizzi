@@ -1,7 +1,10 @@
 [Desktop Entry]
 Name=Stardew Valley
 # Exec=bottles-cli run -p "Stardew Valley" -b "gaming" -- %u
-Exec=wine "/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe"
+# Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132
+Exec=/home/diego/.local/bin/juegos/stardew.sh
+# ASI LO EJECUTO EN SUNSHINE:
+# Exec=env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine "/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe"
 Type=Application
 Terminal=false
 Categories=Application;

@@ -2,7 +2,7 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "wine \"/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe\"",
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
@@ -126,12 +126,23 @@
         },
         {
             "auto-detach": true,
-            "cmd": "local/.local/bin/juegos/pokeone.sh",
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/pokeone.png",
             "name": "PokeOne",
+            "output": "",
+            "wait-all": true
+        },
+        {
+            "auto-detach": true,
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.wine/drive_c/Games/KONAMI/Pro Evolution Soccer 6/PES6.exe\"",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.config/sunshine/covers/pes6.png",
+            "name": "Pro Evolution Soccer 6",
             "output": "",
             "wait-all": true
         },
