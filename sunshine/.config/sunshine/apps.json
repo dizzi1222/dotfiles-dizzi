@@ -2,7 +2,7 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe\"",
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 script -e -q -c \"wine '/home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe'\" /dev/null",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
