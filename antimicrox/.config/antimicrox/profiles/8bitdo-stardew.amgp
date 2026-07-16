@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gamecontroller configversion="19" appversion="3.5.1">
+    <sdlname>8BitDo Ultimate 2C</sdlname>
+    <uniqueID>0500a769c82d00001b300000010000001172012315</uniqueID>
+    <stickAxisAssociation index="2" xAxis="3" yAxis="4"/>
+    <stickAxisAssociation index="1" xAxis="1" yAxis="2"/>
+    <vdpadButtonAssociations index="1">
+        <vdpadButtonAssociation axis="0" button="12" direction="1"/>
+        <vdpadButtonAssociation axis="0" button="13" direction="4"/>
+        <vdpadButtonAssociation axis="0" button="14" direction="8"/>
+        <vdpadButtonAssociation axis="0" button="15" direction="2"/>
+    </vdpadButtonAssociations>
+    <names>
+        <controlstickname index="2">Palanca Derecha</controlstickname>
+        <controlstickname index="1">Palanca Izquierda</controlstickname>
+    </names>
+    <sets>
+        <set index="1">
+            <!-- Right stick = Mouse movement -->
+            <stick index="2">
+                <stickbutton index="3">
+                    <slots>
+                        <slot>
+                            <code>4</code>
+                            <mode>mousemovement</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="5">
+                    <slots>
+                        <slot>
+                            <code>2</code>
+                            <mode>mousemovement</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="1">
+                    <slots>
+                        <slot>
+                            <code>1</code>
+                            <mode>mousemovement</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="7">
+                    <slots>
+                        <slot>
+                            <code>3</code>
+                            <mode>mousemovement</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+            </stick>
+            <!-- Left stick = WASD -->
+            <stick index="1">
+                <stickbutton index="3">
+                    <slots>
+                        <slot>
+                            <code>0x44</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="5">
+                    <slots>
+                        <slot>
+                            <code>0x53</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="1">
+                    <slots>
+                        <slot>
+                            <code>0x57</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+                <stickbutton index="7">
+                    <slots>
+                        <slot>
+                            <code>0x41</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
+            </stick>
+            <!-- D-pad = Inventory slots 1-4 -->
+            <dpad index="1">
+                <dpadbutton index="1">
+                    <slots>
+                        <slot>
+                            <code>0x31</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+                <dpadbutton index="2">
+                    <slots>
+                        <slot>
+                            <code>0x32</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+                <dpadbutton index="4">
+                    <slots>
+                        <slot>
+                            <code>0x33</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+                <dpadbutton index="8">
+                    <slots>
+                        <slot>
+                            <code>0x34</code>
+                            <mode>keyboard</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+            </dpad>
+            <!-- LT = MouseLeft (use tool) -->
+            <trigger index="5">
+                <deadZone>2000</deadZone>
+                <throttle>positivehalf</throttle>
+                <triggerbutton index="2">
+                    <slots>
+                        <slot>
+                            <code>1</code>
+                            <mode>mousebutton</mode>
+                        </slot>
+                    </slots>
+                </triggerbutton>
+            </trigger>
+            <!-- RT = MouseRight (action/interact) -->
+            <trigger index="6">
+                <deadZone>2000</deadZone>
+                <throttle>positivehalf</throttle>
+                <triggerbutton index="2">
+                    <slots>
+                        <slot>
+                            <code>2</code>
+                            <mode>mousebutton</mode>
+                        </slot>
+                    </slots>
+                </triggerbutton>
+            </trigger>
+            <!-- LB = Left bracket [ (previous tool slot) -->
+            <button index="4">
+                <slots>
+                    <slot>
+                        <code>0x5b</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- RB = Right bracket ] (next tool slot) -->
+            <button index="5">
+                <slots>
+                    <slot>
+                        <code>0x5d</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- A = X key (action/interact) -->
+            <button index="2">
+                <slots>
+                    <slot>
+                        <code>0x58</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- B = V key (cancel) -->
+            <button index="1">
+                <slots>
+                    <slot>
+                        <code>0x56</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- X = C key (use tool) -->
+            <button index="3">
+                <slots>
+                    <slot>
+                        <code>0x43</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- Y = E key (menu/inventory) -->
+            <button index="8">
+                <slots>
+                    <slot>
+                        <code>0x45</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- Start = Escape (menu) -->
+            <button index="7">
+                <slots>
+                    <slot>
+                        <code>0x1000000</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- Back = F key (journal) -->
+            <button index="10">
+                <slots>
+                    <slot>
+                        <code>0x46</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- Left stick click = LeftShift (run) -->
+            <button index="9">
+                <slots>
+                    <slot>
+                        <code>0x1000020</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+            <!-- Right stick click = Y key (emote) -->
+            <button index="11">
+                <slots>
+                    <slot>
+                        <code>0x59</code>
+                        <mode>keyboard</mode>
+                    </slot>
+                </slots>
+            </button>
+        </set>
+    </sets>
+</gamecontroller>
