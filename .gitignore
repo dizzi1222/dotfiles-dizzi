@@ -7,6 +7,8 @@ home/clawd/.git/
 # CLAUDE CODE - Datos efímeros y sensibles
 # ═══════════════════════════════════════════════════════════
 home/.claude/.credentials.json
+home/.claude/.credentials.lock
+home/.claude/.credentials.*
 home/.claude/backups/
 home/.claude/history.jsonl
 home/.claude/ide/
@@ -17,6 +19,33 @@ home/.claude/sessions/
 home/.claude/shell-snapshots/
 home/.claude/file-history/
 home/.claude/settings.local.json
+# policy-limits: limites de politica firmados (JWS) + identity/stamp del equipo.
+# Datos personales del dispositivo, no configuracion portable.
+home/.claude/policy-limits.json
+home/.claude/policy-limits.json.*
+# estado de sincronizacion remota (marcador de tiempo, no configuracion)
+home/.claude/remote-settings.json
+home/.claude/remote-settings.json.*
+# Runtime: daemon, jobs, locks, marcas del updater y planes de sesión.
+home/.claude/.last-cleanup
+home/.claude/.last-update-result.json
+home/.claude/.update.lock
+home/.claude/daemon/
+home/.claude/daemon.*
+home/.claude/jobs/
+home/.claude/state/
+home/.claude/session-env/
+home/.claude/plans/
+# Cuenta + cachés (oauthAccount, userID, feature flags). Vive dentro de
+# ~/.claude porque Hermes DirectSDK lanza claude con CLAUDE_CONFIG_DIR=~/.claude.
+home/.claude/.claude.json*
+# Flag on/off de /live (claude-tts): estado por máquina, no config.
+home/.claude/tts-live
+# Skills/plugins que claude.ai sincroniza desde la cuenta.
+home/.claude/skills/synced/
+# Plugins: clon del marketplace oficial, registros con rutas absolutas y
+# cachés. Lo declarativo vive en settings.json → enabledPlugins.
+home/.claude/plugins/
 
 # Antigravity - ignorar todo EXCEPTO settings y keybindings
 Antigravity/.config/Antigravity/*
@@ -24,6 +53,86 @@ Antigravity/.config/Antigravity/*
 Antigravity/.config/Antigravity/User/*
 !Antigravity/.config/Antigravity/User/settings.json
 !Antigravity/.config/Antigravity/User/keybindings.json
+Antigravity/.config/Antigravity IDE/*
+!Antigravity/.config/Antigravity IDE/User/
+Antigravity/.config/Antigravity IDE/User/*
+!Antigravity/.config/Antigravity IDE/User/settings.json
+!Antigravity/.config/Antigravity IDE/User/keybindings.json
+
+# ═══════════════════════════════════════════════════════════
+# GEMINI / ANTIGRAVITY CLI - Datos efímeros, runtime y sesiones
+# ═══════════════════════════════════════════════════════════
+home/.gemini/*
+!home/.gemini/GEMINI.md
+!home/.gemini/settings.json
+home/.gemini/antigravity/
+home/.gemini/antigravity-*/
+# antigravity-cli: solo se versiona settings.json y keybindings.json
+# (tokens, historial, sesiones y cache quedan fuera del repo)
+!home/.gemini/antigravity-cli/
+home/.gemini/antigravity-cli/*
+!home/.gemini/antigravity-cli/settings.json
+!home/.gemini/antigravity-cli/keybindings.json
+home/.gemini/config/
+home/.gemini/history/
+home/.gemini/google_accounts.json
+home/.gemini/projects.json
+home/.gemini/state.json
+home/.gemini/trustedFolders.json
+home/.gemini/installation_id
+*.db-shm
+*.db-wal
+*.db-journal
+
+# ═══════════════════════════════════════════════════════════
+# CREDENCIALES LOCALES - NUNCA al repo
+# ═══════════════════════════════════════════════════════════
+# Sunshine: clave privada TLS y token del portal web
+sunshine/.config/sunshine/sunshine.log*
+sunshine/.config/sunshine/sunshine_state.json
+sunshine/.config/sunshine/credentials/
+sunshine/.config/sunshine/portal_token
+# Perfil de navegador de Antigravity: cookies, logins y sesiones
+home/.gemini/antigravity-browser-profile/
+# Token OAuth del CLI de Antigravity
+home/.gemini/antigravity-cli/antigravity-oauth-token
+
+# ═══════════════════════════════════════════════════════════
+# CODEX CLI - credenciales y estado local NUNCA al repo
+# ═══════════════════════════════════════════════════════════
+codex/.codex/auth.json
+codex/.codex/auth.lock
+codex/.codex/*.sqlite
+codex/.codex/installation_id
+codex/.codex/.sandbox_migration
+codex/.codex/log/
+codex/.codex/plugins/
+codex/.codex/vendor_imports/
+
+# ═══════════════════════════════════════════════════════════
+# GROK CLI - credenciales y estado local NUNCA al repo
+# Solo se versiona grok/.grok/config.toml
+# ═══════════════════════════════════════════════════════════
+grok/.grok/auth.json
+grok/.grok/auth.json.lock
+grok/.grok/auth.json.commit.lock
+grok/.grok/mcp_credentials.json
+grok/.grok/agent_id
+grok/.grok/sessions/
+grok/.grok/logs/
+grok/.grok/memory-v2/
+grok/.grok/memtrace/
+grok/.grok/process-records/
+grok/.grok/worktrees.db
+grok/.grok/*.lock
+grok/.grok/*cache*
+grok/.grok/active_sessions.json
+grok/.grok/settings_cache.json
+grok/.grok/models_cache.json
+grok/.grok/experiments_remote.json
+grok/.grok/version.json
+grok/.grok/slash-mru.json
+grok/.grok/tip_cursor.json
 
 # MCP específico
 .mcp-global.json.local
@@ -117,10 +226,8 @@ home/musicpresence/
 # ═══════════════════════════════════════════════════════════
 **/local/.local/share/lutris/runtime/
 **/local/.local/share/lutris/runners/
-**/local/.local/share/lutris/pga.db
 **/local/.local/share/fonts/**/.uuid
 **/local/.local/share/icons/hicolor/.icon-theme.cache
-**/local/.local/share/applications/gaming--*.desktop
 
 # ═══════════════════════════════════════════════════════════
 # FIREFOX - SOLO mantener perfiles con CSS importantes
@@ -161,6 +268,18 @@ firefox/.mozilla/firefox/*/crashes/
 **/cursor/.cursor/extensions/
 **/vscode/.vscode/extensions/
 
+# Estado local de Cursor/VSCode (binarios efímeros de sesión)
+**/cursor/.config/Cursor/User/globalStorage/
+**/cursor/.config/Cursor/User/workspaceStorage/
+
+# Cursor: conservar solo la configuración de usuario; ignorar cachés,
+# sesiones, historial y datos locales en cursor/.config/Cursor/.
+/cursor/.config/Cursor/*
+!/cursor/.config/Cursor/User/
+/cursor/.config/Cursor/User/*
+!/cursor/.config/Cursor/User/settings.json
+!/cursor/.config/Cursor/User/keybindings.json
+
 # ═══════════════════════════════════════════════════════════
 # CACHES Y TEMPORALES
 # ═══════════════════════════════════════════════════════════
@@ -189,6 +308,7 @@ firefox/.mozilla/firefox/*/crashes/
 *.sqlite
 *.sqlite-*
 *.db
+!**/local/.local/share/lutris/pga.db
 
 # ═══════════════════════════════════════════════════════════
 # ARCHIVOS ESPECÍFICOS
@@ -260,3 +380,65 @@ Session.vim
 # Copilot chat history
 copilot-chat-history/
 home/.opencommit
+
+# ═══════════════════════════════════════════════════════════
+# WINE - ASSETS GENERADOS AUTOMÁTICAMENTE
+# Los .desktop de wine-extension y wine/Programs los genera wine
+# al configurar el prefix (rutas absolutas a ~/.wine, no portables).
+# mimeinfo.cache es caché regenerable.
+# ═══════════════════════════════════════════════════════════
+local/.local/share/applications/wine-extension-*.desktop
+local/.local/share/applications/wine/
+local/.local/share/applications/mimeinfo.cache
+
+# Replit (app .desktop + icono descargados)
+# local/.local/share/applications/Replit*
+# local/.local/share/icons/Replit*
+
+# ═══════════════════════════════════════════════════════════
+# HOME SCRIPTS - lib/ ES codigo versionable (NO ignorar)
+# La regla Python "lib/" de arriba matchea en cualquier nivel
+# y se traga home/scripts/lib/platform.sh. Re-incluimos:
+# ═══════════════════════════════════════════════════════════
+!/home/scripts/lib/
+!/home/scripts/lib/**
+
+# ═══════════════════════════════════════════════════════════
+# STEAM - Carátulas personalizadas (paquete modular steam/)
+# Re-permitir SOLO la rama userdata/*/config/grid tras la
+# regla "**/.local/share/Steam/" (git no re-incluye archivos
+# si un directorio padre está excluido: hay que re-permitir
+# cada nivel de la cadena).
+# ═══════════════════════════════════════════════════════════
+!**/.local/share/Steam/
+!**/.local/share/Steam/userdata/
+!**/.local/share/Steam/userdata/*/
+!**/.local/share/Steam/userdata/*/config/
+!**/.local/share/Steam/userdata/*/config/grid/
+!**/.local/share/Steam/userdata/*/config/grid/**
+
+# STEAM - Bloquear TODOS los .vdf del config EXCEPTO shortcuts.vdf
+# (localconfig/registry/compat son binarios volátiles que Steam reescribe)
+**/.local/share/Steam/userdata/*/config/*.vdf
+!**/.local/share/Steam/userdata/*/config/shortcuts.vdf
+
+# tmux nosek
+/tmux/.config/tmux/plugins/tpm
+/tmux/.config/tmux/plugins/tpm
+/tmux/.config/tmux/plugins/tpm?
+
+# Cache de shaders de juegos (volátil, cientos de MB)
+local/.local/bin/juegos/GLCache/
+
+# opencode password xd
+opencode/.config/opencode/service.json
+
+# Hermes: credenciales y estado privado; versionar solo los ajustes y el pack.
+/hermes/**/.env*
+/hermes/**/auth.json*
+/hermes/**/.hermes_history*
+/hermes/**/sessions/
+# /hermes/**/memories/  # Descomentado: USER.md y MEMORY.md sí se versionan para portabilidad
+/hermes/**/*.pre-dotfiles-*
+# Para que no joda Termux:
+local/.local/bin/lazygit-shell

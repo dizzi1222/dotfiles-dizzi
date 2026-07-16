@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Stardew Sync Save+MODS
+Comment=Sincroniza saves y mods de Stardew Valley entre PC y Android
+Exec=/home/diego/.local/bin/stardew-install-save
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Stardew Valley.png
+Terminal=true
+Type=Application
+Categories=Games;
+StartupNotify=true
