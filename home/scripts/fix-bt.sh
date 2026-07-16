@@ -21,6 +21,7 @@ else
 fi
 
 CARD_ID="${MAC//:/_}"
+MAC_UNDERSCORE="$CARD_ID"
 CARD="bluez_card.${CARD_ID}"
 notify() { notify-send -i "audio-headphones" "$NAME" "$1"; }
 # ────────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ fi
 # 4. Esperar a que PipeWire registre el sink (hasta 15s)
 SINK_ID=""
 for i in $(seq 1 15); do
-  SINK_ID=$(pactl list sinks short | grep -F "$MAC" | awk '{print $1}')
+  SINK_ID=$(pactl list sinks short | grep "$MAC_UNDERSCORE" | awk '{print $1}')
   [ -n "$SINK_ID" ] && break
   sleep 1
 done
@@ -68,7 +69,7 @@ pactl set-card-profile "$CARD" a2dp-sink 2>/dev/null
 sleep 0.5
 
 # 6. Re-leer sink ID (puede cambiar tras cambiar perfil)
-SINK_ID=$(pactl list sinks short | grep -F "$MAC" | awk '{print $1}')
+SINK_ID=$(pactl list sinks short | grep "$MAC_UNDERSCORE" | awk '{print $1}')
 
 # 7. Establecer como sink por defecto y desmutear
 pactl set-default-sink "$SINK_ID"

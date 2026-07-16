@@ -188,7 +188,7 @@ case "$ICON" in
   kitty -e ~/install-bottles.sh
   ;;
 "󱦥")
-  sh ~/scripts/sunshine-local-audio.sh
+  sh ~/scripts/sunshine-local-audio.sh on
   ;;
 "󰳾")
   kitty -e ~/wrapper/autoclicker-menu
