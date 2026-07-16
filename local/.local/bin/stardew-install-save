@@ -1,0 +1,99 @@
+#!/bin/bash
+
+PHONE_SAVE="/sdcard/Download/Diego_339177434"
+PHONE_MODS="/sdcard/Download/DIZZI WORLD APES-1.6.15/overrides/mods"
+LOCAL_SAVES="$HOME/stardew-saves"
+LOCAL_MODS="$HOME/stardew-mods"
+ANDROID_SAVE_SMPI="/sdcard/Android/data/abc.smapi.gameloader/files/Saves"
+ANDROID_SAVE_VANILLA="/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves"
+ANDROID_MODS="/sdcard/Android/data/abc.smapi.gameloader/files/mods"
+WINE_SAVE="$HOME/.wine/drive_c/users/diego/AppData/Roaming/StardewValley/Saves"
+MODPACK_DRIVE="https://drive.google.com/drive/u/0/folders/1hjuhPKr_mV_gZpubSxdz-CMkCbL46wVC"
+
+CYAN='\033[96m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+RED='\033[91m'
+DIM='\033[2m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+mkdir -p "$LOCAL_SAVES" "$LOCAL_MODS"
+
+clear
+echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}${BOLD}║     Stardew Valley Sync PC ↔ Android        ║${RESET}"
+echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════╝${RESET}\n"
+
+echo -e "${BOLD}PREREQUISITOS:${RESET}\n"
+echo -e "  1. Descarga el MODPACK en Drive:"
+echo -e "     ${CYAN}$MODPACK_DRIVE${RESET}"
+echo -e "     Cópialo a ${BOLD}Downloads${RESET} del telefono\n"
+echo -e "  2. Pon tu save en ${BOLD}Downloads${RESET} del telefono"
+echo -e "     (carpeta Diego_339177434)\n"
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
+
+if ! adb devices | grep -q "device$"; then
+    echo -e "${RED}❌ No hay celular conectado${RESET}"
+    exit 1
+fi
+
+echo -e "${GREEN}Celular detectado${RESET}\n"
+
+# ── Pull saves ────────────────────────────────────────────────
+if adb shell "ls -d $PHONE_SAVE" &>/dev/null; then
+    echo -e "${YELLOW}📦 Descargando saves...${RESET}"
+    adb pull "$PHONE_SAVE" "$LOCAL_SAVES/" 2>/dev/null
+    echo -e "${GREEN}✅ Saves → ~/stardew-saves/${RESET}\n"
+else
+    echo -e "${RED}⚠️  No hay saves en Downloads del telefono${RESET}\n"
+fi
+
+# ── Push saves a destinos ─────────────────────────────────────
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
+
+if gum confirm "¿Copiar saves a SMAPI (abc.smapi.gameloader)?"; then
+    adb shell "mkdir -p '$ANDROID_SAVE_SMPI' && cp -r '$PHONE_SAVE' '$ANDROID_SAVE_SMPI/'"
+    echo -e "${GREEN}✅ Saves → SMAPI${RESET}\n"
+fi
+
+if gum confirm "¿Copiar saves a Vanilla (com.chucklefish.stardewvalley)?"; then
+    adb shell "mkdir -p '$ANDROID_SAVE_VANILLA' && cp -r '$PHONE_SAVE' '$ANDROID_SAVE_VANILLA/'"
+    echo -e "${GREEN}✅ Saves → Vanilla${RESET}\n"
+fi
+
+if gum confirm "¿Copiar mods a SMAPI (abc.smapi.gameloader/files/mods)?"; then
+    adb shell "mkdir -p '$ANDROID_MODS' && cp -r '$PHONE_MODS'/* '$ANDROID_MODS/'"
+    echo -e "${GREEN}✅ Mods → SMAPI${RESET}\n"
+fi
+
+# ── Abrir carpetas ────────────────────────────────────────────
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
+
+if gum confirm "¿Abrir ~/stardew-saves?"; then
+    nemo "$LOCAL_SAVES" &
+fi
+
+if gum confirm "¿Abrir ~/stardew-mods?"; then
+    nemo "$LOCAL_MODS" &
+fi
+
+# ── Verificar copias ──────────────────────────────────────────
+echo -e "${DIM}──────────────────────────────────────────────${RESET}"
+echo -e "${BOLD}Verificación en telefono:${RESET}\n"
+
+echo -e "${CYAN}SMAPI Saves:${RESET}"
+adb shell "ls -la '$ANDROID_SAVE_SMPI/Diego_339177434/'" 2>/dev/null
+echo ""
+
+echo -e "${CYAN}Vanilla Saves:${RESET}"
+adb shell "ls -la '$ANDROID_SAVE_VANILLA/Diego_339177434/'" 2>/dev/null
+echo ""
+
+echo -e "${CYAN}SMAPI Mods:${RESET}"
+MODS_COUNT=$(adb shell "ls '$ANDROID_MODS/'" 2>/dev/null | wc -l)
+echo -e "  ${GREEN}$MODS_COUNT carpetas${RESET}\n"
+
+echo -e "${BOLD}Copia manualmente a:${RESET}\n"
+echo -e "  ${CYAN}Windows:${RESET}  $WINE_SAVE"
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"

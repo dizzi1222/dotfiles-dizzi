@@ -2,7 +2,7 @@
 Version=1.0
 Name=Xiaomi MTP Transfer 📱
 Comment=Monta el celular Xiaomi vía MTP en ~/cel y abre Nemo
-Exec=bash -c "simple-mtpfs --allow-other /home/diego/cel && nemo /home/diego/cel"
+Exec=/home/diego/.local/bin/xiaomi-mtp-mount
 Icon=phone
 Terminal=false
 Type=Application
@@ -13,3 +13,4 @@ StartupNotify=true
 [Desktop Action Unmount]
 Name=Desmontar Celular
 Exec=bash -c "fusermount -u /home/diego/cel"
+Terminal=false
