@@ -22,8 +22,8 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
-      "applications:display-setup",
       "clipboard:history",
+      "applications:display-setup",
       "applications:waydroid-start-sd",
       "applications:Stremio_Web"
    ],
