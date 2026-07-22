@@ -65,6 +65,8 @@ Scripts, migraciones, archivos < 40 líneas autoexplicativos, configs.
 
 Siempre dar ambas versiones: español (para que Diego lea) e inglés (para enviar a ChatSpace).
 
+> Para referencia detallada ver: `/home/diego/dotfiles-dizzi/.github/google-chatspace-format.md`
+
 Estructura fija:
 
 ```
@@ -283,6 +285,8 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
 
 - **PULL_REQUEST_TEMPLATE.md**: `/home/diego/dotfiles-dizzi/.github/PULL_REQUEST_TEMPLATE.md` — Plantilla QA unificada para PRs (formato unificado front/back)
 - **PR_CONCLUSION.md**: `/home/diego/dotfiles-dizzi/.github/PR_CONCLUSION.md` — Template para actualizaciones de PR (update brief, foco re-testing, notas)
+- **DMR-TEMPLATE.md**: `/home/diego/dotfiles-dizzi/.github/DMR-TEMPLATE.md` — Developer Merge Report: para developers externos que revisan y mergean PRs ajenos (análisis estructural, refactor, code review, post-merge checks)
+- **GOOGLE-CHATSPACE-FORMAT.md**: `/home/diego/dotfiles-dizzi/.github/google-chatspace-format.md` — Formato concreto de Google ChatSpace: negritas, bullets, títulos, códigos, enlaces
 - **ISSUE_TEMPLATE/**: `/home/diego/dotfiles-dizzi/.github/ISSUE_TEMPLATE/` — Plantillas de issues:
   - `1-epic.md` — Épicas
   - `2-feature.md` — Features
@@ -290,8 +294,19 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
   - `4-dailly-report.md` — Daily Report (ESP/ENG integrado)
   - `5-investigacion.md` — Investigación (INV): comportamiento inusual, inconsistencias, bugs no confirmados
   - `6-spike.md` — Investigación Técnica (SPIKE): aprendizaje, exploración de enfoques, POCs
-    - `7-comentarios-seccionales.md` — Comentarios Seccionales: estandarizar //SectionTitle en archivos
-    - `8-refactor-metodologia.md` — Refactorización: tomar código de otros devs, corregirlo y mergearlo a dev cuando sea requerido para modulos especificos.
+  - `7-comentarios-seccionales.md` — Comentarios Seccionales: estandarizar //SectionTitle en archivos
+  - `8-refactor-metodologia.md` — Refactorización: tomar código de otros devs, corregirlo y mergearlo a dev cuando sea requerido para modulos especificos.
+  - `Estándar de Nombramiento de Ramas en GitHub (PTD-Talento).docx` — Documento con nomenclatura oficial de ramas (tipo-rama/sigla-modulo-[codigo-us]-funcionalidad)
+
+### Sistema de Diseño PTD-Talento
+
+- **GLOSARIO.md**: `/home/diego/dotfiles-dizzi/.github/GLOSARIO.md` — Brandkit Cincinnatus: colores 60-30-10, tipografía, componentes base, reglas visuales
+- **design.md**: `/home/diego/Escritorio/PTD-Talento Material Diego/design.md` — Guía completa de diseño (2,912 líneas): paleta, contraste, tipografía, espaciado, grid, componentes, tokens, estados, navegación, accesibilidad
+- **Brandkit.md**: `/home/diego/Escritorio/PTD-Talento Material Diego/Brandkit.md` — Brand Guidelines Cincinnatus (logo, colores, uso)
+- **PLAN-UI-UX-MARKETPLACE.md**: `/home/diego/Escritorio/PTD-Talento Material Diego/PLAN-UI-UX-MARKETPLACE.md` — Plan de componentes globales UI/UIX + Marketplace
+- **theme.ts (Yordi)**: `/home/diego/Escritorio/PTD-Talento Material Diego/theme.ts/theme.ts` — Theme MUI oficial con paleta extendida, tipografía, breakpoints
+- **Fuentes**: `/home/diego/Escritorio/PTD-Talento Material Diego/theme.ts/fonts/` — Getboreg + Volksans (7 archivos .woff2)
+- **Figma**: https://www.figma.com/design/xJf08uRY7A8G3lXt90dn5u/PTD-Talento-Marketplace
 
 ### Rutas absolutas de referencia
 
@@ -393,3 +408,11 @@ cd workspace/jscamp/01-javascript
 python3 -m http.server 8083
 # → http://localhost:8083/empleos.html
 ```
+
+## Cuentas de Google (login 3ra opción)
+
+1. `sanakyds@gmail.com` → `authuser=0` (default)
+2. `diegosamuel042@gmail.com` → `authuser=1`
+3. `dhardi@cincinnatus.edu.do` (institucional CIC) → `authuser=2`
+
+> Para App Password u otros servicios Google que requieran la cuenta 3 (dhardi), agregar `?authuser=2` a la URL. Ej: `https://myaccount.google.com/apppasswords?authuser=2`
