@@ -318,6 +318,46 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
 - jscamp-memory helper: `/home/diego/dotfiles-dizzi/home/.local/bin/jscamp-memory`
 - Keymaps Neovim: `/home/diego/dotfiles-dizzi/nvim/.config/nvim/lua/config/keymaps.lua`
 
+## Workflow Dual Remote (CIC + dizzi1222)
+
+Cada repo (`ptd-talento-front`, `ptd-talento-back`) tiene dos remotes:
+
+| Remote | URL | Uso |
+|---|---|---|
+| `origin` | `Cincinnatus-Institute-of-Craftsmanship/ptd-talento-*` | Repo oficial CIC (dhardi007) — **NUNCA cambiar author** |
+| `dizzi1222` | `dizzi1222/ptd-talento-*` | Fork personal (dizzi1222) — Vercel, Railway, workflows propios |
+
+### Reglas estrictas
+
+1. **NUNCA** usar `git filter-branch`, `git rebase --exec`, ni `git commit --amend --author` sobre ramas que trackeen `origin`. Esto reescribe historia del repo CIC.
+2. Para pushear a `dizzi1222` con author correcto (Vercel/Railway), usar `git push dizzi1222 <rama> --force` después de un `filter-branch` SOLO en la rama local temporal.
+3. Siempre restaurar ramas locales con `git reset --hard origin/<rama>` después de operaciones de author rewrite.
+4. `git config user.name` y `git config user.email` locales se quedan como `dhardi007` / `dhardi@cincinnatus.edu.do` — no cambiar.
+5. Para verificar acceso a `origin`, usar la sesión `dhardi007` (`gh auth switch -u dhardi007`). Para `dizzi1222`, usar `gh auth switch -u dizzi1222`.
+
+### Proceso para replicar author en dizzi1222
+
+```bash
+# 1. Checkout a la rama
+git checkout <rama>
+
+# 2. Rewriter SOLO local (no tocar origin)
+git filter-branch --env-filter '
+if [ "$GIT_AUTHOR_EMAIL" = "dhardi@cincinnatus.edu.do" ]; then
+    export GIT_AUTHOR_NAME="dizzi1222"
+    export GIT_AUTHOR_EMAIL="diegosamuel042@gmail.com"
+    export GIT_COMMITTER_NAME="dizzi1222"
+    export GIT_COMMITTER_EMAIL="diegosamuel042@gmail.com"
+fi
+' -- <rama>  # SOLO la rama actual, NUNCA --all
+
+# 3. Push a dizzi1222
+git push dizzi1222 <rama> --force
+
+# 4. Restaurar local desde origin
+git reset --hard "origin/<rama>"
+```
+
 ## Engram - Memoria Persistente para Agentes IA
 
 > **Regla fija:** Siempre guardar memorias en proyecto `dotfiles-dizzi` por defecto. Usar `project: "dotfiles-dizzi"` con `project_choice_reason: "user_selected_after_ambiguous_project"` y el recovery token correspondiente cuando haya ambigüedad.
