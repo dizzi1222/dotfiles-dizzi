@@ -331,9 +331,22 @@ Cada repo (`ptd-talento-front`, `ptd-talento-back`) tiene dos remotes:
 
 1. **NUNCA** usar `git filter-branch`, `git rebase --exec`, ni `git commit --amend --author` sobre ramas que trackeen `origin`. Esto reescribe historia del repo CIC.
 2. Para pushear a `dizzi1222` con author correcto (Vercel/Railway), usar `git push dizzi1222 <rama> --force` después de un `filter-branch` SOLO en la rama local temporal.
-3. Siempre restaurar ramas locales con `git reset --hard origin/<rama>` después de operaciones de author rewrite.
-4. `git config user.name` y `git config user.email` locales se quedan como `dhardi007` / `dhardi@cincinnatus.edu.do` — no cambiar.
+3. Siempre restaurar ramas locales con `git reset --hard origin/<rama>` **Y re-configurar upstream** después de operaciones de author rewrite.
+4. `git config user.name` y `git config user.email` locales se quedan como `dhardi007` / `dhardi@cincinnatus.edu.do` — no cambiar. **NUNCA ejecutar `git config user.name/email`** como parte del workflow de author rewrite.
 5. Para verificar acceso a `origin`, usar la sesión `dhardi007` (`gh auth switch -u dhardi007`). Para `dizzi1222`, usar `gh auth switch -u dizzi1222`.
+
+### ⚠️ Error común (NO repetir)
+
+**Problema:** Después de `filter-branch` + push a `dizzi1222`, la rama local queda trackeando `dizzi1222/rama` en vez de `origin/rama`. Esto causa:
+- `git pull` trae commits de `dizzi1222` (con author dizzi1222) en vez de `origin` (con author dhardi007)
+- Ramas "divergent" con 300+ commits diferentes
+- `git config user.name` cambiado accidentalmente a `dizzi1222`
+
+**Solución:** Después de cada operación de author rewrite, SIEMPRE ejecutar:
+```bash
+git reset --hard "origin/<rama>"
+git branch --set-upstream-to="origin/<rama>" <rama>
+```
 
 ### Proceso para replicar author en dizzi1222
 
@@ -354,8 +367,13 @@ fi
 # 3. Push a dizzi1222
 git push dizzi1222 <rama> --force
 
-# 4. Restaurar local desde origin
+# 4. Restaurar local desde origin Y re-configurar upstream
 git reset --hard "origin/<rama>"
+git branch --set-upstream-to="origin/<rama>" <rama>
+
+# 5. Verificar que trackea origin, no dizzi1222
+git branch -vv | grep "<rama>"
+# Debe mostrar: [origin/<rama>] NO [dizzi1222/<rama>]
 ```
 
 ## Engram - Memoria Persistente para Agentes IA
