@@ -59,6 +59,7 @@
     # Color picker
     hyprpicker
     wl-color-picker
+    gpick
 
     # Screen recording
     wf-recorder
@@ -79,6 +80,16 @@
     wlr-randr
     nwg-look
     lxappearance
+
+    # Rclone (cloud storage)
+    rclone
+
+    # Qt theming
+    kdePackages.qt6ct
+    kdePackages.qtstyleplugin-kvantum
+
+    # Pywal
+    pywal16
   ];
 
 }

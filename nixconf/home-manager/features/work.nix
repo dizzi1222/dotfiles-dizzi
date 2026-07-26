@@ -9,6 +9,10 @@
     # Languages
     python3
     python3Packages.pip
+    python3Packages.setuptools
+    python3Packages.wheel
+    python3Packages.pillow
+    python3Packages.pygobject3
     pyenv
     nodejs
     yarn
@@ -30,6 +34,11 @@
     tig
     gh
     glow
+
+    # AI tools
+    ollama
+    opencommit
+    aichat
 
     # Nix
     nil
@@ -80,9 +89,11 @@
 
     # Cloud
     google-cloud-sdk
+    rclone
 
     # Misc
     nh
+    n8n
   ];
 
   # ── Terminal Configs ───────────────────────────────────────
