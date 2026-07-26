@@ -41,6 +41,18 @@
     dolphin-emu
     ryubing
     snes9x
+    rpcs3
+    cemu
+    xemu
+    mgba
+    dosbox
+    melonDS
+
+    # Minecraft
+    prismlauncher
+
+    # Misc gaming
+    protontricks
   ];
 
   # ── Gamemode ───────────────────────────────────────────────

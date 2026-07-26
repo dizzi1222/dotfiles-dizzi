@@ -49,10 +49,11 @@
     timeout = 3;
   };
 
-  # ── Display Manager ────────────────────────────────────────
+  # ── Display Manager (SDDM with Astronaut theme) ──────────
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
+    theme = "astronaut";
   };
 
   # ── Services ───────────────────────────────────────────────
@@ -75,6 +76,22 @@
         tapping = true;
         middleEmulation = true;
       };
+    };
+
+    # Ollama (local LLM)
+    ollama = {
+      enable = true;
+      package = pkgs.ollama-cuda;
+    };
+
+    # Input Remapper
+    input-remapper.enable = true;
+
+    # Syncthing
+    syncthing = {
+      enable = true;
+      user = username;
+      openDefaultPorts = true;
     };
   };
 
@@ -106,6 +123,7 @@
     wget
     curl
     git
+    git-filter-repo
     unzip
     p7zip
     wget
@@ -125,11 +143,23 @@
     gparted
     acpi
     inotify-tools
+    linuxPackages.cpupower
+    power-profiles-daemon
+    man-db
+    gucharmap
+    font-manager
+    kdePackages.partitionmanager
+    bleachbit
 
     # Audio
     pavucontrol
     easyeffects
     pamixer
+    cava
+    wireplumber
+    pulseaudio
+    alsa-utils
+    alsa-tools
 
     # Bluetooth extras
     blueman
@@ -143,6 +173,8 @@
     polkit_gnome
     qt5.qtwayland
     qt6.qtwayland
+    kdePackages.qt6ct
+    kdePackages.qtstyleplugin-kvantum
     wl-clipboard
     wlr-randr
     grim
@@ -164,6 +196,7 @@
     gst_all_1.gst-libav
     ntfs3g
     exfat
+    exfatprogs
     fuse
     fuse3
 
@@ -171,12 +204,18 @@
     imagemagick
     loupe
 
+    # File transfer / MTP
+    android-file-transfer
+    gvfs
+    simple-mtpfs
+
     # Clipboard history
     cliphist
 
     # Misc
     scrcpy
     ydotool
+    wtype
     rclone
     gedit
     gnome-calculator
@@ -194,6 +233,12 @@
     # Text expanders
     espanso
 
+    # TheFuck replacement (pay-respects)
+    pay-respects
+
+    # Network Manager dmenu
+    networkmanager_dmenu
+
     # Dev tools (system level)
     cmake
     llvm
@@ -205,6 +250,10 @@
     nodejs
     python3
     pyenv
+    python3Packages.pygobject3
+    python3Packages.setuptools
+    python3Packages.pillow
+    expect
 
     # System inspection
     pciutils
@@ -213,6 +262,7 @@
     intel-gpu-tools
     vulkan-tools
     vulkan-loader
+    vulkan-validation-layers
 
     # Fonts
     font-awesome
@@ -220,6 +270,7 @@
     source-han-sans
     source-han-serif
     nerd-fonts.symbols-only
+      nerd-fonts.hurmit
     iosevka
     mononoki
   ];
@@ -251,6 +302,13 @@
     pulse.enable = true;
     jack.enable = true;
   };
+
+  # ── Audio firmware (Intel HDA ThinkPad) ────────────────────
+  # Critical for proper volume levels on ThinkPad X1E2
+  hardware.firmware = with pkgs; [
+    sof-firmware
+    alsa-ucm-conf
+  ];
 
   # ── Bluetooth ──────────────────────────────────────────────
   hardware.bluetooth = {
