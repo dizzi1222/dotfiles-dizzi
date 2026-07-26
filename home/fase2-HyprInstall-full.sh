@@ -4012,6 +4012,131 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 34.6: GEFORCE NOW (FLATPAK OFICIAL NVIDIA)
+# ═══════════════════════════════════════════════════════════
+echo ""
+print_step "34.6: GeForce NOW (Flatpak oficial NVIDIA)"
+read -p "¿Instalar GeForce NOW oficial (Flatpak NVIDIA)? [S/n]: " f_gfn
+if [[ ! "$f_gfn" =~ ^[Nn]$ ]]; then
+  # Verificar flatpak
+  if ! command -v flatpak &>/dev/null; then
+    sudo pacman -S --needed --noconfirm flatpak
+  fi
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+  # Agregar remote oficial NVIDIA
+  if ! flatpak remotes --columns=name | grep -q "^GeForceNOW$"; then
+    flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo
+    print_success "Remote NVIDIA GeForceNOW agregado"
+  fi
+
+  # Runtime 24.08 requerido por GFN oficial (aunque ya exista 25.08)
+  if ! flatpak list --columns=application,branch | grep -q "org.freedesktop.Platform//24.08"; then
+    print_status "Instalando runtime org.freedesktop.Platform 24.08 (requerido por GFN)..."
+    flatpak install -y --system flathub org.freedesktop.Platform//24.08
+  fi
+
+  # Capa Vulkan gamescope (requerida por GFN)
+  if ! flatpak list --columns=application | grep -q "org.freedesktop.Platform.VulkanLayer.gamescope"; then
+    print_status "Instalando VulkanLayer gamescope..."
+    flatpak install -y --user flathub org.freedesktop.Platform.VulkanLayer.gamescope
+  fi
+
+  # Instalar app oficial GFN
+  if ! flatpak list --columns=application | grep -q "com.nvidia.geforcenow"; then
+    print_status "Instalando NVIDIA GeForce NOW..."
+    flatpak install -y --user GeForceNOW com.nvidia.geforcenow
+    print_success "GeForce NOW oficial instalado"
+  else
+    print_success "GeForce NOW ya instalado"
+  fi
+  echo ""
+  print_status "Lanzar con: flatpak run com.nvidia.geforcenow"
+else
+  print_warning "GeForce NOW omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.7: QTSCRCPY (SCRCPY CON UI QT)
+# ═══════════════════════════════════════════════════════════
+print_step "34.7: QtScrcpy"
+if command -v qtscrcpy &> /dev/null || [ -d "/opt/QtScrcpy" ] || [ -d "$HOME/QtScrcpy" ]; then
+  print_success "QtScrcpy ya instalado"
+else
+  if [ "${INSTALL_QTSCRCPY:-true}" = true ]; then
+    print_status "Instalando QtScrcpy..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm qtscrcpy 2>/dev/null && print_success "QtScrcpy instalado via yay" || {
+        print_warning "qtscrcpy no disponible en AUR, compilando desde fuente..."
+        sudo pacman -S --noconfirm --needed qt5-base qt5-multimedia qt5-svg qt5-quickcontrols2 android-tools git base-devel 2>/dev/null
+        cd /tmp
+        rm -rf QtScrcpy 2>/dev/null
+        git clone https://github.com/barry-ran/QtScrcpy.git 2>/dev/null
+        cd QtScrcpy
+        chmod +x build.sh 2>/dev/null
+        ./build.sh 2>/dev/null && print_success "QtScrcpy compilado desde fuente" || print_error "Error compilando QtScrcpy"
+        cd /tmp
+        rm -rf QtScrcpy
+      }
+    else
+      print_warning "yay no disponible, instala QtScrcpy manualmente: yay -S qtscrcpy"
+    fi
+  else
+    print_warning "QtScrcpy omitido"
+  fi
+  echo ""
+  print_status "Ejecutar: qtscrcpy (o desde /opt/QtScrcpy/QtScrcpy)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.8: SYNCTHING-BIN (SYNC DE ARCHIVOS P2P)
+# ═══════════════════════════════════════════════════════════
+print_step "34.8: Syncthing"
+if command -v syncthing &> /dev/null; then
+  print_success "Syncthing ya instalado"
+else
+  if [ "${INSTALL_SYNCTHING:-true}" = true ]; then
+    print_status "Instalando Syncthing..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm syncthing-bin 2>/dev/null && print_success "Syncthing instalado" || print_error "Error instalando Syncthing"
+    else
+      sudo pacman -S --noconfirm syncthing 2>/dev/null && print_success "Syncthing instalado via pacman" || print_error "Error instalando Syncthing"
+    fi
+    # Habilitar servicio
+    systemctl --user enable syncthing.service 2>/dev/null || true
+    systemctl --user start syncthing.service 2>/dev/null || true
+  else
+    print_warning "Syncthing omitido"
+  fi
+  echo ""
+  print_status "Web UI: http://127.0.0.1:8384"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.9: RQUICKSHARE (COMPARTIR ARCHIVOS ANDROID<->LINUX)
+# ═══════════════════════════════════════════════════════════
+print_step "34.9: RQuickShare"
+if command -v rquickshare &> /dev/null || [ -d "$HOME/.local/share/rquickshare" ]; then
+  print_success "RQuickShare ya instalado"
+else
+  if [ "${INSTALL_RQUICKSHARE:-true}" = true ]; then
+    print_status "Instalando RQuickShare..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm rquickshare-x-bin 2>/dev/null && print_success "RQuickShare instalado" || {
+        print_warning "rquickshare-x-bin no disponible, intentando r-quick-share-bin..."
+        yay -S --noconfirm r-quick-share-bin 2>/dev/null && print_success "RQuickShare instalado" || print_error "Error instalando RQuickShare"
+      }
+    else
+      print_warning "yay no disponible, instala manualmente: yay -S rquickshare-x-bin"
+    fi
+  else
+    print_warning "RQuickShare omitido"
+  fi
+  echo ""
+  print_status "Ejecutar: rquickshare (Nearby Share / Quick Share)"
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 35: LIMPIEZA FINAL
 # ═══════════════════════════════════════════════════════════
 print_step "35/35: Limpieza Final"

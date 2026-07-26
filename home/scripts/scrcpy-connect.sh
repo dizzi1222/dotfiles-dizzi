@@ -13,6 +13,21 @@ save_last_port() {
   echo "last_debug_port=$1" > "$CONFIG_FILE"
 }
 
+start_keepalive() {
+  (
+    while true; do
+      adb shell echo > /dev/null 2>&1
+      sleep 20
+    done
+  ) &
+  KEEPALIVE_PID=$!
+}
+
+stop_keepalive() {
+  kill "$KEEPALIVE_PID" 2>/dev/null
+  wait "$KEEPALIVE_PID" 2>/dev/null
+}
+
 LAST_PORT=$(load_last_port)
 : "${LAST_PORT:=39781}"
 
@@ -75,8 +90,11 @@ case "$opcion" in
   sleep 1
   if adb devices | grep -q "5555.*device"; then
     echo "✅ Conectado. Iniciando scrcpy..."
+    echo "   (keepalive activo cada 20s para evitar desconexión)"
     sleep 1
+    start_keepalive
     /usr/bin/scrcpy
+    stop_keepalive
   else
     echo "❌ Falló. Verifica: misma red, firewall, IP correcta."
     read -p "Presiona Enter..."
@@ -120,8 +138,11 @@ case "$opcion" in
   adb devices
   if adb devices | grep -q "device$"; then
     echo "✅ Conectado. Iniciando scrcpy..."
+    echo "   (keepalive activo cada 20s para evitar desconexión)"
     sleep 1
+    start_keepalive
     /usr/bin/scrcpy
+    stop_keepalive
   else
     echo "❌ Falló la conexión."
     read -p "Presiona Enter..."
