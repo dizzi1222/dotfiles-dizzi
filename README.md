@@ -1056,6 +1056,67 @@ fastfetch
 - 🗂️ [Gruvbox Icons](https://github.com/SylEleuth/gruvbox-plus-icon-pack)
 - 📚 [Arch Linux Wiki](https://wiki.archlinux.org/)
 - 🚀 [Hyprland Docs](https://wiki.hyprland.org/)
+- 🧊 [NixOS Wiki](https://wiki.nixos.org/)
+- 🏠 [Home Manager Manual](https://nix-community.github.io/home-manager/)
+
+---
+
+## 🧊 NixOS + Home Manager (ThinkPad X1 Extreme Gen 2)
+
+Configuración declarativa para el ThinkPad X1E2 (GTX 1650 hybrid). Mismos dotfiles, diferente OS manager.
+
+**Inspirado en [ghaerdi/dotfiles](https://github.com/ghaerdi/dotfiles).**
+
+### What's Included
+
+| Categoría | Herramientas |
+|-----------|-------------|
+| **Desktop** | Hyprland, Waybar, SwayNC, Wlogout, SWWW |
+| **Terminal** | Ghostty, Kitty, Zellij, Fish, Starship, Zoxide |
+| **Apps** | Neovim, Rofi, Espanso, EasyEffects, Dunst |
+| **Visual** | Fastfetch, Wal, Stylix (Catppuccin Mocha) |
+| **Dev** | Lazygit, Docker, Go/Rust/Python/Node.js, pnpm |
+| **AI** | Opencode, Engram |
+| **Sync** | Syncthing, RQuickShare (Nearby Share) |
+| **Screen** | QtScrcpy (scrcpy con UI), Flameshot, Satty |
+
+### Quick Start
+
+```bash
+cd nixconf
+sudo nixos-rebuild switch --flake .#thinkpad-x1e2
+home-manager switch --flake .#diego@thinkpad-x1e2
+```
+
+After rebuilding, your dotfiles will be symlinked to `$HOME/dotfiles-dizzi/` and configs linked to their expected locations.
+
+> 📖 **[Ver guía completa de instalación desde ISO →](nixconf/README.md#installation-from-nixos-iso)**
+
+### Structure
+
+```
+nixconf/
+├── flake.nix           # Flake definition
+├── hosts/              # Machine-specific configs
+│   └── thinkpad-x1e2/  # ThinkPad X1E2 (GTX 1650 hybrid)
+├── home-manager/       # User-level configs
+│   ├── home.nix        # Symlinks to dotfiles-dizzi/
+│   └── features/       # Feature modules
+├── nixos/              # NixOS module definitions
+│   └── features/       # System features
+└── scripts/            # Helper scripts
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `nixrb` | Rebuild NixOS system |
+| `hm` | Switch Home Manager config |
+| `nixup` | Update flake inputs |
+| `nixgc` | Garbage collect old generations |
+
+> 📖 See [nixconf/README.md](nixconf/README.md) for full documentation.
 
 ---
 
