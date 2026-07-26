@@ -71,11 +71,16 @@
     #".config/kanata".source = link "kanata/.config/kanata";
     # Caelestia
     ".config/caelestia".source = link "caelestia/.config/caelestia";
+    # Eww
+    ".config/eww".source = link "eww/.config/eww";
     # Systemd
     #".config/systemd".source = link "systemd/.config/systemd";
 
     # Wallpapers
     "Wallpapers".source = link "wallpapers/wallpapers";
+
+    # Scripts (~/scripts → dotfiles-dizzi/home/scripts)
+    "scripts".source = link "home/scripts";
 
     # Local bin scripts
     ".local/bin".source = link "local/.local/bin";
@@ -101,6 +106,13 @@
     enable = true;
     mime.enable = true;
   };
+
+  # ── Git submodules auto-init ──────────────────────────────
+  # Ensure submodules (nvim config, fzf-tab, etc.) are pulled
+  # on every home-manager switch
+  home.activation.initSubmodules = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    cd ~/dotfiles-dizzi && git submodule update --init --recursive 2>/dev/null || true
+  '';
 
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;

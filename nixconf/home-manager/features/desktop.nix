@@ -11,18 +11,24 @@
     # Audio
     pavucontrol
     easyeffects
+    cava
 
     # File Managers
     thunar
     thunar-volman
     thunar-archive-plugin
     nemo
+    ranger
 
     # Communication
     signal-desktop
     telegram-desktop
     discord
     vencord
+
+    # Browsers
+    brave
+    firefox
 
     # Graphics / Creative
     gimp
@@ -31,6 +37,10 @@
     obs-studio
     flameshot
     satty
+    kdePackages.kdenlive
+
+    # Editors
+    neovim
 
     # Office
     libreoffice-fresh
@@ -56,6 +66,11 @@
     rquickshare
     filezilla
     transmission_4-gtk
+    copyq
+    gpick
+
+    # VPN
+    proton-vpn
 
     # Appearance
     lxappearance

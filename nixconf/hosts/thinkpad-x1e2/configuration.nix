@@ -5,6 +5,7 @@
     ../../nixos/base-configuration.nix
     ../../nixos/features/hyprland.nix
     ../../nixos/features/steam.nix
+    ../../nixos/features/waydroid.nix
     ./features/nvidia.nix
     ./hardware-configuration.nix
   ];

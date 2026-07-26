@@ -133,6 +133,11 @@
       if [ -n "''${GHOSTTY_RESOURCES_DIR}" ]; then
           source "''${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
       fi
+
+      # Pywal colors
+      if [ -f ~/.cache/wal/colors.sh ]; then
+          . ~/.cache/wal/colors.sh
+      fi
     '';
     shellAliases = {
       ll = "exa -lha --icons --git --color=always";
