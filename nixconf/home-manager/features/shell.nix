@@ -171,7 +171,7 @@
       python.symbol = " ";
       rust.symbol = " ";
       golang.symbol = " ";
-      docker_symbol = " ";
+      docker_context.symbol = " ";
     };
   };
 
@@ -217,6 +217,7 @@
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
+      credential.helper = "!gh auth git-credential";
     };
   };
 
