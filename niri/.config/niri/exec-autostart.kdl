@@ -62,6 +62,7 @@ spawn-sh-at-startup "sh ~/scripts/launch_widgets.sh"
 // Mount drives
 spawn-sh-at-startup "/home/diego/montar_gdrive.sh"
 spawn-sh-at-startup "/home/diego/montar_gd-musica.sh"
+spawn-sh-at-startup "/home/diego/montar_gd-libros.sh"
 
 // Cursor theme
 spawn-sh-at-startup "hyprctl setcursor Kafka 24 || true"

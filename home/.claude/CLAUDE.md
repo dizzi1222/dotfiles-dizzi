@@ -279,6 +279,77 @@ Separación de responsabilidades en ramas:
 
 Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` con formato QA.
 
+## Reglas de Commit
+
+- Commits descriptivos con bullet points detallando cada cambio
+- Usar formato: `fix:|feat:|chore:` según corresponda
+- Incluir métricas cuando aplique (espacio liberado, tiempo, etc.)
+- Máximo 325 commits en el repo
+
+## NixOS Config (thinkpad-x1e2)
+
+### Flake structure
+```
+dotfiles-dizzi/nixconf/
+├── flake.nix              # Entry point: nixos + home-manager outputs
+├── nixos/
+│   ├── base-configuration.nix  # system-level: pkgs, services, users, boot, sddm
+│   └── pkgs/                    # custom package derivations
+│       └── sddm-astronaut-theme/default.nix
+└── home-manager/
+    ├── home.nix                 # home-manager: symlinks, activation scripts
+    └── features/
+        ├── shell.nix            # zsh, starship, eza, bat, git, bottom, etc.
+        ├── work.nix             # dev tools: code-cursor, pgadmin4, gcloud, docker
+        ├── desktop.nix          # theming: GTK, Qt, cursors, icons
+        └── programs.nix         # misc programs
+```
+
+### Rebuild commands
+```bash
+# Full rebuild (nixos + home-manager)
+sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2
+sudo -u $USER home-manager switch --flake ~/dotfiles-dizzi/nixconf#$USER@thinkpad-x1e2 -b backup
+
+# Or use the wrapper script
+~/.local/bin/nixconf-rebuild
+```
+
+### Key packages installed
+| Package | Location | Notes |
+|---|---|---|
+| `code-cursor` | work.nix | AI editor, reemplazó vscodium |
+| `pgadmin4` | work.nix | PostgreSQL GUI |
+| `google-cloud-sql-proxy` | work.nix | GCP SQL proxy — binario: `cloud-sql-proxy` |
+| `docker-client` | work.nix | Docker CLI |
+| `gnome-disk-utility` + `udisks2` | base-configuration | USB Disk Manager |
+| `lazydocker` | shell.nix | Docker TUI |
+| `sddm-astronaut` | base-configuration | SDDM theme |
+| `xorg.xinput` | base-configuration | needed for ydotool virtual device |
+
+### Git safe.directory (NixOS fix)
+```nix
+# shell.nix — formato correcto para git config multi-value
+"safe" = { directory = "/home/diego/dotfiles-dizzi"; };
+```
+
+### ydotool (autoclicker/autopress)
+- Service: `~/wrapper/autoclicker-menu` → `~/.local/bin/autoclicker menu`
+- Service: `~/wrapper/autopress-menu` → `~/.local/bin/autopress`
+- Keybinds: F7 (autoclicker), F9 (autopress) in hypr/bindings.conf
+- Socket: `/tmp/.ydotool_socket` (needs `xorg.xinput` + `ydotool.service` running)
+- Service: systemctl --user ydotool.service (auto-started by wrapper)
+
+### system_control.sh (rofi menu)
+Path: `~/scripts/system_control.sh` (symlinked from `home/scripts/`)
+- `󰮮` → `~/.local/bin/clean-boot`
+- `` → `~/.local/bin/nixconf-rebuild`
+- `🦙` → ollama list
+- `󰳾` → autoclicker (via wrapper)
+- `󰌌 󱊮` → autopress (via wrapper)
+- `` → ydotool service check
+- `` → Docker Desktop flatpak / lazydocker
+
 ## Referencias dotfiles-dizzi
 
 ### Plantillas GitHub (dotfiles-dizzi)

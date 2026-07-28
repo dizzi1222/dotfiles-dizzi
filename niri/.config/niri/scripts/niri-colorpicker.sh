@@ -20,7 +20,7 @@ check hyprpicker || {
 }
 
 # Limpiar procesos previos
-killall -q hyprpicker
+pkill hyprpicker
 
 # Capturar color
 color=$(hyprpicker -a)

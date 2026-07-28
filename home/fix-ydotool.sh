@@ -20,7 +20,7 @@ echo
 # ═══════════════════════════════════════════════════════════
 echo -e "${YELLOW}[1/5]${NC} Deteniendo servicios existentes..."
 systemctl --user stop ydotool.service 2>/dev/null || true
-killall ydotoold 2>/dev/null || true
+pkill ydotoold 2>/dev/null || true
 sleep 1
 
 # ═══════════════════════════════════════════════════════════

@@ -3,6 +3,8 @@
 
 allowNotifications=1
 
+alwaysCrossfade=0
+
 repeatState=2
 
 shuffleEnabled=0
@@ -15,7 +17,7 @@ coverAnsi=0
 
 [visualizer]
 
-visualizerEnabled=1
+visualizerColortype=2
 
 [chroma]
 
@@ -27,3 +29,5 @@ colorMode=2
 
 theme=ravachol
 
+currentSongId=3179
+currentSongSeconds=86.153671
