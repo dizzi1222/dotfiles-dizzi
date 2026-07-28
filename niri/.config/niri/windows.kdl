@@ -34,14 +34,21 @@ window-rule {
     open-floating true
     default-column-width { fixed 600; }
     default-window-height { fixed 338; }
-    opacity 1.0
+    opacity 0.0
 }
 
-// Nemo desktop
+// Nemo desktop — SOLO la ventana flotante (title="^nemo-desktop$"),
+// NO la "Desktop" con los iconos (que debe quedar 100% opaca).
+// app-id real: "Nemo-desktop" (case-sensitive).
 window-rule {
-    match app-id=r#"^(nemo-desktop)$"#
-    open-maximized true
-    open-on-workspace "magic"
+    match app-id=r#"^[Nn]emo-desktop$"# title="^nemo-desktop$"
+    open-floating true
+    default-column-width { fixed 1920; }
+    default-window-height { fixed 1080; }
+    opacity 0.0
+    // Work: anclar por NOMBRE (no por índice): con 2 monitores los idx se
+    // duplican y un "9" numérico mueve a un workspace arbitrario (~idx 3).
+    open-on-workspace "isolated"
 }
 
 // Vesktop
@@ -143,6 +150,28 @@ window-rule {
 window-rule {
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     default-column-width {}
+}
+
+// Scripts de control del sistema (lanzados vía wm_spawn desde kitty)
+window-rule {
+    match title=r#"^(PowerOff|Reboot|Suspend)$"#
+    open-floating true
+    default-column-width { fixed 500; }
+    default-window-height { fixed 200; }
+}
+
+window-rule {
+    match title=r#"^(CleanBoot)$"#
+    open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 600; }
+}
+
+window-rule {
+    match title=r#"^(NixRebuild)$"#
+    open-floating true
+    default-column-width { fixed 1000; }
+    default-window-height { fixed 700; }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

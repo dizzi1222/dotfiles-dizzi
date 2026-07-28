@@ -7,7 +7,7 @@ check() {
 
 notify() {
   if check notify-send; then
-    # notify-send -a "Color Picker" "$@"
+    notify-send -a "Color Picker" "$@"
   else
     echo "$@"
   fi
@@ -20,7 +20,7 @@ check hyprpicker || {
 }
 
 # Limpiar procesos previos
-killall -q hyprpicker
+pkill hyprpicker
 
 # Capturar color
 color=$(hyprpicker -a)
@@ -58,9 +58,9 @@ if [[ -n "$color" && "$color" =~ ^#[0-9A-Fa-f]{6}$ ]]; then
 
   # 🔔 Notificar
   if [[ "$clipboard_ok" = true ]]; then
-    # notify "✅ Color copiado" "$color" -t 3000
+    notify "✅ Color copiado" "$color" -t 3000
   else
-    # notify "📝 Color guardado" "$color (clipboard falló)" -t 3000
+    notify "📝 Color guardado" "$color (clipboard falló)" -t 3000
   fi
 
   # 📊 Mostrar en rofi/fuzzel (opcional)
@@ -69,5 +69,5 @@ if [[ -n "$color" && "$color" =~ ^#[0-9A-Fa-f]{6}$ ]]; then
   fi
 
 else
-  # notify "❌ Selección cancelada" "No se capturó ningún color"
+  notify "❌ Selección cancelada" "No se capturó ningún color"
 fi

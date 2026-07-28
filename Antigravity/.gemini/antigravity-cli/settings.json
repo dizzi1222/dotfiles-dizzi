@@ -1,0 +1,13 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "dangerouslySkipPermissions": true,
+  "permissions": {
+    "allow": [
+      "command(*)",
+      "command(nix-instantiate)"
+    ]
+  },
+  "trustedWorkspaces": [
+    "/home/diego/dotfiles-dizzi/nvim/.config/nvim"
+  ]
+}

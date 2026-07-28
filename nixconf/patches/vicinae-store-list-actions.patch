@@ -1,0 +1,69 @@
+--- a/src/server/src/qml/vicinae-store-model.cpp	2026-08-14 00:47:09.438611637 -0400
++++ b/src/server/src/qml/vicinae-store-model.cpp	2026-08-14 00:47:27.086130300 -0400
+@@ -4,9 +4,11 @@
+ #include "internal/keyboard/keybind.hpp"
+ #include "navigation-controller.hpp"
+ #include "services/extension-registry/extension-registry.hpp"
++#include "services/toast/toast-service.hpp"
+ #include "utils/utils.hpp"
+ #include "view-utils.hpp"
+ #include <QCoreApplication>
++#include <QFutureWatcher>
+ 
+ void VicinaeStoreSection::setEntries(const std::vector<VicinaeStore::Extension> &extensions,
+                                      ExtensionRegistry *registry, const QString &sectionName) {
+@@ -43,14 +45,50 @@
+       [author = entry.extension.author.handle, name = entry.extension.name, scope = this->scope()]() {
+         scope.pushView(new VicinaeStoreDetailHost(author, name));
+       });
+-  auto uninstall = new UninstallExtensionAction(entry.extension.id);
+-
+   showDetails->setShortcut(Keyboard::Shortcut::enter());
+-  uninstall->setShortcut(Keybind::RemoveAction);
+ 
+   panel->setTitle(entry.extension.name);
+   section->addAction(showDetails);
+-  danger->addAction(uninstall);
++  if (entry.installed) {
++    auto uninstall = new UninstallExtensionAction(entry.extension.id);
++    uninstall->setShortcut(Keybind::RemoveAction);
++    danger->addAction(uninstall);
++  } else {
++    auto install = new StaticAction(
++        QCoreApplication::translate("VicinaeStoreSection", "Install extension"), entry.extension.themedIcon(),
++        [ext = entry.extension](const ApplicationContext *ctx) {
++          using Watcher = QFutureWatcher<VicinaeStore::DownloadExtensionResult>;
++          auto store = ctx->services->vicinaeStore();
++          auto watcher = new Watcher;
++          auto toast = ctx->services->toastService();
++          auto registry = ctx->services->extensionRegistry();
++
++          toast->dynamic(QCoreApplication::translate("VicinaeStoreSection", "Downloading extension..."));
++
++          QObject::connect(watcher, &Watcher::finished, [registry, toast, ext, watcher]() {
++            auto result = watcher->result();
++            watcher->deleteLater();
++
++            if (!result) {
++              toast->failure(QCoreApplication::translate("VicinaeStoreSection", "Failed to download extension"));
++              return;
++            }
++
++            registry->installFromZip(QString("store.vicinae.%1").arg(ext.name), result->toStdString(),
++                                     [toast](bool ok) {
++                                       if (!ok) {
++                                         toast->failure(QCoreApplication::translate("VicinaeStoreSection", "Failed to extract extension archive"));
++                                         return;
++                                       }
++                                       toast->success(QCoreApplication::translate("VicinaeStoreSection", "Extension installed"));
++                                     });
++          });
++
++          auto downloadResult = store->downloadExtension(ext.downloadUrl);
++          watcher->setFuture(downloadResult);
++        });
++    section->addAction(install);
++  }
+   showDetails->setPrimary(true);
+ 
+   return panel;

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# restart-portals: sana la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
+set -u
+
+for _ in 1 2 3 4 5; do
+  systemctl --user is-system-running --quiet 2>/dev/null && break
+  sleep 0.5
+done
+
+systemctl --user reset-failed \
+  xdg-desktop-portal.service \
+  xdg-desktop-portal-gnome.service \
+  xdg-desktop-portal-gtk.service 2>/dev/null || true
+
+systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
+systemctl --user restart xdg-desktop-portal-gtk.service 2>/dev/null || true
+
+case "${XDG_CURRENT_DESKTOP:-}" in
+  Hyprland)
+    systemctl --user restart xdg-desktop-portal-hyprland.service 2>/dev/null || true
+    ;;
+  ni[r1]i|Niri)
+    ;;
+esac
+
+systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true

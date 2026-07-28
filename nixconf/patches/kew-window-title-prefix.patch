@@ -1,0 +1,15 @@
+--- kew-orig/kew/src/update/effects.c	2026-07-08 12:41:37.000000000 -0400
++++ kew/src/update/effects.c	2026-08-16 02:05:44.087646050 -0400
+@@ -192,8 +192,10 @@
+         if (is_refresh_triggered() && model->state.settings.trackTitleAsWindowTitle) {
+ 
+                 if (model->songdata_ok) {
+-                        set_terminal_window_title(
+-                            model->songdata->metadata->title);
++                        char window_title[KEW_NAME_MAX + 3 + METADATA_MAX_LENGTH];
++                        snprintf(window_title, sizeof(window_title), "kew - %s",
++                                 model->songdata->metadata->title);
++                        set_terminal_window_title(window_title);
+                 } else {
+                         set_terminal_window_title("kew");
+                 }

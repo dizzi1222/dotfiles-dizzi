@@ -26,9 +26,9 @@ input {
     mouse {
         accel-profile "flat"
         scroll-factor 2.0
+        left-handed
         // 🔧 Si quieres scroll "natural" en el mouse, descomenta:
         // natural-scroll
-        // left-handed  // Descomenta esta línea para invertir
     }
 }
 

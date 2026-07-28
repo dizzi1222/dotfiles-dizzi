@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Name=Hades
+# Icon=lutris_hades
+Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Hades.png
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1761700754
+Categories=Game
+TryExec=lutris

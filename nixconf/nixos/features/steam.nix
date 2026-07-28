@@ -46,10 +46,14 @@
     xemu
     mgba
     dosbox
-    melonDS
+    melonds
 
     # Minecraft
     prismlauncher
+    modrinth-app-unwrapped
+
+    # More Games
+    pokemmo-installer
 
     # Misc gaming
     protontricks

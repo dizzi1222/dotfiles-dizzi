@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# clean-boot-yazi: limpiador visual de /boot con yazi
+set -euo pipefail
+
+BOOT="/boot"
+KERNELS_DIR="$BOOT/kernels"
+ENTRIES_DIR="$BOOT/loader/entries"
+
+command -v yazi >/dev/null || { echo "Instalá yazi: nix profile add nixpkgs#yazi"; exit 1; }
+
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+cat > "$TMPDIR/kernels.txt" <<'EOF'
+# Kernels en /boot/kernels/
+# Marca con 'x ' los que quieras BORRAR (no referenciados por bootloader)
+EOF
+
+for f in "$KERNELS_DIR"/*; do
+    [ -e "$f" ] || continue
+    name=$(basename "$f")
+    size=$(du -sh "$f" | cut -f1)
+    echo "$size  $name" >> "$TMPDIR/kernels.txt"
+done
+
+cat > "$TMPDIR/entries.txt" <<'EOF'
+# Entradas de bootloader (NO borrar estos kernels)
+EOF
+
+for f in "$ENTRIES_DIR"/*.conf; do
+    [ -f "$f" ] || continue
+    basename "$f" >> "$TMPDIR/entries.txt"
+done
+
+echo "Abriendo yazi... Marcá kernels con 'x ' al inicio de línea"
+echo "Presioná 'q' para salir y procesar"
+sleep 1
+
+yazi "$TMPDIR"
+
+SELECTED=$(grep '^x ' "$TMPDIR/kernels.txt" | sed 's/^x  *//' | awk '{print $2}')
+
+[ -z "$SELECTED" ] && { echo "Nada seleccionado."; exit 0; }
+
+echo "Se borrarán:"
+echo "$SELECTED" | sed 's/^/  /'
+read -rp "¿Confirmar? [y/N] " -n1; echo
+[[ $REPLY =~ ^[Yy]$ ]] || exit 1
+
+for k in $SELECTED; do
+    rm -f "$KERNELS_DIR/$k"
+    echo "Borrado: $k"
+done
+
+# Generaciones Nix
+GENS=$(nix-env --list-generations --profile /nix/var/nix/profiles/system 2>/dev/null | awk '{print $1}' | sort -n)
+CURRENT=$(readlink -f /nix/var/nix/profiles/system | grep -o '[0-9]*$')
+OLD_GENS=$(echo "$GENS" | grep -v "^$CURRENT$")
+
+[ -n "$OLD_GENS" ] && {
+    echo "Generaciones viejas: $OLD_GENS"
+    read -rp "Borrar generaciones viejas y garbage collect? [y/N] " -n1; echo
+    [[ $REPLY =~ ^[Yy]$ ]] && {
+        for g in $OLD_GENS; do nix-env --delete-generations "$g" --profile /nix/var/nix/profiles/system 2>/dev/null; done
+        nix-collect-garbage -d
+    }
+}
+
+df -h "$BOOT"

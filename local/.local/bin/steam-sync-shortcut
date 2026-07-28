@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# //Steam Sync Shortcut
+# Re-aplica el symlink de shortcuts.vdf roto por Steam.
+# Uso: steam-sync-shortcut [--auto] [vdf-path] [repo-dir]
+
+set -euo pipefail
+
+CFG="$HOME/.local/share/Steam/userdata/1187856367/config"
+REPO_CFG="$HOME/dotfiles-dizzi/local/.local/share/Steam/userdata/1187856367/config"
+VDF="${1:-$CFG/shortcuts.vdf}"
+REPO_VDF="${REPO_CFG}/$(basename "$VDF")"
+AUTO=0
+[[ "${1:-}" == "--auto" ]] && { AUTO=1; VDF="$CFG/shortcuts.vdf"; }
+
+if [ -L "$VDF" ]; then
+  [ -f "$REPO_VDF" ] && echo "OK: shortcuts.vdf ya es symlink al repo"
+  exit 0
+fi
+
+echo "Steam rompió el symlink de shortcuts.vdf — sincronizando..."
+
+if [ -f "$VDF" ]; then
+  cp "$VDF" "$REPO_VDF"
+  rm "$VDF"
+fi
+ln -s "$REPO_VDF" "$VDF"
+
+echo "OK: repo actualizado y symlink restaurado -> $REPO_VDF"
+[ "$AUTO" -eq 1 ] || echo "Pendiente: git -C ~/dotfiles-dizzi add + commit de shortcuts.vdf"
