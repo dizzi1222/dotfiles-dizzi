@@ -1,0 +1,13 @@
+diff --git a/src/data/directorytree.c b/src/data/directorytree.c
+index 2d87d32f..c16eeb9b 100644
+--- a/src/data/directorytree.c
++++ b/src/data/directorytree.c
+@@ -331,7 +331,7 @@ void set_full_path(FileSystemEntry *entry,
+         if (nameLen == 0) {
+ 
+                 snprintf(entry->full_path,
+-                         KEW_PATH_MAX,
++                         needed,
+                          "%s",
+                          parent_path);
+ 

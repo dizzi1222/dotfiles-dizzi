@@ -7,7 +7,7 @@ ICON_ACTIVE="󰂛" # Timbre/Notificación
 DND_STATUS=""
 
 # 1. Verificar si SwayNC está corriendo
-if pgrep -x "swaync" >/dev/null; then
+if pgrep -x "swaync" >/dev/null || pgrep -x ".swaync-wrapped" >/dev/null; then
   # SwayNC activo: Obtener estado DND
   DND_STATUS=$(swaync-client --get-dnd)
 elif pgrep -x "dunst" >/dev/null; then

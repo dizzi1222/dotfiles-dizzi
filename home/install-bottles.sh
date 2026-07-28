@@ -33,16 +33,286 @@ function print_info() { echo -e "${CYAN}[ℹ]${NC} $1"; }
 function print_package() { echo -e "  ${MAGENTA}📦${NC} $1"; }
 
 # ═══════════════════════════════════════════════════════════
-# VERIFICACIONES INICIALES
+# FUNCIÓN: APLICAR TEMA OSCURO A UN PREFIX
 # ═══════════════════════════════════════════════════════════
+# Uso: apply_wine_dark_theme <prefix> <etiqueta>
+# Busca wine-breeze-dark.reg en ubicaciones conocidas, lo aplica
+# con regedit y verifica que quedó en user.reg.
+function apply_wine_dark_theme() {
+  local prefix="$1"
+  local label="$2"
+
+  # Matar instancias del prefix antes de tocar el registro
+  print_status "Matando instancias de Wine ($label)..."
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 2
+
+  DARK_THEME_PATHS=(
+    ~/dotfiles-dizzi/wine-breeze-dark.reg
+    ~/wine-breeze-dark.reg
+    ~/.config/wine-breeze-dark.reg
+  )
+
+  local found=false
+  for path in "${DARK_THEME_PATHS[@]}"; do
+    if [[ -f "$path" ]]; then
+      print_status "Aplicando tema oscuro ($label) desde: $path"
+      WINEPREFIX="$prefix" wine regedit "$path" 2>/dev/null || true
+      # Verificar que realmente se aplicó (color del theme, ej. ActiveBorder)
+      if rg -q '"ActiveBorder"="49 54 58"' "$prefix/user.reg" 2>/dev/null; then
+        print_success "Dark theme aplicado en $label (verificado en user.reg)"
+      else
+        print_warning "El dark theme NO se detectó en $prefix/user.reg — revisa el output de regedit."
+      fi
+      found=true
+      break
+    fi
+  done
+
+  if [[ "$found" == false ]]; then
+    print_warning "wine-breeze-dark.reg no encontrado"
+    print_info "Aplica manualmente: $label → Herramientas/Configuración → Escritorio → Theme: Dark"
+  fi
+
+  # Reiniciar wineserver para que el prefix quede limpio
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null || true
+}
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIÓN: FIX ICU.DLL STALE EN UN PREFIX
+# ═══════════════════════════════════════════════════════════
+# Uso: fix_stale_icu_dll <prefix> <etiqueta>
+# Corrige el crash "module not found for forward 'icuucNN...'" (Error: 127 /
+# c0000409) que aparece al migrar un prefix de wine-ge-* a sys-wine (Wine 11):
+# el prefix conserva un icu.dll VIEJO que forwardea a una libicu que ya no
+# existe en el runtime, y ese .dll shadowea al builtin del runner actual.
+function fix_stale_icu_dll() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  local fixed=false
+  for dir in system32 syswow64; do
+    local icu_dll="$prefix/drive_c/windows/$dir/icu.dll"
+    if [[ -f "$icu_dll" ]]; then
+      local bad="$(grep -aoE 'icuuc[0-9]+' "$icu_dll" 2>/dev/null | head -1)"
+      if [[ -n "$bad" ]] && [[ "$bad" != "icuuc" ]]; then
+        print_warning "$label: icu.dll ($dir) stale forwardeando a $bad → moviendo a .bak"
+        mv "$icu_dll" "$icu_dll.bak.$(date +%Y%m%d)"
+        fixed=true
+      else
+        print_info "$label: icu.dll ($dir) sin forward extraño (OK)"
+      fi
+    fi
+  done
+
+  if [[ "$fixed" == true ]]; then
+    print_success "$label: icu.dll stale resuelto (Wine 11 usa libicuuc del runtime, no necesita el .dll del prefix)"
+  else
+    print_info "$label: sin icu.dll stale (OK)"
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIÓN: INSTALAR SHIMS CLR .NET 4.8 NATIVOS EN UN PREFIX
+# ═══════════════════════════════════════════════════════════
+# Uso: install_ms_shims_dotnet48 <prefix> <etiqueta>
+# PokeOne (app WPF/.NET 4.8) muere con "Wine Mono is not installed" porque
+# el builtin mscoree.dll de Wine hostea wine-mono. Para que la app use el
+# CLR NATIVO (clr.dll 4.8 instalado por winetricks dotnet48) se copian los
+# shims MS REALES (mscoreei/mscoreeis x64+x86 del instalador NDP48, y
+# mscoree.dll nativo del sistema) y se fuerzan overrides native.
+# Los DLL se cachean en ~/.cache/dotnet48-shims/ (descarga/extracción 1 vez).
+# NOTA: el helper get_ms_shim funiona extrayendo UN archivo por vez del cab
+#        con 7z (extraer varios en un mismo comando vuelca todo el cab).
+function get_ms_shim() {
+  local cabfile="$1"   # path al .cab (contiene el archivo)
+  local inner_path="$2" # ruta interna dentro del cab
+  local target="$3"     # archivo destino
+  if [[ -f "$target" ]]; then return 0; fi
+  mkdir -p "$(dirname "$target")"
+  if 7z e "$cabfile" -o"$(dirname "$target")" -y -- "$inner_path" >/dev/null 2>&1; then
+    [[ -f "$target" ]] && return 0
+  fi
+  # fallback: extraer el cab completo y buscar el archivo
+  local tmpdir
+  tmpdir="$(mktemp -d /tmp/cabdump.XXXXXX)"
+  ( cd "$tmpdir" && 7z e "$cabfile" -y -- "$inner_path" >/dev/null 2>&1 )
+  find "$tmpdir" -name "$(basename "$inner_path")" -exec cp {} "$target" \; 2>/dev/null
+  rm -rf "$tmpdir"
+  [[ -f "$target" ]]
+}
+
+function install_ms_shims_dotnet48() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  local www="$prefix/drive_c/windows"
+  local cache="$HOME/.cache/dotnet48-shims"
+  local work
+  work="$(mktemp -d /tmp/ndp48.XXXXXX)"
+
+  # ¿Ya instalados los shims nativos? (mscoreei no-builtin de Wine = señal)
+  if [[ -f "$www/system32/mscoreei.dll" ]] && [[ ! "$(file -b "$www/system32/mscoreei.dll" 2>/dev/null)" =~ for\ WINE ]]; then
+    print_success "$label: shims CLR .NET 4.8 ya nativos (OK)"
+    rm -rf "$work"
+    return 0
+  fi
+
+  print_status "$label: instalando shims CLR .NET 4.8 nativos..."
+
+  # 0) Descargar NDP48 una sola vez (cache en ~/.cache)
+  if [[ ! -f "$cache/ndp48.exe" ]]; then
+    print_status "Descargando instalador .NET 4.8 (~121MB, una sola vez)..."
+    mkdir -p "$cache"
+    curl -L --fail --retry 2 -o "$cache/ndp48.exe" \
+      "https://go.microsoft.com/fwlink/?linkid=2088631" || {
+        print_error "No se pudo descargar NDP48. Manual: https://go.microsoft.com/fwlink/?linkid=2088631"
+        return 1
+      }
+  fi
+
+  # 1) Extraer del instalador SOLO los cabs x64/x86 de Win10 (contienen los shims)
+  7z x "$cache/ndp48.exe" -o"$work" -y 'x64-Windows10.0-KB4486129-x64.cab' \
+    'Windows10.0-KB4486129-x86.cab' >/dev/null 2>&1 || true
+
+  # 2) Extraer mscoreei/mscoreeis (x64 y x86)
+  get_ms_shim "$work/x64-Windows10.0-KB4486129-x64.cab" \
+    "amd64_netfx4-mscoreei_dll_b03f5f7f11d50a3a_4.0.15744.551_none_2c50ee0715d57ff8/mscoreei.dll" \
+    "$cache/x64/mscoreei.dll"
+  get_ms_shim "$work/x64-Windows10.0-KB4486129-x64.cab" \
+    "amd64_netfx4-mscoreeis_dll_b03f5f7f11d50a3a_4.0.15744.161_none_dd9b58148c09a150/mscoreeis.dll" \
+    "$cache/x64/mscoreeis.dll"
+  get_ms_shim "$work/Windows10.0-KB4486129-x86.cab" \
+    "x86_netfx4-mscoreei_dll_b03f5f7f11d50a3a_4.0.15744.551_none_73fe24de2a51a8fe/mscoreei.dll" \
+    "$cache/x86/mscoreei.dll"
+  get_ms_shim "$work/Windows10.0-KB4486129-x86.cab" \
+    "x86_netfx4-mscoreeis_dll_b03f5f7f11d50a3a_4.0.15744.161_none_25488eeba085ca56/mscoreeis.dll" \
+    "$cache/x86/mscoreeis.dll"
+
+  # 3) mscoree.dll MS nativo (NO viene en NDP48 — es parte del OS). Fuentes
+  #    posibles (se prueban ambas arquitecturas por separado):
+  #      1) cache antigua de ~/.cache/dotnet48-shims
+  #      2) ~/.wine (prefix con dotnet nativo instalado previamente)
+  #      3) la propia botella gaming (si ya se corrigió antes manualmente)
+  mkdir -p "$cache/x64" "$cache/x86"
+  for bits in x64 x86; do
+    if [[ -f "$cache/$bits/mscoree.dll" ]]; then
+      continue
+    fi
+    for arch in system32 syswow64; do
+      for src in \
+        "$HOME/.wine/drive_c/windows/$arch/mscoree.dll" \
+        "$BOTTLES_BASE/bottles/gaming/drive_c/windows/$arch/mscoree.dll"
+      do
+        [[ -f "$src" ]] || continue
+        if file -b "$src" 2>/dev/null | grep -q "for WINE"; then
+          continue
+        fi
+        # x64 → system32/cache x64; x86 → syswow64/cache x86
+        if [[ "$bits" == "x64" ]] && file -b "$src" 2>/dev/null | grep -q "x86-64"; then
+          cp -f "$src" "$cache/x64/mscoree.dll"
+          break
+        elif [[ "$bits" == "x86" ]] && ! file -b "$src" 2>/dev/null | grep -q "x86-64"; then
+          cp -f "$src" "$cache/x86/mscoree.dll"
+          break
+        fi
+      done
+      [[ -f "$cache/$bits/mscoree.dll" ]] && break
+    done
+  done
+  if [[ ! -f "$cache/x64/mscoree.dll" || ! -f "$cache/x86/mscoree.dll" ]]; then
+    print_warning "mscoree.dll MS nativo (x64/x86) no encontrado en fuentes locales"
+    print_info "Búscalo en: sistema Windows real (C:\\Windows\\System32) o un prefix con dotnet nativo."
+  fi
+
+  # 4) Copiar los shims al prefix (los que existan)
+  local has_any=false
+  mkdir -p "$www/system32" "$www/syswow64"
+  for f in mscoreei.dll mscoreeis.dll mscoree.dll; do
+    if [[ -f "$cache/x64/$f" ]]; then
+      cp -f "$cache/x64/$f" "$www/system32/$f" && has_any=true
+    fi
+    if [[ -f "$cache/x86/$f" ]]; then
+      cp -f "$cache/x86/$f" "$www/syswow64/$f" && has_any=true
+    fi
+  done
+
+  rm -rf "$work"
+
+  if [[ "$has_any" == true ]]; then
+    print_success "$label: shims CLR .NET 4.8 nativos instalados en system32/syswow64"
+  else
+    print_warning "$label: no se copiaron shims (revisar cache ~/.cache/dotnet48-shims y fuentes)"
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# DETECCIÓN DE DISTRO Y VARIABLES DE ENTORNO
+# ═══════════════════════════════════════════════════════════
+# Soporta Arch (nativo, yay/pacman) y NixOS (flatpak).
 if [[ $EUID -eq 0 ]]; then
   print_error "NO ejecutar como root. Ejecuta como usuario normal."
   exit 1
 fi
 
-if ! command -v yay &>/dev/null; then
-  print_error "yay no está instalado. Instálalo primero."
+if command -v pacman &>/dev/null && command -v yay &>/dev/null; then
+  IS_ARCH=true
+  DISTRO_LABEL="Arch/CachyOS"
+  DEPS_CMD_PREFIX=""
+elif command -v flatpak &>/dev/null; then
+  IS_ARCH=false
+  DISTRO_LABEL="NixOS (flatpak)"
+  DEPS_CMD_PREFIX=""
+else
+  print_error "No se detectó Arch (yay+pacman) ni NixOS (flatpak). Instálalos primero."
   exit 1
+fi
+
+print_info "Distribución detectada: ${DISTRO_LABEL}"
+
+# ═══════════════════════════════════════════════════════════
+# DETECCIÓN DE BOTTLES: INSTALACIÓN Y RUTA REAL
+# ═══════════════════════════════════════════════════════════
+# Bottles puede instalarse como:
+#   - flatpak (sandboxed) → ~/.var/app/com.usebottles.bottles/data/bottles
+#   - nativo/pacman       → ~/.local/share/bottles
+# Se detecta la instalación REAL y su ruta. Se puede forzar
+# con la variable de entorno BOTTLES_BASE.
+
+BOTTLES_BASE="${BOTTLES_BASE:-}"
+
+# Candidatas en orden de prioridad (flatpak primero si existe la app)
+FLATPAK_BOTTLES_BASE="$HOME/.var/app/com.usebottles.bottles/data/bottles"
+NATIVE_BOTTLES_BASE="$HOME/.local/share/bottles"
+
+if [[ -n "$BOTTLES_BASE" ]]; then
+  BOTTLES_METHOD="manual (override BOTTLES_BASE=$BOTTLES_BASE)"
+  print_warning "Forzando ruta de Bottles: $BOTTLES_BASE"
+elif flatpak list --app 2>/dev/null | grep -qi "com.usebottles.bottles" && \
+     [[ -d "$FLATPAK_BOTTLES_BASE/bottles" ]]; then
+  BOTTLES_BASE="$FLATPAK_BOTTLES_BASE"
+  BOTTLES_METHOD="flatpak"
+elif [[ -d "$NATIVE_BOTTLES_BASE/bottles" ]]; then
+  BOTTLES_BASE="$NATIVE_BOTTLES_BASE"
+  BOTTLES_METHOD="nativo (pacman/AUR)"
+else
+  BOTTLES_METHOD="no detectado"
+fi
+
+print_info "Bottles instalado vía: ${BOTTLES_METHOD}"
+print_info "Ruta de Bottles: ${BOTTLES_BASE:-NO ENCONTRADA}"
+
+# Listar botellas existentes (si hay)
+if [[ -d "$BOTTLES_BASE/bottles" ]] && [[ -n "$(ls -A "$BOTTLES_BASE/bottles" 2>/dev/null)" ]]; then
+  print_info "Botellas encontradas: $(ls -1 "$BOTTLES_BASE/bottles" | tr '\n' ' ')"
+else
+  print_warning "No hay botellas aún en $BOTTLES_BASE/bottles"
 fi
 
 # ═══════════════════════════════════════════════════════════
@@ -76,6 +346,29 @@ echo -e "  ${MAGENTA}•${NC} Wine-GE 8: ${GREEN}Mejor para Steam, apps Windows 
 echo -e "  ${MAGENTA}•${NC} Proton-GE 10: ${GREEN}Mejor para juegos (Sparking Zero, etc)${NC}"
 echo -e "  ${MAGENTA}•${NC} Puedes cambiar el runner cuando quieras${NC}"
 echo
+echo -e "${BOLD}${CYAN}¿WINE-GE o GE-PROTON? Cómo elegir el runner:${NC}"
+echo
+echo -e "  ${GREEN}wine-ge-proton (Wine-GE)${NC} — ${BOLD}el runner por defecto${NC}"
+echo -e "    Es Wine clásico (wineboot/wineserver) con los parches de GloriousEggroll."
+echo -e "    Cada botella tiene su propio prefix y puedes instalar cualquier componente"
+echo -e "    (dotnet48, dxvk, vkd3d, winetricks) de forma independiente al runner."
+echo -e "    → USALO PARA: juegos no-Steam, apps/productividad, INSTALADORES,"
+echo -e "      emuladores, juegos clásicos/medios, launchers custom, y cualquier"
+echo -e "      juego con MODS dentro del prefijo (ej. Hollow Knight/Silksong con"
+echo -e "      BepInEx + .NET: necesitan dotnet48 + control del prefix)."
+echo
+echo -e "  ${GREEN}GE-Proton (Proton-GE)${NC} — ${BOLD}solo cuando Wine-GE no alcanza${NC}"
+echo -e "    Es el fork de Proton (Valve) + GE. En Bottles llega como 'custom"
+echo -e "    tool' (ge-proton*) con script 'proton' y protonfixes. Usa el modelo"
+echo -e "    Proton de Valve: menos control sobre los componentes del prefix."
+echo -e "    → USALO SOLO PARA: juegos AAA/online recientes que piden los últimos"
+echo -e "      parches de Proton y no arrancan o fallan con Wine-GE (ej. Sparking"
+echo -e "      Zero, juegos con anti-cheat moderno online)."
+echo
+echo -e "  ${YELLOW}Regla rápida:${NC} si el juego usa mods/manual (.NET, BepInEx, prefix"
+echo -e "  tuneado) → ${GREEN}Wine-GE${NC}. Si es un AAA online reciente que necesita los"
+echo -e "  últimos fixes de Valve → ${GREEN}GE-Proton${NC}."
+echo
 read -p "¿Continuar? [S/n]: " confirm
 [[ "$confirm" =~ ^[Nn]$ ]] && exit 0
 
@@ -84,31 +377,32 @@ read -p "¿Continuar? [S/n]: " confirm
 # ═══════════════════════════════════════════════════════════
 print_header "PASO 1: Verificar instalación de Bottles"
 
-if command -v bottles &>/dev/null || pacman -Qi bottles &>/dev/null 2>&1; then
-  print_success "Bottles ya está instalado"
+if command -v bottles &>/dev/null || flatpak list --app 2>/dev/null | grep -qi "com.usebottles.bottles" || [[ -n "$BOTTLES_BASE" ]]; then
+  print_success "Bottles ya está instalado (${BOTTLES_METHOD:-nativo})"
   BOTTLES_INSTALLED=true
 else
   print_warning "Bottles no está instalado"
   echo
-  read -p "¿Instalar Bottles ahora? (compila ~1 hora) [S/n]: " install_bottles
+  read -p "¿Instalar Bottles ahora? [S/n]: " install_bottles
 
   if [[ ! "$install_bottles" =~ ^[Nn]$ ]]; then
-    print_status "Instalando Bottles desde AUR..."
-    print_warning "Esto puede tardar 1+ hora. Ve por un café ☕"
-
-    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-      bottles 2>/dev/null || {
-      print_error "Error instalando Bottles"
-      exit 1
-    }
-
-    if command -v bottles &>/dev/null; then
-      print_success "Bottles instalado correctamente"
-      BOTTLES_INSTALLED=true
+    if [[ "$IS_ARCH" == true ]]; then
+      print_status "Instalando Bottles desde AUR..."
+      print_warning "Esto puede tardar 1+ hora. Ve por un café ☕"
+      yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+        bottles 2>/dev/null || {
+        print_error "Error instalando Bottles"
+        exit 1
+      }
     else
-      print_error "Bottles no se instaló correctamente"
-      exit 1
+      print_status "Instalando Bottles vía flatpak..."
+      flatpak install -y --user flathub com.usebottles.bottles 2>/dev/null || {
+        print_error "Error instalando Bottles (flatpak)"
+        exit 1
+      }
     fi
+    print_success "Bottles instalado correctamente"
+    BOTTLES_INSTALLED=true
   else
     print_error "Bottles es necesario para continuar"
     exit 1
@@ -116,23 +410,308 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 1.5: SANDBOX FLATPAK — PERMISOS DE FILESYSTEM
+# ═══════════════════════════════════════════════════════════
+# En NixOS Bottles corre sandboxed (flatpak). Por defecto NO puede acceder
+# a mounts de udisks2 (/run/media/diego/*) donde GNOME/KDE montan ISOs
+# automáticamente. Sin esto, bottles-cli falla con:
+#   "Executable file path does not exist or is not accessible by the Flatpak"
+print_header "PASO 1.5: Permisos Flatpak (acceso a /run/media)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Instalación nativa (Arch): sin sandbox, no hace falta override."
+else
+  print_status "Aplicando overrides de filesystem a com.usebottles.bottles..."
+  # /mnt  → montajes loop manuales (ISO en /mnt/iso-N)
+  # /media/diego → disco externo montado por montar_disco_externo.sh
+  # /run/media/diego → ISOs autocontenidas por udisks2 (GNOME/KDE)
+  flatpak override --user --filesystem=/mnt com.usebottles.bottles
+  flatpak override --user --filesystem=/media/diego com.usebottles.bottles
+  flatpak override --user --filesystem=/run/media/diego com.usebottles.bottles
+
+  perms="$(flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -i filesystem || true)"
+  if echo "$perms" | grep -qE "/run/media|/media/diego|/mnt"; then
+    print_success "Bottles ya puede ver los mounts externos:"
+    echo -e "  ${MAGENTA}•${NC} $perms"
+  else
+    print_warning "Override aplicado pero flatpak info no lo refleja aún (revisa manualmente)."
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.6: KERNEL ASLR — FIX INSTALADORES 32-BIT (mmap)
+# ═══════════════════════════════════════════════════════════
+# En kernel 6.1+ vm.mmap_rnd_bits=32 rompe instaladores 32-bit bajo Wine
+# (elamigos/Inno Setup) que explotan: bucle infinito de
+#   "mmap() error Cannot allocate memory, range 0x90000000-..."
+# El fix conocido es bajar la entropía a 28. Esto afecta a TODAS las distros.
+print_header "PASO 1.6: Fix kernel ASLR (mmap_rnd_bits=28)"
+
+current_bits="$(cat /proc/sys/vm/mmap_rnd_bits 2>/dev/null || echo '?')"
+if [[ "$current_bits" == "28" ]]; then
+  print_success "vm.mmap_rnd_bits ya está en 28 (instaladores 32-bit OK)"
+elif [[ "$current_bits" == "32" ]]; then
+  print_warning "vm.mmap_rnd_bits=32 detectado: instaladores 32-bit de Wine fallarán con mmap."
+  echo
+  read -p "¿Aplicar fix (sysctl 32→28) ahora? [S/n]: " fix_mmap
+  if [[ ! "$fix_mmap" =~ ^[Nn]$ ]]; then
+    if sudo sysctl -w vm.mmap_rnd_bits=28 2>/dev/null; then
+      print_success "Aplicado (runtime). Persistiendo en /etc/sysctl.d/99-wine-mmap.conf..."
+      echo "vm.mmap_rnd_bits=28" | sudo tee /etc/sysctl.d/99-wine-mmap.conf >/dev/null
+      print_info "Nota NixOS: usa boot.kernel.sysctl.\"vm.mmap_rnd_bits\" = \"28\" en configuration.nix para que no se pierda al rebuild."
+    else
+      print_error "No se pudo aplicar (permisos). Hazlo manualmente:"
+      echo -e "   ${YELLOW}sudo sysctl -w vm.mmap_rnd_bits=28${NC}"
+    fi
+  else
+    print_warning "Fix omitido: instaladores 32-bit (elamigos/Inno) pueden fallar con mmap."
+  fi
+else
+  print_info "valor actual: ${current_bits} (no requiere cambio)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.7: FIX ICU.DLL STALE EN PREFIXES (NixOS/Wine 11)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: al lanzar un exe en una botella, Wine muere con:
+#   err:module:find_forwarded_export module not found for forward
+#     'icuuc68.u_charsToUChars_68' used by L"C:\windows\system32\icu.dll"
+#   Cannot get symbol u_charsToUChars from libicuuc → Error: 127 → c0000409
+#
+# Causa raiz (NixOS, sep 2026 — PokeOne p1setup.exe):
+#   - El prefix de la botella conserva un icu.dll VIEJO (de la era wine-ge
+#     runner) que forwardea a libicuuc.so.68 (icuuc68).
+#   - sys-wine-11.0 (Wine 11 del runtime / host) usa libicuuc.so.77 y NO trae
+#     icu.dll propio en /app — el runtime lo provee como ELF libicuuc.so.77.
+#   - El icu.dll stale del prefix gana prioridad en el loader → forward inválido.
+# Fix: respaldar y quitar el icu.dll stale de system32+syswow64 del prefix.
+# Además: el sandbox flatpak NO ve ~/Descargas por defecto → dar override.
+print_header "PASO 1.7: Fix ICU.dll stale en prefixes (NixOS/Wine 11)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: runtime libicu del sistema coincide con los runners, no aplica."
+else
+  # 1) Acceso flatpak a ~/Descargas (donde suelen vivir los instaladores)
+  if ! flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+    print_status "Dando acceso flatpak a ~/Descargas (instaladores)..."
+    flatpak override --user --filesystem="$HOME/Descargas" com.usebottles.bottles
+    if flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+      print_success "Bottles ya puede ver ~/Descargas"
+    else
+      print_warning "Override aplicado pero flatpak info no lo refleja aún."
+    fi
+  else
+    print_success "Bottles ya tiene acceso a ~/Descargas"
+  fi
+
+  # 2) Escanear botellas existentes y limpiar icu.dll stale
+  if [[ -d "$BOTTLES_BASE/bottles" ]]; then
+    for prefix in "$BOTTLES_BASE"/bottles/*/; do
+      [[ -d "$prefix/drive_c/windows" ]] || continue
+      fix_stale_icu_dll "${prefix%/}" "Botella $(basename "$prefix")"
+    done
+  else
+    print_warning "No hay botellas aún en $BOTTLES_BASE/bottles (este paso corre la próxima vez)."
+  fi
+
+  # 3) Mismo fix para el prefix ~/.wine si existe (Wine directo)
+  if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
+    fix_stale_icu_dll "$HOME/.wine" "Wine (~/.wine)"
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.8: SHIMS CLR .NET 4.8 NATIVOS PARA POKEONE (Y APPS WPF)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: Launcher.exe (PokeOne) muere con:
+#   err:ole:CoCreateInstance apartment not initialised / Wine Mono is not installed
+#   (la app es WPF/.NET 4.8 y el builtin mscoree.dll de Wine hostea wine-mono)
+#
+# Causa raiz:
+#   - winetricks dotnet48 instala el CLR nativo (clr.dll en Framework64/
+#     v4.0.30319) PERO NO reemplaza los shims builtin en system32/syswow64.
+#   - mscoree/mscoreei/mscoreeis.dll nativos MS viven en el instalador NDP48
+#     (los mscoreei/mscoreeis) y el OS (mscoree.dll NO viene en NDP48).
+#   - Con los shims MS + override native, Wine usa el CLR real (4.0.30319)
+#     en vez de Wine Mono. Verificado: launcher corre, 92 hilos, red OK.
+# Fix: copiar los shims MS nativos a system32/syswow64 y forzar override native.
+print_header "PASO 1.8: Shims CLR .NET 4.8 nativos (fix PokeOne WPF)"
+
+# La botella con PokeOne
+POKEONE_BOTTLE="$BOTTLES_BASE/bottles/gaming"
+if [[ -f "$POKEONE_BOTTLE/drive_c/Games/PokeOne/Launcher.exe" ]]; then
+  install_ms_shims_dotnet48 "$POKEONE_BOTTLE" "Botella gaming (PokeOne)"
+
+  # Forzar overrides native en bottle.yml (idempotente)
+  BOTTLE_YML="$POKEONE_BOTTLE/bottle.yml"
+  if [[ -f "$BOTTLE_YML" ]] && ! grep -q "mscoree" "$BOTTLE_YML" 2>/dev/null; then
+    print_status "Agregando DLL_Overrides mscoree/mscoreei/mscoreeis=native en bottle.yml..."
+    sed -i 's/^DLL_Overrides: {}$/DLL_Overrides:\n    mscoree: native\n    mscoreei: native\n    mscoreeis: native/' "$BOTTLE_YML"
+    if grep -q "mscoree: native" "$BOTTLE_YML" 2>/dev/null; then
+      print_success "Override mscoree=native aplicado en bottle.yml"
+    else
+      print_warning "Revisa bottle.yml manualmente: DLL_Overrides vacío aun."
+    fi
+  elif grep -q "mscoree: native" "$BOTTLE_YML" 2>/dev/null; then
+    print_success "Override mscoree=native ya presente en bottle.yml"
+  fi
+else
+  print_warning "No se encontró PokeOne en botella gaming — el fix aplicará cuando exista la ruta."
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 2: VERIFICAR DEPENDENCIAS
 # ═══════════════════════════════════════════════════════════
 print_header "PASO 2: Verificar dependencias"
 
-print_status "Instalando dependencias base..."
-sudo pacman -S --needed --noconfirm \
-  wine-staging winetricks gamemode lib32-gamemode \
-  vkd3d lib32-vkd3d vulkan-icd-loader lib32-vulkan-icd-loader
+if [[ "$IS_ARCH" == true ]]; then
+  print_status "Instalando dependencias base (Arch)..."
+  sudo pacman -S --needed --noconfirm \
+    wine-staging winetricks gamemode lib32-gamemode \
+    vkd3d lib32-vkd3d vulkan-icd-loader lib32-vulkan-icd-loader
+else
+  print_status "Verificando runtime de Wine (NixOS/flatpak)..."
+  # En NixOS los runners (wine) se instalan dentro de Bottles GUI; winetricks
+  # está disponible vía el paquete del sistema o flatpak. Solo avisamos.
+  if ! command -v winetricks &>/dev/null; then
+    print_warning "winetricks no está en PATH. Instálelo: nix-shell -p winetricks (o flatpak)."
+  fi
+fi
 
-print_success "Dependencias instaladas"
+print_success "Dependencias listas"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 2.1: LIBS DE WINE PARA NIXOS (libunwind/freetype/libxft)
+# ═══════════════════════════════════════════════════════════
+# Los runners de Bottles (wine/wine64) son ELF del host: al arrancar buscan
+# libunwind.so.8, libfreetype.so.6 y libXft.so.2 en el runtime. En NixOS esas
+# libs viven en /nix/store pero NO están en la cache del loader dinámico, así
+# que wine64 muere con:
+#   could not load ntdll.so: libunwind.so.8 → ... not found
+#   Wine cannot find the FreeType font library (libfreetype/libxft)
+# Este paso las localiza en el system actual y las exporta vía LD_LIBRARY_PATH
+# para que wine, wineboot y winetricks (PASO 2.5 y PASO 6) las encuentren.
+print_header "PASO 2.1: Exportar libs de Wine (NixOS)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: las libs de wine vienen del sistema, no hace falta este paso."
+else
+  print_status "Resolviendo libs de Wine en /nix/store (system actual)..."
+  reqs="$(nix-store -q --requisites /run/current-system/sw 2>/dev/null || true)"
+  WINE_SYSTEM_LIBS=""
+
+  for lib in libunwind.so.8 libfreetype.so.6 libXft.so.2; do
+    libdir="$(echo "$reqs" | while read -r p; do
+      [[ -f "$p/lib/$lib" ]] && echo "$p/lib" && break
+    done)"
+
+    # Fallback: buscar directamente en el store si no está en el system actual
+    if [[ -z "$libdir" ]]; then
+      found_so="$(find /nix/store -maxdepth 3 -path "*lib/$lib" -print -quit 2>/dev/null)"
+      [[ -n "$found_so" ]] && libdir="$(dirname "$found_so")"
+    fi
+
+    if [[ -n "$libdir" ]]; then
+      WINE_SYSTEM_LIBS="$WINE_SYSTEM_LIBS:$libdir"
+      print_success "$lib → $libdir"
+    else
+      print_warning "$lib NO encontrada — wine/winetricks pueden fallar al cargarla."
+      print_info "  Si vuelve a fallar: nix store / nix-shell -p libunwind freetype libxft primero."
+    fi
+  done
+
+  WINE_SYSTEM_LIBS="${WINE_SYSTEM_LIBS#:}"
+  if [[ -n "$WINE_SYSTEM_LIBS" ]]; then
+    export LD_LIBRARY_PATH="$WINE_SYSTEM_LIBS${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    print_success "LD_LIBRARY_PATH exportado para Wine: $WINE_SYSTEM_LIBS"
+  else
+    print_warning "No se exportó LD_LIBRARY_PATH (ninguna lib resuelta)."
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 2.5: WINE PREFIX (~/.wine) — Cross-platform
+# ═══════════════════════════════════════════════════════════
+print_header "PASO 2.5: Configurar Wine prefix (~/.wine)"
+
+echo
+read -p "¿Configurar Wine prefix ahora? [S/n]: " setup_wine
+
+if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
+  if ! command -v wine &>/dev/null || ! command -v winetricks &>/dev/null; then
+    print_warning "wine/winetricks no están en PATH. En NixOS usa: nix-shell -p wine winetricks"
+    print_warning "Omitiendo Wine prefix (Bottles usa sus propios runners)."
+  else
+    export WINEPREFIX="$HOME/.wine"
+    # Solo forzar win64 cuando se va a recrear limpio; un prefix win32 con
+    # WINEARCH=win64 hace que winetricks/wine/funcionen mal (arch desalineada).
+    if [[ -f "$WINEPREFIX/system.reg" ]] && rg -qi '^#arch=win32' "$WINEPREFIX/system.reg"; then
+      export WINEARCH=win32
+      print_warning "Prefix detectado como $WINEARCH; usando WINEARCH=$WINEARCH (no win64)"
+    else
+      export WINEARCH=win64
+    fi
+
+    # ── Pre-config: detectar prefix existente con arch distinta a win64 ──
+    # Si ~/.wine ya existe como win32 (o sin #arch) pero queremos win64,
+    # winetricks/wine fallan ("WINEARCH set to win64 but ... is a 32-bit
+    # installation"). Se respalda el prefix y se recrea limpio como win64.
+    if [ -f ~/.wine/system.reg ] || [ -d ~/.wine/drive_c ]; then
+      current_arch=$(rg -m1 -i '^#arch=' ~/.wine/system.reg 2>/dev/null | sed 's/#arch=//i' || true)
+      echo
+      echo -e "${YELLOW}⚠  Detectado prefix existente en ~/.wine (arch: ${current_arch:-desconocida}).${NC}"
+      if [[ "$current_arch" != "win64" ]]; then
+        read -p "  No es win64. ¿Respaldo y recreo como win64 (se borra el actual)? [S/n]: " recreate_wine
+        if [[ ! "$recreate_wine" =~ ^[Nn]$ ]]; then
+          backup_wine=~/.wine.bak.$(date +%Y%m%d-%H%M%S)
+          print_status "Respaldando ~/.wine -> $backup_wine"
+          mv ~/.wine "$backup_wine" 2>/dev/null || true
+          print_warning "Prefix anterior respaldado en $backup_wine"
+        else
+          print_warning "Omitiendo recreación: winetricks puede fallar por arch distinta."
+        fi
+      fi
+    fi
+
+    print_status "Inicializando Wine prefix"
+    wineboot -u 2>/dev/null &
+    sleep 5
+
+    print_status "Instalando componentes Wine con winetricks"
+    wt_fail=0
+    for wt_args in \
+      "corefonts dotnet40 dotnet48 dxvk d3dx9 vcrun2022" \
+      "d3dcompiler_47 d3dx11_42 win10" \
+      "vcrun2013 vcrun2012 vcrun2010 vcrun2008 vcrun2005" \
+      "mf quartz"
+    do
+      print_status "winetricks $wt_args"
+      winetricks $wt_args 2>&1 || wt_fail=1
+    done
+    if [[ "$wt_fail" -ne 0 ]]; then
+      print_warning "Algunos componentes winetricks reportaron error (revisa el output de arriba)."
+    else
+      print_success "Componentes winetricks instalados."
+    fi
+
+    # Wine Dark Theme
+    read -p "¿Aplicar Wine Dark Theme? [S/n]: " apply_dark
+    if [[ ! "$apply_dark" =~ ^[Nn]$ ]]; then
+      apply_wine_dark_theme "$WINEPREFIX" "Wine (~/.wine)"
+    fi
+
+    print_success "Wine configurado"
+  fi
+else
+  print_warning "Wine prefix omitido"
+fi
 
 # ═══════════════════════════════════════════════════════════
 # PASO 3: CONFIGURACIÓN DE BOTELLA
 # ═══════════════════════════════════════════════════════════
 print_header "PASO 3: Configuración de Botella"
 
-BOTTLES_DIR="$HOME/.local/share/bottles/bottles"
+BOTTLES_DIR="$BOTTLES_BASE/bottles"
 
 echo
 echo -e "${CYAN}¿Qué quieres hacer?${NC}"
@@ -200,8 +779,9 @@ echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Wine-GE Custom${NC}"
 echo -e "  ${MAGENTA}•${NC} Mejor para: ${GREEN}Steam, apps Windows, juegos generales${NC}"
-echo -e "  ${MAGENTA}•${NC} Versión recomendada: ${YELLOW}GE-Proton8-25${NC}"
+echo -e "  ${MAGENTA}•${NC} Versión recomendada: ${YELLOW}ge-proton11-3${NC}"
 echo -e "  ${MAGENTA}•${NC} Compatibilidad: ${GREEN}Excelente${NC}"
+echo -e "  ${MAGENTA}•${NC} ${RED}Evita wine-ge-proton8-26:${NC} bucle 'mmap() Cannot allocate memory' en instaladores 32-bit (elamigos/Inno) con kernel 6.x"
 echo
 echo -e "${BOLD}${GREEN}2. Proton-GE Custom${NC}"
 echo -e "  ${MAGENTA}•${NC} Mejor para: ${GREEN}Sparking Zero, juegos AAA recientes${NC}"
@@ -218,25 +798,39 @@ read -p "Seleccionar opción [1/2/3/4]: " runner_choice
 case "$runner_choice" in
 1)
   print_header "Instalando Wine-GE Custom"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    wine-ge-custom 2>/dev/null || print_warning "wine-ge-custom falló (puede que ya esté)"
-  print_success "Wine-GE instalado"
+  if [[ "$IS_ARCH" == true ]]; then
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      wine-ge-custom 2>/dev/null || print_warning "wine-ge-custom falló (puede que ya esté)"
+  else
+    print_info "En NixOS, descarga el runner desde Bottles GUI:"
+    print_info "  Preferencias → Ejecutores → Wine (Wine-GE xxx)"
+  fi
+  print_success "Wine-GE listo"
   SELECTED_RUNNER="wine-ge"
   ;;
 
 2)
   print_header "Instalando Proton-GE Custom"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    proton-ge-custom-bin 2>/dev/null || print_warning "proton-ge falló (puede que ya esté)"
-  print_success "Proton-GE instalado"
+  if [[ "$IS_ARCH" == true ]]; then
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      proton-ge-custom-bin 2>/dev/null || print_warning "proton-ge falló (puede que ya esté)"
+  else
+    print_info "En NixOS, descarga el runner en Bottles GUI:"
+    print_info "  Preferencias → Ejecutores → Prootn-GE xxx"
+  fi
+  print_success "Proton-GE listo"
   SELECTED_RUNNER="proton-ge"
   ;;
 
 3)
   print_header "Instalando Wine-GE + Proton-GE"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    wine-ge-custom proton-ge-custom-bin 2>/dev/null || print_warning "Algunos falló (pueden estar instalados)"
-  print_success "Ambos runners instalados"
+  if [[ "$IS_ARCH" == true ]]; then
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      wine-ge-custom proton-ge-custom-bin 2>/dev/null || print_warning "Algunos falló (pueden estar instalados)"
+  else
+    print_info "En NixOS, descarga ambos runners en: Bottles GUI → Preferencias → Ejecutores"
+  fi
+  print_success "Ambos runners listos"
   SELECTED_RUNNER="ambos"
   ;;
 
@@ -308,28 +902,30 @@ if [[ -n "$BOTTLE_NAME" ]]; then
     else
       print_status "Instalando dependencias en: $BOTTLE_NAME"
 
-      # Dependencias críticas
-      print_package "DXVK + D3D"
-      WINEPREFIX="$BOTTLE_PREFIX" winetricks -q dxvk d3dcompiler_47 d3dx9 d3dx11_42 2>/dev/null || true
-
-      print_package "Visual C++ Redistributables"
-      WINEPREFIX="$BOTTLE_PREFIX" winetricks -q vcrun2013 vcrun2015 vcrun2019 vcrun2022 2>/dev/null || true
-
-      print_package ".NET Framework"
-      WINEPREFIX="$BOTTLE_PREFIX" winetricks -q dotnet40 dotnet48 2>/dev/null || true
-
-      print_package "Fuentes y extras"
-      WINEPREFIX="$BOTTLE_PREFIX" winetricks -q corefonts 2>/dev/null || true
+      dep_fail=0
+      for wt_args in \
+        "dxvk d3dcompiler_47 d3dx9 d3dx11_42" \
+        "vcrun2013 vcrun2015 vcrun2022" \
+        "dotnet40 dotnet48" \
+        "corefonts"
+      do
+        print_package "winetricks $wt_args"
+        WINEPREFIX="$BOTTLE_PREFIX" winetricks $wt_args 2>&1 || dep_fail=1
+      done
 
       # Para juegos que necesitan media (RE4, etc)
       echo
       read -p "¿Juego necesita codecs media (RE4, etc)? [s/N]: " install_media
       if [[ "$install_media" =~ ^[Ss]$ ]]; then
         print_package "Media Foundation + Codecs"
-        WINEPREFIX="$BOTTLE_PREFIX" winetricks -q mf wmv9 quartz 2>/dev/null || true
+        WINEPREFIX="$BOTTLE_PREFIX" winetricks mf quartz 2>&1 || dep_fail=1
       fi
 
-      print_success "Dependencias instaladas"
+      if [[ "$dep_fail" -ne 0 ]]; then
+        print_warning "Algunos componentes reportaron error (revisa el output de arriba)."
+      else
+        print_success "Dependencias instaladas"
+      fi
     fi
   else
     print_warning "Dependencias omitidas"
@@ -398,41 +994,61 @@ chmod +x ~/bottles-switch-runner.sh
 print_success "Script creado: ~/bottles-switch-runner.sh"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 8: CONFIGURAR TEMA OSCURO
+# PASO 8: TEMA OSCURO — WINE Y/O BOTTLES
 # ═══════════════════════════════════════════════════════════
-if [[ -n "$BOTTLE_NAME" ]]; then
-  print_header "PASO 8: Tema oscuro en Wine"
+print_header "PASO 8: Tema oscuro en Wine y Bottles"
 
-  echo
-  read -p "¿Aplicar tema oscuro a '$BOTTLE_NAME'? [S/n]: " apply_dark
+echo
+echo -e "${CYAN}¿A dónde quieres aplicar el tema oscuro?${NC}"
+echo
+echo -e "${BOLD}${GREEN}1.${NC} Wine (~/.wine)"
+echo -e "${BOLD}${GREEN}2.${NC} Botella Bottles"
+echo -e "${BOLD}${GREEN}3.${NC} Ambos"
+echo -e "${BOLD}${GREEN}4.${NC} Omitir"
+echo
+read -p "Selecciona opción [1/2/3/4]: " dark_choice
 
-  if [[ ! "$apply_dark" =~ ^[Nn]$ ]]; then
-    BOTTLE_PREFIX="$BOTTLES_DIR/$BOTTLE_NAME"
-
-    # Buscar wine-breeze-dark.reg en múltiples ubicaciones
-    DARK_THEME_PATHS=(
-      ~/dotfiles-dizzi/wine-breeze-dark.reg
-      ~/wine-breeze-dark.reg
-      ~/.config/wine-breeze-dark.reg
-    )
-
-    THEME_FOUND=false
-    for path in "${DARK_THEME_PATHS[@]}"; do
-      if [[ -f "$path" ]]; then
-        print_status "Aplicando tema oscuro desde: $path"
-        WINEPREFIX="$BOTTLE_PREFIX" wine regedit "$path" 2>/dev/null || true
-        print_success "Tema oscuro aplicado"
-        THEME_FOUND=true
-        break
+case "$dark_choice" in
+1)
+  apply_wine_dark_theme "$HOME/.wine" "Wine (~/.wine)"
+  ;;
+2)
+  if [[ -n "$BOTTLE_NAME" ]]; then
+    apply_wine_dark_theme "$BOTTLES_DIR/$BOTTLE_NAME" "Bottles ($BOTTLE_NAME)"
+  else
+    if [[ -d "$BOTTLES_DIR" ]]; then
+      echo
+      print_info "Botellas disponibles:"
+      ls -1 "$BOTTLES_DIR"
+      echo
+      read -p "Nombre de la botella (para dark theme): " EXTRA_BOTTLE
+      if [[ -n "$EXTRA_BOTTLE" ]] && [[ -d "$BOTTLES_DIR/$EXTRA_BOTTLE" ]]; then
+        apply_wine_dark_theme "$BOTTLES_DIR/$EXTRA_BOTTLE" "Bottles ($EXTRA_BOTTLE)"
+      else
+        print_error "Botella '$EXTRA_BOTTLE' no encontrada en $BOTTLES_DIR"
       fi
-    done
-
-    if [[ "$THEME_FOUND" == false ]]; then
-      print_warning "wine-breeze-dark.reg no encontrado"
-      print_info "Configura manualmente: Bottles → $BOTTLE_NAME → Herramientas → Configuración → Escritorio → Theme: Dark"
+    else
+      print_warning "No hay botellas de Bottles (BOTTLES_DIR no existe: $BOTTLES_DIR)"
+      print_info "Crea una botella primero (PASO 3 o desde la GUI de Bottles)."
     fi
   fi
-fi
+  ;;
+3)
+  apply_wine_dark_theme "$HOME/.wine" "Wine (~/.wine)"
+  if [[ -n "$BOTTLE_NAME" ]]; then
+    apply_wine_dark_theme "$BOTTLES_DIR/$BOTTLE_NAME" "Bottles ($BOTTLE_NAME)"
+  else
+    print_warning "Sin botella seleccionada en este run — aplica a Bottles manualmente:"
+    print_info "Bottles → botella → Herramientas de Wine → Configuración → Escritorio → Theme: Dark"
+  fi
+  ;;
+4)
+  print_warning "Tema oscuro omitido"
+  ;;
+*)
+  print_error "Opción inválida"
+  ;;
+esac
 
 # ═══════════════════════════════════════════════════════════
 # RESUMEN FINAL
@@ -448,13 +1064,24 @@ echo
 
 echo -e "${YELLOW}${BOLD}GUÍA DE USO RÁPIDO:${NC}"
 echo
-echo -e "${CYAN}1. Abrir Bottles:${NC}"
-echo -e "   ${YELLOW}bottles${NC}"
-echo
-echo -e "${CYAN}2. Ejecutar juego/app desde terminal:${NC}"
-echo -e "   ${YELLOW}bottles-cli run -p steam -b '$BOTTLE_NAME'${NC}"
-echo -e "   ${YELLOW}bottles-cli run -p 'Hades' -b '$BOTTLE_NAME'${NC}"
-echo
+
+if [[ "$IS_ARCH" == true ]]; then
+  echo -e "${CYAN}1. Abrir Bottles:${NC}"
+  echo -e "   ${YELLOW}bottles${NC}"
+  echo
+  echo -e "${CYAN}2. Ejecutar juego/app desde terminal:${NC}"
+  echo -e "   ${YELLOW}bottles-cli run -p steam -b '$BOTTLE_NAME'${NC}"
+  echo -e "   ${YELLOW}bottles-cli run -p 'Hades' -b '$BOTTLE_NAME'${NC}"
+  echo
+else
+  echo -e "${CYAN}1. Abrir Bottles (flatpak):${NC}"
+  echo -e "   ${YELLOW}flatpak run com.usebottles.bottles${NC}"
+  echo
+  echo -e "${CYAN}2. Ejecutar juego/app (flatpak):${NC}"
+  echo -e "   ${YELLOW}flatpak run com.usebottles.bottles --run -p Steam -b '$BOTTLE_NAME'${NC}"
+  echo
+fi
+
 echo -e "${CYAN}3. Cambiar runner rápidamente:${NC}"
 echo -e "   ${YELLOW}~/bottles-switch-runner.sh $BOTTLE_NAME${NC}"
 echo

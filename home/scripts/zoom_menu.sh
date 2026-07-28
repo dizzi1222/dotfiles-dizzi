@@ -1,4 +1,8 @@
 #!/bin/bash
+# Cross-WM Zoom Menu (Hyprland + Niri)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/platform.sh"
+
 MONITOR="eDP-1"
 LAUNCHER="wofi --show dmenu -i --prompt Zoom-Level"
 
@@ -19,22 +23,8 @@ CHOICE=$(echo -e "$OPTIONS" | $LAUNCHER | awk '{print $1}')
 if [ -n "$CHOICE" ]; then
   SCALE=$(echo "$CHOICE" | awk '{print $1}')
 
-  # Guardar IDs de ventanas activas por workspace
-  WINDOWS=$(hyprctl clients -j | jq -r '.[] | "\(.workspace.id):\(.address)"')
+  wm_monitor_scale "$MONITOR" "$SCALE"
 
-  # Aplicar scale
-  hyprctl keyword monitor "$MONITOR,preferred,auto,$SCALE"
-  sleep 0.3
-
-  # Para cada ventana, forzar refocus en su workspace
-  echo "$WINDOWS" | while IFS=: read -r ws_id win_addr; do
-    hyprctl dispatch focuswindow "address:$win_addr" 2>/dev/null
-  done
-
-  # Volver al workspace original
-  CURRENT_WS=$(hyprctl activeworkspace -j | jq -r '.id')
-  hyprctl dispatch workspace "$CURRENT_WS"
-
-  echo "$SCALE" >~/.config/hypr/last_scale
-  notify-send " Zoom: $SCALE" "Ventanas restauradas"
+  echo "$SCALE" >~/.cache/zoom_menu_last_scale
+  notify-send " Zoom: $SCALE" "Escala aplicada a $MONITOR"
 fi
