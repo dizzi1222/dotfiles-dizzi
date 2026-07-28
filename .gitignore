@@ -24,6 +24,11 @@ Antigravity/.config/Antigravity/*
 Antigravity/.config/Antigravity/User/*
 !Antigravity/.config/Antigravity/User/settings.json
 !Antigravity/.config/Antigravity/User/keybindings.json
+Antigravity/.config/Antigravity IDE/*
+!Antigravity/.config/Antigravity IDE/User/
+Antigravity/.config/Antigravity IDE/User/*
+!Antigravity/.config/Antigravity IDE/User/settings.json
+!Antigravity/.config/Antigravity IDE/User/keybindings.json
 
 # MCP específico
 .mcp-global.json.local
@@ -117,7 +122,6 @@ home/musicpresence/
 # ═══════════════════════════════════════════════════════════
 **/local/.local/share/lutris/runtime/
 **/local/.local/share/lutris/runners/
-**/local/.local/share/lutris/pga.db
 **/local/.local/share/fonts/**/.uuid
 **/local/.local/share/icons/hicolor/.icon-theme.cache
 **/local/.local/share/applications/gaming--*.desktop
@@ -161,6 +165,10 @@ firefox/.mozilla/firefox/*/crashes/
 **/cursor/.cursor/extensions/
 **/vscode/.vscode/extensions/
 
+# Estado local de Cursor/VSCode (binarios efímeros de sesión)
+**/cursor/.config/Cursor/User/globalStorage/
+**/cursor/.config/Cursor/User/workspaceStorage/
+
 # ═══════════════════════════════════════════════════════════
 # CACHES Y TEMPORALES
 # ═══════════════════════════════════════════════════════════
@@ -189,6 +197,7 @@ firefox/.mozilla/firefox/*/crashes/
 *.sqlite
 *.sqlite-*
 *.db
+!**/local/.local/share/lutris/pga.db
 
 # ═══════════════════════════════════════════════════════════
 # ARCHIVOS ESPECÍFICOS
@@ -260,3 +269,17 @@ Session.vim
 # Copilot chat history
 copilot-chat-history/
 home/.opencommit
+
+# ═══════════════════════════════════════════════════════════
+# WINE - ASSETS GENERADOS AUTOMÁTICAMENTE
+# Los .desktop de wine-extension y wine/Programs los genera wine
+# al configurar el prefix (rutas absolutas a ~/.wine, no portables).
+# mimeinfo.cache es caché regenerable.
+# ═══════════════════════════════════════════════════════════
+local/.local/share/applications/wine-extension-*.desktop
+local/.local/share/applications/wine/
+local/.local/share/applications/mimeinfo.cache
+
+# Replit (app .desktop + icono descargados)
+local/.local/share/applications/Replit*
+local/.local/share/icons/Replit*

@@ -46,13 +46,11 @@ spawn-sh-at-startup "wl-paste --type image --watch cliphist store"
 spawn-at-startup "espanso"
 spawn-sh-at-startup "sh ~/.config/hypr/scripts/toggle_copyq.sh"
 
-// Wallpaper (swaybg reemplaza a swww-daemon)
-
-spawn-sh-at-startup "sleep 1; swaybg &"
-spawn-sh-at-startup "sleep 1; swaybg -i ~/wallpapers/40.jpg -m fill &"
+// Wallpaper (swaybg reemplaza a swww-daemon) — restaura el último wallpaper elegido
+spawn-sh-at-startup "bash -c 'sleep 1; W=\"$(cat ~/.cache/wallpaper/last 2>/dev/null)\"; swaybg -i \"${W:-$HOME/wallpapers/40.jpg}\" -m fill &'"
 
 // Status bar
-spawn-sh-at-startup "sleep 3; waybar"
+spawn-sh-at-startup "sleep 3; waybar -c ~/.config/waybar/config-niri.json"
 
 // Scripts
 spawn-sh-at-startup "sh ~/.config/hypr/scripts/text_animation/anitext.sh"
@@ -62,6 +60,7 @@ spawn-sh-at-startup "sh ~/scripts/launch_widgets.sh"
 // Mount drives
 spawn-sh-at-startup "/home/diego/montar_gdrive.sh"
 spawn-sh-at-startup "/home/diego/montar_gd-musica.sh"
+spawn-sh-at-startup "/home/diego/montar_gd-libros.sh"
 
 // Cursor theme
 spawn-sh-at-startup "hyprctl setcursor Kafka 24 || true"

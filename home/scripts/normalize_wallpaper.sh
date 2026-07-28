@@ -5,7 +5,7 @@
 # #######################################################################################
 
 # Define the target directory
-DIRECTORY=~/wallpapers/ # Change this to your target directory
+DIRECTORY=~/wallpapers/wallpapers/ # Change this to your target directory
 
 # Ensure the directory exists
 DIRECTORY=$(eval echo "$DIRECTORY")

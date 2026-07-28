@@ -35,6 +35,7 @@ sources=[('xkb', 'us')]
 [desktop/interface]
 cursor-blink-time=1200
 cursor-size=24
+gtk-theme='Colloid-Pink-Dark'
 toolkit-accessibility=true
 
 [desktop/keybindings]

@@ -42,6 +42,7 @@ window-rule {
     match app-id=r#"^(nemo-desktop)$"#
     open-maximized true
     open-on-workspace "magic"
+    opacity 0.1
 }
 
 // Vesktop
@@ -143,6 +144,28 @@ window-rule {
 window-rule {
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     default-column-width {}
+}
+
+// Scripts de control del sistema (lanzados vía wm_spawn desde kitty)
+window-rule {
+    match title=r#"^(PowerOff|Reboot|Suspend)$"#
+    open-floating true
+    default-column-width { fixed 500; }
+    default-window-height { fixed 200; }
+}
+
+window-rule {
+    match title=r#"^(CleanBoot)$"#
+    open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 600; }
+}
+
+window-rule {
+    match title=r#"^(NixRebuild)$"#
+    open-floating true
+    default-column-width { fixed 1000; }
+    default-window-height { fixed 700; }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

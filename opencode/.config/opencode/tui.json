@@ -1,5 +1,10 @@
 {
-  "plugin": [
-    "opencode-subagent-statusline"
-  ]
+  "$schema": "https://opencode.ai/tui.json",
+  "theme": "tokyonight",
+  "keybinds": {
+    "leader": "ctrl+x",
+    "theme_list": "<leader>t",
+    "variant_list": "<leader>v"
+  },
+  "plugin": ["opencode-subagent-statusline"]
 }

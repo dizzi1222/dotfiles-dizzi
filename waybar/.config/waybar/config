@@ -129,14 +129,14 @@
         // a la sección de "Alternativa".
     ]
 },
-  	"bluetooth": {
-		"format": "<span font='13'>󰂯</span>",
-		"format-disabled": "󰂲",
-		"format-connected": "",
-		"tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "$TERMINAL --class=com.ghaerdi.Bluetui -e bluetui",
-    "on-click-right": "blueman-manager"
-	},
+    "bluetooth": {
+        "format": "<span font='13'>󰂯</span>",
+        "format-disabled": "󰂲",
+        "format-connected": "",
+        "tooltip-format": "Devices connected: {num_connections}",
+        "on-click": "$TERMINAL --class=com.ghaerdi.Bluetui -e bluetui",
+        "on-click-right": "blueman-manager"
+    },
   "temperature": {
     "format": " {temperatureC}°C",
     "format-critical": " {temperatureC}°C",
@@ -232,8 +232,8 @@
     "network#speed": {
         "format": "{bandwidthDownBits}",
         "interval": 1,
-        "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}	⇡{bandwidthUpBytes}",
-        "tooltip-format-ethernet": "⇣{bandwidthDownBytes}	⇡{bandwidthUpBytes}",
+        "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}\t⇡{bandwidthUpBytes}",
+        "tooltip-format-ethernet": "⇣{bandwidthDownBytes}\t⇡{bandwidthUpBytes}",
         "tooltip-format-disconnected": "Disconnected",
         "on-click": "networkmanager_dmenu"
     },
@@ -286,11 +286,11 @@
         "format-playing": "{icon_cover} {status} {title}",
         "format-stopped": "{icon} No hay música reproduciéndose"
     },
-	"custom/notification-center": {
-		"format": "󱧐",
-		"tooltip-format": "Notification center",
-		"on-click": "swaync-client -t"
-	},
+    "custom/notification-center": {
+        "format": "󱧐",
+        "tooltip-format": "Notification center",
+        "on-click": "swaync-client -t"
+    },
 "custom/widgets-right": {
     "format": "",
         "tooltip-format": "Widgets",

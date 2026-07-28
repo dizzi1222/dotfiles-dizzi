@@ -18,6 +18,12 @@ include "input.kdl"
 include "monitor.kdl"
 include "envs.kdl"
 
+// FIX transparencia (Niri: el focus-ring/borde se dibuja como rect sólido
+// DETRÁS de la ventana y se ve a través de terminales translúcidas).
+// Con prefer-no-csd el borde se dibuja ALREDEDOR → el wallpaper pasa por
+// atrás. Requiere reiniciar las apps (kitty/ghostty) tras aplicar.
+prefer-no-csd
+
 // ═══════════════════════════════════════════════════════════════════════════
 // NOTAS DE MIGRACIÓN
 // ═══════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Jscamp (Infojobs) | MiduDev Botocamp
+Comment=Open Jscamp (Infojobs) | MiduDev Botocamp
+Exec=zen-browser --new-window --kiosk https://www.jscamp.dev/javascript/manipulacion-dom
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Jscamp_(Infojobs)_|_MiduDev_Botocamp.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Jscamp_(Infojobs)_|_MiduDev_Botocamp

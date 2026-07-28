@@ -1,10 +1,11 @@
-#bin/bash
+#!/bin/bash
 #######################################################################################
 # Configs DIZZI - Wallpaper Selector con Animaciones Aleatorias
 #######################################################################################
 
 # Directorio de wallpapers
-WALL_DIR="$HOME/wallpapers/wallpapers/"
+WALL_DIR="$HOME/wallpapers/wallpapers/wallpapers/"
+CACHE_DIR="$HOME/.cache/wallpaper"
 cd "$WALL_DIR" || exit
 
 # Selección desde Rofi con previews
@@ -15,35 +16,26 @@ done | rofi -dmenu -p "󰸉 " -theme ~/.config/rofi/config-wallpaper.rasi)
 if [ -n "$SELECTED_WALL" ]; then
   notify-send "🎨 Changing Theme" "Applying new wallpaper with epic transition..."
 
-  # 🎭 Array de 6 animaciones increíbles
+  # 🎭 Array de 6 animaciones increíbles (type|params)
   transitions=(
-    # 1️⃣ Ola épica desde cualquier dirección
-    "wave --transition-angle 45 --transition-fps 60 --transition-step 90 --transition-wave 30,20"
-
-    # 2️⃣ Crecimiento explosivo desde el centro
-    "grow --transition-pos 0.5,0.5 --transition-fps 60 --transition-step 90"
-
-    # 3️⃣ Barrido circular impactante
-    "wipe --transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120"
-
-    # 4️⃣ Zoom desde esquina aleatoria
-    "outer --transition-pos $(shuf -e "0.0,0.0" "1.0,0.0" "0.0,1.0" "1.0,1.0" -n 1) --transition-fps 60 --transition-step 100"
-
-    # 5️⃣ Múltiples ondas entrelazadas
-    "wave --transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120 --transition-wave 50,30"
-
-    # 6️⃣ Centro clásico suave (animación original)
-    "center --transition-fps 30 --transition-step 2"
+    "wave|--transition-angle 45 --transition-fps 60 --transition-step 90 --transition-wave 30,20"
+    "grow|--transition-pos 0.5,0.5 --transition-fps 60 --transition-step 90"
+    "wipe|--transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120"
+    "outer|--transition-pos $(shuf -e "0.0,0.0" "1.0,0.0" "0.0,1.0" "1.0,1.0" -n 1) --transition-fps 60 --transition-step 100"
+    "wave|--transition-angle $(shuf -i 0-360 -n 1) --transition-fps 60 --transition-step 120 --transition-wave 50,30"
+    "center|--transition-fps 30 --transition-step 2"
   )
 
-  # 🎲 Seleccionar animación aleatoria
-  RANDOM_TRANSITION=${transitions[$RANDOM % ${#transitions[@]}]}
+  # 🎲 Seleccionar animación aleatoria y separar type|params
+  RANDOM_ENTRY=${transitions[$RANDOM % ${#transitions[@]}]}
+  TRANS_TYPE="${RANDOM_ENTRY%%|*}"
+  TRANS_PARAMS="${RANDOM_ENTRY#*|}"
 
   # 🔧 Función para detectar el compositor
   detect_compositor() {
     if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
       echo "niri"
-    elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null; then
+    elif command -v hyprctl >/dev/null 2>&1 && pgrep Hyprland >/dev/null; then
       echo "hyprland"
     elif pgrep -x cinnamon >/dev/null; then
       echo "cinnamon"
@@ -54,17 +46,26 @@ if [ -n "$SELECTED_WALL" ]; then
     fi
   }
 
+  # Guardar wallpaper seleccionado para restaurar tras reboot
+  save_wallpaper_state() {
+    mkdir -p "$CACHE_DIR"
+    echo "$WALL_DIR/$SELECTED_WALL" > "$CACHE_DIR/last"
+    echo "$TRANS_TYPE" > "$CACHE_DIR/last_transition_type"
+  }
+
   # 🔧 Función para activar modo noche
   toggle-wallpaper() {
     local compositor=$(detect_compositor)
+    save_wallpaper_state
 
     case "$compositor" in
     "hyprland")
       # 🌊 Cambiar el fondo con swww y animación épica
-      swww img "$WALL_DIR/$SELECTED_WALL" --transition-type $RANDOM_TRANSITION
+      swww img "$WALL_DIR/$SELECTED_WALL" --transition-type "$TRANS_TYPE" $TRANS_PARAMS
       ;;
     "niri")
-      swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill
+      pkill -x swaybg 2>/dev/null
+      swaybg -i "$WALL_DIR/$SELECTED_WALL" -m fill &
       ;;
     "cinnamon")
       gsettings set org.cinnamon.desktop.background picture-uri "file://$WALL_DIR/$SELECTED_WALL"
@@ -81,12 +82,8 @@ if [ -n "$SELECTED_WALL" ]; then
     # Generar paleta de colores con Pywal (silencioso)
     wal -q -i "$WALL_DIR/$SELECTED_WALL"
 
-    # Recargar Waybar de manera eficiente
-    if pgrep -x waybar >/dev/null; then
-      pkill -RTMIN+1 waybar
-    else
-      waybar -c ~/.config/waybar/config &
-    fi
+    # Recargar Waybar
+    pkill -9 waybar 2>/dev/null; waybar -c ~/.config/waybar/config &
 
     # Recargar Eww solo si está corriendo
     if pgrep -x eww >/dev/null; then

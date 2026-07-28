@@ -1,3 +1,4 @@
+#!/bin/bash
 YEAR=$(date +%Y)
 MONTH=$(date +%m)
 TODAY=$(date +%d)

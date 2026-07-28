@@ -2,18 +2,35 @@
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "engram": {
+      "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
+      "enabled": true,
+      "type": "local"
+    },
+    "figma": {
       "command": [
-        "/home/diego/.local/bin/engram",
-        "mcp",
-        "--tools=agent"
+        "npx",
+        "-y",
+        "figma-developer-mcp",
+        "--figma-api-key={env:FIGMA_API_KEY}",
+        "--stdio"
       ],
       "enabled": true,
       "type": "local"
+    },
+    "composio-connect": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "enabled": true,
+      "headers": {
+        "x-api-key": "{env:COMPOSIO_API_KEY}"
+      }
     }
   },
   "plugin": [
-    "opencode-gemini-auth@latest"
+    "opencode-gemini-auth@latest",
+    "/home/diego/workspace/opencode-discord-rpc"
   ],
+  "small_model": "opencode/deepseek-v4-flash-free",
   "provider": {
     "google": {
       "whitelist": [
@@ -21,55 +38,101 @@
         "gemini-2.5-pro",
         "gemini-3-flash-preview",
         "gemini-3-pro-preview"
-      ]
+      ],
+      "options": {
+        "projectId": "cic-ptd-dev"
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      },
+      "models": {
+        "gemini-2.5-flash": {
+          "options": {
+            // "reasoning": {
+            //   "enabled": false
+            // }
+          }
+        },
+        "gemini-2.5-pro": {
+          "options": {
+            // "reasoning": {
+            //   "enabled": false
+            // }
+          }
+        },
+        "gemini-3-flash-preview": {
+          "options": {
+            // "reasoning": {
+            //   "enabled": false
+            // }
+          }
+        },
+        "gemini-3-pro-preview": {
+          "options": {
+            // "reasoning": {
+            //   "enabled": false
+            // }
+          }
+        }
+      }
     },
     "ollama": {
       "models": {
-        "deepseek-v3.1:671b-cloud": {
-          "_launch": true,
-          "name": "deepseek-v3.1:671b-cloud"
-        },
-        "deepseek-v3.2:cloud": {
-          "_launch": true,
-          "limit": {
-            "context": 163840,
-            "output": 65536
-          },
-          "name": "deepseek-v3.2:cloud"
-        },
-        "gemini-3-flash-preview:cloud": {
-          "_launch": true,
-          "name": "gemini-3-flash-preview:cloud"
-        },
-        "gemma3:27b-cloud": {
-          "_launch": true,
-          "name": "gemma3:27b-cloud"
-        },
-        "gpt-oss:120b-cloud": {
-          "_launch": true,
-          "name": "gpt-oss:120b-cloud"
-        },
-        "mistral-large-3:675b-cloud": {
-          "_launch": true,
-          "name": "mistral-large-3:675b-cloud"
-        },
-        "qwen3-coder:480b-cloud": {
-          "_launch": true,
-          "name": "qwen3-coder:480b-cloud"
-        },
-        "qwen3-next:80b-cloud": {
-          "_launch": true,
-          "name": "qwen3-next:80b-cloud"
-        },
-        "qwen3-vl:235b-instruct-cloud": {
-          "_launch": true,
-          "name": "qwen3-vl:235b-instruct-cloud"
+        "nemotron-3-super:cloud": {
+          "name": "nemotron-3-super:cloud",
+          "options": {
+            // "reasoning": {
+            //   "enabled": false
+            // }
+          }
         }
       },
       "name": "Ollama (local)",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
         "baseURL": "http://127.0.0.1:11434/v1"
+      }
+    },
+    "opencode": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      }
+    },
+    "openai": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      }
+    },
+    "anthropic": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      }
+    },
+    "openrouter": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      }
+    },
+    "deepseek": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
+      }
+    },
+    "copilot": {
+      "options": {
+        // "reasoning": {
+        //   "enabled": false
+        // }
       }
     }
   }

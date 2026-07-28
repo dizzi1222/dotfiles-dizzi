@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # ~/.config/eww/scripts/get-gamemode-icon.sh
 
 # Archivo de estado para game mode
