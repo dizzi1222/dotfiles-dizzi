@@ -24,5 +24,7 @@ if [ -n "$NIRI_SOCKET" ] && command -v jq >/dev/null; then
       niri msg action move-window-to-floating --id "$WID" >/dev/null 2>&1
     fi
     niri msg action focus-workspace 1 >/dev/null 2>&1
+    niri msg action toggle-window-floating --id "$WID" >/dev/null 2>&1
+    niri msg action toggle-windowed-fullscreen --id "$WID" >/dev/null 2>&1
   fi
 fi
