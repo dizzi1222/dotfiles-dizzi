@@ -4,7 +4,7 @@
 Type=Application
 Name=Start Nemo Windows Desktop
 Comment=Desktop, Windows 10, XP, 11, Vista, 7, 8, 8.1, 10, 11, Escritorio
-# Exec=sh -c 'killall nemo-desktop 2>/dev/null ; sleep 1 ; nemo-desktop & ; sleep 1 ; hyprctl dispatch togglefloating'
+# Exec=sh -c 'pkill nemo-desktop 2>/dev/null ; sleep 1 ; nemo-desktop & ; sleep 1 ; hyprctl dispatch togglefloating'
 Exec=/home/diego/scripts/nemo-windows.sh
 # Icon=nemo
 Icon=/home/diego/.local/share/icons/Windows-XP.png

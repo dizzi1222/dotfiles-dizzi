@@ -2,6 +2,9 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/platform.sh"
+
 CHOICE=$(printf "\n\n\n\n\n󰒲" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
 
 case "$CHOICE" in
@@ -9,14 +12,14 @@ case "$CHOICE" in
   cd /$HOME
   # shutdown now
   sync                                                                                                   # Fuerza escritura a disco
-  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl poweroff --force --force" # Doble --force = bypass todo
+  wm_spawn "500 200" kitty --title "PowerOff" -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
   # poweroff
   ;;
 "")
   cd /$HOME
   sync # Fuerza escritura a disco
   sleep 1
-  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl reboot --force --force" # Doble --force = bypass todo
+  wm_spawn "500 200" kitty --title "Reboot" -- sudo systemctl reboot --force --force # Doble --force = bypass todo
   # reboot
   ;;
 "")
@@ -26,7 +29,7 @@ case "$CHOICE" in
   cd /$HOME
   sync # Fuerza escritura a disco
   sleep 1
-  hyprctl dispatch exec "[float; size 500 200; center] kitty -- sudo systemctl suspend --force --force" # o usa sleep
+  wm_spawn "500 200" kitty --title "Suspend" -- sudo systemctl suspend --force --force # o usa sleep
   ;;
 "󰒲")
   # hibernar
@@ -43,7 +46,7 @@ case "$CHOICE" in
   if pgrep -x "niri" >/dev/null; then
     niri msg action quit
     # Niri: mata el proceso principal (equivale a "exit")
-    killall niri
+    pkill niri
     pkill -TERM niri
     sleep 2
     pkill -KILL niri # Por si no respondió al TERM

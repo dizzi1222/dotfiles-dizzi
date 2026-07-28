@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CONFIG_FILE="$HOME/.config/scrcpy-connect.conf"
+SCRCPY_BIN="${SCRCPY_BIN:-$(command -v scrcpy || echo "$HOME/.nix-profile/bin/scrcpy")}"
 
 load_last_port() {
   if [ -f "$CONFIG_FILE" ]; then
@@ -14,9 +15,14 @@ save_last_port() {
 }
 
 start_keepalive() {
+  local serial="${1:-}"
   (
     while true; do
-      adb shell echo > /dev/null 2>&1
+      if [ -n "$serial" ]; then
+        adb -s "$serial" shell echo > /dev/null 2>&1
+      else
+        adb shell echo > /dev/null 2>&1
+      fi
       sleep 20
     done
   ) &
@@ -61,7 +67,7 @@ case "$opcion" in
   echo "✅ Dispositivo detectado: $DEVICE"
   echo "▶ Iniciando scrcpy..."
   sleep 1
-  /usr/bin/scrcpy
+  "$SCRCPY_BIN" -s "$DEVICE"
   ;;
 2)
   echo ""
@@ -88,12 +94,12 @@ case "$opcion" in
   echo "▶ Conectando a $IP:5555 ..."
   adb connect "$IP:5555"
   sleep 1
-  if adb devices | grep -q "5555.*device"; then
+  if adb devices | grep -q "$IP:5555.*device"; then
     echo "✅ Conectado. Iniciando scrcpy..."
     echo "   (keepalive activo cada 20s para evitar desconexión)"
     sleep 1
-    start_keepalive
-    /usr/bin/scrcpy
+    start_keepalive "$IP:5555"
+    "$SCRCPY_BIN" -s "$IP:5555"
     stop_keepalive
   else
     echo "❌ Falló. Verifica: misma red, firewall, IP correcta."
@@ -136,12 +142,12 @@ case "$opcion" in
   fi
   sleep 1
   adb devices
-  if adb devices | grep -q "device$"; then
+  if adb devices | grep -q "$IP:$DEBUG_PORT.*device"; then
     echo "✅ Conectado. Iniciando scrcpy..."
     echo "   (keepalive activo cada 20s para evitar desconexión)"
     sleep 1
-    start_keepalive
-    /usr/bin/scrcpy
+    start_keepalive "$IP:$DEBUG_PORT"
+    "$SCRCPY_BIN" -s "$IP:$DEBUG_PORT"
     stop_keepalive
   else
     echo "❌ Falló la conexión."

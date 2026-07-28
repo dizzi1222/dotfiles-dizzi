@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   # ── Stylix ─────────────────────────────────────────────────
@@ -55,17 +55,23 @@
     # Opacity
     opacity = {
       applications = 0.9;
-      terminal = 0.85;
+      terminal = 0.8;
       desktop = 0.95;
       popups = 0.9;
     };
 
-    # Cursor
-    cursor = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-      size = 24;
-    };
+    # La config de terminales se gestiona a mano (symlink a dotfiles-dizzi):
+    # kitty background_opacity 0.8, ghostty background-opacity 0.7.
+    # Evita que stylix la regenere/pise en cada switch.
+    targets.kitty.enable = false;
+    targets.ghostty.enable = false;
+
+    # Cursor (desactivado: requiere package+name+size, conflict with system fonts.packages)
+    # cursor = {
+    #   name = "Bibata-Modern-Ice";
+    #   package = pkgs.bibata-cursors;
+    #   size = 24;
+    # };
 
     targets.zen-browser.profileNames = [ "default" ];
   };
@@ -73,30 +79,48 @@
   # ── GTK Theme ──────────────────────────────────────────────
   gtk = {
     enable = true;
+    # Tema oscuro explícito (en ~/.themes vía desktop.nix); Stylix por defecto
+    # dejaba adw-gtk3 (claro) → apps GTK blancas.
+    theme.name = lib.mkForce "Colloid-Pink-Dark";
     font = {
       name = "Noto Sans";
       size = 11;
     };
     cursorTheme = {
-      name = "Bibata-Modern-Ice";
+      name = "Kafka";
       size = 24;
     };
     iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.papirus-icon-theme;
+      name = "Gruvbox-Plus-Dark";
+      package = pkgs.gruvbox-plus-icons;
     };
   };
 
+  # ── Transparencia total del fondo de nemo-desktop ──────────────
+  # El fondo GTK del widget se vuelve transparente (pixels con alpha=0),
+  # de modo que niri descubre el shape y deja ver el wallpaper a través.
+  # Se combina con la window-rule `opacity` de niri (windows.kdl).
+  stylix.targets.gtk.extraCss = ''
+    .nemo-desktop {
+      background-color: transparent;
+    }
+  '';
+
   # ── Qt Theme ───────────────────────────────────────────────
+  # Qt sigue al GTK (oscuro). Se quitó el estilo kvantum huérfano (no había
+  # tema en ~/.config/Kvantum) y el platformTheme qtct que se pisaban con Stylix.
   qt = {
     enable = true;
     platformTheme = {
-      name = "qtct";
-    };
-    style = {
-      name = "kvantum";
+      name = "gtk3";
     };
   };
+
+  # ── Preferencia oscura global ──────────────────────────────
+  # color-scheme=prefer-dark es lo que oscurece apps nativas/Chromium que
+  # ignoran GTK/Qt (Zed, Figma, Electron). Stylix lo dejaba en 'default' (claro).
+  dconf.enable = true;
+  dconf.settings."org/gnome/desktop/interface".color-scheme = lib.mkForce "prefer-dark";
 
   # ── Fonts ──────────────────────────────────────────────────
   home.packages = with pkgs; [
