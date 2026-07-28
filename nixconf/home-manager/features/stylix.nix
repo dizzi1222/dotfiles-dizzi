@@ -107,11 +107,13 @@
   # La solución: pintar al enfocar el tono dominante del wallpaper, que ya
   # coincide con lo que se ve cuando la ventana no tiene foco (#1a1b26
   # Tokyo Night, medido con grim+PIL). Resultado: indistinguible.
-  stylix.targets.gtk.extraCss = ''
-    .nemo-desktop-window {
-      background-color: #1a1b26;
-    }
-  '';
+  # stylix.targets.gtk.extraCss = ''
+  #   .nemo-desktop-window {
+  #     background-color: #1a1b26;
+  #   }
+  # '';
+  # LO DESACTIVE PORQUE NO FUNCIONA. Me jode la transparencia de hyprland..
+  # En niri por default usa: #7FC8FF y no se puede cambiar. mejor dejarlo asi.
 
   # ── Qt Theme ───────────────────────────────────────────────
   # Qt sigue al GTK (oscuro). Se quitó el estilo kvantum huérfano (no había
