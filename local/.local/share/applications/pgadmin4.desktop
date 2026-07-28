@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=pgAdmin 4 (PostgreSQL)
+Comment=PostgreSQL administration and development platform
+Exec=pgadmin4-launcher
+Icon=/home/diego/.local/share/icons/pgadmin.png
+Terminal=false
+Type=Application
+Categories=Database;Development;
+StartupNotify=true

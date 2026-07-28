@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Wix [Constructor]
+Comment=Open Wix [Constructor]
+Exec=zen-browser --new-window --kiosk https://es.wix.com/
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Wix_[Constructor].png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Wix_[Constructor]

@@ -32,4 +32,4 @@ configuration {
 
 //@theme "/usr/share/rofi/themes/fullscreen-preview.rasi"
 
-@theme "/usr/share/rofi/themes/fullscreen-preview.rasi"
+//@theme "/usr/share/rofi/themes/fullscreen-preview.rasi"

@@ -72,10 +72,11 @@ socat -u UNIX-CONNECT:"$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socke
     if [ "$moved" = false ]; then
       # Caso especial: kew corre en kitty
       # El título en el evento llega como "kitty" aún — hay que re-leerlo con hyprctl
+      # kew pone "kew - <canción>" como título (trackTitleAsWindowTitle=1) o "kew" con logo
       if [ "$window_class" = "kitty" ]; then
         sleep 0.5
         actual_title=$(hyprctl clients -j | jq -r ".[] | select(.address == \"0x$window_addr\") | .title" 2>/dev/null)
-        if echo "$actual_title" | grep -qiE "^kew$"; then
+        if echo "$actual_title" | grep -qiE "^kew(\s|-|$)"; then
           addr="0x$window_addr"
           hyprctl dispatch movetoworkspacesilent special:music,address:"$addr"
           sleep 0.1

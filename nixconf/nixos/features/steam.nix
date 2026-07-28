@@ -46,10 +46,11 @@
     xemu
     mgba
     dosbox
-    melonDS
+    melonds
 
     # Minecraft
     prismlauncher
+    modrinth-app-unwrapped
 
     # Misc gaming
     protontricks

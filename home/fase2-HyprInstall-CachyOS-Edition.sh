@@ -2048,9 +2048,31 @@ echo
 read -p "¿Configurar Wine prefix ahora? [S/n]: " setup_wine
 
 if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
-  print_installing "Inicializando Wine prefix"
   export WINEPREFIX=~/.wine
   export WINEARCH=win64
+
+  # ── Pre-config: detectar prefix existente con arch distinta a win64 ──
+  # Si ~/.wine ya existe como win32 (o sin #arch) pero queremos win64,
+  # winetricks/wine fallan ("WINEARCH set to win64 but ... is a 32-bit
+  # installation"). Se respalda el prefix y se recrea limpio como win64.
+  if [ -f ~/.wine/system.reg ] || [ -d ~/.wine/drive_c ]; then
+    current_arch=$(rg -m1 -i '^#arch=' ~/.wine/system.reg 2>/dev/null | sed 's/#arch=//i' || true)
+    echo
+    echo -e "${YELLOW}⚠  Detectado prefix existente en ~/.wine (arch: ${current_arch:-desconocida}).${NC}"
+    if [[ "$current_arch" != "win64" ]]; then
+      read -p "  No es win64. ¿Respaldo y recreo como win64 (se borra el actual)? [S/n]: " recreate_wine
+      if [[ ! "$recreate_wine" =~ ^[Nn]$ ]]; then
+        backup_wine=~/.wine.bak.$(date +%Y%m%d-%H%M%S)
+        print_installing "Respaldando ~/.wine -> $backup_wine"
+        mv ~/.wine "$backup_wine" 2>/dev/null || true
+        print_warning "Prefix anterior respaldado en $backup_wine"
+      else
+        print_warning "Omitiendo recreación: winetricks puede fallar por arch distinta."
+      fi
+    fi
+  fi
+
+  print_installing "Inicializando Wine prefix"
   wineboot -u 2>/dev/null &
   sleep 5
 
@@ -3292,6 +3314,15 @@ rclone mount gd-musica:/ ~/mi_gdmusica --vfs-cache-mode full &
 EOL
   chmod +x ~/montar_gdmusica.sh
 
+  # Script para gdrive libros
+  cat >~/montar_gd-libros.sh <<'EOL'
+#!/bin/bash
+fusermount -u ~/mi_gdlibros 2>/dev/null
+mkdir -p ~/mi_gdlibros
+rclone mount gd-libros:/ ~/mi_gdlibros --vfs-cache-mode full &
+EOL
+  chmod +x ~/montar_gd-libros.sh
+
   # Crear servicios systemd
   mkdir -p ~/.config/systemd/user
 
@@ -3319,10 +3350,23 @@ Type=oneshot
 WantedBy=default.target
 EOL
 
+  cat >~/.config/systemd/user/montar_gd-libros.service <<'EOL'
+[Unit]
+Description=Montar Google Drive Libros al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gd-libros.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
+EOL
+
   # Habilitar servicios
   systemctl --user daemon-reload
   systemctl --user enable montar_gdrive.service
   systemctl --user enable montar_gdmusica.service
+  systemctl --user enable montar_gd-libros.service
 
   print_success "Rclone configurado"
   print_status "Monta manualmente con: ~/montar_gdrive.sh"

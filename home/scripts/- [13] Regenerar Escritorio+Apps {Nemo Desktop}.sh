@@ -59,7 +59,7 @@ declare -a ROOT_FILES=(
   # "Legcord-wine.desktop"
   "CustomRP-wine.desktop"
   "Discord.desktop"
-  "net.lutris.discord-130.desktop"
+  # "net.lutris.discord-130.desktop"
   # "uTorrent µ-wine.desktop"
   # "bottles-dbz--Geometry Dash--1761703337.881545.desktop"
   # "Wine11 Manager [Uninstaller-Installer].desktop"

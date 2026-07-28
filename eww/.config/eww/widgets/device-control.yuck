@@ -224,7 +224,7 @@
           :class "trigger-area"
   (label :class "device-title"
         ;; :text "DEVICES"
-        :text "dizzi ii"
+        :text "dizzi"
          :halign "center"))    
 
     ;; Panel que se revela
