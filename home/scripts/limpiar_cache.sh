@@ -1,5 +1,20 @@
 #
-# Script interactivo para limpiar caché y dependencias en Arch Linux + yay
+# Script interactivo para limpiar caché y dependencias
+# Soporta: NixOS (nix-collect-garbage / nix store) y Arch/CachyOS (pacman/yay)
+
+# ── Detección de distribución ────────────────────────────────
+IS_NIXOS=false
+IS_ARCH=false
+if [ -e /etc/nixos ] || command -v nixos-rebuild &>/dev/null || command -v nix-collect-garbage &>/dev/null; then
+  IS_NIXOS=true
+fi
+if command -v pacman &>/dev/null || command -v yay &>/dev/null; then
+  IS_ARCH=true
+fi
+if [[ "$IS_NIXOS" == false && "$IS_ARCH" == false ]]; then
+  echo -e "${RED}❌ No se detectó NixOS ni Arch/CachyOS.${RESET}"
+  exit 1
+fi
 
 # Colores y formato
 RESET='\033[0m'
@@ -12,6 +27,25 @@ RED='\033[91m'
 BLUE='\033[94m'
 MAGENTA='\033[95m'
 
+# ── Funciones NixOS ──────────────────────────────────────────
+nixos_gc() {
+  echo -e "\n${YELLOW}⚡ Recopilando basura del store de Nix (nix-collect-garbage)...${RESET}"
+  sudo nix-collect-garbage -d
+  echo -e "${GREEN}✔ GC completado.${RESET}"
+}
+
+nixos_optimise() {
+  echo -e "\n${YELLOW}⚡ Optimizando el store (deduplicación de hardlinks)...${RESET}"
+  sudo nix store optimise
+  echo -e "${GREEN}✔ Optimización completada.${RESET}"
+}
+
+nixos_dryrun() {
+  echo -e "\n${YELLOW}⚡ ¿Cuánto liberaría el GC? (dry-run, no borra nada)...${RESET}"
+  dead=$(sudo nix-store --gc --print-dead 2>/dev/null | wc -l)
+  echo -e "${CYAN}ℹ  ${dead} derivaciones muertas en el store.${RESET}"
+}
+
 while true; do
   clear
   echo -e "${CYAN}${BOLD}"
@@ -19,9 +53,18 @@ while true; do
   echo "║        ⚙️  Limpiar caché y dependencias - MENÚ             ║"
   echo "╚════════════════════════════════════════════════════════════╝"
   echo -e "${RESET}"
-  echo -e "${BLUE}  1)${RESET} Limpiar caché de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
-  echo -e "${BLUE}  2)${RESET} Eliminar dependencias huérfanas de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
-  echo -e "${BLUE}  3)${RESET} Limpiar caché y dependencias huérfanas de yay ${BOLD}${RESET}"
+  echo -e "${DIM}Distro: ${GREEN}${IS_NIXOS:+NixOS}${IS_ARCH:+Arch/CachyOS}${RESET}"
+  echo ""
+  if [[ "$IS_NIXOS" == true ]]; then
+    echo -e "${BLUE}  0)${RESET} [NixOS] ${BOLD}nix-collect-garbage -d${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  9)${RESET} [NixOS] ${BOLD}nix store optimise${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  a)${RESET} [NixOS] ${DIM}dry-run: derivaciones muertas${RESET}"
+  fi
+  if [[ "$IS_ARCH" == true ]]; then
+    echo -e "${BLUE}  1)${RESET} Limpiar caché de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  2)${RESET} Eliminar dependencias huérfanas de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  3)${RESET} Limpiar caché y dependencias huérfanas de yay ${BOLD}${RESET}"
+  fi
   echo -e "${BLUE}  4)${RESET} Limpiar caches de npm/yarn/pnpm ${BOLD}󰎙${RESET}"
   echo -e "${BLUE}  5)${RESET} Limpiar ~/.cache completo ${BOLD}󰃨${RESET}"
   echo -e "${BLUE}  6)${RESET} Limpiar caché de neovim ${BOLD}${RESET}"
@@ -32,6 +75,17 @@ while true; do
   read -rp "$(echo -e ${GREEN}${BOLD}➜${RESET}) Selecciona una opción: " opcion
 
   case $opcion in
+  0)
+    nixos_gc
+    notify-send "🗑️ NIX GC" 'nix-collect-garbage -d completado  🎨'
+    ;;
+  9)
+    nixos_optimise
+    notify-send "🗑️ NIX Optimise" 'nix store optimise completado  🎨'
+    ;;
+  a)
+    nixos_dryrun
+    ;;
   1)
     echo -e "\n${YELLOW}⚡ Limpiando caché de pacman...${RESET}"
     sudo rm -rf /var/cache/pacman/pkg/download-* 2>/dev/null || true

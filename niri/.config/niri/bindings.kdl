@@ -48,7 +48,7 @@ binds {
     // ═══════════════════════════════════════════════════════════════════════
     
     Mod+N hotkey-overlay-title="notifications" { spawn-sh "swaync-client -t -sw"; }
-    Mod+Ctrl+N hotkey-overlay-title="reload swaync" { spawn-sh "killall swaync && swaync &"; }
+    Mod+Ctrl+N hotkey-overlay-title="reload swaync" { spawn-sh "pkill swaync && swaync &"; }
     Mod+Shift+N hotkey-overlay-title="reload styles" { spawn-sh "swaync-client -rs"; }
     Super+Delete allow-when-locked=true hotkey-overlay-title="clear notifs" { spawn-sh "swaync-client -d -sw"; }
     
@@ -56,7 +56,7 @@ binds {
     // APPS
     // ═══════════════════════════════════════════════════════════════════════
     
-    F1 hotkey-overlay-title="firefox" { spawn "zen-browser"; } 
+    F1 hotkey-overlay-title="firefox" { spawn-sh "zen-beta 2>/dev/null || zen-browser"; } // fallback Arch→NixOS
     // F10 hotkey-overlay-title="brave" { spawn "brave"; }
     Mod+E hotkey-overlay-title="Nautilus" { spawn "Nautilus"; } // Nemo , thunar, dolphin
     Super+Alt+M hotkey-overlay-title="yazi" { spawn-sh "kitty --class YaziTerminal -- yazi"; }
@@ -307,8 +307,8 @@ Mod+T {
     // BAR (NOTA: Mod+K se usa para focus up, no para kill eww)
     // ═══════════════════════════════════════════════════════════════════════
     
-    Mod+K { spawn-sh "killall eww"; }
-    Shift+Alt+W { spawn-sh "killall waybar"; }
+    Mod+K { spawn-sh "pkill eww"; }
+    Shift+Alt+W { spawn-sh "pkill waybar"; }
     Ctrl+Shift+W { spawn-sh "/usr/bin/waybar &"; }
 
     

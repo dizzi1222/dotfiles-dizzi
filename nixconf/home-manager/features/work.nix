@@ -4,7 +4,7 @@
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
     # Editors
-    vscodium
+    code-cursor
 
     # Languages
     python3
@@ -25,8 +25,9 @@
     # Dev tools
     git
     lazygit
-    docker
+    docker-client
     docker-compose
+    # docker-desktop — no disponible en nixpkgs actual; instalar via flatpak si se necesita
     kubectl
     helm
     terragrunt
@@ -39,6 +40,10 @@
     ollama
     opencommit
     aichat
+    gemini-cli
+
+    # DB tools
+    pgadmin4
 
     # Nix
     nil
@@ -83,17 +88,20 @@
     unzip
     p7zip
 
-    # Wine
-    wine
+    # Wine (64-bit WoW64 — el `wine` default de nixpkgs es solo 32-bit
+    # y tira "Bad EXE format" con instaladores PE32+ x86-64)
+    wineWow64Packages.stable
     winetricks
 
     # Cloud
     google-cloud-sdk
+    google-cloud-sql-proxy
     rclone
 
     # Misc
     nh
-    n8n
+    # n8n comment: hash mismatch, rebuild later
+    # n8n
   ];
 
   # ── Terminal Configs ───────────────────────────────────────

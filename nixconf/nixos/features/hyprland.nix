@@ -1,16 +1,19 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   # ── Hyprland (System Level) ────────────────────────────────
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+    package = pkgs.hyprland.override { wrapRuntimeDeps = false; };
   };
 
   # ── XDG Portal ─────────────────────────────────────────────
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
+    # extraPortals y configPackages desactivados porque causan duplicación
+    # de xdg-desktop-portal-hyprland.service en systemd.packages.
+    # Los portales se instalan via environment.systemPackages en base-configuration.nix.
   };
 
   # ── Hyprland ecosystem packages ────────────────────────────
@@ -30,12 +33,15 @@
     # Waybar + widgets
     waybar
     eww
+    inputs.quickshell.packages.${pkgs.system}.default
 
     # Launchers
     wofi
     fuzzel
     rofi
     wlogout
+    vicinae
+
 
     # Notifications
     dunst
@@ -94,6 +100,11 @@
     # Bluetooth TUI
     bluetui
 
+    # Input devices / controllers
+    antimicrox
+    evtest
+    sc-controller
+
     # File bind mount (waydroid sync)
     bindfs
 
@@ -110,6 +121,10 @@
     libnotify
     networkmanagerapplet
     udiskie
+
+    # Dev tools
+    opencode
+    opencode-desktop
 
     # Qt/GTK Wayland
     qt5.qtwayland

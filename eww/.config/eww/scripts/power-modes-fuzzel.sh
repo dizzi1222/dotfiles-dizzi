@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # ~/.config/eww/scripts/power-modes-fuzzel.sh
 
 # Estados
@@ -33,7 +33,6 @@ $BLUR_OPTION
 case "$CHOICE" in
     *"Modo Ahorro"*)
         game_off
-        powerprofilesctl set power-saver
         eww update power-mode-icon="󰂄"
         cpupower frequency-set -g powersave
         notify-send "󰂄 Modo Ahorro Activo" "Energía optimizada"
@@ -41,8 +40,8 @@ case "$CHOICE" in
 
     *"Modo Equilibrado"*)
         game_off
-        powerprofilesctl set balanced
         eww update power-mode-icon=""
+        cpupower frequency-set -g powersave
         notify-send " Modo Equilibrado" "Configuración normal"
         ;;
 
@@ -50,11 +49,10 @@ case "$CHOICE" in
         bash "$GAME_SCRIPT"
 
         if [[ -f "$GAME_STATE" ]]; then
-            powerprofilesctl set performance
             cpupower frequency-set -g performance
             eww update power-mode-icon=""
         else
-            powerprofilesctl set balanced
+            cpupower frequency-set -g powersave
             eww update power-mode-icon=""
         fi
         ;;
@@ -74,7 +72,7 @@ case "$CHOICE" in
     *"RESET"*)
         game_off
         [[ -f "$BLUR_STATE" ]] && hyprctl keyword decoration:blur:enabled false && rm "$BLUR_STATE"
-        powerprofilesctl set balanced
+        cpupower frequency-set -g powersave
         hyprctl reload
         eww update power-mode-icon=""
         notify-send "🔄 Sistema Reseteado" "Configuración por defecto"

@@ -3292,6 +3292,15 @@ rclone mount gd-musica:/ ~/mi_gdmusica --vfs-cache-mode full &
 EOL
   chmod +x ~/montar_gdmusica.sh
 
+  # Script para gdrive libros
+  cat >~/montar_gd-libros.sh <<'EOL'
+#!/bin/bash
+fusermount -u ~/mi_gdlibros 2>/dev/null
+mkdir -p ~/mi_gdlibros
+rclone mount gd-libros:/ ~/mi_gdlibros --vfs-cache-mode full &
+EOL
+  chmod +x ~/montar_gd-libros.sh
+
   # Crear servicios systemd
   mkdir -p ~/.config/systemd/user
 
@@ -3319,10 +3328,23 @@ Type=oneshot
 WantedBy=default.target
 EOL
 
+  cat >~/.config/systemd/user/montar_gd-libros.service <<'EOL'
+[Unit]
+Description=Montar Google Drive Libros al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gd-libros.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
+EOL
+
   # Habilitar servicios
   systemctl --user daemon-reload
   systemctl --user enable montar_gdrive.service
   systemctl --user enable montar_gdmusica.service
+  systemctl --user enable montar_gd-libros.service
 
   print_success "Rclone configurado"
   print_status "Monta manualmente con: ~/montar_gdrive.sh"

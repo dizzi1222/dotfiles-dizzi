@@ -43,7 +43,7 @@ case "$CHOICE" in
   if pgrep -x "niri" >/dev/null; then
     niri msg action quit
     # Niri: mata el proceso principal (equivale a "exit")
-    killall niri
+    pkill niri
     pkill -TERM niri
     sleep 2
     pkill -KILL niri # Por si no respondió al TERM
