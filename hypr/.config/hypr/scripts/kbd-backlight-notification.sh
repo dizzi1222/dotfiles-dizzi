@@ -1,6 +1,6 @@
 #!/bin/bash
 TIMEOUT=2000
-DEVICE="dell::kbd_backlight"
+DEVICE="tpacpi::kbd_backlight"
 KBD_PATH="/sys/class/leds/$DEVICE/brightness"
 MAX=$(cat /sys/class/leds/$DEVICE/max_brightness)
 

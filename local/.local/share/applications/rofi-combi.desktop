@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Application
+Icon=system-search
 Name=Rofi Combi
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/rofi-combi.sh
 NoDisplay=true

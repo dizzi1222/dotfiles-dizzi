@@ -2,60 +2,43 @@
 
 # Variables
 SELECTED_WALLPAPER=$1
-WALLPAPER_DIR="$HOME/wallpapers"
+WALLPAPER_DIR="$HOME/wallpapers/wallpapers"
 
 # Ensure the wallpaper exists
 if [ ! -f "$WALLPAPER_DIR/$SELECTED_WALLPAPER.jpg" ]; then
-  r echo "Error: Wallpaper not found: $SELECTED_WALLPAPER"
+  echo "Error: Wallpaper not found: $WALLPAPER_DIR/$SELECTED_WALLPAPER.jpg"
   exit 1
 fi
 
-# Apply pywal colors
-wal -i "$WALLPAPER_DIR/$SELECTED_WALLPAPER.jpg" || {
+WALL_FILE="$WALLPAPER_DIR/$SELECTED_WALLPAPER.jpg"
+
+# Aplicar pywal
+wal -i "$WALL_FILE" || {
   echo "Error: pywal failed"
   exit 1
 }
 
-# Reload eww
-killall eww || echo "Warning: No eww process found"
-eww open-many side-bar notifications
+# Cambiar wallpaper con swww (compatible con walset-menu / GIFs).
+# swww y hyprpaper NO pueden correr a la vez; aquí usamos swww.
+if pgrep -x swww-daemon >/dev/null; then
+  swww img "$WALL_FILE" --transition-type=center --transition-fps=30 --transition-step=2
+else
+  swww-daemon &
+  sleep 1
+  swww img "$WALL_FILE" --transition-type=center --transition-fps=30 --transition-step=2
+fi
 
-# Restart hyprpaper
-killall hyprpaper || echo "Warning: No hyprpaper process found"
-hyprpaper &
-#
-# 📌SI PREFIERES hyprpaper USA LO DE ARRIBA. Abajo lo mismo pero con sww.. 🚨
-#!/bin/bash
-#
-# SELECTED_WALLPAPER=$1
-# WALL_DIR="$HOME/wallpapers"
-# WALL_FILE="$WALL_DIR/$SELECTED_WALLPAPER.jpg"
-#
-# if [ ! -f "$WALL_FILE" ]; then
-#   echo "Error: Wallpaper not found: $SELECTED_WALLPAPER"
-#   exit 1
-# fi
-#
-# # Cambiar wallpaper con swww
-# swww img "$WALL_FILE" --transition-type=center --transition-fps=30 --transition-step=2
-#
-# # Aplicar pywal
-# wal -i "$WALL_FILE"
-#
-# # #1- Recargar Eww si está corriendo
-# # if pgrep -x eww >/dev/null; then
-# #   eww reload
-# # fi
-#
-# # 📌 AMBAS FORMAS VALIDAS DE RECARGAR EWW. 🚨
-#
-# # #2- Recargar Eww matando el proceso primero
-# killall eww 2>/dev/null || echo "Warning: No eww process found"
-# eww open-many side-bar notifications
-#
-# # Recargar Waybar de manera eficiente
-# if pgrep -x waybar >/dev/null; then
-#   pkill -RTMIN+1 waybar
-# else
-#   waybar -c ~/.config/waybar/config &
-# fi
+# Recargar Eww (matando y reabriendo para aplicar colores)
+pkill eww 2>/dev/null || echo "Warning: No eww process found"
+eww reload 2>/dev/null || true
+
+# Actualizar hyprlock con la misma imagen
+if [ -f "$HOME/.config/hypr/hyprlock.conf" ]; then
+  sed -i -e "s|path = .*|path = \$HOME/wallpapers/wallpapers/$SELECTED_WALLPAPER.jpg|" \
+    "$HOME/.config/hypr/hyprlock.conf" 2>/dev/null || true
+fi
+
+# Quickshell/quickshell: recargar si está activo
+if pgrep -x quickshell >/dev/null; then
+  quickshell --reload 2>/dev/null || true
+fi

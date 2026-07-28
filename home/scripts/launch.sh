@@ -7,7 +7,7 @@
 # by Abuku (2024)
 
 # Quit running eww bar instances
-killall eww
+pkill eww
 
 # Start eww bar
 eww open side-bar

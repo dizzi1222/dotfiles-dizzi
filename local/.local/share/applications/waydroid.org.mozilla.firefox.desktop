@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Firefox
+Exec=waydroid app launch org.mozilla.firefox
+Icon=/home/diego/.local/share/waydroid/data/icons/org.mozilla.firefox.png
+Categories=X-WayDroid-App;
+X-Purism-FormFactor=Workstation;Mobile;
+Actions=app-settings;
+
+[Desktop Action app-settings]
+Name=App Settings
+Exec=waydroid app intent android.settings.APPLICATION_DETAILS_SETTINGS package:org.mozilla.firefox
+Icon=/home/diego/.local/share/waydroid/data/icons/com.android.settings.png

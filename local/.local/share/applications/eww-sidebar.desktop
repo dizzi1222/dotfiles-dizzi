@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Application
+Icon=view-list-tree
 Name=EWW Sidebar
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/eww-sidebar.sh
 NoDisplay=true

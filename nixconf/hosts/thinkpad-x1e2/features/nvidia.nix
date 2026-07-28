@@ -22,8 +22,10 @@
   };
 
   # ── NVIDIA environment ─────────────────────────────────────
+  # GDK_BACKEND global NO se setea: rompe el screencast portal en niri
+  # (https://github.com/niri-wm/niri/wiki/Important-Software#portals).
+  # Si alguna app X11 lo necesita, setear solo para esa app.
   environment.sessionVariables = {
-    GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
   };

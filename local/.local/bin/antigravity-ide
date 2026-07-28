@@ -1,0 +1,6 @@
+#!/bin/bash
+# ~/.local/bin/antigravity-ide (local/.local/bin/antigravity-ide)
+# Alias del wrapper self-healing: lo usan los .desktop del store
+# (Exec=antigravity-ide) y el URL handler. Como ~/.local/bin va primero en
+# el PATH, el menú y xdg-open caen aquí → runtime writable, sin EROFS.
+exec "$HOME/.local/bin/antigravity" "$@"
