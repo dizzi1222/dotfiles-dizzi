@@ -10,7 +10,7 @@ binds {
    
     Mod+S repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
     Mod+O repeat=false hotkey-overlay-title="Toggle overview" { toggle-overview; }
-    Mod+Shift+Slash hotkey-overlay-title="Important hotkeys" { show-hotkey-overlay; }
+    Mod+Ctrl+Slash hotkey-overlay-title="Important hotkeys" { show-hotkey-overlay; }
     Mod+Escape allow-inhibiting=false hotkey-overlay-title="Toggle shortcuts inhibit" { toggle-keyboard-shortcuts-inhibit; }
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -48,7 +48,7 @@ binds {
     // ═══════════════════════════════════════════════════════════════════════
     
     Mod+N hotkey-overlay-title="notifications" { spawn-sh "swaync-client -t -sw"; }
-    Mod+Ctrl+N hotkey-overlay-title="reload swaync" { spawn-sh "killall swaync && swaync &"; }
+    Mod+Ctrl+N hotkey-overlay-title="reload swaync" { spawn-sh "pkill swaync && swaync &"; }
     Mod+Shift+N hotkey-overlay-title="reload styles" { spawn-sh "swaync-client -rs"; }
     Super+Delete allow-when-locked=true hotkey-overlay-title="clear notifs" { spawn-sh "swaync-client -d -sw"; }
     
@@ -56,7 +56,7 @@ binds {
     // APPS
     // ═══════════════════════════════════════════════════════════════════════
     
-    F1 hotkey-overlay-title="firefox" { spawn "zen-browser"; } 
+    F1 hotkey-overlay-title="firefox" { spawn-sh "zen-beta 2>/dev/null || zen-browser"; } // fallback Arch→NixOS
     // F10 hotkey-overlay-title="brave" { spawn "brave"; }
     Mod+E hotkey-overlay-title="Nautilus" { spawn "Nautilus"; } // Nemo , thunar, dolphin
     Super+Alt+M hotkey-overlay-title="yazi" { spawn-sh "kitty --class YaziTerminal -- yazi"; }
@@ -251,12 +251,12 @@ Mod+T {
 
     // Super+Print hotkey-overlay-title="display" { spawn-sh "screenshot-screen"; }
     // # 4. Captura de Pantalla Completa
-    Super+Print { spawn "sh" "-c" "/home/diego/.config/niri/scripts/niri-satty-fullscreen.sh"; }
+    Shift+Print { spawn "sh" "-c" "/home/diego/.config/niri/scripts/niri-satty-fullscreen.sh"; }
     // en vez de Escritorio , puedes usar Desktop, depende del locale de tu sistema. (eso lo modificas en el script)
 
     // # 5. Captura de Caelestia:screenshot
     // Ctrl+Shift+Print hotkey-overlay-title="caelestia fullscreen" { spawn-sh "pkill satty ||, caelestia screenshot"; }
-    Shift+Print hotkey-overlay-title="display caelestia Freeze" { spawn-sh "pkill satty || caelestia screenshotFreeze"; }
+    Super+Print hotkey-overlay-title="display caelestia Freeze" { spawn-sh "pkill satty || caelestia screenshotFreeze"; }
 
     
     // ═══════════════════════════════════════════════════════════════════════
@@ -307,8 +307,8 @@ Mod+T {
     // BAR (NOTA: Mod+K se usa para focus up, no para kill eww)
     // ═══════════════════════════════════════════════════════════════════════
     
-    Mod+K { spawn-sh "killall eww"; }
-    Shift+Alt+W { spawn-sh "killall waybar"; }
+    Mod+K { spawn-sh "pkill eww"; }
+    Shift+Alt+W { spawn-sh "pkill waybar"; }
     Ctrl+Shift+W { spawn-sh "/usr/bin/waybar &"; }
 
     

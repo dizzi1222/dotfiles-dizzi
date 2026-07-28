@@ -1,2 +1,1 @@
-0=${(%):-%N}
-source ${0:A:h}/zsh-history-substring-search.zsh
+/nix/store/s9mx341494s2jci1v4gb35jn7rcpncc5-zsh-history-substring-search-1.1.0/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh

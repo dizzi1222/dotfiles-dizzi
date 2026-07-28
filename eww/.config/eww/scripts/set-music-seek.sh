@@ -1,10 +1,7 @@
-
+#!/bin/bash
 # Forzar salida consistente en inglés
 export LC_ALL=C
 export LANG=C
-
-#!/bin/zsh
-
 
 LENGTH_MICROSECONDS=$(playerctl metadata --format "{{mpris:length}}")
 

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Lanza Hyprland anidado: backend wayland si ya hay sesion wayland, x11 si no.
+if [ -n "$WAYLAND_DISPLAY" ]; then
+  export WLR_BACKENDS=wayland
+else
+  export WLR_BACKENDS=x11
+fi
+export WLR_NO_HARDWARE_CURSORS=1
+Hyprland 2>&1 | tee /tmp/hyprland-nested.log

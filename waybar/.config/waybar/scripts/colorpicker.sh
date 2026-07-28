@@ -53,7 +53,7 @@ check hyprpicker || {
   exit
 }
 
-killall -q hyprpicker
+pkill hyprpicker
 color=$(hyprpicker)
 
 # 🔧 FIX: Validar que el color sea válido antes de guardarlo

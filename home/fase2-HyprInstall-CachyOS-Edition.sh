@@ -254,7 +254,23 @@ if [[ "$SWWW_PKG" == "awww" ]]; then
   print_success "Symlinks creados: swww → awww"
 fi
 
-yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
+yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset xdg-desktop-portal-wlr
+print_installing "Fix ScreenCapture niri (wlr portal UseIn=niri)"
+mkdir -p ~/.local/share/xdg-desktop-portal/portals ~/.config/xdg-desktop-portal
+cat > ~/.local/share/xdg-desktop-portal/portals/wlr-niri.portal <<'EOF'
+[portal]
+DBusName=org.freedesktop.impl.portal.desktop.wlr
+Interfaces=org.freedesktop.impl.portal.Screenshot;org.freedesktop.impl.portal.ScreenCast;
+UseIn=niri
+EOF
+cat > ~/.config/xdg-desktop-portal/niri-portals.conf <<'EOF'
+[preferred]
+ScreenCast=wlr
+Screenshot=wlr
+Settings=gtk;gnome
+default=gtk
+EOF
+print_success "OBS ScreenCapture en niri: wlr portal declarado (UseIn=niri) + niri-portals.conf"
 echo
 echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
 print_success "Hyprland instalado"
@@ -290,7 +306,7 @@ print_step "10/35: Utilidades del Sistema"
 print_installing "Neovim + Zsh + Tmux + Yazi + Btop + Fastfetch"
 sudo pacman -S --needed --noconfirm \
   neovim zsh zsh-autosuggestions zsh-syntax-highlighting \
-  zsh-history-substring-search zsh-completions starship tmux zellij bat eza dust fd ripgrep fzf \
+  zsh-history-substring-search zsh-completions starship tmux zellij bat eza dust fd ripgrep fzf television \
   htop btop bottom ncdu tree jq socat \
   yazi stow ranger imagemagick \
   inotify-tools acpi power-profiles-daemon cpupower \
@@ -358,7 +374,7 @@ echo -e "${BOLD}${YELLOW}╔═════════════════�
 echo -e "${BOLD}${YELLOW}║          🎮 CONFIGURACIÓN DE GAMING 🎮                    ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
-echo -e "${CYAN}Se instalará en 3 categorías (SOLO BINARIOS):${NC}"
+echo -e "${CYAN}Se instalará en 4 categorías (SOLO BINARIOS):${NC}"
 echo
 echo -e "${BOLD}${GREEN}Categoría 1: Plataformas Base${NC} (~2GB)"
 echo -e "  ${MAGENTA}•${NC} Steam"
@@ -380,9 +396,14 @@ echo -e "  ${MAGENTA}•${NC} Ryujinx-bin (precompilado)"
 echo -e "  ${MAGENTA}•${NC} Dolphin (GameCube/Wii)"
 echo -e "  ${MAGENTA}•${NC} SNES9x (Super Nintendo)"
 echo
+echo -e "${BOLD}${GREEN}Categoría 4: Rich Presence${NC} (opcional, AUR)"
+echo -e "  ${MAGENTA}•${NC} SGDBoop (assets SteamGridDB: botón Boop en steamgriddb.com)"
+echo -e "  ${MAGENTA}•${NC} wine-discord-ipc-bridge (presence de juegos Proton/Wine en Discord)"
+echo
 read -p "¿Instalar Plataformas Base (Steam, Lutris, Wine) y Geforce Experience? [S/n]: " install_base
 read -p "¿Instalar Compatibilidad Windows (Proton-GE, VKD3D, DXVK)? [S/n]: " install_compat
 read -p "¿Instalar Emuladores? [S/n]: " install_emu
+read -p "¿Instalar Rich Presence (SGDBoop + wine-discord-ipc-bridge)? [S/n]: " install_richpresence
 
 # ═══════════════════════════════════════════════════════════
 # Categoría 1: Plataformas Base
@@ -439,6 +460,24 @@ if [[ ! "$install_emu" =~ ^[Nn]$ ]]; then
   print_success "Emuladores instalados"
 else
   print_warning "Emuladores omitidos"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# Categoría 4: Rich Presence (opcional)
+# ═══════════════════════════════════════════════════════════
+if [[ ! "$install_richpresence" =~ ^[Nn]$ ]]; then
+  echo
+  print_header "Instalando Rich Presence"
+
+  print_installing "SGDBoop + wine-discord-ipc-bridge"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    wine-discord-ipc-bridge-bin sgdboop-bin \
+    2>/dev/null || print_warning "Algunos paquetes de Rich Presence fallaron"
+
+  print_success "Rich Presence instalado (aplicar assets con SGDBoop y reiniciar Steam)"
+  print_warning "Presence de juegos: añadir 'winediscordipcbridge-steam.sh %command%' en Steam Launch Options"
+else
+  print_warning "Rich Presence omitido"
 fi
 
 print_success "Gaming configurado (sin compilaciones)"
@@ -1160,7 +1199,7 @@ proton-vpn-gtk-app --connect rapid &
 sleep 5
 echo "▶️  Iniciando Yuki-IPTV..."
 yuki-iptv
-EOF
+EOL
     chmod +x ~/.local/bin/yuki-with-vpn.sh
 
     print_success "ProtonVPN instalado"
@@ -1397,17 +1436,41 @@ print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx pyenv \
   docker rust \
-  llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
+  uv llama-cpp \
+  llvm clang patchelf git github-cli tgpt glow expect lazygit  # expect: Para unbuffer, glow: para los colores, lazygit: TUI git (nvim <leader>gg) 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat
+  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat \
+  postman-bin
 print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
 python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
 
+# Runtime de sweep.nvim (proxy llama-cpp-python en :5555). Nix Only en NixOS;
+# en Arch/CachyOS se instala por pip con --break-system-packages.
+print_installing "Sweep.nvim runtime (llama-cpp-python)"
+python -m pip install --user --break-system-packages llama-cpp-python fastapi uvicorn 2>/dev/null || true
+
 print_installing "Node packages (neovim)"
 npm install -g neovim 2>/dev/null || true
+
+print_installing "Lazygit shell wrapper (nvim <leader>gg)"
+if [ ! -f ~/.local/bin/lazygit-shell ]; then
+  if [ -f "$HOME/dotfiles-dizzi/local/.local/bin/lazygit-shell" ]; then
+    cp "$HOME/dotfiles-dizzi/local/.local/bin/lazygit-shell" ~/.local/bin/lazygit-shell
+  else
+    cat >~/.local/bin/lazygit-shell <<'EOL'
+#!/bin/bash
+if [ "$1" = "-c" ]; then
+  shift
+fi
+cmd="$*"
+zsh -ic "$cmd; exit"
+EOL
+  fi
+fi
+chmod +x ~/.local/bin/lazygit-shell 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════════
 # ENGRAM - Memoria persistente para agentes IA
@@ -2048,9 +2111,31 @@ echo
 read -p "¿Configurar Wine prefix ahora? [S/n]: " setup_wine
 
 if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
-  print_installing "Inicializando Wine prefix"
   export WINEPREFIX=~/.wine
   export WINEARCH=win64
+
+  # ── Pre-config: detectar prefix existente con arch distinta a win64 ──
+  # Si ~/.wine ya existe como win32 (o sin #arch) pero queremos win64,
+  # winetricks/wine fallan ("WINEARCH set to win64 but ... is a 32-bit
+  # installation"). Se respalda el prefix y se recrea limpio como win64.
+  if [ -f ~/.wine/system.reg ] || [ -d ~/.wine/drive_c ]; then
+    current_arch=$(rg -m1 -i '^#arch=' ~/.wine/system.reg 2>/dev/null | sed 's/#arch=//i' || true)
+    echo
+    echo -e "${YELLOW}⚠  Detectado prefix existente en ~/.wine (arch: ${current_arch:-desconocida}).${NC}"
+    if [[ "$current_arch" != "win64" ]]; then
+      read -p "  No es win64. ¿Respaldo y recreo como win64 (se borra el actual)? [S/n]: " recreate_wine
+      if [[ ! "$recreate_wine" =~ ^[Nn]$ ]]; then
+        backup_wine=~/.wine.bak.$(date +%Y%m%d-%H%M%S)
+        print_installing "Respaldando ~/.wine -> $backup_wine"
+        mv ~/.wine "$backup_wine" 2>/dev/null || true
+        print_warning "Prefix anterior respaldado en $backup_wine"
+      else
+        print_warning "Omitiendo recreación: winetricks puede fallar por arch distinta."
+      fi
+    fi
+  fi
+
+  print_installing "Inicializando Wine prefix"
   wineboot -u 2>/dev/null &
   sleep 5
 
@@ -3292,6 +3377,15 @@ rclone mount gd-musica:/ ~/mi_gdmusica --vfs-cache-mode full &
 EOL
   chmod +x ~/montar_gdmusica.sh
 
+  # Script para gdrive libros
+  cat >~/montar_gd-libros.sh <<'EOL'
+#!/bin/bash
+fusermount -u ~/mi_gdlibros 2>/dev/null
+mkdir -p ~/mi_gdlibros
+rclone mount gd-libros:/ ~/mi_gdlibros --vfs-cache-mode full &
+EOL
+  chmod +x ~/montar_gd-libros.sh
+
   # Crear servicios systemd
   mkdir -p ~/.config/systemd/user
 
@@ -3319,10 +3413,23 @@ Type=oneshot
 WantedBy=default.target
 EOL
 
+  cat >~/.config/systemd/user/montar_gd-libros.service <<'EOL'
+[Unit]
+Description=Montar Google Drive Libros al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gd-libros.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
+EOL
+
   # Habilitar servicios
   systemctl --user daemon-reload
   systemctl --user enable montar_gdrive.service
   systemctl --user enable montar_gdmusica.service
+  systemctl --user enable montar_gd-libros.service
 
   print_success "Rclone configurado"
   print_status "Monta manualmente con: ~/montar_gdrive.sh"

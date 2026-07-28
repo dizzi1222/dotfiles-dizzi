@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 get_data() {
@@ -15,7 +14,7 @@ get_data
 socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock - | \
 while read -r line; do
   case "$line" in
-    workspace>>*|focusedmon>>*|createworkspace>>*|destroyworkspace>>*|movewindow>>*|activewindow>>*)
+    "workspace>>"*|"focusedmon>>"*|"createworkspace>>"*|"destroyworkspace>>"*|"movewindow>>"*|"activewindow>>"*)
       get_data
       ;;
   esac

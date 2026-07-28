@@ -30,7 +30,7 @@ echo -e "${GREEN}✅ Waydroid listo${RESET}"
 
 # ─── Phantom daemon ──────────────────────────────────────────────────
 echo -e "${CYAN}[2/3] Arrancando Phantom daemon...${RESET}"
-sudo killall phantom 2>/dev/null
+sudo pkill phantom 2>/dev/null
 sudo phantom --daemon &
 sleep 3
 
@@ -53,5 +53,5 @@ read -rp "Presiona Enter para salir y limpiar..."
 echo -e "${CYAN}Limpiando...${RESET}"
 phantom exit-capture 2>/dev/null
 phantom shutdown 2>/dev/null
-sudo killall phantom 2>/dev/null
+sudo pkill phantom 2>/dev/null
 echo -e "${GREEN}✅ Hecho.${RESET}"
