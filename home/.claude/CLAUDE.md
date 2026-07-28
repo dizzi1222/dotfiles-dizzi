@@ -279,6 +279,77 @@ Separación de responsabilidades en ramas:
 
 Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` con formato QA.
 
+## Reglas de Commit
+
+- Commits descriptivos con bullet points detallando cada cambio
+- Usar formato: `fix:|feat:|chore:` según corresponda
+- Incluir métricas cuando aplique (espacio liberado, tiempo, etc.)
+- Máximo 325 commits en el repo
+
+## NixOS Config (thinkpad-x1e2)
+
+### Flake structure
+```
+dotfiles-dizzi/nixconf/
+├── flake.nix              # Entry point: nixos + home-manager outputs
+├── nixos/
+│   ├── base-configuration.nix  # system-level: pkgs, services, users, boot, sddm
+│   └── pkgs/                    # custom package derivations
+│       └── sddm-astronaut-theme/default.nix
+└── home-manager/
+    ├── home.nix                 # home-manager: symlinks, activation scripts
+    └── features/
+        ├── shell.nix            # zsh, starship, eza, bat, git, bottom, etc.
+        ├── work.nix             # dev tools: code-cursor, pgadmin4, gcloud, docker
+        ├── desktop.nix          # theming: GTK, Qt, cursors, icons
+        └── programs.nix         # misc programs
+```
+
+### Rebuild commands
+```bash
+# Full rebuild (nixos + home-manager)
+sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2
+sudo -u $USER home-manager switch --flake ~/dotfiles-dizzi/nixconf#$USER@thinkpad-x1e2 -b backup
+
+# Or use the wrapper script
+~/.local/bin/nixconf-rebuild
+```
+
+### Key packages installed
+| Package | Location | Notes |
+|---|---|---|
+| `code-cursor` | work.nix | AI editor, reemplazó vscodium |
+| `pgadmin4` | work.nix | PostgreSQL GUI |
+| `google-cloud-sql-proxy` | work.nix | GCP SQL proxy — binario: `cloud-sql-proxy` |
+| `docker-client` | work.nix | Docker CLI |
+| `gnome-disk-utility` + `udisks2` | base-configuration | USB Disk Manager |
+| `lazydocker` | shell.nix | Docker TUI |
+| `sddm-astronaut` | base-configuration | SDDM theme |
+| `xorg.xinput` | base-configuration | needed for ydotool virtual device |
+
+### Git safe.directory (NixOS fix)
+```nix
+# shell.nix — formato correcto para git config multi-value
+"safe" = { directory = "/home/diego/dotfiles-dizzi"; };
+```
+
+### ydotool (autoclicker/autopress)
+- Service: `~/wrapper/autoclicker-menu` → `~/.local/bin/autoclicker menu`
+- Service: `~/wrapper/autopress-menu` → `~/.local/bin/autopress`
+- Keybinds: F7 (autoclicker), F9 (autopress) in hypr/bindings.conf
+- Socket: `/tmp/.ydotool_socket` (needs `xorg.xinput` + `ydotool.service` running)
+- Service: systemctl --user ydotool.service (auto-started by wrapper)
+
+### system_control.sh (rofi menu)
+Path: `~/scripts/system_control.sh` (symlinked from `home/scripts/`)
+- `󰮮` → `~/.local/bin/clean-boot`
+- `` → `~/.local/bin/nixconf-rebuild`
+- `🦙` → ollama list
+- `󰳾` → autoclicker (via wrapper)
+- `󰌌 󱊮` → autopress (via wrapper)
+- `` → ydotool service check
+- `` → Docker Desktop flatpak / lazydocker
+
 ## Referencias dotfiles-dizzi
 
 ### Plantillas GitHub (dotfiles-dizzi)
@@ -327,17 +398,66 @@ Cada repo (`ptd-talento-front`, `ptd-talento-back`) tiene dos remotes:
 | `origin` | `Cincinnatus-Institute-of-Craftsmanship/ptd-talento-*` | Repo oficial CIC (dhardi007) — **NUNCA cambiar author** |
 | `dizzi1222` | `dizzi1222/ptd-talento-*` | Fork personal (dizzi1222) — Vercel, Railway, workflows propios |
 
+### Mapeo de deploys (verificado 2026-08-24)
+
+| Destino | Rama que dispara | Author requerido |
+|---|---|---|
+| **CIC** (`origin`) | `dev`; QA via merge dev→qa (dispara Cloud Build) | `dhardi007 <dhardi@cincinnatus.edu.do>` |
+| **Vercel** | `dizzi1222/main` | `dizzi1222 <diegosamuel042@gmail.com>` |
+
+⚠️ `dizzi1222/main` y `origin/dev` **NO comparten merge-base** (historia espejo con SHAs reescritos): un `git merge` entre ellos es imposible/inútil. NO intentar sincronizarlos por merge/rebase.
+
 ### Reglas estrictas
 
 1. **NUNCA** usar `git filter-branch`, `git rebase --exec`, ni `git commit --amend --author` sobre ramas que trackeen `origin`. Esto reescribe historia del repo CIC.
-2. Para pushear a `dizzi1222` con author correcto (Vercel/Railway), usar `git push dizzi1222 <rama> --force` después de un `filter-branch` SOLO en la rama local temporal.
-3. Siempre restaurar ramas locales con `git reset --hard origin/<rama>` **Y re-configurar upstream** después de operaciones de author rewrite.
-4. `git config user.name` y `git config user.email` locales se quedan como `dhardi007` / `dhardi@cincinnatus.edu.do` — no cambiar. **NUNCA ejecutar `git config user.name/email`** como parte del workflow de author rewrite.
+2. Para pushear a `dizzi1222` con author correcto (Vercel/Railway), usar el **snapshot squash** (método preferido, abajo). `filter-branch` queda como LEGACY.
+3. Las ramas locales de trabajo (`dev`, `qa`, `main`) SIEMPRE trackean `origin/<rama>`. Si alguna quedó apuntando a `dizzi1222`: `git reset --hard origin/<rama> && git branch --set-upstream-to="origin/<rama>" <rama>`.
+4. `git config user.name` y `git config user.email` locales se quedan como `dhardi007` / `dhardi@cincinnatus.edu.do` — no cambiar. **NUNCA ejecutar `git config user.name/email`** como parte del author rewrite: usar env-vars inline (`GIT_COMMITTER_NAME=... git commit --author=...`).
 5. Para verificar acceso a `origin`, usar la sesión `dhardi007` (`gh auth switch -u dhardi007`). Para `dizzi1222`, usar `gh auth switch -u dizzi1222`.
+
+### ✅ Método preferido: snapshot squash a dizzi1222/main
+
+Crea UN commit nuevo encima del tip actual del fork con el árbol exacto de `origin/dev`. No reescribe historia existente, no toca ramas locales ni su tracking. Usado con éxito 2026-08-24 (`e5af37b`).
+
+```bash
+# 0. Dev al día + rama temporal desde el main del fork
+git checkout dev && git pull --ff-only
+git fetch dizzi1222
+git checkout -b sync-vercel dizzi1222/main
+
+# 1. Volcar el árbol COMPLETO de origin/dev sobre el temporal
+git rm -rq .
+git restore --source=origin/dev --staged --worktree :/
+
+# 2. PRESERVAR overrides propios del fork (ej. .env.production apunta a backend PROD)
+git checkout HEAD -- .env.production
+
+# 3. Registrar TODO (incluye deletes de archivos que ya no existen en dev) y VERIFICAR
+git add -A
+git diff --stat origin/dev --cached
+#    DEBE mostrar ÚNICAMENTE los archivos override preservados (ej. solo .env.production).
+#    Si aparece cualquier otro archivo, DETENER y revisar antes de commitear.
+
+# 4. Commit squasheado con author dizzi1222 (env-vars inline, sin tocar git config)
+GIT_COMMITTER_NAME="dizzi1222" GIT_COMMITTER_EMAIL="diegosamuel042@gmail.com" \
+  git commit --author="dizzi1222 <diegosamuel042@gmail.com>" \
+  -m "sync: dev -> main para Vercel"
+
+# 5. Push (suele ser fast-forward; --force-with-lease cubre el caso de fork avanzado)
+git push dizzi1222 sync-vercel:main --force-with-lease=main:dizzi1222/main
+
+# 6. Limpieza y verificación final
+git checkout dev
+git branch -D sync-vercel
+git branch -vv | grep -E '^\*?\s+(dev|main)\b'
+#    Ambas deben seguir mostrando [origin/dev] y [origin/main]
+```
+
+Ventajas vs filter-branch: 1 commit nuevo en vez de reescribir ~600 SHAs; push fast-forward posible; cero riesgo de corromper tracking local.
 
 ### ⚠️ Error común (NO repetir)
 
-**Problema:** Después de `filter-branch` + push a `dizzi1222`, la rama local queda trackeando `dizzi1222/rama` en vez de `origin/rama`. Esto causa:
+Aplica sobre todo al flujo LEGACY de abajo. **Problema:** Después de operaciones de author rewrite, la rama local queda trackeando `dizzi1222/rama` en vez de `origin/rama`. Esto causa:
 - `git pull` trae commits de `dizzi1222` (con author dizzi1222) en vez de `origin` (con author dhardi007)
 - Ramas "divergent" con 300+ commits diferentes
 - `git config user.name` cambiado accidentalmente a `dizzi1222`
@@ -348,7 +468,9 @@ git reset --hard "origin/<rama>"
 git branch --set-upstream-to="origin/<rama>" <rama>
 ```
 
-### Proceso para replicar author en dizzi1222
+### LEGACY: filter-branch completo (evitar — solo si se necesita espejo de historia completa)
+
+> Preferir el snapshot squash de arriba. Este proceso reescribe TODOS los SHAs en cada ejecución y es el origen del error común documentado arriba.
 
 ```bash
 # 1. Checkout a la rama
@@ -474,3 +596,70 @@ python3 -m http.server 8083
 3. `dhardi@cincinnatus.edu.do` (institucional CIC) → `authuser=2`
 
 > Para App Password u otros servicios Google que requieran la cuenta 3 (dhardi), agregar `?authuser=2` a la URL. Ej: `https://myaccount.google.com/apppasswords?authuser=2`
+
+---
+
+# Convenciones del Profesor (sesión `vim-learn`)
+
+> Documento fusionado desde `~/.claude/CLAUDE.md` (config global) al repo para unificar la fuente única.
+
+## Rol: Profesor
+
+- Soy el **Profesor** de Diego: doy instrucciones y el razonamiento ideal para que ÉL resuelva los problemas.
+- Busco documentación oficial y uso métodos de aprendizaje efectivos.
+- **PROHIBIDO escribir código en archivos** (regla general). Muestro snippets en el chat de referencia; el trabajo lo hace Diego.
+- **EXCEPCIÓN (autorizada): la submodule `nvim/.config/nvim`** — Diego me dio permiso para leer y **editar** su configuración Lua/plugins, y sus docs `.md` (limpieza markdownlint). En el resto de repos de código la regla Profesor sigue vigente.
+- En `nvim/`, **los commits los hace Diego**, nunca yo.
+
+## Nota: `hypr/.config/hypr/scripts/text_animation/scripttext`
+
+- **Este archivo se autogenera siempre** (script de text animation).
+- **Siempre hay que ignorarlo del stage** — nunca hacer `git add`, ni incluirlo en un commit/amend.
+- NO es necesario que esté en `.gitignore`; simplemente se ignora al commitear.
+- No es un valor literal fijo: su contenido cambia con cada ejecución de la animación.
+- Si aparece como `M` en `git status`, descartar con `git checkout --` y seguir.
+
+## Trabajo con nvim (`dotfiles-dizzi/nvim/.config/nvim`)
+
+Esta submodule **sí puedo editarla** (config Lua, plugins y docs `.md`).
+
+### Linters markdown y config
+- Hay **dos** linters:
+  - `markdownlint` (CLI, `~/.npm-global`) → lee **`.markdownlintrc`** (JSON anidado).
+  - `markdownlint-cli2` (vía Mason; es el **LSP** que ve Diego en Neovim) → lee **`.markdownlint-cli2.jsonc`** con estructura `{"config": { ... }}`.
+- **IMPORTANTE:** para que no aparezcan errores en Neovim hay que crear **ambos** archivos en cada directorio, con la misma regla: `MD013` line_length 120 + `tables: false`, y `MD060: false`.
+  - Config en `nvim/.config/nvim/docs/.markdownlintrc` y `.markdownlint-cli2.jsonc`.
+  - Config en `workspace/AGENT-records/.markdownlintrc` y `.markdownlint-cli2.jsonc`.
+- **El LSP de Neovim (markdownlint-cli2) NO auto-detecta `.markdownlint-cli2.jsonc` por defecto** → muestra `Expected: 80` (defaults). La solución definitiva es forzar las reglas vía `settings.config` del server en `nvim/.config/nvim/lua/plugins/overrides.lua` (server `markdownlint`): `MD013 { line_length = 120, tables = false }`, `MD060 = false`. Tras cambiarlo: `:LspRestart` o reabrir el archivo.
+- **⚠️ CAUSA REAL del "Expected: 80":** el diagnostico `markdownlint` con MD013 a 80 NO viene del LSP (que no existe como server lspconfig) sino de **`nvim-lint`** (extra de LazyVim `extras/lang/markdown.lua` → `linters_by_ft.markdown = { "markdownlint-cli2" }`). Al correr con stdin `-` y sin config desde el cwd (`~/`), usa defaults. **Solución:** override en `overrides.lua` del linter `["markdownlint-cli2"]` con `args = { "--config", vim.fn.stdpath("config") .. "/.markdownlint-cli2.jsonc", "-" }`, apuntando al config canónico `~/.config/nvim/.markdownlint-cli2.jsonc`. (El server `markdownlint` en `servers` NO sirve porque lspconfig ya no trae ese server.)
+- Verificar con la CLI del LSP: `cd <dir> && markdownlint-cli2 "*.md"` → 0 issues.
+
+### Warnings de Lua del LSP (falsos positivos comunes)
+El LSP de nvim diagnostica sobre la submodule `nvim/lua/plugins/*.lua`. La mayoría son **falsos positivos** por las *globals* de LazyVim que se definen en otros archivos:
+- `Undefined global 'LazyVim'` → global de LazyVim; ignorar.
+- `Undefined global 'get_args'` → función usada en keybindings de nvim-dap; se define en otra parte; ignorar.
+- `Undefined global 'Mini...'`/`snacks`/otros → globals de frameworks; ignorar.
+- `Duplicate field 'json_decode'` en nvim-dap.lua → es un *override* intencional para el `dap.ext.vscode`; ignorar.
+- `Deprecated` (cualquiera) → revisar, puede implicar limpieza.
+- `undefined-global` reales con nombres no-LazyVim → revisar si son un bug.
+
+### Verificar sintaxis Lua sin romper el setup
+- `timeout 30 nvim --headless -u NONE -c "luafile lua/plugins/nvim-dap.lua" -c "q"` → exit 0 = sintaxis válida.
+- `luac -p` normalmente no está instalado; usar el chequeo con nvim headless.
+
+### DAP (nvim-dap)
+- Para JS/TS/React: adapter `pwa-node`/`pwa-chrome` vía plugin `mxsdev/nvim-dap-vscode-js` + `microsoft/vscode-js-debug`.
+- El `build` de `vscode-js-debug` usa **`--ignore-scripts`** (salta el postinstall de Playwright que necesita `apt-get`, no disponible) + `gulp vsDebugServerBundle && mv dist out`.
+- `nvim-dap-vscode-js` necesita `debugger_path = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug"` (no la ruta de packer por defecto).
+- `dap.configurations` definidos para `typescriptreact`, `typescript`, `javascript`, `javascriptreact`: Launch file (Node), Attach (Node), Launch Chrome (Vite :5173, runtimeExecutable `/home/diego/.nix-profile/bin/chromium`), Attach a Chrome (puerto 9222).
+- `dap.ext.vscode.load_launchjs()` está **deprecado** (leyó launch.json automáticamente); no usarlo.
+- El `vscode.json_decode` override sí se conserva (parsea JSON con comentarios).
+
+### Chromium/Playwright vía Nix
+- Diego tiene Playwright/Chromium **nativos vía Nix** (`nixconf/home-manager/features/work.nix`: `playwright-driver.browsers`, `chromium`, `chromedriver`, `geckodriver`, `cypress`).
+- Chromium del sistema: `/home/diego/.nix-profile/bin/chromium` (no hay google-chrome/edge).
+- El postinstall de Playwright del repo `vscode-js-debug` es solo para sus tests; el adapter `pwa-chrome` lanza el Chromium del sistema vía `runtimeExecutable`.
+
+### Plugin `cord.nvim`
+- Tiene un **patch local de Diego** (`[dizzi patch]`) en `lua/cord/internal/activity/workspace.lua` que sube directorios padres para detectar `.git`.
+- **NO revertirlo** — es intencional y se auto-reaplica con el build del plugin. Lazy mostrará "local changes" al actualizar cord.nvim; ignorar ese aviso.

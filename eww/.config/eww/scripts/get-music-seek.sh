@@ -1,3 +1,4 @@
+#!/bin/bash
 # Forzar salida consistente en inglés
 export LC_ALL=C
 export LANG=C

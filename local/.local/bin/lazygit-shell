@@ -1,0 +1,18 @@
+#!/bin/bash
+# Lazygit shell wrapper
+# lazygit ejecuta los comandos del prompt ':' con "$SHELL -c <cmd>" (p.ej:
+# "~/.local/bin/lazygit-shell -c gitflow"). Este wrapper debe DESCARTAR el
+# flag -c que lazygit pasa y re-ejecutar el comando con zsh -ic (interactivo)
+# para que SI cargue ~/.zshrc completo (funciones como gitflow, aliases, etc).
+#
+# - el '; exit' evita el hang conocido de lazygit 0.63 (issue jesseduffield/lazygit#3937):
+#   el shell interactivo no devuelve el tty a lazygit hasta que sale.
+
+# Quitar el flag "-c" que lazygit antepone a los argumentos
+if [ "$1" = "-c" ]; then
+  shift
+fi
+
+# Recomponer el comando (maneja argumentos con espacios)
+cmd="$*"
+zsh -ic "$cmd; exit"

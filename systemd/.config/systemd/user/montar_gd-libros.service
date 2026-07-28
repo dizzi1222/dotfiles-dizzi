@@ -1,0 +1,9 @@
+[Unit]
+Description=Montar Google Drive Libros al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gd-libros.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target

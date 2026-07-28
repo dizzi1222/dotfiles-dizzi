@@ -1,7 +1,8 @@
 game:
   args: ''
-  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow Knight/hollow_knight.exe
-  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow
+  exe: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
+    Knight/hollow_knight.exe
+  working_dir: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
     Knight/
 system:
   env:

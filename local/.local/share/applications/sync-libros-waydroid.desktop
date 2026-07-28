@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Sync Libros a Waydroid
+GenericName=Sync GD Libros a Waydroid Documents
+Exec=kitty --hold -e bash /home/diego/scripts/sync-libros-waydroid.sh
+Icon=folder-books
+Terminal=false
+Categories=Utility;FileTools;
+Comment=Sincroniza mi_gdlibros/📖Libros a Waydroid Documents

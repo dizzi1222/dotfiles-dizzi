@@ -1,3 +1,3 @@
 game:
-  exe: /home/diego/.wine-11/drive_c/Games/Dragon Ball Sparking ZERO/SparkingZERO.exe
-  working_dir: /home/diego/.wine-11/drive_c/Games/Dragon Ball Sparking ZERO/
+  exe: /home/diego/.wine/drive_c/Games/Dragon Ball Sparking ZERO/SparkingZERO.exe
+  working_dir: /home/diego/.wine/drive_c/Games/Dragon Ball Sparking ZERO/

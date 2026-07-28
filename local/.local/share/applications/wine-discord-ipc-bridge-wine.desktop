@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Wine Discord IPC Bridge (Wine)
+Comment=Lanza el bridge manual (0e4ef622) en el prefijo ~/.wine — lanzar ANTES del juego
+Exec=/home/diego/.local/bin/juegos/wine-discord-ipc-bridge.sh wine
+Icon=wine
+Type=Application
+Terminal=false
+StartupNotify=false

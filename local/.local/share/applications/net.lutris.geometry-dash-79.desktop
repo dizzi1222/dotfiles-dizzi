@@ -5,5 +5,6 @@ Type=Application
 Name=Geometry Dash
 Icon=lutris_geometry-dash
 Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/79
+# Exec=wine "/home/diego/.wine/drive_c/Games/Geometry Dash v2.11/GeometryDash.exe"
 Categories=Game
 TryExec=lutris

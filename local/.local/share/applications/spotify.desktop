@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Spotify
+Comment=Spotify music player
+Icon=spotify-client
+Exec=env -u DISPLAY spotify %U
+Categories=Audio;AudioVideo;Player;
+Terminal=false
+StartupNotify=false
+StartupWMClass=spotify

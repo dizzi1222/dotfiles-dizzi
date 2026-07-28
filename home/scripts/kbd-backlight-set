@@ -1,8 +1,8 @@
 #!/bin/bash
 # Script para controlar retroiluminación del teclado Dell
 
-KBD_PATH="/sys/class/leds/dell::kbd_backlight/brightness"
-MAX_BRIGHTNESS=$(cat /sys/class/leds/dell::kbd_backlight/max_brightness)
+KBD_PATH="/sys/class/leds/tpacpi::kbd_backlight/brightness"
+MAX_BRIGHTNESS=$(cat /sys/class/leds/tpacpi::kbd_backlight/max_brightness)
 
 if [[ ! -f "$KBD_PATH" ]]; then
   echo "Error: No se encontró el teclado retroiluminado"
