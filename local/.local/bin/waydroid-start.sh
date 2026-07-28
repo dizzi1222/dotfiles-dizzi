@@ -49,7 +49,17 @@ set_prop() {
 
 set_prop "persist.waydroid.width" "$WIDTH"
 set_prop "persist.waydroid.height" "$HEIGHT"
-set_prop "persist.waydroid.multi_windows" "false"
+set_prop "persist.waydroid.multi_windows" "true"
+
+# Also write to waydroid.prop so the physical display size matches
+PROP_FILE="/var/lib/waydroid/waydroid.prop"
+BASE_PROP="/var/lib/waydroid/waydroid_base.prop"
+for f in "$PROP_FILE" "$BASE_PROP"; do
+  sudo sed -i "/^persist\\.waydroid\\.width=/d" "$f" 2>/dev/null || true
+  sudo sed -i "/^persist\\.waydroid\\.height=/d" "$f" 2>/dev/null || true
+  echo "persist.waydroid.width=$WIDTH" | sudo tee -a "$f" >/dev/null
+  echo "persist.waydroid.height=$HEIGHT" | sudo tee -a "$f" >/dev/null
+done
 echo "✅ cfg actualizado"
 
 # ─── Arrancar contenedor ──────────────────────────────
@@ -71,9 +81,9 @@ apply_size() {
   done
 
   if [[ "$INPUT" == "fullscreen" ]]; then
-    echo "🖥️  Fullscreen: reseteando override..."
-    sudo waydroid shell wm size reset
-    sudo waydroid shell wm density reset
+    echo "🖥️  Fullscreen: forzando ${WIDTH}x${HEIGHT}..."
+    sudo waydroid shell wm size "${WIDTH}x${HEIGHT}"
+    sudo waydroid shell wm density 240
   else
     echo "📏 Forzando wm size ${WIDTH}x${HEIGHT}..."
     sudo waydroid shell wm size "${WIDTH}x${HEIGHT}"
@@ -81,6 +91,10 @@ apply_size() {
     [[ "$INPUT" == "arzopa" ]] && density=320
     sudo waydroid shell wm density $density
   fi
+
+  # Reiniciar window service para que tome el nuevo tamaño
+  sudo waydroid shell setprop ctl.restart window
+  sleep 2
 
   echo "✅ Listo: ${WIDTH}x${HEIGHT}"
   echo "📏 Tamaño actual: $(sudo waydroid shell wm size 2>/dev/null)"

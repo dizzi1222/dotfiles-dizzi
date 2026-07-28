@@ -3,8 +3,9 @@ Version=1.0
 Name=Stremio Web
 Comment=Open Stremio Web
 # Exec=brave --app="https://web.stremio.com/"
+Exec=zen-browser --new-window --kiosk https://web.stremio.com/
 Hidden=false
-Exec=/home/diego/.local/bin/stremio-web-brave-App.sh
+# Exec=/home/diego/.local/bin/stremio-web-brave-App.sh
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Stremio_Web.png

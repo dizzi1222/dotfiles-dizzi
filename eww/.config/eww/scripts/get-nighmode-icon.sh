@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # ~/.config/eww/scripts/get-nightmode-icon.sh
 
 # Archivo de estado para night mode

@@ -7,7 +7,7 @@ run() {
 }
 
 # Arrancar daemon si no está corriendo
-if ! pgrep -x eww >/dev/null; then
+if ! pgrep -u "$USER" eww >/dev/null; then
   eww -c "$HOME/.config/eww" daemon
   sleep 1
 fi

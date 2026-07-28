@@ -3,7 +3,7 @@
 # by Abuku (2024)
 
 # Kill all hyprpaper instance
-killall swww-daemon
+pkill swww-daemon
 pkill -f hyprpaper
 # Reload SWW
 swww-daemon

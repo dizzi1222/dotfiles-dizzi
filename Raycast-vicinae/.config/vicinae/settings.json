@@ -22,7 +22,9 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
+      "@sovereign/store.vicinae.awww-switcher:wpgrid",
       "clipboard:history",
+      "@knoopx/store.vicinae.nix:packages",
       "applications:display-setup",
       "applications:waydroid-start-sd",
       "applications:Stremio_Web"
@@ -35,12 +37,20 @@
             }
          }
       },
+      "@sovereign/store.vicinae.awww-switcher": {
+         "preferences": {
+            "wallpaperPath": "/home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers"
+         }
+      },
       "applications": {
          "entrypoints": {
             "Dorion": {
                "enabled": false
             },
             "Shadow_PC": {
+               "enabled": false
+            },
+            "discord": {
                "enabled": false
             },
             "gaming--PokeMMO--1772229200.475779": {

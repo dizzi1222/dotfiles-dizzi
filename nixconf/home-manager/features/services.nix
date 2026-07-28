@@ -11,7 +11,8 @@
 
   # ── Espanso (Text Expander) ────────────────────────────────
   # Config managed via symlink from dotfiles-dizzi/espanso/.config/espanso
-  # HM service disabled — it conflicts with the out-of-store symlink
+  # Service managed by the NixOS `services.espanso` module (base-configuration.nix),
+  # which provides the cap_dac_override wrapper that fixes the EVDEV Wayland issue.
 
   # ── Flameshot ──────────────────────────────────────────────
   services.flameshot = {
@@ -23,13 +24,6 @@
         showStartupLaunchMessage = false;
       };
     };
-  };
-
-  # ── XDG Portals ────────────────────────────────────────────
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-    config.common.default = "*";
   };
 
   # ── Services packages ──────────────────────────────────────
@@ -63,7 +57,6 @@
 
     # Screen recording
     wf-recorder
-    obs-studio
 
     # Notification tools
     libnotify
@@ -74,7 +67,7 @@
     blueman
 
     # Misc
-    espanso
+    espanso-wayland
     ydotool
     wtype
     wlr-randr
