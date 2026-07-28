@@ -2,7 +2,7 @@
 # ~/.config/hypr/scripts/delayed_copyq.sh
 copyq
 sleep 2
-killall copyq
+pkill copyq
 # Esperar a que Hyprland esté completamente inicializado
 sleep 4
 

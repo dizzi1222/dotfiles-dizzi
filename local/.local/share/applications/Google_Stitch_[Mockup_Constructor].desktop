@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Google Stitch [Mockup Constructor]
+Comment=Open Google Stitch [Mockup Constructor]
+Exec=zen-browser --new-window --kiosk https://stitch.withgoogle.com/
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Google_Stitch_[Mockup_Constructor].png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Google_Stitch_[Mockup_Constructor]

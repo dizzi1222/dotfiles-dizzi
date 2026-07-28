@@ -14,17 +14,38 @@ option=$(printf " Captura Ventana con Click\n  Ventana Activa (Auto)\n󰵝
 pkill -9 rofi
 sleep 1
 
+# === Detectar compositor (Hyprland vs niri) ===
+comp="niri"
+if command -v hyprctl >/dev/null 2>&1 && [ -S "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock" ]; then
+  comp="hypr"
+fi
+
 # === Captura de pantalla ===
 if [[ "$option" == *"Click"* ]]; then
-  hyprshot -m window --freeze
-  sleep 0.5
-  HYPR_IMG=$(ls -t "$HOME/Pictures"/*.png "$HOME/Imágenes/"/*.png 2>/dev/null | head -1)
-  mv "$HYPR_IMG" "$IMG_PATH"
+  if [ "$comp" = "hypr" ]; then
+    hyprshot -m window --freeze
+    sleep 0.5
+    HYPR_IMG=$(ls -t "$HOME/Pictures"/*.png "$HOME/Imágenes/"/*.png 2>/dev/null | head -1)
+    mv "$HYPR_IMG" "$IMG_PATH"
+  else
+    # niri: ventana bajo el cursor usando slurp
+    grim -g "$(slurp -p | awk '{print $1","$2" "$3"x"$4}')" "$IMG_PATH" || { notify-send "❌ Captura cancelada"; exit 1; }
+  fi
 
 elif [[ "$option" == *"Auto"* ]]; then
-  hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "$IMG_PATH"
+  if [ "$comp" = "hypr" ]; then
+    hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "$IMG_PATH"
+  else
+    # niri: ventana enfocada → geometry desde layout
+    grim -g "$(
+      niri msg --json focused-window | jq -r '
+        (.layout.pos_in_scrolling_layout[0]|tostring) + "," +
+        (.layout.pos_in_scrolling_layout[1]|tostring) + " " +
+        (.layout.window_size[0]|tostring) + "x" +
+        (.layout.window_size[1]|tostring)'
+    )" "$IMG_PATH"
+  fi
 
-# ← AQUÍ ESTÁ EL CAMBIO PARA OPCIÓN 3
 elif [[ "$option" == *Completa* ]]; then
   grim "$IMG_PATH"
 
@@ -35,7 +56,7 @@ elif [[ "$option" == *Completa* ]]; then
   fi
 
 elif [[ "$option" == *Área* ]]; then
-  hyprshot -m region -o "$IMG_PATH"
+  grim -g "$(slurp)" "$IMG_PATH" || { notify-send "❌ Captura cancelada"; exit 1; }
 
 elif [[ "$option" == *Share* ]]; then
   sh -c "scripts/gyazo-wayland-captura-clip"

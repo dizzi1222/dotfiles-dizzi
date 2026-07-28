@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/diego/montar_gd-musica.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Montar Google Drive Música
+Comment=Montar GDrive Música al iniciar sesión

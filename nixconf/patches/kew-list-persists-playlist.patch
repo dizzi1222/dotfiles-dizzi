@@ -1,0 +1,12 @@
+--- kew-orig/kew/src/data/playlist.c	2026-07-08 12:41:37.000000000 -0400
++++ kew/src/data/playlist.c	2026-08-16 01:56:37.994625140 -0400
+@@ -912,6 +912,9 @@
+                                    search_type, exact_search, 0) == 0) {
+                                 if (strcmp(argv[1], "list") == 0) {
+                                         read_m3u_file(buf, *playlist);
++                                        Model *model = get_model();
++                                        if (model->library)
++                                                mark_list_as_enqueued(model->library, *playlist);
+                                 } else {
+                                         pthread_mutex_lock(&((*playlist)->mutex));
+ 

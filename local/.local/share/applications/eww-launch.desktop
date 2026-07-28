@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Application
+Icon=view-grid
 Name=EWW Launch
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/eww-launch.sh
 NoDisplay=true

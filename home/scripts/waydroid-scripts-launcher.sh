@@ -1,8 +1,11 @@
 #!/bin/bash
 # ══════════════════════════════════════════════════════════════════════════════
 # WAYDROID SCRIPTS LAUNCHER - Gestión completa de Waydroid
-# Con fix para CachyOS/EndeavourOS y opción de reset ID
+# Cross-platform: Arch/CachyOS + NixOS
 # ══════════════════════════════════════════════════════════════════════════════
+
+PLATFORM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$PLATFORM_DIR/lib/platform.sh"
 
 SCRIPT_DIR="$HOME/waydroid_script/"
 VENV_DIR="$SCRIPT_DIR/venv"
@@ -275,20 +278,29 @@ case "$option" in
 
 6)
   # ── Instalar waydroid-helper (keymapper) ─────────────────
-  echo -e "${CYAN}Instalando waydroid-helper desde AUR...${RESET}"
-  if command -v yay &>/dev/null; then
-    yay -S waydroid-helper
-  elif command -v paru &>/dev/null; then
-    paru -S waydroid-helper
-  elif command -v pacman &>/dev/null; then
-    git clone https://aur.archlinux.org/waydroid-helper.git /tmp/waydroid-helper
-    cd /tmp/waydroid-helper && makepkg -si
+  if is_nixos; then
+    echo -e "${RED}waydroid-helper no está disponible en NixOS.${RESET}"
+    echo -e "${YELLOW}Alternativas en NixOS:${RESET}"
+    echo -e "  • Usar XtMapper + cage-xtmapper (opción 7)"
+    echo -e "  • Usar Phantom (opción 8)"
+    echo -e "  • keymapper desde: github.com/houmain/keymapper"
+    echo ""
   else
-    echo -e "${RED}✗ No se encontró yay/paru/makepkg. Instálalo manualmente desde AUR.${RESET}"
+    echo -e "${CYAN}Instalando waydroid-helper desde AUR...${RESET}"
+    if command -v yay &>/dev/null; then
+      yay -S waydroid-helper
+    elif command -v paru &>/dev/null; then
+      paru -S waydroid-helper
+    elif command -v pacman &>/dev/null; then
+      git clone https://aur.archlinux.org/waydroid-helper.git /tmp/waydroid-helper
+      cd /tmp/waydroid-helper && makepkg -si
+    else
+      echo -e "${RED}✗ No se encontró yay/paru/makepkg. Instálalo manualmente desde AUR.${RESET}"
+    fi
+    echo ""
+    echo -e "${GREEN}✅ Listo. Ejecútalo con: ${YELLOW}waydroid-helper${RESET}"
+    echo -e "${CYAN}📖 Guía: pestaña Key Mapper → Edit Mode → clic derecho → asignar teclas${RESET}"
   fi
-  echo ""
-  echo -e "${GREEN}✅ Listo. Ejecútalo con: ${YELLOW}waydroid-helper${RESET}"
-  echo -e "${CYAN}📖 Guía: pestaña Key Mapper → Edit Mode → clic derecho → asignar teclas${RESET}"
   ;;
 
 7)
@@ -407,7 +419,7 @@ sudo waydroid status 2>/dev/null | grep -q "RUNNING" || {
   sleep 12
 }
 
-sudo killall phantom 2>/dev/null
+sudo pkill phantom 2>/dev/null
 sudo phantom --daemon &
 sleep 3
 
@@ -422,7 +434,7 @@ echo ""
 read -rp "Presiona Enter para salir..."
 phantom exit-capture 2>/dev/null
 phantom shutdown 2>/dev/null
-sudo killall phantom 2>/dev/null
+sudo pkill phantom 2>/dev/null
 BD2EOF
   chmod +x "$HOME/scripts/waydroid-bd2.sh"
 

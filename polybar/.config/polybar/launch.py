@@ -8,7 +8,7 @@ import os
 allmonitors = []
 gdkdsp = Gdk.Display.get_default()
 
-os.system('killall -q polybar')
+os.system('pkill polybar')
 os.system('while pgrep -u $UID -x polybar > /dev/null; do sleep 1; done')
 
 print(gdkdsp.get_n_monitors() == 1)

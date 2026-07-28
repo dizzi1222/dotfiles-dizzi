@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Application
+Icon=utilities-terminal
 Name=Quickshell Launch
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/quickshell-launch.sh
 NoDisplay=true

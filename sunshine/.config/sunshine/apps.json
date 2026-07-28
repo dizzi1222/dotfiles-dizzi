@@ -2,13 +2,13 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "/home/diego/dotfiles-dizzi/local/.local/bin/juegos/stardew.sh",
+            "cmd": "steam steam://rungameid/9813346792119468032",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/stardew-valley.png",
             "name": " Stardew Valley",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132",
             "wait-all": true
         },
         {
@@ -17,7 +17,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/blasphemous.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_274522.png",
             "name": "Blasphemous",
             "output": "",
             "wait-all": true
@@ -28,7 +28,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/cuphead.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_210917.png",
             "name": "Cuphead",
             "output": "",
             "wait-all": true
@@ -39,7 +39,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/dead-cells.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_26855.png",
             "name": "Dead Cells",
             "output": "",
             "wait-all": true
@@ -54,7 +54,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/geometry-dash.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_38693.png",
             "name": "Geometry Dash",
             "output": "",
             "wait-all": true
@@ -65,50 +65,40 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hades.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_113112.png",
             "name": "Hades",
             "output": "",
             "wait-all": true
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/47",
+            "cmd": "steam steam://rungameid/16142108676189061120",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_106817.png",
             "name": "Hollow Knight",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/47",
             "wait-all": true
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74",
+            "cmd": "steam steam://rungameid/11348340293796626432",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight-silksong.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_372563.png",
             "name": "Hollow Knight Silksong",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74",
             "wait-all": true
         },
         {
-            "image-path": "desktop.png",
-            "name": "Low Res Desktop",
-            "prep-cmd": [
-                {
-                    "do": "xrandr --output HDMI-1 --mode 1920x1080",
-                    "undo": "xrandr --output HDMI-1 --mode 1920x1200"
-                }
-            ]
-        },
-        {
             "auto-detach": true,
-            "cmd": "curseforge",
+            "cmd": "prismlauncher",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/minecraft.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_121.png",
             "name": "Minecraft Launcher",
             "output": "",
             "wait-all": true
@@ -119,18 +109,18 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pokemmo.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_127976.png",
             "name": "PokeMMO",
             "output": "",
             "wait-all": true
         },
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pokeone.png",
+            "image-path": "/home/diego/dotfiles-dizzi/local/.local/share/bottles/bottles/gaming/icons/PokeOne.png",
             "name": "PokeOne",
             "output": "",
             "wait-all": true
@@ -141,7 +131,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pes6.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_237546.png",
             "name": "Pro Evolution Soccer 6",
             "output": "",
             "wait-all": true

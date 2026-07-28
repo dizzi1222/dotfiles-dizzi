@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Steam
+MimeType=x-scheme-handler/steam;
+Exec=env "WINEPREFIX=/home/diego/.wine" wine start %u
+NoDisplay=true
+StartupNotify=true
+Icon=5026_steam.0

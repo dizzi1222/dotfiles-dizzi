@@ -22,7 +22,9 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
+      "applications:wine-discord-ipc-bridge-wine",
       "clipboard:history",
+      "@knoopx/store.vicinae.nix:packages",
       "applications:display-setup",
       "applications:waydroid-start-sd",
       "applications:Stremio_Web"
@@ -35,6 +37,11 @@
             }
          }
       },
+      "@sovereign/store.vicinae.awww-switcher": {
+         "preferences": {
+            "wallpaperPath": "/home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers"
+         }
+      },
       "applications": {
          "entrypoints": {
             "Dorion": {
@@ -43,7 +50,16 @@
             "Shadow_PC": {
                "enabled": false
             },
+            "discord": {
+               "enabled": false
+            },
             "gaming--PokeMMO--1772229200.475779": {
+               "enabled": false
+            },
+            "net.lutris.geforce-infinity-125": {
+               "enabled": false
+            },
+            "net.lutris.geforce-now-86": {
                "enabled": false
             },
             "net.lutris.neovim-124": {

@@ -88,7 +88,7 @@
                   :onclick "reboot" "")
           (button :class "exit"
                   :tooltip "Exit"
-                  :onclick "killall Hyprland" "")
+                  :onclick "pkill Hyprland" "")
         (button :class "suspend"
                 :tooltip "Suspend"
                 :onclick "systemctl suspend" ""))))))

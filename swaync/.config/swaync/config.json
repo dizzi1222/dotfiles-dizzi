@@ -58,7 +58,7 @@
       "label": "󰌌",
       "max": 2,
       "max_limit": 2,
-      "cmd_getter": "cat /sys/class/leds/dell::kbd_backlight/brightness",
+      "cmd_getter": "cat /sys/class/leds/tpacpi::kbd_backlight/brightness",
       "cmd_setter": "/home/diego/scripts/kbd-backlight-set $value"
     },
     "buttons-grid": {
@@ -145,6 +145,10 @@
       "state": "muted",
       "urgency": "Low",
       "app-name": "Spotify"
+    },
+    "espanso": {
+      "state": "muted",
+      "app-name": "Espanso"
     }
   }
 }

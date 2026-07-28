@@ -1,16 +1,26 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   # ── Hyprland (System Level) ────────────────────────────────
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    package = pkgs.hyprland.override { wrapRuntimeDeps = false; };
   };
 
-  # ── XDG Portal ─────────────────────────────────────────────
+  # ── XDG Portal ──────────────────────────────────────────────
+  # Backends declarativos (sin duplicación de units). El routing por WM lo
+  # declara cada WM: Hyprland se auto-detecta vía UseIn=Hyprland
+  # (portalPackage) y niri vía su niri-portals.conf del paquete
+  # (default=gnome;gtk; → screencast por xdg-desktop-portal-gnome).
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
+    xdgOpenUsePortal = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-gnome
+    ];
   };
 
   # ── Hyprland ecosystem packages ────────────────────────────
@@ -30,12 +40,15 @@
     # Waybar + widgets
     waybar
     eww
+    inputs.quickshell.packages.${pkgs.system}.default
 
     # Launchers
     wofi
     fuzzel
     rofi
     wlogout
+    vicinae
+
 
     # Notifications
     dunst
@@ -94,6 +107,11 @@
     # Bluetooth TUI
     bluetui
 
+    # Input devices / controllers
+    antimicrox
+    evtest
+    sc-controller
+
     # File bind mount (waydroid sync)
     bindfs
 
@@ -110,6 +128,10 @@
     libnotify
     networkmanagerapplet
     udiskie
+
+    # Dev tools
+    opencode
+    # opencode-desktop
 
     # Qt/GTK Wayland
     qt5.qtwayland
