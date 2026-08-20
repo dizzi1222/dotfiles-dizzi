@@ -4,7 +4,8 @@
 #######################################################################################
 
 # Directorio de wallpapers
-WALL_DIR="$HOME/wallpapers/wallpapers/"
+WALL_DIR="$HOME/wallpapers/wallpapers/wallpapers/"
+CACHE_DIR="$HOME/.cache/wallpaper"
 cd "$WALL_DIR" || exit
 
 # Selección desde Rofi con previews
@@ -15,7 +16,7 @@ done | rofi -dmenu -p "󰸉 " -theme ~/.config/rofi/config-wallpaper.rasi)
 if [ -n "$SELECTED_WALL" ]; then
   notify-send "🎨 Changing Theme" "Applying new wallpaper with epic transition..."
 
-  # 🎭 Array de 6 animaciones increíbles
+  # 🎭 Array de 6 animaciones increíbles (type|params)
   transitions=(
     # 1️⃣ Ola épica desde cualquier dirección
     "wave --transition-angle 45 --transition-fps 60 --transition-step 90 --transition-wave 30,20"
@@ -36,8 +37,10 @@ if [ -n "$SELECTED_WALL" ]; then
     "center --transition-fps 30 --transition-step 2"
   )
 
-  # 🎲 Seleccionar animación aleatoria
-  RANDOM_TRANSITION=${transitions[$RANDOM % ${#transitions[@]}]}
+  # 🎲 Seleccionar animación aleatoria y separar type|params
+  RANDOM_ENTRY=${transitions[$RANDOM % ${#transitions[@]}]}
+  TRANS_TYPE="${RANDOM_ENTRY%%|*}"
+  TRANS_PARAMS="${RANDOM_ENTRY#*|}"
 
   # 🔧 Función para detectar el compositor
   detect_compositor() {

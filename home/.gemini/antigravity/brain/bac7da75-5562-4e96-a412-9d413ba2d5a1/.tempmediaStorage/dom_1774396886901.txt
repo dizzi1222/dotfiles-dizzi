@@ -1,0 +1,128 @@
+<current_dom_explanation>
+This is a temporary snapshot of the current page's DOM structure. The DOM will change if you navigate to or interact with another page. Use a tool like browser_get_dom to capture and preserve the DOM in your trajectory if needed for later reference.
+</current_dom_explanation>
+<current_dom>
+💰
+Capital
+[0] (195,32)<a class='topnav__link topnav__link--active' href='#'>Wealth />
+[1] (272,32)<a class='topnav__link' href='#'>Team />
+[2] (338,32)<a class='topnav__link' href='#'>Tax />
+[3] (414,32)<a class='topnav__link' href='#'>Services />
+[4] (495,32)<a class='topnav__link' href='#'>Vault />
+[5] (961,32)<div  />
+	[6] (961,32)<span >DH />
+💰
+Wealth
+All information about your finances
+[7] (719,96)<button class='tab tab--active'>Accounts />
+[8] (817,96)<button class='tab'>Transactions />
+[9] (905,96)<button class='tab'>Flows />
+[10] (959,96)<button aria-label='More options' class='tab tab--icon'>⋯ />
+[11] (150,564)<aside class='sidebar' id='sidebar' scrollable='true' />
+	[12] (141,179)<input class='sidebar__search-input' id='searchAccounts' placeholder='Search accounts' />
+	⌘K
+	[13] (142,244)<button class='sidebar__add-btn' id='addAccountBtn'>Add Account />
+		[14] (99,244)<span >+ />
+	[15] (142,331)<div  />
+		[16] (81,331)<div  />
+			[17] (44,331)<span >⊞ />
+			[18] (99,331)<span >Net Worth />
+		[19] (194,331)<div  />
+			[20] (163,331)<span >$20.98M />
+			[21] (226,331)<span >↑12.6% />
+	[22] (142,410)<div  />
+		[23] (64,410)<div  />
+			[24] (43,410)<span >💵 />
+			[25] (83,410)<span >Cash />
+		[26] (231,410)<div  />
+			[27] (231,410)<span >$2.80M />
+	[28] (142,477)<div  />
+		[29] (90,477)<div  />
+			[30] (43,477)<span >📊 />
+			[31] (108,477)<span >Public Assets />
+		[32] (231,477)<div  />
+			[33] (231,477)<span >$1.85M />
+	[34] (142,544)<div  />
+		[35] (69,544)<div  />
+			[36] (43,544)<span >₿ />
+			[37] (88,544)<span >Crypto />
+		[38] (224,544)<div  />
+			[39] (224,544)<span >$341.43K />
+	[40] (142,610)<div  />
+		[41] (99,610)<div  />
+			[42] (43,610)<span >🏢 />
+			[43] (117,610)<span >Company Equity />
+		[44] (231,610)<div  />
+			[45] (231,610)<span >$8.85M />
+	[46] (142,682)<div  />
+		[47] (89,682)<div  />
+			[48] (66,682)<span >S />
+			[49] (105,682)<span >Stripe />
+		[50] (226,682)<div  />
+			[51] (232,672)<span >$6.03M />
+			[52] (226,693)<span >1 month ago />
+	Vested Options
+	$4.80M
+	Common Stock
+	$1.23M
+	[53] (142,841)<div  />
+		[54] (90,841)<div  />
+			[55] (66,841)<span >F />
+			[56] (105,841)<span >Figma />
+		[57] (226,841)<div  />
+			[58] (232,832)<span >$2.57M />
+			[59] (226,853)<span >1 month ago />
+	Vested Options
+	$1.57M
+	Unvested Options
+	$869.48K
+	M
+	Mercury
+	[60] (226,991)<span >$250.00K />
+[61] (650,564)<section class='content' scrollable='true' />
+	Assets
+	Liabilities
+	Assets Classes
+	Assets
+	All
+	≡
+	Weight H > L
+	↕
+	Stripe Vested options
+	$4,800,000.00
+	24.16%
+	Assets
+	Asset Class
+	% of Assets
+	Value
+	All-time Return
+	S
+	Stripe
+	Vested Options · 175K shares
+	Company Equity
+	24.16%
+	$4,800,000.00
+	↑ 100%
+	W
+	Wells Fargo
+	USD · $3M
+	Cash
+	13.36%
+	$2,708,336.20
+	↓ 25%
+	F
+	Figma
+	Vested Options · 24K shares
+	Company Equity
+	12.5%
+	$2,500,000.00
+	↓ 18%
+	M
+	Mercury
+	Common Shares · 10K shares
+	Company Equity
+	12.4%
+	$2,400,000.00
+	↑ 12%
+
+</current_dom>

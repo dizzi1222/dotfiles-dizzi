@@ -1,5 +1,8 @@
 game:
-  exe: /home/diego/.wine/drive_c/Games/KONAMI/Pro Evolution Soccer 6/PES6.exe
-  working_dir: /home/diego/.wine/drive_c/Games/KONAMI/Pro Evolution Soccer 6/
+  exe: /home/diego/.local/bin/juegos/pes6.sh
+  working_dir: ''
+system:
+  env:
+    WINEDEBUG: -all
 wine:
   version: wine-ge-8-26-x86_64

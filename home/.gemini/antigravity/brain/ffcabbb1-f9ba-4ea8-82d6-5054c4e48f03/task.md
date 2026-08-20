@@ -1,0 +1,22 @@
+# PCE-Agencia — Implementación
+
+## Backend (Server)
+- [ ] Configuración inicial (`package.json`, `.env`, `index.js`)
+- [ ] Conexión a MongoDB (`src/config/db.js`)
+- [ ] Modelos Mongoose (User, Cliente, Proveedor, Itinerario, Reserva, Transaccion, Factura)
+- [ ] Middlewares (auth JWT, roles)
+- [ ] Rutas y Controladores Auth (register/login)
+- [ ] Rutas y Controladores CRUD (clientes, proveedores, itinerarios, reservas, transacciones, facturas)
+
+## Frontend (Client)
+- [ ] Inicializar Vite + React
+- [ ] Instalar dependencias (react-router, axios, tailwindcss)
+- [ ] Layout base (Navbar, Sidebar, estructura general)
+- [ ] Páginas Auth (Login, Register)
+- [ ] Páginas CRUD (Clientes, Proveedores, Itinerarios, Reservas)
+- [ ] Services (axios) para conectar con API
+- [ ] Dashboard / Reportes
+
+## Verificación
+- [ ] Backend levanta y conecta a MongoDB
+- [ ] Frontend compila y se renderiza correctamente

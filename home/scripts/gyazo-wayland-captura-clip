@@ -15,6 +15,9 @@ grim -g "$(slurp)" "$IMG_PATH" || {
   exit 1
 }
 
+# === Guardar copia en Escritorio ===
+cp "$IMG_PATH" "$HOME/Escritorio/$(basename "$IMG_PATH")"
+
 # === Copiar imagen como archivo binario al portapapeles ===
 wl-copy --type image/png <"$IMG_PATH"
 

@@ -29,7 +29,10 @@ First, install Autocomplete itself. Here are some way to do so:
     manager. As of this writing, this package is available through Homebrew, Nix, `pacman`, Plumage,
     and (as `app-shells/zsh-autocomplete`) Portage.
   * To always use the latest commit on the `main` branch, do one of the following:
-    * Use `pacman` to install `zsh-autocomplete-git`.
+    * Install the AUR package [zsh-autocomplete-git](https://aur.archlinux.org/packages/zsh-autocomplete-git)<sup>AUR</sup> from the Arch User Repository (for example, using [yay](https://github.com/Jguer/yay), an AUR helper):
+      ```sh
+       yay -S zsh-autocomplete-git
+      ```
     * Use a Zsh plugin manager to install `marlonrichert/zsh-autocomplete`. (If you don't have a
       plugin manager yet, I recommend using [Znap](https://github.com/marlonrichert/zsh-snap).)
     * Clone the repo directly:
@@ -256,7 +259,7 @@ then a space is never inserted.
 By default, Autocomplete adds a semicolon to each history line to allow adding another line with
 <kbd>Ctrl</kbd><kbd>Space</kbd>. You can deactivate this feature as follows:
 ```zsh
-zstyle ':autocomplete:*' append-semicolon no
+zstyle ':autocomplete:*' add-semicolon no
 ```
 
 ### Start each command line in history search mode
@@ -321,30 +324,37 @@ generates more lines than fit on screen, you can simply use <kbd>PgUp</kbd> and 
 scroll through the excess lines. (Note: On some terminals, you have to additionally hold
 <kbd>Shift</kbd> or, otherwise, it will scroll the terminal buffer instead.)
 
-### Use a custom backend for recent directories
-Autocomplete comes with its own backend for keeping track of and listing recent directories (which
-uses part of
-[`cdr`](https://zsh.sourceforge.io/Doc/Release/User-Contributions.html#Recent-Directories) under the
-hood). However, you can override this and supply Autocomplete with recent directories from any
-source that you like. To do so, define a function like this:
+### Use a custom backend for recent directories/files
+Autocomplete by default uses [`cdr`](
+https://zsh.sourceforge.io/Doc/Release/User-Contributions.html#Recent-Directories)
+to keeping track of and list recent directories (but not files). Override the following two
+functions to supply Autocomplete with recent directories/files from any source that you like:
 
-```sh
-+autocomplete:recent-directories() {
-  <code>
-  typeset -ga reply=( <any number of absolute paths> )
+```zsh
+# This function should populate an array $reply with a list of absolute paths. Path completions are
+# listed in the same order as in this array.
+chpwd_recent_filehandler() {
+  reply=( '/first/recent/dir' '/recent/file' '/second/recent/dir' )
 }
+
+# Called whenever you change dirs, to give you a chance to write the new dir to file.
+# NOTE: If you override the function above, then you are *required* to override this one, too. Can
+# be left empty, though.
+chpwd_recent_dirs() {}
 ```
 
-#### Add a backend for recent files
-Out of the box, Autocomplete doesn't track or offer recent files. However, it will do so if you add
-a backend for it:
-
-```sh
-+autocomplete:recent-files() {
-  <code>
-  typeset -ga reply=( <any number of absolute paths> )
-}
+### Auto-include recent directories
+Instead of having to press a keyboard shortcut, you can automatically include recent directories
+whenever directories are listed:
+```zsh
+# Show recent dirs unless the current word is empty or equal to an existing directory.
+zstyle -e ':completion:*:directories' fake '
+    [[ -z $PREFIX$SUFFIX || -d $PREFIX$SUFFIX ]] ||
+        +autocomplete:recent-directories
+'
+zstyle ':completion:*:directories' sort no
 ```
+
 
 ## Troubleshooting
 Try the steps in the

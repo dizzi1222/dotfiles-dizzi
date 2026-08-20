@@ -180,11 +180,10 @@ print_success "Audio configurado"
 print_step "4/35: Bluetooth"
 print_installing "BlueZ + Blueman + Bluetuith"
 sudo pacman -S --needed --noconfirm \
-  bluez-utils blueman bluez-plugins
-# bluez en conflicto con bluez-ps3 lo quite
+  bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO # bluez en conflicto con bluez-ps3 lo quite
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  bluez-ps3 bluetuith 2>/dev/null || true
+  bluez bluetuith 2>/dev/null || true  # necesitas bluez-ps3  para que funcione el bluetooth en wine/bottles PS3 CONTROLLER
 
 sudo systemctl enable --now bluetooth
 print_success "Bluetooth habilitado"
@@ -200,6 +199,7 @@ sudo pacman -S --needed --noconfirm \
   ttf-font-awesome ttf-dejavu ttf-liberation \
   adobe-source-han-sans-otc-fonts \
   adobe-source-han-serif-otc-fonts
+sh ~/.local/bin/MAC-theme🫟🔴🔵🟢 && sh ~/scripts/fix-gtk-fonts-icons.sh
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   ttf-iosevka ttf-mononoki-nerd otf-hermit-nerd 2>/dev/null || true
@@ -225,8 +225,17 @@ fi
 # ═══════════════════════════════════════════════════════════
 print_step "7/35: Hyprland Ecosystem"
 print_installing "Hyprland + Waybar + Rofi + Dunst + Kitty/Zellij + Nix Packer"
+
+# 🔧 Fix CachyOS: swww se llama awww y necesita symlinks
+if grep -qi "cachyos" /etc/os-release 2>/dev/null; then
+  print_warning "CachyOS detectado: instalando awww en lugar de swww"
+  SWWW_PKG="awww"
+else
+  SWWW_PKG="swww"
+fi
+
 sudo pacman -S --needed --noconfirm \
-  hyprland xdg-desktop-portal-hyprland \
+  hyprland xdg-desktop-portal-hyprland cinnamon gpick copyq flameshot cage \
   waybar rofi-wayland dunst \
   kitty ghostty konsole thunar nemo \
   grim slurp wl-clipboard cliphist \
@@ -434,16 +443,20 @@ sudo pacman -S --needed --noconfirm \
 # 🔴 CORRECCIÓN: Remover linuxconsole antes de instalar joyutils
 sudo pacman -R --noconfirm linuxconsole 2>/dev/null || true
 
-# Ahora instalar joyutils sin conflicto
-sudo pacman -S --needed --noconfirm joyutils
+sudo pacman -S --needed --noconfirm joyutils # Ahora instalar joyutils sin conflicto
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  ds4drv xpadneo-dkms sixpair input-remapper \
+  xpadneo-dkms input-remapper espanso-wayland \
   2>/dev/null || print_warning "Algunos drivers fallaron"
 
-# Crear grupos
+sudo tee /etc/udev/rules.d/99-8bitdo-xinput.rules << 'EOF'
+ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 310a > /sys/bus/usb/drivers/xpad/new_id'"
+ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", MODE="0666"
+EOF
+sudo udevadm control --reload-rules && sudo systemctl restart dkms # 8bitdo ultimate 2c wireless - bt→xinput (reemplaza aur package roto:8bitdo-ultimate-controller-udev | xboxrdrv )
+
 sudo groupadd uinput 2>/dev/null || true
-sudo usermod -aG input,uinput $USER
+sudo usermod -aG input,uinput $USER # Crear grupos
 
 print_success "Controllers configurados"
 
@@ -458,15 +471,13 @@ read -p "¿Configurar PS3 controller específicamente? [s/N]: " setup_ps3
 if [[ "$setup_ps3" =~ ^[Ss]$ ]]; then
   print_header "Configurando PS3 Controller"
 
-  # Dependencias específicas PS3
   print_installing "Dependencias PS3 (bluez-ps3, sixpair, ds4drv)"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    bluez-ps3 sixpair ds4drv 2>/dev/null || print_warning "Algunas dependencias fallaron"
+    bluez-ps3 sixpair ds4drv 2>/dev/null || print_warning "Algunas dependencias fallaron" # Dependencias específicas PS3
 
-  # Configurar kernel module
   print_status "Configurando módulo hid_sony"
   echo 'hid_sony' | sudo tee /etc/modules-load.d/hid_sony.conf
-  sudo modprobe hid_sony 2>/dev/null || true
+  sudo modprobe hid_sony 2>/dev/null || true # Configurar kernel module
 
   # Script de conexión PS3
   print_status "Creando script de conexión PS3"
@@ -523,7 +534,6 @@ EOL
 
   print_success "PS3 configurado"
   print_status "Ejecuta: ~/conectar-ps3.sh para conectar tu control"
-
   # Ofrecer conectar ahora
   echo
   read -p "¿Conectar PS3 controller ahora? [s/N]: " connect_now
@@ -534,7 +544,6 @@ EOL
 else
   print_warning "Configuración PS3 omitida"
 fi
-
 # ═══════════════════════════════════════════════════════════
 # PASO 13: APLICACIONES (SOLO -BIN)
 # ═══════════════════════════════════════════════════════════
@@ -543,10 +552,10 @@ print_installing "Firefox + VLC [+plugins] + OBS + GIMP + Krita + LibreOffice"
 sudo pacman -S --needed --noconfirm \
   firefox vlc vlc-plugins-all mpv obs-studio \
   gimp inkscape krita \
-  libreoffice-fresh filezilla transmission-gtk \
+  libreoffice-fresh okular filezilla transmission-gtk \
   pavucontrol loupe \
   scrcpy android-file-transfer \
-  gvfs gvfs-gphoto2 kio-extras libxfce4ui
+  gvfs gvfs-gphoto2 kio-extras libxfce4ui # comentado firefox. uso ZEN, obs-studio funciona mejor en flatpak
 
 # ═══════════════════════════════════════════════════════════
 # Kdenlive - Selección interactiva
@@ -619,17 +628,13 @@ echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Visual Studio Code${NC} (vscode-bin + code-features)"
 echo -e "  ${MAGENTA}•${NC} Editor más popular"
-echo -e "  ${MAGENTA}•${NC} Extensiones oficiales de Microsoft"
 echo -e "  ${MAGENTA}•${NC} Incluye code-features para mejor integración"
 echo
 echo -e "${BOLD}${GREEN}2. Cursor${NC} (cursor-bin)"
 echo -e "  ${MAGENTA}•${NC} Fork de VSCode con IA integrada"
-echo -e "  ${MAGENTA}•${NC} Copilot++ nativo"
-echo -e "  ${MAGENTA}•${NC} Compatible con extensiones de VSCode"
 echo
 echo -e "${BOLD}${GREEN}3. Antigravity${NC} (yay)"
-echo -e "  ${MAGENTA}•${NC} Editor experimental"
-echo -e "  ${MAGENTA}•${NC} Ligero y rápido"
+echo -e "  ${MAGENTA}•${NC} Editor experimental, Excelente"
 echo
 echo -e "${BOLD}${GREEN}4. Ninguno${NC}"
 echo -e "  ${MAGENTA}•${NC} Omitir instalación de editor"
@@ -669,12 +674,12 @@ case "$editor_choice" in
 
   print_success "Cursor instalado"
   ;;
-3)
-  print_header "Instalando Antigravity"
-  print_installing "antigravity desde yay"
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    antigravity \
-    2>/dev/null || print_warning "Antigravity falló"
+  3)
+    print_header "Instalando Antigravity"
+    print_installing "antigravity desde yay"
+    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+      antigravity \
+      2>/dev/null || print_warning "Antigravity falló"
 
   print_success "Antigravity instalado"
   ;;
@@ -1293,7 +1298,7 @@ if [[ "$STREMIO_INSTALLED" == false ]]; then
 
     # Instalar Flatpak si no está
     if ! command -v flatpak &>/dev/null; then
-      sudo pacman -S --needed --noconfirm flatpak
+      sudo pacman -S --needed --noconfirm flatpak && read -rp "¿Instalar PokeMMO? [s/N]: " r && [[ "$r" =~ ^[sS]$ ]] && flatpak install flathub com.pokemmo.PokeMMO
     fi
 
     # Agregar Flathub
@@ -1533,7 +1538,74 @@ else
   print_warning "Gemini CLI omitido"
 fi
 
-print_success "Dev tools instalados"
+# ═══════════════════════════════════════════════════════════
+# GCLOUD CLI + CLOUD SQL AUTH PROXY
+# ═══════════════════════════════════════════════════════════
+
+print_header "Google Cloud CLI + Cloud SQL Auth Proxy"
+print_installing "gcloud CLI"
+
+if ! command -v gcloud &>/dev/null; then
+  GCLOUD_VERSION="523.0.0"
+  GCLOUD_TAR="/tmp/google-cloud-cli-${GCLOUD_VERSION}-linux-x86_64.tar.gz"
+
+  print_status "Descargando Google Cloud CLI ${GCLOUD_VERSION}..."
+  wget -q --show-progress -O "$GCLOUD_TAR" \
+    "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_VERSION}-linux-x86_64.tar.gz"
+
+  print_status "Extrayendo..."
+  tar -xf "$GCLOUD_TAR" -C /tmp/
+
+  print_status "Instalando gcloud CLI..."
+  cd /tmp/google-cloud-sdk
+  ./install.sh --quiet --path-update=true --command-completion=true --usage-reporting=false
+  cd ~
+
+  rm -f "$GCLOUD_TAR"
+  print_success "gcloud CLI instalado (reinicia terminal o ejecuta: source ~/.bashrc)"
+else
+  print_success "gcloud CLI ya instalado: $(gcloud version 2>/dev/null | head -1)"
+fi
+
+print_installing "Cloud SQL Auth Proxy"
+if [[ ! -f ~/cloud-sql-proxy ]]; then
+  print_status "Descargando Cloud SQL Auth Proxy v2.21.3..."
+  curl -#Lo ~/cloud-sql-proxy \
+    https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.21.3/cloud-sql-proxy.linux.amd64
+  chmod +x ~/cloud-sql-proxy
+  print_success "cloud-sql-proxy descargado en ~/cloud-sql-proxy"
+else
+  print_success "cloud-sql-proxy ya descargado en ~/cloud-sql-proxy"
+fi
+
+print_header "Configuracion manual: pgAdmin4 + conexion a GCP"
+echo
+echo -e "${BOLD}Pasos para conectar a la BD del PTD:${NC}"
+echo
+echo -e "  ${GREEN}1.${NC} Autenticate con tu cuenta CIC (abre navegador):"
+echo -e "     ${CYAN}gcloud auth application-default login${NC}"
+echo
+echo -e "  ${GREEN}2.${NC} Inicia el proxy (en OTRA terminal, mantener corriendo):"
+echo -e "     ${CYAN}~/cloud-sql-proxy --port 5433 cic-ptd-dev:us-east1:cic-ptd-dev${NC}"
+echo
+echo -e "  ${GREEN}3.${NC} Abre pgAdmin4 y crea nueva conexion con:"
+echo -e "     - ${BOLD}Host:${NC}     ${YELLOW}127.0.0.1${NC} (NUNCA el nombre de la BD)"
+echo -e "     - ${BOLD}Port:${NC}     ${YELLOW}5433${NC} (el del proxy, no 5432)"
+echo -e "     - ${BOLD}Database:${NC} ${YELLOW}talento-dev${NC}"
+echo -e "     - ${BOLD}Username:${NC} ${YELLOW}talento-dev${NC}"
+echo -e "     - ${BOLD}Password:${NC} ${YELLOW}**** (ver .env o 1Password)${NC}"
+echo
+echo -e "  ${GREEN}4.${NC} Conexion via psql (alternativa):"
+echo -e "     ${CYAN}psql -h 127.0.0.1 -p 5433 -U talento-dev -d talento-dev${NC}"
+echo
+echo -e "  ${YELLOW}Errores comunes:${NC}"
+echo -e "     - ${RED}failed to resolve host${NC} → pusiste 'talento-dev' como Host (debe ser 127.0.0.1)"
+echo -e "     - ${RED}Connection refused port 5432${NC} → usa puerto 5433 (del proxy) no 5432"
+echo -e "     - ${RED}Connection refused${NC} → el proxy no esta corriendo"
+echo
+read -rp "$(echo -e ${YELLOW}Presiona Enter cuando hayas configurado pgAdmin4 o para continuar...${NC})" </dev/tty
+
+print_success "GCloud + Cloud SQL Proxy listos"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 15: ZSH + OH-MY-ZSH
@@ -1588,9 +1660,19 @@ fi
 sudo chsh -s $(which zsh) $USER 2>/dev/null || print_warning "Cambio de shell manual requerido"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 16: DOTFILES
+# PASO 16: OH-MY-POSH
 # ═══════════════════════════════════════════════════════════
-print_step "16/35: Dotfiles dizzi1222"
+print_step "16/35: Oh-My-Posh (Prompt Moderno)"
+print_installing "oh-my-posh desde AUR"
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  oh-my-posh 2>/dev/null || print_warning "oh-my-posh falló"
+
+print_success "Oh-My-Posh instalado"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 17: DOTFILES
+# ═══════════════════════════════════════════════════════════
+print_step "17/35: Dotfiles dizzi1222"
 if [[ ! -d ~/dotfiles-dizzi ]]; then
   print_installing "Clonando dotfiles desde GitHub"
   git clone https://github.com/dizzi1222/dotfiles-dizzi.git ~/dotfiles-dizzi || {
@@ -1611,7 +1693,22 @@ if [[ -d ~/dotfiles-dizzi ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
     fi
-  done
+  done # PROCEDO A APLICAR CONFIG DE CINNAMON.
+
+[[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ < ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
+print_status "Aplicando Submodulos [NVIM]    ."
+
+echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+# Verificar submodules
+git submodule update --init --recursive
+rm -rf nvim
+
+# Recuperar cada submódulo
+git submodule update --init --recursive nvim
+
+echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
+cd  nvim/.config/nvim  && git checkout main
+cd  ../../../
 
 print_status "Aplicando Submodulos [NVIM]    ."
 
@@ -1631,9 +1728,9 @@ cd  ../../../
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 17: SYMLINKS A /etc
+# PASO 18: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
+print_step "18/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
@@ -1642,6 +1739,21 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules ]]; then
     print_package "Symlink: DualSense (PS5)"
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules /etc/udev/rules.d/
+  fi
+
+  # Config de Sudoers POWER para systemctl reboot --force --force
+  if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
+    print_package "Symlink: Sudoers POWER"
+    # sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # como root ejecuta: su - # &
+    # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
+  fi
+
+  # TIMESHIFT Snapshots config
+  if [[ -f ~/dotfiles-dizzi/etc/timeshift/timeshift.json ]]; then
+    print_package "Symlink: Timeshift Snapshots"
+    sudo mkdir -p /etc/timeshift
+    sudo ln -sf ~/dotfiles-dizzi/etc/timeshift/timeshift.json /etc/timeshift/timeshift.json
   fi
 
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-ds4-controllers.rules ]]; then
@@ -1690,6 +1802,8 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo pacman -S gnome-keyring --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
+  # Para SDDM THEME
+  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && { print_package "Symlink: SDDM Theme de Jake"; sudo pacman -S sddm --needed --noconfirm; sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf; }
 
   # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
@@ -2437,9 +2551,6 @@ EOL
     echo -e "  ${YELLOW}ydotool click${NC}  → Click izquierdo"
     echo -e "  ${YELLOW}ydotool click 0xC1${NC}  → Click derecho"
     echo
-    echo -e "${CYAN}Autoclicker:${NC}"
-    echo -e "  ${YELLOW}while true; do ydotool click; sleep 0.1; done${NC}"
-    echo
   fi
 
   # ══════════════════════════════════════════════════════════════════
@@ -2707,7 +2818,7 @@ gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
 # ═══════════════════════════════════════════════════════════
 # PASO 26: PYTHON-PYWAL
 # ═══════════════════════════════════════════════════════════
-print_step " 5/35: Python-pywal (Temas Dinámicos)"
+print_step " 26/35: Python-pywal (Temas Dinámicos)"
 print_installing "python-pywal + imagemagick"
 sudo pacman -S --needed --noconfirm python-pywal imagemagick
 
@@ -2721,17 +2832,7 @@ fi
 print_success "Pywal instalado"
 
 # ═══════════════════════════════════════════════════════════
-# PASO 27: OH-MY-POSH
-# ═══════════════════════════════════════════════════════════
-print_step "26/35: Oh-My-Posh (Prompt Moderno)"
-print_installing "oh-my-posh desde AUR"
-yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  oh-my-posh 2>/dev/null || print_warning "oh-my-posh falló"
-
-print_success "Oh-My-Posh instalado"
-
-# ═══════════════════════════════════════════════════════════
-# PASO 28: OLLAMA + OPENCOMMIT (OCO)
+# PASO 27: OLLAMA + OPENCOMMIT (OCO)
 # ═══════════════════════════════════════════════════════════
 print_step "27/35: Ollama + opencommit (IA Local)"
 
@@ -2746,10 +2847,10 @@ if [[ ! "$install_ollama" =~ ^[Nn]$ ]]; then
   print_installing "Descargando modelo qwen2.5:0.5b (más ligero y rápido)"
   ollama pull qwen2.5:0.5b
   # Modelos Onlines
-  ollama run qwen3-coder:480b-cloud
-  ollama run gpt-oss:120b-cloud
-  ollama run gemma3:27b-cloud
-  ollama run deepseek-v3.1:671b-cloud
+  ollama pull qwen3-coder:480b-cloud
+  ollama pull gpt-oss:120b-cloud
+  ollama pull gemma3:27b-cloud
+  ollama pull deepseek-v3.1:671b-cloud
 
   print_installing "opencommit (npm)"
   npm install -g opencommit
@@ -2844,9 +2945,7 @@ echo -e "${BOLD}${YELLOW}║          🎨 ICONOS, GLYPHS Y EMOJIS 🎨         
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
 echo -e "${CYAN}Este paso instala herramientas para buscar e insertar:${NC}"
-echo -e "  ${MAGENTA}•${NC} Emojis (rofimoji)"
-echo -e "  ${MAGENTA}•${NC} Nerd Font glyphs (iconos para nvim, terminal, etc.)"
-echo -e "  ${MAGENTA}•${NC} Font Awesome, Material Icons, etc."
+echo -e "  ${MAGENTA}•${NC} Nerd Font glyphs, rofimoji (iconos para nvim, terminal, etc.)"
 echo -e "  ${MAGENTA}•${NC} Alternativa a Raycast para Linux (Ulauncher + extensiones)"
 echo
 
@@ -2861,6 +2960,7 @@ sudo pacman -S --needed --noconfirm \
 # Rofimoji para emojis
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   rofimoji 2>/dev/null || print_warning "rofimoji falló"
+sh ~/.local/bin/MAC-theme🫟🔴🔵🟢 && sh ~/scripts/fix-gtk-fonts-icons.sh
 
 print_success "Emojis y Nerd Fonts instalados"
 
@@ -2905,21 +3005,14 @@ echo
 echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. Eww (Elkowar's Wacky Widgets)${NC} - ${MAGENTA}ESENCIAL${NC}"
-echo -e "  ${MAGENTA}•${NC} Widgets ligeros y rápidos"
 echo -e "  ${MAGENTA}•${NC} Configuración en Yuck (similar a Lisp)"
-echo -e "  ${MAGENTA}•${NC} Compatible con Hyprland"
-echo -e "  ${MAGENTA}•${NC} Instalación: ~2 minutos"
 echo
 echo -e "${BOLD}${GREEN}2. Quickshell${NC} - ${YELLOW}OPCIONAL${NC}"
 echo -e "  ${MAGENTA}•${NC} Widgets modernos en QML"
-echo -e "  ${MAGENTA}•${NC} Soporte Qt6"
-echo -e "  ${MAGENTA}•${NC} Compilación: ~15-20 minutos"
 echo
 echo -e "${BOLD}${GREEN}3. Caelestia Shell${NC} - ${YELLOW}OPCIONAL${NC}"
 echo -e "  ${MAGENTA}•${NC} Shell completo basado en Quickshell"
-echo -e "  ${MAGENTA}•${NC} Temas visuales impresionantes"
 echo -e "  ${MAGENTA}•${NC} Compilación: ~30 minutos"
-echo -e "  ${MAGENTA}•${NC} Requiere Quickshell"
 echo
 read -p "¿Instalar Eww (esencial)? [S/n]: " install_eww
 read -p "¿Instalar Quickshell (compilación ~15min)? [s/N]: " install_quickshell
@@ -3139,6 +3232,15 @@ rclone mount gd-musica:/ ~/mi_gdmusica --vfs-cache-mode full &
 EOL
   chmod +x ~/montar_gdmusica.sh
 
+  # Script para gdrive libros
+  cat >~/montar_gd-libros.sh <<'EOL'
+#!/bin/bash
+fusermount -u ~/mi_gdlibros 2>/dev/null
+mkdir -p ~/mi_gdlibros
+rclone mount gd-libros:/ ~/mi_gdlibros --vfs-cache-mode full &
+EOL
+  chmod +x ~/montar_gd-libros.sh
+
   # Crear servicios systemd
   mkdir -p ~/.config/systemd/user
 
@@ -3166,10 +3268,23 @@ Type=oneshot
 WantedBy=default.target
 EOL
 
+  cat >~/.config/systemd/user/montar_gd-libros.service <<'EOL'
+[Unit]
+Description=Montar Google Drive Libros al iniciar sesión
+
+[Service]
+ExecStart=/home/diego/montar_gd-libros.sh
+Type=oneshot
+
+[Install]
+WantedBy=default.target
+EOL
+
   # Habilitar servicios
   systemctl --user daemon-reload
   systemctl --user enable montar_gdrive.service
   systemctl --user enable montar_gdmusica.service
+  systemctl --user enable montar_gd-libros.service
 
   print_success "Rclone configurado"
   print_status "Monta manualmente con: ~/montar_gdrive.sh"
@@ -3195,7 +3310,6 @@ if [[ ! "$config_themes" =~ ^[Nn]$ ]]; then
 
   # Configurar Qt para usar temas oscuros
   print_installing "Configurando Qt5/Qt6"
-
   # Qt5
   mkdir -p ~/.config/qt5ct
   cat >~/.config/qt5ct/qt5ct.conf <<'EOL'
@@ -3207,7 +3321,6 @@ color_scheme_path=~/.config/qt5ct/colors/darker.conf
 fixed=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 general=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 EOL
-
   # Qt6
   mkdir -p ~/.config/qt6ct
   cat >~/.config/qt6ct/qt6ct.conf <<'EOL'
@@ -3219,20 +3332,17 @@ color_scheme_path=~/.config/qt6ct/colors/darker.conf
 fixed=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 general=@Variant(\0\0\0@\0\0\0\x12\0J\0e\0t\0B\0r\0a\0i\0n\0s@$\0\0\0\0\0\0\xff\xff\xff\xff\x5\x1\0\x32\x10)
 EOL
-
   # Variables de entorno para Qt
   if [[ -f ~/.config/hypr/hyprland.conf ]]; then
     if ! grep -q "QT_QPA_PLATFORMTHEME" ~/.config/hypr/hyprland.conf; then
       echo "env = QT_QPA_PLATFORMTHEME,qt6ct" >>~/.config/hypr/hyprland.conf
     fi
   fi
-
   # Configurar GTK para tema oscuro
   print_installing "Configurando GTK"
 
   gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark' 2>/dev/null || true
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
-
   # Si existe tema Colloid en dotfiles, aplicarlo
   if [[ -d ~/.themes/Colloid-Dark ]]; then
     gsettings set org.gnome.desktop.interface gtk-theme 'Colloid-Dark' 2>/dev/null || true
@@ -3766,26 +3876,21 @@ echo -e "${BOLD}${YELLOW}╔═════════════════�
 echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️               ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
-echo -e "${CYAN}Opciones disponibles:${NC}"
+echo -e "${CYAN}Sistema modular y completo de backups/snapshots:${NC}"
+echo -e "  ${MAGENTA}•${NC} Detección automática de filesystem (ext4/Btrfs)"
+echo -e "  ${MAGENTA}•${NC} Timeshift para ext4 (rsync incremental)"
+echo -e "  ${MAGENTA}•${NC} Snapper para Btrfs (snapshots nativos)"
+echo -e "  ${MAGENTA}•${NC} Límite de 5GB máximo para ahorro de espacio"
+echo -e "  ${MAGENTA}•${NC} Snapshots automáticos antes de actualizaciones"
+echo -e "  ${MAGENTA}•${NC} Opción de desinstalación/reversión completa"
 echo
-echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
-echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
-echo -e "  ${MAGENTA}•${NC} Soporte Wayland nativo"
-echo -e "  ${MAGENTA}•${NC} Más ligero (~100MB RAM)"
-echo
-echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
-echo -e "  ${MAGENTA}•${NC} ${BOLD}Setup.sh interactivo funcional${NC}"
-echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
-echo -e "  ${MAGENTA}•${NC} Wallpapers animados"
-echo -e "  ${MAGENTA}•${NC} Teclado virtual integrado"
-echo -e "  ${MAGENTA}•${NC} Instalación robusta y confiable"
-echo
-echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
-echo
-read -p "Seleccionar Display Manager [1=GDM, 2=SDDM, 3=Ninguno]: " dm_choice
 
-if [[ "$dm_choice" == "2" ]]; then
-  print_header "🚀 Instalando SDDM + Astronaut Theme (Versión Mejorada)"
+# Ejecutar script de configuración de backups
+if [[ -f ~/dotfiles-dizzi/setup-backup-system.sh ]]; then
+  bash ~/dotfiles-dizzi/setup-backup-system.sh
+else
+  print_error "Script de configuración no encontrado: ~/dotfiles-dizzi/setup-backup-system.sh"
+  read -p "¿Continuar sin configurar backups? [S/n]: " skip_backups
 
   # Paso 1: Instalar SDDM y dependencias
   print_installing "SDDM + Dependencias Qt6"
@@ -3850,59 +3955,250 @@ if [[ "$dm_choice" == "2" ]]; then
 
     print_success "Tema configurado mediante setup.sh"
   fi
+fi
 
-  # Paso 7: Configurar SDDM para usar el tema
-  print_status "Configurando SDDM..."
+echo
+print_success "Configuración de backups completada"
 
+# ═══════════════════════════════════════════════════════════
+# PASO 34.5: DISPLAY MANAGER UNIFICADO (GDM / SDDM / LIGHTDM)
+# ═══════════════════════════════════════════════════════════
+print_step "34.5/35: Display Manager (GDM, SDDM o LightDM)"
+echo
+echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}${YELLOW}║          🖥️  SELECCIONAR DISPLAY MANAGER 🖥️               ║${NC}"
+echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+echo -e "${CYAN}Opciones disponibles:${NC}"
+echo -e "${BOLD}${GREEN}1. GDM${NC} | ${MAGENTA}•${NC} Interfaz limpia y moderna"
+echo -e "${BOLD}${GREEN}2. SDDM${NC} + Astronaut | ${MAGENTA}•${NC} 10 temas visuales"
+echo -e "${BOLD}${GREEN}3. LightDM${NC} + WebKit2 | ${MAGENTA}•${NC} Glorious / Aether"
+echo -e "${BOLD}${GREEN}4. Ninguno${NC} (mantener actual)"
+read -p "Seleccionar [1=GDM, 2=SDDM, 3=LightDM, 4=Ninguno]: " dm_choice
+
+if [[ "$dm_choice" == "1" ]]; then
+  print_header "Instalando GDM"
+  sudo pacman -Sy --needed --noconfirm gdm
+  sudo systemctl set-default graphical.target
+  sudo systemctl disable sddm lightdm 2>/dev/null || true
+  sudo systemctl enable gdm
+  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
+  print_success "GDM habilitado"
+elif [[ "$dm_choice" == "2" ]]; then
+  print_header "Instalando SDDM + Astronaut Theme"
+  sudo pacman -Sy --needed --noconfirm sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
+  sudo systemctl set-default graphical.target
+  sudo systemctl disable gdm lightdm 2>/dev/null || true
+  print_success "SDDM instalado"
+  print_status "Limpiando instalaciones previas..."
+  sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme /tmp/sddm-astronaut-theme
+  print_installing "Clonando tema Astronaut..."
+  cd /tmp && git clone --depth 1 https://github.com/keyitdev/sddm-astronaut-theme.git && cd sddm-astronaut-theme
+  print_success "Tema clonado"
+  # Copiar primero como root, dar permisos al usuario para ejecutar setup.sh
+  sudo cp -r /tmp/sddm-astronaut-theme /usr/share/sddm/themes/
+  sudo chown -R $USER:$USER /usr/share/sddm/themes/sddm-astronaut-theme/
+  [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]] && sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null && fc-cache -fv >/dev/null
+  echo -e "${CYAN}Elige uno de los 10 temas disponibles...${NC}"
+  bash setup.sh
+  sudo chown -R root:root /usr/share/sddm/themes/sddm-astronaut-theme/
+  cd ~
   sudo tee /etc/sddm.conf >/dev/null <<EOF
 [Theme]
 Current=sddm-astronaut-theme
-
 [General]
 InputMethod=qtvirtualkeyboard
 EOF
-
-  # Paso 8: Configurar teclado virtual en conf.d
   sudo mkdir -p /etc/sddm.conf.d
   sudo tee /etc/sddm.conf.d/virtualkbd.conf >/dev/null <<EOF
 [General]
 InputMethod=qtvirtualkeyboard
 EOF
-
-  print_success "Configuración de SDDM completada"
-
-  # Paso 9: Copiar fuentes si existen
-  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]]; then
-    print_status "Instalando fuentes del tema..."
-    sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null || true
-    fc-cache -fv >/dev/null
-    print_success "Fuentes instaladas"
-  fi
-
-  # Paso 10: Habilitar servicio SDDM
-  print_status "Habilitando servicio SDDM..."
+  [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]] && sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null && fc-cache -fv >/dev/null
   sudo systemctl enable sddm
-  print_success "SDDM habilitado"
-
-  # Resumen final
-  echo
-  echo -e "${GREEN}${BOLD}✨ SDDM + Astronaut Theme instalado correctamente ✨${NC}"
-  echo
-  echo -e "${CYAN}Comandos útiles:${NC}"
-  echo -e "  ${YELLOW}•${NC} Probar tema: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
-  echo -e "  ${YELLOW}•${NC} Editar config: ${YELLOW}sudo nano /etc/sddm.conf${NC}"
-  echo -e "  ${YELLOW}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
-  echo
-
-elif [[ "$dm_choice" == "1" ]]; then
-  print_header "Instalando GDM"
-
-  print_installing "GDM (GNOME Display Manager)"
-  sudo pacman -S --needed --noconfirm gdm
-  sudo systemctl enable gdm
-  print_success "GDM habilitado"
+  sudo ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
+  cd ~
+  print_success "SDDM + Astronaut Theme habilitado"
+elif [[ "$dm_choice" == "3" ]]; then
+  print_header "Instalando LightDM + WebKit2 Theme"
+  BACKUP_DIR=~/lightdm-backup-$(date +%Y%m%d_%H%M%S)
+  mkdir -p "$BACKUP_DIR"
+  sudo cp /etc/lightdm/lightdm.conf "$BACKUP_DIR/" 2>/dev/null || true
+  sudo cp /etc/lightdm/lightdm-webkit2-greeter.conf "$BACKUP_DIR/" 2>/dev/null || true
+  print_success "Backup en: $BACKUP_DIR"
+  echo -e "${BOLD}${GREEN}Temas: 1.${NC} Glorious  ${BOLD}${GREEN}2.${NC} Aether"
+  read -p "Seleccionar [1/2]: " webkit_choice
+  sudo pacman -Sy --needed --noconfirm lightdm lightdm-webkit2-greeter wget
+  sudo systemctl set-default graphical.target
+  sudo systemctl disable gdm sddm 2>/dev/null || true
+  print_success "Dependencias instaladas"
+  sudo sed -i 's/^#*greeter-session=.*/greeter-session=lightdm-webkit2-greeter/' /etc/lightdm/lightdm.conf
+  grep -q "^greeter-session=lightdm-webkit2-greeter" /etc/lightdm/lightdm.conf || sudo sed -i '/^\[Seat:\*\]/a greeter-session=lightdm-webkit2-greeter' /etc/lightdm/lightdm.conf
+  THEMES_DIR="/usr/share/lightdm-webkit/themes"
+  sudo mkdir -p "$THEMES_DIR"
+  if [[ "$webkit_choice" == "1" ]]; then
+    THEME_NAME="glorious"
+    cd /tmp
+    wget -q git.io/webkit2 -O theme.tar.gz 2>/dev/null || wget -q https://github.com/manilarome/lightdm-webkit2-theme-glorious/releases/download/v2.0.0/lightdm-webkit2-theme-glorious-2.0.0.tar.gz -O theme.tar.gz 2>/dev/null
+    mkdir -p /tmp/glorious_theme && tar -xzf theme.tar.gz -C /tmp/glorious_theme/ 2>/dev/null
+    sudo mv /tmp/glorious_theme "$THEMES_DIR/glorious" 2>/dev/null || sudo cp -r /tmp/glorious_theme/* "$THEMES_DIR/glorious/" 2>/dev/null
+    rm -rf /tmp/glorious_theme theme.tar.gz && cd ~
+  else
+    THEME_NAME="aether"
+    git clone --depth 1 https://github.com/NoiSek/Aether.git /tmp/aether_theme 2>/dev/null || {
+      THEME_NAME="glorious"
+      cd /tmp && wget -q git.io/webkit2 -O theme.tar.gz 2>/dev/null
+      mkdir -p /tmp/glorious_theme && tar -xzf theme.tar.gz -C /tmp/glorious_theme/ 2>/dev/null
+      sudo mv /tmp/glorious_theme "$THEMES_DIR/glorious" 2>/dev/null
+      rm -rf theme.tar.gz && cd ~
+    }
+    [[ -d /tmp/aether_theme ]] && sudo cp -r /tmp/aether_theme "$THEMES_DIR/aether" && rm -rf /tmp/aether_theme
+  fi
+  WEBKIT_CONF="/etc/lightdm/lightdm-webkit2-greeter.conf"
+  if [[ ! -f "$WEBKIT_CONF" ]]; then
+    sudo tee "$WEBKIT_CONF" > /dev/null <<EOF
+[greeter]
+debug_mode          = false
+detect_theme_errors = true
+screensaver_timeout = 300
+secure_mode         = true
+time_format         = LT
+time_language       = auto
+webkit_theme        = $THEME_NAME
+EOF
+  else
+    sudo sed -i "s/^webkit_theme.*/webkit_theme        = $THEME_NAME/" "$WEBKIT_CONF"
+    sudo sed -i "s/^debug_mode.*/debug_mode          = true/" "$WEBKIT_CONF"
+  fi
+  sudo systemctl enable lightdm
+  sudo ln -sf /usr/lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
+  print_success "LightDM habilitado"
 else
   print_warning "Display Manager omitido (manteniendo actual)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.6: GEFORCE NOW (FLATPAK OFICIAL NVIDIA)
+# ═══════════════════════════════════════════════════════════
+echo ""
+print_step "34.6: GeForce NOW (Flatpak oficial NVIDIA)"
+read -p "¿Instalar GeForce NOW oficial (Flatpak NVIDIA)? [S/n]: " f_gfn
+if [[ ! "$f_gfn" =~ ^[Nn]$ ]]; then
+  # Verificar flatpak
+  if ! command -v flatpak &>/dev/null; then
+    sudo pacman -S --needed --noconfirm flatpak
+  fi
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+  # Agregar remote oficial NVIDIA
+  if ! flatpak remotes --columns=name | grep -q "^GeForceNOW$"; then
+    flatpak remote-add --user --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo
+    print_success "Remote NVIDIA GeForceNOW agregado"
+  fi
+
+  # Runtime 24.08 requerido por GFN oficial (aunque ya exista 25.08)
+  if ! flatpak list --columns=application,branch | grep -q "org.freedesktop.Platform//24.08"; then
+    print_status "Instalando runtime org.freedesktop.Platform 24.08 (requerido por GFN)..."
+    flatpak install -y --system flathub org.freedesktop.Platform//24.08
+  fi
+
+  # Capa Vulkan gamescope (requerida por GFN)
+  if ! flatpak list --columns=application | grep -q "org.freedesktop.Platform.VulkanLayer.gamescope"; then
+    print_status "Instalando VulkanLayer gamescope..."
+    flatpak install -y --user flathub org.freedesktop.Platform.VulkanLayer.gamescope
+  fi
+
+  # Instalar app oficial GFN
+  if ! flatpak list --columns=application | grep -q "com.nvidia.geforcenow"; then
+    print_status "Instalando NVIDIA GeForce NOW..."
+    flatpak install -y --user GeForceNOW com.nvidia.geforcenow
+    print_success "GeForce NOW oficial instalado"
+  else
+    print_success "GeForce NOW ya instalado"
+  fi
+  echo ""
+  print_status "Lanzar con: flatpak run com.nvidia.geforcenow"
+else
+  print_warning "GeForce NOW omitido"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.7: QTSCRCPY (SCRCPY CON UI QT)
+# ═══════════════════════════════════════════════════════════
+print_step "34.7: QtScrcpy"
+if command -v qtscrcpy &> /dev/null || [ -d "/opt/QtScrcpy" ] || [ -d "$HOME/QtScrcpy" ]; then
+  print_success "QtScrcpy ya instalado"
+else
+  if [ "${INSTALL_QTSCRCPY:-true}" = true ]; then
+    print_status "Instalando QtScrcpy..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm qtscrcpy 2>/dev/null && print_success "QtScrcpy instalado via yay" || {
+        print_warning "qtscrcpy no disponible en AUR, compilando desde fuente..."
+        sudo pacman -S --noconfirm --needed qt5-base qt5-multimedia qt5-svg qt5-quickcontrols2 android-tools git base-devel 2>/dev/null
+        cd /tmp
+        rm -rf QtScrcpy 2>/dev/null
+        git clone https://github.com/barry-ran/QtScrcpy.git 2>/dev/null
+        cd QtScrcpy
+        chmod +x build.sh 2>/dev/null
+        ./build.sh 2>/dev/null && print_success "QtScrcpy compilado desde fuente" || print_error "Error compilando QtScrcpy"
+        cd /tmp
+        rm -rf QtScrcpy
+      }
+    else
+      print_warning "yay no disponible, instala QtScrcpy manualmente: yay -S qtscrcpy"
+    fi
+  else
+    print_warning "QtScrcpy omitido"
+  fi
+  echo ""
+  print_status "Ejecutar: qtscrcpy (o desde /opt/QtScrcpy/QtScrcpy)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.8: SYNCTHING-BIN (SYNC DE ARCHIVOS P2P)
+# ═══════════════════════════════════════════════════════════
+print_step "34.8: Syncthing"
+if command -v syncthing &> /dev/null; then
+  print_success "Syncthing ya instalado"
+else
+  if [ "${INSTALL_SYNCTHING:-true}" = true ]; then
+    print_status "Instalando Syncthing..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm syncthing-bin 2>/dev/null && print_success "Syncthing instalado" || print_error "Error instalando Syncthing"
+    else
+      sudo pacman -S --noconfirm syncthing 2>/dev/null && print_success "Syncthing instalado via pacman" || print_error "Error instalando Syncthing"
+    fi
+    # Habilitar servicio
+    systemctl --user enable syncthing.service 2>/dev/null || true
+    systemctl --user start syncthing.service 2>/dev/null || true
+  else
+    print_warning "Syncthing omitido"
+  fi
+  echo ""
+  print_status "Web UI: http://127.0.0.1:8384"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 34.9: RQUICKSHARE (COMPARTIR ARCHIVOS ANDROID<->LINUX)
+# ═══════════════════════════════════════════════════════════
+print_step "34.9: RQuickShare"
+if command -v rquickshare &> /dev/null || [ -d "$HOME/.local/share/rquickshare" ]; then
+  print_success "RQuickShare ya instalado"
+else
+  if [ "${INSTALL_RQUICKSHARE:-true}" = true ]; then
+    print_status "Instalando RQuickShare..."
+    if command -v yay &> /dev/null; then
+      yay -S --noconfirm rquickshare-x-bin 2>/dev/null && print_success "RQuickShare instalado" || {
+        print_warning "rquickshare-x-bin no disponible, intentando r-quick-share-bin..."
+        yay -S --noconfirm r-quick-share-bin 2>/dev/null && print_success "RQuickShare instalado" || print_error "Error instalando RQuickShare"
+      }
+    else
+      print_warning "yay no disponible, instala manualmente: yay -S rquickshare-x-bin"
+    fi
+  else
+    print_warning "RQuickShare omitido"
+  fi
+  echo ""
+  print_status "Ejecutar: rquickshare (Nearby Share / Quick Share)"
 fi
 
 # ═══════════════════════════════════════════════════════════
@@ -3927,15 +4223,12 @@ nohup waybar >/dev/null 2>&1 & # NOHUP LA SOLUCION PARA QUE NO SE CIERRE AL CERR
 sleep 1
 
 print_success "Limpieza completada"
-
 # ═══════════════════════════════════════════════════════════
 # RESUMEN
 # ═══════════════════════════════════════════════════════════
 kill $SUDO_PID 2>/dev/null || true
-
 clear
 cat <<"EOF"
-
 ╔══════════════════════════════════════════════════════════════════════╗
 ║              🎉 INSTALACIÓN ULTRA-FAST COMPLETADA 🎉                 ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -3946,23 +4239,13 @@ cat <<"EOF"
 ║  ✅ Symlinks a /etc configurados                                     ║
 ║  ✅ Temas Qt/GTK configurados automáticamente                        ║
 ║  ✅ Oh-My-Zsh + Plugins completos                                    ║
-║  ✅ Python-pywal + Oh-My-Posh + Rofimoji                             ║
-║  ✅ Ollama + opencommit (si seleccionado)                            ║
-║  ✨ SDDM Astronaut Theme configurado interactivamente                ║
+║  ✅ Apps, DevOps (Docker), Ollama + opencommit (si seleccionado)     ║
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
 EOF
-
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
 echo -e "  ${CYAN}1.${NC} ${RED}CERRAR SESIÓN Y VOLVER A ENTRAR${NC} (crucial para grupos)"
 echo -e "  ${CYAN}2.${NC} ${YELLOW}reboot${NC}"
-echo -e "  ${CYAN}3.${NC} Seleccionar ${YELLOW}Hyprland${NC} en GDM/SDDM"
-echo
-echo -e "${YELLOW}${BOLD}SDDM Astronaut Theme:${NC}"
-echo -e "  ${CYAN}•${NC} Tema activo: ${GREEN}$(grep -A1 '\[Theme\]' /etc/sddm.conf 2>/dev/null | grep Current | cut -d'=' -f2 || echo 'No configurado')${NC}"
-echo -e "  ${CYAN}•${NC} Cambiar tema: ${YELLOW}cd /usr/share/sddm/themes/sddm-astronaut-theme && sudo bash setup.sh${NC}"
-echo -e "  ${CYAN}•${NC} Probar: ${YELLOW}sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/sddm-astronaut-theme/${NC}"
-echo
 echo -e "${YELLOW}${BOLD}Configuraciones post-instalación:${NC}"
 echo -e "  ${CYAN}•${NC} Neovim: Abre ${YELLOW}nvim${NC} y ejecuta ${YELLOW}:MasonInstall prettier markdownlint-cli2${NC}"
 echo -e "  ${CYAN}•${NC} Copilot: En nvim ejecuta ${YELLOW}:CopilotAuth${NC}"
@@ -3997,4 +4280,3 @@ echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros pr
   ps aux --sort=-%cpu | grep -E "eww | hypr | waybar | dunst | swaync | swww | caelestia" | head -20.${NC}"
 echo
 echo -e "${GREEN}¡Disfruta tu setup Hyprland perfeccionado con SDDM Astronaut! 🚀${NC}"
-echo

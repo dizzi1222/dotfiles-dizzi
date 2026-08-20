@@ -43,6 +43,9 @@ else
   exit 1
 fi
 
+# === Guardar copia en Escritorio ===
+cp "$IMG_PATH" "$HOME/Escritorio/$(basename "$IMG_PATH")"
+
 # === Subir SOLO si SKIP_GYAZO = 0 ===
 if [ $SKIP_GYAZO -eq 0 ] && ping -c 1 -W 1 gyazo.com &>/dev/null; then
   response=$(curl -s -X POST https://upload.gyazo.com/api/upload \

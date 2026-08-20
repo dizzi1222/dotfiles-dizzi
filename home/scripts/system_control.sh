@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # #######################################################################################
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
@@ -31,12 +33,95 @@ case "$ICON" in
   pactl set-sink-mute @DEFAULT_SINK@ toggle
   ;;
 "󰺐")
-  kitty -e /usr/bin/scrcpy
+  kitty -e ~/scripts/scrcpy-connect.sh
+  ;;
+"󰗃")
+  kitty --hold -e bash -c "
+    if ! command -v bindfs &>/dev/null; then
+      if is_arch; then
+        echo '📦 Instalando bindfs...'
+        yay -S bindfs --noconfirm
+      else
+        echo '📦 bindfs no disponible en NixOS. Montando sin bindfs...'
+        sudo mkdir -p /mnt/waydroid
+        sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+        sudo mount -o remount,bind,uid=\$(id -u),gid=\$(id -g) /mnt/waydroid
+      fi
+    fi
+
+    echo '🔧 Preparando montaje...'
+    sudo mkdir -p /mnt/waydroid
+    sudo umount /mnt/waydroid 2>/dev/null
+
+    echo '🔗 Montando almacenamiento de Waydroid...'
+    if command -v bindfs &>/dev/null; then
+      sudo bindfs --mirror=\$(id -u) \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+    else
+      sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+    fi
+
+    echo '📂 Sincronizando canciones...'
+    rsync -av /mnt/waydroid/Android/media/in.shabinder.soundbound/ \$HOME/Descargas/Soundbound/ 2>/dev/null
+    rsync -av /mnt/waydroid/Soundbound/ \$HOME/Descargas/Soundbound/ 2>/dev/null
+
+    echo '🧹 Limpiando...'
+    sudo umount /mnt/waydroid
+
+    echo ''
+    echo '✅ Soundbound sincronizado en ~/Descargas/Soundbound/'
+    xdg-open \$HOME/Descargas/Soundbound/
+  "
+  ;;
+"")
+  kitty --hold -e bash -c "
+    if ! command -v bindfs &>/dev/null; then
+      if is_arch; then
+        echo '📦 Instalando bindfs...'
+        yay -S bindfs --noconfirm
+      else
+        echo '📦 bindfs no disponible en NixOS. Montando sin bindfs...'
+      fi
+    fi
+
+    echo '🔧 Preparando montaje...'
+    sudo mkdir -p /mnt/waydroid
+    sudo umount /mnt/waydroid 2>/dev/null
+
+    echo '🔗 Montando almacenamiento de Waydroid...'
+    if command -v bindfs &>/dev/null; then
+      sudo bindfs --mirror=\$(id -u) \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+    else
+      sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+    fi
+
+    mkdir -p \$HOME/Descargas/Waydroid_Fotos
+
+    echo '📂 Sincronizando imágenes...'
+    # Desde bindfs (almacenamiento compartido)
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' /mnt/waydroid/DCIM/ \$HOME/Descargas/Waydroid_Fotos/DCIM/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' /mnt/waydroid/Pictures/ \$HOME/Descargas/Waydroid_Fotos/Pictures/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' /mnt/waydroid/Download/ \$HOME/Descargas/Waydroid_Fotos/Download/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/WhatsApp/Media/WhatsApp Images/' \$HOME/Descargas/Waydroid_Fotos/WhatsApp/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/' \$HOME/Descargas/Waydroid_Fotos/Statuses/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/Pictures/Screenshots/' \$HOME/Descargas/Waydroid_Fotos/Screenshots/ 2>/dev/null
+
+    echo '🧹 Limpiando bindfs...'
+    sudo umount /mnt/waydroid
+
+    echo '📂 Sincronizando ViewOnce (datos privados, requiere sudo)...'
+    sudo mkdir -p \$HOME/Descargas/Waydroid_Fotos/ViewOnce
+    sudo rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --exclude='*' \$HOME/.local/share/waydroid/data/data/com.whatsapp/files/ViewOnce/ \$HOME/Descargas/Waydroid_Fotos/ViewOnce/ 2>/dev/null
+    sudo chown -R \$USER:\$USER \$HOME/Descargas/Waydroid_Fotos/ViewOnce/ 2>/dev/null
+
+    echo ''
+    echo '✅ Imágenes sincronizadas en ~/Descargas/Waydroid_Fotos/'
+    xdg-open \$HOME/Descargas/Waydroid_Fotos/
+  "
   ;;
 "")
   sh ~/scripts/power_management.sh
   ;;
-"")
+"󱓞")
   sh ~/.config/eww/scripts/power-modes-fuzzel.sh
   ;;
 "")
@@ -49,6 +134,22 @@ case "$ICON" in
 "")
   sh ~/.config/eww/scripts/toggle-night-mode.sh
   ;;
+"")
+  PID=$(pgrep -x hypridle | head -1)
+  if [ -n "$PID" ]; then
+    STATE=$(ps -o state= -p "$PID" 2>/dev/null | head -c1)
+    if [ "$STATE" = "T" ]; then
+      pkill -CONT hypridle
+      notify-send " Hypridle" "Reanudado" -i /home/diego/.local/share/icons/Hyprland_logo.png
+    else
+      pkill -STOP hypridle
+      notify-send " Hypridle" "Detenido (congelado)" -i /home/diego/.local/share/icons/Hyprland_logo.png
+    fi
+  else
+    systemctl --user start hypridle
+    notify-send " Hypridle" "Iniciado" -i /home/diego/.local/share/icons/Hyprland_logo.png
+  fi
+  ;;
 "󰩫")
   sh -c "scripts/gyazo-wayland-captura-clip"
 
@@ -59,29 +160,52 @@ case "$ICON" in
 "")
   kitty -e ~/scripts/limpiar_cache.sh
   ;;
+"󰮮")
+  hyprctl dispatch exec "[float; size 800 600; center] kitty -- sh -c 'sudo ~/.local/bin/clean-boot; read -p \"Presiona Enter para cerrar...\"'"
+  ;;
+"")
+  hyprctl dispatch exec "[float; size 1000 700; center] kitty -- sh -c '~/.local/bin/nixconf-rebuild; read -p \"Presiona Enter para cerrar...\"'"
+  ;;
 "")
   sh ~/scripts/git_clean.sh
   ;;
 "󰜫")
-  kitty -e ~/omarchy-arch-bin/omarchy-webapp-install
+  if [ -x ~/omarchy-arch-bin/omarchy-webapp-install ]; then
+    kitty -e ~/omarchy-arch-bin/omarchy-webapp-install
+  else
+    notify-send "system-control" "omarchy-webapp-install: script no encontrado en ~/omarchy-arch-bin/"
+  fi
   ;;
 "")
-  kitty -e ~/omarchy-arch-bin/omarchy-pkg-install
+  if [ -x ~/omarchy-arch-bin/omarchy-pkg-install ]; then
+    kitty -e ~/omarchy-arch-bin/omarchy-pkg-install
+  else
+    notify-send "system-control" "omarchy-pkg-install: script no encontrado en ~/omarchy-arch-bin/"
+  fi
   ;;
 "󰣇")
-  kitty -e ~/omarchy-arch-bin/omarchy-pkg-aur-install
+  if [ -x ~/omarchy-arch-bin/omarchy-pkg-aur-install ]; then
+    kitty -e ~/omarchy-arch-bin/omarchy-pkg-aur-install
+  else
+    notify-send "system-control" "AUR (omarchy) solo disponible en Arch/CachyOS"
+  fi
   ;;
 "")
   kitty -e ~/scripts/show_githelp.sh
   ;;
-" 󰬺")
-  # Fase 1 de la instalación de Hyprland, en ROOT
-  kitty -e ~/HYPER-arch-INSTALL.sh
+"󰬺")
+  if is_arch; then
+    kitty -e ~/HYPER-arch-INSTALL.sh
+  else
+    notify-send "system-control" "Hyprland install (Arch) — NixOS usa flake en su lugar"
+  fi
   ;;
-" 󰬻")
-  # Fase 2 de la instalación de Hyprland, con usuario normal
-  # su diego
-  kitty -e ~/fase2-HyprInstall-full.sh
+"󰬻")
+  if is_arch; then
+    kitty -e ~/fase2-HyprInstall-full.sh
+  else
+    notify-send "system-control" "Hyprland install (Arch) — NixOS usa flake en su lugar"
+  fi
   ;;
 "󰋊󰬼")
   # Es el mismo que el fase 2 pero post particion para reparar grub

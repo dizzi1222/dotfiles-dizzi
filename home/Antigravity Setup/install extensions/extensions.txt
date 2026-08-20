@@ -1,3 +1,4 @@
+sst-dev.opencode
 asvetliakov.vscode-neovim
 bierner.color-info
 supermaven.supermaven
@@ -63,3 +64,4 @@ zarifprogrammer.tailwind-snippets
 zignd.html-css-class-completion
 tomrijndorp.find-it-faster
 jellydn.find-it-faster
+daltonmenezes.aura-theme
