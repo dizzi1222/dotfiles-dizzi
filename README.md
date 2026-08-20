@@ -788,11 +788,7 @@ cd ~/dotfiles-dizzi
 stow *
 
 # Opción 2: Aplicar selectivamente
-stow alacritty autostart bottom copyq cursor dunst easyeffects espanso \
-     eww fastfetch ghostty home htop hypr kanata kew kitty local \
-     manual-ln neofetch nixconf nvim picom polybar qtile rofi starship \
-     systemd themes tmux wal wallpapers waybar wireplumber wofi xprofile \
-     yazi zsh input-remapper quickshell caelestia icons firefox vscode
+stow cinnamon niri mcphub kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile opencode dolphin-files global-keyboard-shortcutsrc sunshine antimicrox fish
 ```
 
 #### Configurar GRUB
@@ -1056,6 +1052,69 @@ fastfetch
 - 🗂️ [Gruvbox Icons](https://github.com/SylEleuth/gruvbox-plus-icon-pack)
 - 📚 [Arch Linux Wiki](https://wiki.archlinux.org/)
 - 🚀 [Hyprland Docs](https://wiki.hyprland.org/)
+- 🧊 [NixOS Wiki](https://wiki.nixos.org/)
+- 🏠 [Home Manager Manual](https://nix-community.github.io/home-manager/)
+
+---
+
+## 🧊 NixOS + Home Manager (ThinkPad X1 Extreme Gen 2)
+
+Migrado de Arch/CachyOS a NixOS. Configuración declarativa con flakes.
+
+### Nix Flake Structure
+
+```
+dotfiles-dizzi/nixconf/
+├── flake.nix                    # Entry point
+├── nixos/
+│   ├── base-configuration.nix   # system pkgs, services, users, boot, sddm
+│   └── pkgs/                    # custom derivations (sddm-astronaut-theme)
+└── home-manager/
+    ├── home.nix                 # symlinks a ~/dotfiles-dizzi/<app>/
+    └── features/
+        ├── shell.nix            # zsh, starship, git, eza, bat, bottom
+        ├── work.nix             # code-cursor, pgadmin4, docker, gcloud
+        ├── desktop.nix          # GTK/Qt theme, cursors, icons
+        └── programs.nix         # misc programs
+```
+
+### Quick Start
+
+```bash
+cd nixconf
+sudo nixos-rebuild switch --flake .#thinkpad-x1e2
+sudo -u $USER home-manager switch --flake .#diego@thinkpad-x1e2 -b backup
+```
+
+### Helper Scripts
+
+| Script | Path | Function |
+|--------|------|----------|
+| `nixconf-rebuild` | `~/.local/bin/nixconf-rebuild` | git safe.directory → flake update → nixos-rebuild → home-manager |
+| `clean-boot` | `~/.local/bin/clean-boot` | ncdu → old kernel purge → gen cleanup → rebuild |
+| `system_control.sh` | `~/scripts/system_control.sh` | Rofi menu: clean-boot, rebuild, ollama, autoclicker, docker, etc. |
+
+### Key Packages
+
+| Package | Where | Notes |
+|---------|-------|-------|
+| `code-cursor` | work.nix | AI editor |
+| `pgadmin4` | work.nix | PostgreSQL GUI |
+| `google-cloud-sql-proxy` | work.nix | GCP SQL proxy |
+| `gnome-disk-utility` + `udisks2` | base-config | USB Disk Manager |
+| `sddm-astronaut` | base-config | SDDM astronaut theme |
+| `lazydocker` | shell.nix | Docker TUI |
+| `xorg.xinput` | base-config | needed for ydotool |
+
+### Keybindings (Hyprland → Rofi System Control)
+
+| Key | Action |
+|-----|--------|
+| `Super + Z` | system_control.sh (rofi grid) |
+| `F7` | Autoclicker menu (ydotool) |
+| `F9` | Autopress key (ydotool) |
+
+> 📖 Full Arch install guide below still valid for reference. NixOS ISO install: [nixconf/README.md](nixconf/README.md)
 
 ---
 

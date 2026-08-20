@@ -1,6 +1,6 @@
 #!/bin/bash
 
-killall eww
+pkill eww
 APP_PROCESS="kew"
 
 if pgrep -x "$APP_PROCESS" >/dev/null; then

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=EWW Launch
+Exec=/home/diego/.config/scripts-plasma-windows-desktop/eww-launch.sh
+NoDisplay=true
+Hidden=true

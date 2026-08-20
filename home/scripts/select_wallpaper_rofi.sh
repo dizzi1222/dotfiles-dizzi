@@ -21,7 +21,7 @@ if [ -n "$SELECTED_WALLPAPER" ]; then
     -e "s|wallpaper = ,.*|wallpaper = ,$HOME/wallpapers/$SELECTED_WALLPAPER|" "$TARGET_FILE"
   sed -i -e "s|path = .*|path = $HOME/wallpapers/$SELECTED_WALLPAPER|" "$TARGET_FILE2"
 
-  killall hyprpaper
+  pkill hyprpaper
   hyprpaper
 
   eww --restart open bar

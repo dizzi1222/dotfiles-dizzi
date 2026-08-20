@@ -20,7 +20,10 @@ if [[ -z "$1" ]]; then
 fi
 
 URL="$1"
-BROWSER="${2:-firefox}"
+# Priorizar zen-browser sobre firefox como navegador por defecto
+DEFAULT_FF="firefox"
+command -v zen-browser &>/dev/null && DEFAULT_FF="zen-browser"
+BROWSER="${2:-$DEFAULT_FF}"
 
 # Extraer dominio para perfil
 DOMAIN=$(echo "$URL" | sed -E 's|^https?://([^/]+).*|\1|' | tr -cd '[:alnum:]_-')
@@ -32,11 +35,14 @@ if command -v xdg-open &>/dev/null; then
   exit 0
 fi
 
-# Firefox con perfil separado
-if [[ "$BROWSER" == "firefox" ]] && command -v firefox &>/dev/null; then
+# Firefox/Zen-browser con perfil separado
+# Priorizar zen-browser sobre firefox si está instalado
+FF_BIN="firefox"
+command -v zen-browser &>/dev/null && FF_BIN="zen-browser"
+if [[ "$BROWSER" == "firefox" ]] && (command -v zen-browser &>/dev/null || command -v firefox &>/dev/null); then
   # Crear perfil si no existe
   if ! find ~/.mozilla/firefox -name "*.$DOMAIN*" 2>/dev/null | grep -q .; then
-    firefox -CreateProfile "$DOMAIN $HOME/.mozilla/firefox/$DOMAIN" 2>/dev/null
+    "$FF_BIN" -CreateProfile "$DOMAIN $HOME/.mozilla/firefox/$DOMAIN" 2>/dev/null
   fi
 
   firefox "$DOMAIN" --new-window --kiosk "$URL" &

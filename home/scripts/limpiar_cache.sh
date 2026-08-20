@@ -12,6 +12,25 @@ RED='\033[91m'
 BLUE='\033[94m'
 MAGENTA='\033[95m'
 
+# ── Funciones NixOS ──────────────────────────────────────────
+nixos_gc() {
+  echo -e "\n${YELLOW}⚡ Recopilando basura del store de Nix (nix-collect-garbage)...${RESET}"
+  sudo nix-collect-garbage -d
+  echo -e "${GREEN}✔ GC completado.${RESET}"
+}
+
+nixos_optimise() {
+  echo -e "\n${YELLOW}⚡ Optimizando el store (deduplicación de hardlinks)...${RESET}"
+  sudo nix store optimise
+  echo -e "${GREEN}✔ Optimización completada.${RESET}"
+}
+
+nixos_dryrun() {
+  echo -e "\n${YELLOW}⚡ ¿Cuánto liberaría el GC? (dry-run, no borra nada)...${RESET}"
+  dead=$(sudo nix-store --gc --print-dead 2>/dev/null | wc -l)
+  echo -e "${CYAN}ℹ  ${dead} derivaciones muertas en el store.${RESET}"
+}
+
 while true; do
   clear
   echo -e "${CYAN}${BOLD}"
@@ -19,9 +38,18 @@ while true; do
   echo "║        ⚙️  Limpiar caché y dependencias - MENÚ             ║"
   echo "╚════════════════════════════════════════════════════════════╝"
   echo -e "${RESET}"
-  echo -e "${BLUE}  1)${RESET} Limpiar caché de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
-  echo -e "${BLUE}  2)${RESET} Eliminar dependencias huérfanas de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
-  echo -e "${BLUE}  3)${RESET} Limpiar caché y dependencias huérfanas de yay ${BOLD}${RESET}"
+  echo -e "${DIM}Distro: ${GREEN}${IS_NIXOS:+NixOS}${IS_ARCH:+Arch/CachyOS}${RESET}"
+  echo ""
+  if [[ "$IS_NIXOS" == true ]]; then
+    echo -e "${BLUE}  0)${RESET} [NixOS] ${BOLD}nix-collect-garbage -d${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  9)${RESET} [NixOS] ${BOLD}nix store optimise${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  a)${RESET} [NixOS] ${DIM}dry-run: derivaciones muertas${RESET}"
+  fi
+  if [[ "$IS_ARCH" == true ]]; then
+    echo -e "${BLUE}  1)${RESET} Limpiar caché de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  2)${RESET} Eliminar dependencias huérfanas de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
+    echo -e "${BLUE}  3)${RESET} Limpiar caché y dependencias huérfanas de yay ${BOLD}${RESET}"
+  fi
   echo -e "${BLUE}  4)${RESET} Limpiar caches de npm/yarn/pnpm ${BOLD}󰎙${RESET}"
   echo -e "${BLUE}  5)${RESET} Limpiar ~/.cache completo ${BOLD}󰃨${RESET}"
   echo -e "${BLUE}  6)${RESET} Limpiar caché de neovim ${BOLD}${RESET}"
@@ -32,21 +60,44 @@ while true; do
   read -rp "$(echo -e ${GREEN}${BOLD}➜${RESET}) Selecciona una opción: " opcion
 
   case $opcion in
+  0)
+    nixos_gc
+    notify-send "🗑️ NIX GC" 'nix-collect-garbage -d completado  🎨'
+    ;;
+  9)
+    nixos_optimise
+    notify-send "🗑️ NIX Optimise" 'nix store optimise completado  🎨'
+    ;;
+  a)
+    nixos_dryrun
+    ;;
   1)
     echo -e "\n${YELLOW}⚡ Limpiando caché de pacman...${RESET}"
+    sudo rm -rf /var/cache/pacman/pkg/download-* 2>/dev/null || true
     sudo pacman -Scc
     notify-send "🗑️ PACMAN Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   2)
     echo -e "\n${YELLOW}⚡ Eliminando dependencias huérfanas de pacman...${RESET}"
-    sudo pacman -Rns $(pacman -Qdtq)
+    orphans=$(pacman -Qdtq 2>/dev/null)
+    if [ -n "$orphans" ]; then
+      sudo pacman -Rns $orphans
+    else
+      echo -e "${DIM}✔ No hay dependencias huérfanas de pacman.${RESET}"
+    fi
     notify-send "🗑️ Pacman Huérfanas" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   3)
     echo -e "\n${YELLOW}⚡ Eliminando dependencias huérfanas y caché de yay...${RESET}"
+    sudo rm -rf /var/cache/pacman/pkg/download-* 2>/dev/null || true
     yay -Scc
     rm -rf ~/.cache/yay
-    yay -Rns $(yay -Qdtq)
+    orphans=$(yay -Qdtq 2>/dev/null)
+    if [ -n "$orphans" ]; then
+      yay -Rns $orphans
+    else
+      echo -e "${DIM}✔ No hay dependencias huérfanas de yay.${RESET}"
+    fi
     notify-send "🗑️ YAY Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   4)

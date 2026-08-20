@@ -1,9 +1,0 @@
-[Unit]
-Description=YDotool socket
-
-[Socket]
-ListenStream=/tmp/.ydotool_socket
-SocketMode=0600
-
-[Install]
-WantedBy=sockets.target

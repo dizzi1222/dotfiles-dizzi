@@ -1,0 +1,124 @@
+#!/bin/bash
+#######################################################################################
+# Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
+# Detecta el compositor activo y aplica la rotación correcta con estado persistente.
+#######################################################################################
+
+MONITORS=(DP-1 DP-2 HDMI-A-1)
+
+# ── Detectar compositor ──────────────────────────────────────────────────────────────
+detect_compositor() {
+  if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null; then
+    echo "niri"
+  elif command -v hyprctl >/dev/null 2>&1 && pgrep -f hyprland >/dev/null; then
+    echo "hyprland"
+  elif pgrep -x cinnamon >/dev/null; then
+    echo "cinnamon"
+  elif pgrep -x plasmashell >/dev/null; then
+    if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+      echo "plasma-wayland"
+    else
+      echo "plasma-x11"
+    fi
+  else
+    echo "unknown"
+  fi
+}
+
+# ── Aplicar rotación según compositor ───────────────────────────────────────────────
+apply_niri() {
+  local transform="$1" # "normal" | "90"
+  for mon in "${MONITORS[@]}"; do
+    niri msg output "$mon" transform "$transform" 2>/dev/null
+  done
+}
+
+apply_hyprland() {
+  local transform="$1" # "0" | "1"
+  for mon in "${MONITORS[@]}"; do
+    if [[ "$transform" == "1" ]]; then
+      # Vertical: usar 1280x720@60 que al rotar da 720x1280 (modo soportado)
+      # Esto evita el crash de 1080x1920@60 que no está en EDID
+      hyprctl keyword monitor "$mon,1280x720@60,auto,auto,transform,1" 2>/dev/null
+    else
+      # Horizontal: resolución preferida
+      hyprctl keyword monitor "$mon,preferred,auto,auto,transform,0" 2>/dev/null
+    fi
+  done
+}
+
+apply_xrandr() {
+  local rotate="$1" # "normal" | "left"
+  for mon in "${MONITORS[@]}"; do
+    xrandr --output "$mon" --rotate "$rotate" 2>/dev/null
+  done
+}
+
+apply_plasma_wayland() {
+  local rotation="$1" # "none" | "left"
+  for mon in "${MONITORS[@]}"; do
+    kscreen-doctor "output.$mon.rotation.$rotation" 2>/dev/null
+  done
+}
+
+# ── Reiniciar nemo-desktop tras rotar ────────────────────────────────────────────────
+restart_nemo() {
+  local compositor="$1"
+  pkill -x nemo-desktop 2>/dev/null
+  sleep 1
+  case "$compositor" in
+  hyprland)
+    hyprctl dispatch exec nemo-desktop
+    sleep 1
+    for addr in $(hyprctl clients -j | jq -r '.[] | select(.class == "Nemo-desktop") | .address'); do
+      hyprctl dispatch movetoworkspacesilent "special:magic,address:$addr"
+    done
+    ;;
+  niri)
+    niri msg action spawn-workspace "magic"
+    nemo-desktop &
+    sleep 1 && niri msg action focus-workspace 1
+    ;;
+  *) nemo-desktop & ;;
+  esac
+}
+
+# ── Selección con rofi ──────────────────────────────────────────────────────────────
+CHOICE=$(echo -e "󰍹 󰯎  Vertical\n󰍹 󰯍  Horizontal" | rofi -dmenu -p "Rotación del monitor" -selected-row 1 -timeout 10 -theme-str 'window {width: 300px;}' 2>/dev/null)
+
+# ── Main ─────────────────────────────────────────────────────────────────────────────
+COMPOSITOR=$(detect_compositor)
+
+if [[ "$COMPOSITOR" == "unknown" ]]; then
+  notify-send "toggle-monitor-rotation" "Compositor no soportado" --urgency=critical
+  exit 1
+fi
+
+# Default: horizontal si no eligió nada o eligió horizontal
+if [[ -z "$CHOICE" ]] || [[ "$CHOICE" == *"Horizontal"* ]]; then
+  NEW_STATE="horizontal"
+  case "$COMPOSITOR" in
+  niri) apply_niri "normal" ;;
+  hyprland) apply_hyprland "0" ;;
+  cinnamon) apply_xrandr "normal" ;;
+  plasma-x11) apply_xrandr "normal" ;;
+  plasma-wayland) apply_plasma_wayland "none" ;;
+  esac
+  notify-send "  Monitor" "Modo horizontal activado"
+else
+  NEW_STATE="vertical"
+  case "$COMPOSITOR" in
+  niri) apply_niri "90" ;;
+  hyprland) apply_hyprland "1" ;;
+  cinnamon) apply_xrandr "left" ;;
+  plasma-x11) apply_xrandr "left" ;;
+  plasma-wayland) apply_plasma_wayland "left" ;;
+  esac
+  notify-send "  Monitor" "Modo vertical activado"
+fi
+
+restart_nemo "$COMPOSITOR"
+# Para ocultar Nemo al final de la rotación
+sleep 2 && hyprctl dispatch workspace 2
+# Para cerrar hyprpaper y que no se quede con el fondo sin actualizar (PANTALLA NEGRA - BLACK SCREEN)
+pkill hyprpaper

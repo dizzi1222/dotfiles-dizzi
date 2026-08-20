@@ -115,8 +115,8 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # see 'man strftime' for details.
 # HIST_STAMPS="mm/dd/yyyy"
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+# ZSH_CUSTOM must be exported before source $ZSH/oh-my-zsh.sh for OMZ plugins
+export ZSH_CUSTOM="$ZSH/custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
