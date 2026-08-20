@@ -1,0 +1,1 @@
+diego ALL=(ALL) NOPASSWD: /usr/bin/systemctl hibernate, /usr/bin/systemctl suspend, /usr/bin/systemctl poweroff, /usr/bin/systemctl reboot

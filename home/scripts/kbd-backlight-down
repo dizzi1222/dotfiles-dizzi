@@ -1,11 +1,11 @@
 #!/bin/bash
 # Script para bajar el brillo del teclado Dell
-DEVICE="dell::kbd_backlight"
+DEVICE="tpacpi::kbd_backlight"
 CURRENT_BRIGHTNESS=$(cat /sys/class/leds/$DEVICE/brightness)
 # Decrementa el brillo en 1 nivel
 NEW_BRIGHTNESS=$((CURRENT_BRIGHTNESS - 1))
 
 # Si el nuevo brillo no es negativo, aplícalo
 if [ "$NEW_BRIGHTNESS" -ge 0 ]; then
-    echo $NEW_BRIGHTNESS | sudo tee /sys/class/leds/$DEVICE/brightness
+    echo $NEW_BRIGHTNESS > /sys/class/leds/$DEVICE/brightness
 fi

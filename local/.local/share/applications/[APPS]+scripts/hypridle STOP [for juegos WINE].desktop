@@ -3,7 +3,7 @@
 Type=Application
 Name=Hypridle Stop 󰊴 [for juegos WINE PS3, Gamepad]
 Comment=Para evitar que Hypridle interfiera con juegos WINE
-Exec=pkill -STOP hypridle
+Exec=/home/diego/.config/hypr/scripts/hypridle-stop.sh
 Icon=/home/diego/.local/share/icons/Hyprland_logo.png
 Terminal=false
 Categories=Utility; # Opcional: Define categorías para organizarlo

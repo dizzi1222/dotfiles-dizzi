@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Exercism: Programación Orientada a Objetos [Ejercicios, Cursos, cli testing]
+Comment=Open Exercism: Programación Orientada a Objetos [Ejercicios, Cursos, cli testing]
+Exec=zen-browser --new-window --kiosk https://exercism.org/tracks
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Exercism:_Programación_Orientada_a_Objetos_[Ejercicios,_Cursos,_cli_testing].png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Exercism:_Programación_Orientada_a_Objetos_[Ejercicios,_Cursos,_cli_testing]

@@ -19,6 +19,9 @@ EDITOR=""
 if command -v antigravity &>/dev/null; then
   EDITOR="antigravity"
   echo -e "${GREEN}✅ Detectado: Antigravity${NC}"
+elif command -v cursor &>/dev/null; then
+  EDITOR="cursor"
+  echo -e "${GREEN}✅ Detectado: Cursor${NC}"
 elif command -v code &>/dev/null; then
   EDITOR="code"
   echo -e "${GREEN}✅ Detectado: VSCode${NC}"

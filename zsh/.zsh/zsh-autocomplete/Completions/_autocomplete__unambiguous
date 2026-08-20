@@ -12,8 +12,8 @@
     return 1
 
 # Doesn't make sense to show.
-(( compstate[nmatches] < 2 )) &&
-    return 1
+[[ compstate[nmatches] -lt 2 || $_completer == expand ]] &&
+  return 1
 
 # Nothing to insert.
 [[ -z $compstate[unambiguous] ]] &&
@@ -30,8 +30,6 @@ _tags ||
     return
 _requested $tag ||
     return
-
-typeset -g _autocomplete__unambiguous="$compstate[unambiguous]"
 
 # Retrieve highlight value.
 local format

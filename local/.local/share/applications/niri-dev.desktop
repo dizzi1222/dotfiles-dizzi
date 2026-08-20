@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Niri (Dev Nested)
+Comment=Lanza Niri anidado en la sesión actual con logs en kitty
+Exec=kitty --hold --title "Niri [nested]" -e bash -c "niri 2>&1 | tee /tmp/niri-nested.log"
+Icon=/home/diego/.local/share/icons/Niri_logo.png
+Terminal=false
+Type=Application
+Categories=System;
+Actions=Logs;
+
+[Desktop Action Logs]
+Name=Ver Logs
+Exec=kitty --hold -e bash -c "tail -f /tmp/niri-nested.log"

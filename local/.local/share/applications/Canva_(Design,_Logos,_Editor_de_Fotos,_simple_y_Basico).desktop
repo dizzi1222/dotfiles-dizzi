@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Canva (Design, Logos, Editor de Fotos, simple y Basico)
+Comment=Open Canva (Design, Logos, Editor de Fotos, simple y Basico)
+Exec=zen-browser --new-window --kiosk https://www.canva.com/
+Terminal=false
+Type=Application
+Icon=/home/diego/dotfiles-dizzi/local/.local/share/applications/logos/Canva.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Canva_(Design,_Logos,_Editor_de_Fotos,_simple_y_Basico)

@@ -1,0 +1,542 @@
+{
+  "meta": {
+    "url": "https://n8n.io/",
+    "extracted_at": "2026-04-12T18:34:18.322429",
+    "title": "AI Workflow Automation Platform - n8n"
+  },
+  "detection": {
+    "category": "airbnb",
+    "mood": [
+      "glass",
+      "gradient"
+    ],
+    "tags": []
+  },
+  "colors": {
+    "hex": [
+      "#ffffff12",
+      "#180f14",
+      "#48556a1a",
+      "#0e0918b3",
+      "#bdbdbd33",
+      "#08080814",
+      "#1c1726",
+      "#ffffff1f",
+      "#35a670",
+      "#a85c5c40",
+      "#7a7a7a",
+      "#1f192a80",
+      "#18132933",
+      "#1b172800",
+      "#ff2f0033",
+      "#d97e4b22",
+      "#5780e6",
+      "#0e091880",
+      "#fd89250d",
+      "#ffffff0d",
+      "#0e091800",
+      "#ffffffcf",
+      "#67454533",
+      "#02090fcc",
+      "#040506",
+      "#46464600",
+      "#1b1728b3",
+      "#ff3b2100",
+      "#b83dff",
+      "#6b21ef",
+      "#ffffff26",
+      "#170f490a",
+      "#f96e494d",
+      "#ee4f2780",
+      "#a85c5c0d",
+      "#ffffffed",
+      "#08080833",
+      "#fd8925",
+      "#7d8082",
+      "#897f90"
+    ],
+    "gradients": [
+      "linear-gradient(90deg,#ff9b26 29.28%,#ee4f27 67.8%)",
+      "linear-gradient(to bottom,var(--tw-gradient-stops)",
+      "linear-gradient(to bottom right,var(--tw-gradient-stops)",
+      "linear-gradient(to right,var(--tw-gradient-stops)",
+      "linear-gradient(to top,var(--tw-gradient-stops)",
+      "linear-gradient(180deg,#0e0918,rgba(14,9,24,0)",
+      "radial-gradient(hsla(0,0%,100%,.1)",
+      "linear-gradient(89.98deg,#ffb552 29.9%,#ff5873 71.24%,#b83dff 96.05%)",
+      "radial-gradient(266.47% 215.14% at 10.15% 142.35%,#d97e4b38 0,#fff0 37%)",
+      "radial-gradient(138.18% 148.32% at 77.49% 23.63%,#0400ff26 0,#a2a68700 80%)"
+    ],
+    "css_vars": [
+      {
+        "name": "vc-clr-primary",
+        "value": "#000"
+      },
+      {
+        "name": "vc-clr-secondary",
+        "value": "#090f207f"
+      },
+      {
+        "name": "vc-clr-white",
+        "value": "#fff}.carousel,.carousel *{box-sizing:border-box}."
+      },
+      {
+        "name": "clone",
+        "value": "first-child{margin-block-start:var(--vc-cloned-off"
+      },
+      {
+        "name": "vc-icn-width",
+        "value": "1.2em}.carousel__icon{fill:currentColor"
+      },
+      {
+        "name": "vc-nav-background",
+        "value": "transparent"
+      },
+      {
+        "name": "vc-nav-border-radius",
+        "value": "0"
+      },
+      {
+        "name": "vc-nav-color",
+        "value": "var(--vc-clr-primary)"
+      },
+      {
+        "name": "vc-nav-color-hover",
+        "value": "var(--vc-clr-secondary)"
+      },
+      {
+        "name": "vc-nav-height",
+        "value": "30px"
+      },
+      {
+        "name": "vc-nav-width",
+        "value": "30px}.carousel__next,.carousel__prev{align-items:c"
+      },
+      {
+        "name": "vc-pgn-active-color",
+        "value": "var(--vc-clr-primary)"
+      },
+      {
+        "name": "vc-pgn-background-color",
+        "value": "var(--vc-clr-secondary)"
+      },
+      {
+        "name": "vc-pgn-border-radius",
+        "value": "0"
+      },
+      {
+        "name": "vc-pgn-height",
+        "value": "4px"
+      }
+    ],
+    "glassmorphism": true
+  },
+  "structure": {
+    "sections": [
+      {
+        "name": "navbar-wrapper relative",
+        "elements": 248,
+        "has_grid": false
+      },
+      {
+        "name": "mx-auto w-full",
+        "elements": 55,
+        "has_grid": false
+      },
+      {
+        "name": "relative overflow-hidden",
+        "elements": 54,
+        "has_grid": false
+      },
+      {
+        "name": "relative z-20",
+        "elements": 49,
+        "has_grid": false
+      },
+      {
+        "name": "font-geomanist text-headline-xs",
+        "elements": 0,
+        "has_grid": false
+      },
+      {
+        "name": "section-cta-wrapper flex",
+        "elements": 6,
+        "has_grid": false
+      },
+      {
+        "name": "section-bottom flex",
+        "elements": 37,
+        "has_grid": false
+      },
+      {
+        "name": "content-styles preset-base-secondary",
+        "elements": 3,
+        "has_grid": false
+      },
+      {
+        "name": "logo-banner-blinking flex",
+        "elements": 32,
+        "has_grid": false
+      },
+      {
+        "name": "w-full px-section-gap-x",
+        "elements": 49,
+        "has_grid": false
+      },
+      {
+        "name": "mx-auto w-full",
+        "elements": 48,
+        "has_grid": false
+      },
+      {
+        "name": "features-tabs-items flex",
+        "elements": 47,
+        "has_grid": false
+      },
+      {
+        "name": "content-styles preset-base-secondary",
+        "elements": 5,
+        "has_grid": false
+      },
+      {
+        "name": "content-styles preset-base-secondary",
+        "elements": 5,
+        "has_grid": false
+      },
+      {
+        "name": "content-styles preset-base-secondary",
+        "elements": 5,
+        "has_grid": false
+      }
+    ],
+    "navigation": [
+      [
+        "n8n.io",
+        "Product",
+        "Product overviewAutomate ",
+        "IntegrationsSeamlessly mo",
+        "TemplatesExplore +8500 wo",
+        "AIGet to prod faster — an",
+        "Building AI agents",
+        "RAG"
+      ]
+    ],
+    "hero": null
+  },
+  "components": {
+    "buttons": [
+      {
+        "text": "Use cases",
+        "href": null,
+        "primary": false,
+        "classes": [
+          "button-link",
+          "relative",
+          "z-10",
+          "flex"
+        ]
+      },
+      {
+        "text": "Community",
+        "href": null,
+        "primary": false,
+        "classes": [
+          "button-link",
+          "relative",
+          "z-10",
+          "flex"
+        ]
+      },
+      {
+        "text": "Sign in",
+        "href": "https://app.n8n.cloud/login",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Get Started",
+        "href": "https://app.n8n.cloud/register",
+        "primary": true,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Get started for free",
+        "href": "https://app.n8n.cloud/register",
+        "primary": true,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Talk to sales",
+        "href": "https://n8n-community.typeform.com/to/y9X2YuGa",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Browse all integrations",
+        "href": "/integrations/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Explore AI",
+        "href": "/ai/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "items-center",
+          "whitespace-nowrap"
+        ]
+      },
+      {
+        "text": "See full product overview",
+        "href": "/features/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Read Case Study",
+        "href": "/case-studies/huel/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Read Case Study",
+        "href": "/case-studies/vodafone/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Explore n8n for enterprise",
+        "href": "/enterprise/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Talk to sales",
+        "href": null,
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "See the case",
+        "href": "/case-studies/musixmatch/",
+        "primary": false,
+        "classes": [
+          "btn",
+          "relative",
+          "flex",
+          "items-center"
+        ]
+      },
+      {
+        "text": "Start building",
+        "href": "https://app.n8n.cloud/register",
+        "primary": true,
+        "classes": [
+          "btn",
+          "relative",
+          "items-center",
+          "whitespace-nowrap"
+        ]
+      }
+    ],
+    "cards": [
+      "n8n.io Product Product overview Automate business processes without limits on your logic. Integratio",
+      "183,355 Sign in Get Started",
+      "AI agents and workflows you can see and control Build visually, go deep with code, connect to anythi",
+      "The world's most popular workflow automation platform for technical teams including"
+    ],
+    "images": [
+      {
+        "src": "https://n8n.io/images/hero-bg.webp",
+        "alt": "Hero image",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-prod/assets/meta_66ca35072c.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/re_mistral_ai_e2a2bff83f.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/microsoft_logo_white_673a9e3e32.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/seat_67bbe322ec.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/re_delivery_hero_aeb8ebd112.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/wayfair_logo_white_fe595e6b33.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/zendesk_logo_white_33a443408b.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/re_dedatech_bfc8c7c7ff.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/onfleet_04f3069030.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/paddle_e74541f6b3.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/unbabel_1392f8b8ac.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/re_vodafone_1dfddd2e7c.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-prod/assets/workflow_itops_5d5a4bf299.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/social_proof_2_ca4969534d.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/social_proof_2_ca4969534d.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-stage/assets/social_proof_2_ca4969534d.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-prod/assets/integration_24_a8a7208838.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-prod/assets/integration_23_95d19b4191.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://n8niostorageaccount.blob.core.windows.net/n8nio-strapi-blobs-prod/assets/integration_26_e4d668a67e.svg",
+        "alt": "Sin descripción",
+        "lazy": true
+      }
+    ]
+  },
+  "typography": {
+    "fonts": [
+      "inherit",
+      "geomanist-book",
+      "ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+      "ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji",
+      "inherit}.font-geomanist{font-family:geomanist,ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.font-geomanist-book{font-family:geomanist-book,ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}.text-\\[12px\\]{font-size:12px}.text-\\[14px\\]{font-size:14px}.text-\\[15px\\]{font-size:15px}.text-headline-lg{font-size:54px",
+      "geomanist,ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}h1,h2{font-size:54px}h1,h2,h3{line-height:100%}h3{font-size:48px}h4{font-size:38px}h4,h5{line-height:100%}h5{font-size:32px}.button-link,a{transition-duration:.2s",
+      "geomanist,ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji",
+      "geomanist-book,ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji"
+    ],
+    "weights": [
+      "500",
+      "bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+      "inherit",
+      "300",
+      "300}.font-medium{font-weight:500}.font-normal{font-weight:400}.uppercase{text-transform:uppercase}.lowercase{text-transform:lowercase}.capitalize{text-transform:capitalize}.ordinal{--tw-ordinal:ordinal",
+      "700",
+      "inherit}a{color:inherit",
+      "400}.heading-desc{font-weight:300"
+    ]
+  },
+  "effects": {
+    "shadows": [
+      "box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)",
+      "box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.focused{outline:2px solid transparent",
+      "box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)",
+      "box-shadow:4px 4px 14px #080f340a,1px 1px 1px #170f490a,0 0 1px #170f4908",
+      "box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)!important",
+      "box-shadow:4px 4px 14px #080f340a,1px 1px 1px #170f490a,0 0 1px #170f4908}.v-popper--theme-menu .v-popper__inner a{text-decoration-line:underline}.v-popper--theme-menu .v-popper__arrow-container{display:none!important}.html-tooltip-base a{text-decoration-line:underline}.content-styles{--tw-text-opacity:1",
+      "drop-shadow: ",
+      "drop-shadow: "
+    ],
+    "animations": [
+      "skeleton",
+      "spin",
+      "marquee"
+    ]
+  }
+}

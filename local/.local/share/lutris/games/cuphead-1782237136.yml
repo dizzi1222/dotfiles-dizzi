@@ -1,0 +1,6 @@
+game:
+  exe: /home/diego/.wine/drive_c/Games/Cuphead/Cuphead.exe
+  working_dir: /home/diego/.wine/drive_c/Games/Cuphead/
+system:
+  env:
+    WINEDEBUG: -all

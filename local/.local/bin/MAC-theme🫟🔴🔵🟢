@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # --- 1. INSTALACIÓN DE TEMA GTK (Colloid) ---
-# Cambiar al directorio del tema
-cd ~/.themes/Colloid-gtk-theme
+mkdir -p ~/.themes
+if [[ ! -d ~/.themes/Colloid-gtk-theme ]]; then
+  git clone --depth 1 https://github.com/vinceliuice/Colloid-gtk-theme.git ~/.themes/Colloid-gtk-theme
+fi
+
+cd ~/.themes/Colloid-gtk-theme || { echo "Error: no se pudo acceder a Colloid-gtk-theme"; exit 1; }
 
 # Ejecutar el script de instalación (Modo Dark, Estándar)
 ./install.sh -t all -c dark -s standard

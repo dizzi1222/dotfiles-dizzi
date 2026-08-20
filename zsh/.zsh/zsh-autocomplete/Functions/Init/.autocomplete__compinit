@@ -92,16 +92,18 @@ EOF
   autocomplete:_main_complete:new() {
     local -i _autocomplete__reserved_lines=0
     local -Pi ret=1
-    unset _autocomplete__partial_list _autocomplete__unambiguous
+    unset _autocomplete__partial_list
 
     compstate[insert]=automenu-unambiguous  # To get `all-expansions` from _expand.
     compstate[last_prompt]=yes  # Completion doesn't stay on the same command line without this.
-    compstate[list]='list force packed rows' # `_setup` doesn't work well for this.
+    compstate[list]='list force packed'  # Always use same defaults, regardless of widget.
+
     unset 'compstate[vared]'
 
     local +h -a  compprefuncs=( autocomplete:_main_complete:new:pre  "$compprefuncs[@]" )
     local +h -a comppostfuncs=( autocomplete:_main_complete:new:post "$comppostfuncs[@]" )
     # functions -T autocomplete:_main_complete:old
+
     autocomplete:_main_complete:old "$@"
     # functions +T _path_files
 

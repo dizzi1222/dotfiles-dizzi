@@ -1,6 +1,30 @@
 # Añadir esto a tu .gitignore actual
 # cat >> .gitignore << 'EOF'
 
+home/clawd/.git/
+
+# ═══════════════════════════════════════════════════════════
+# CLAUDE CODE - Datos efímeros y sensibles
+# ═══════════════════════════════════════════════════════════
+home/.claude/.credentials.json
+home/.claude/backups/
+home/.claude/history.jsonl
+home/.claude/ide/
+home/.claude/mcp-needs-auth-cache.json
+home/.claude/paste-cache/
+home/.claude/projects/
+home/.claude/sessions/
+home/.claude/shell-snapshots/
+home/.claude/file-history/
+home/.claude/settings.local.json
+
+# Antigravity - ignorar todo EXCEPTO settings y keybindings
+Antigravity/.config/Antigravity/*
+!Antigravity/.config/Antigravity/User/
+Antigravity/.config/Antigravity/User/*
+!Antigravity/.config/Antigravity/User/settings.json
+!Antigravity/.config/Antigravity/User/keybindings.json
+
 # MCP específico
 ./home/.opencommit
 .mcp-global.json.local
@@ -92,11 +116,11 @@ home/musicpresence/
 # ═══════════════════════════════════════════════════════════
 # LUTRIS - Mantener estructura, ignorar runtime pesado
 # ═══════════════════════════════════════════════════════════
-# Ignorar runtime (51.4 MiB) pero mantener todo lo demás
 **/local/.local/share/lutris/runtime/
-
-# Mantener: coverart, banners, games, pga.db, runners, lutris.conf, system.yml
-# (no necesitas excluirlos explícitamente si solo ignoras runtime/)
+**/local/.local/share/lutris/runners/
+**/local/.local/share/fonts/**/.uuid
+**/local/.local/share/icons/hicolor/.icon-theme.cache
+**/local/.local/share/applications/gaming--*.desktop
 
 # ═══════════════════════════════════════════════════════════
 # FIREFOX - SOLO mantener perfiles con CSS importantes
@@ -137,6 +161,10 @@ firefox/.mozilla/firefox/*/crashes/
 **/cursor/.cursor/extensions/
 **/vscode/.vscode/extensions/
 
+# Estado local de Cursor/VSCode (binarios efímeros de sesión)
+**/cursor/.config/Cursor/User/globalStorage/
+**/cursor/.config/Cursor/User/workspaceStorage/
+
 # ═══════════════════════════════════════════════════════════
 # CACHES Y TEMPORALES
 # ═══════════════════════════════════════════════════════════
@@ -165,6 +193,7 @@ firefox/.mozilla/firefox/*/crashes/
 *.sqlite
 *.sqlite-*
 *.db
+!**/local/.local/share/lutris/pga.db
 
 # ═══════════════════════════════════════════════════════════
 # ARCHIVOS ESPECÍFICOS
@@ -173,7 +202,7 @@ firefox/.mozilla/firefox/*/crashes/
 **/nvim/spell/*.txt
 
 # Wallpapers duplicados
-wallpapers/wallpapers/
+# wallpapers/wallpapers/
 
 # CopyQ locks
 copyq/.config/copyq/*.lock*

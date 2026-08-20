@@ -1,7 +1,18 @@
 # ~/scripts/kill-gamescope
 #!/bin/bash
-killall gamescopereaper 2>/dev/null
-killall gamescope 2>/dev/null
+pkill gamescopereaper 2>/dev/null
+pkill gamescope 2>/dev/null
+sleep 4
+pkill hyprland-dialog
+sudo waydroid session stop
+sudo waydroid session start
+sudo systemctl stop waydroid-container
+# Sin admin:
+systemctl stop waydroid-container
+waydroid session stop
+pkill -f "waydroid"
+pkill -f waydroid
+wineserver -k
 # killactive # en terminal:
 hyprctl dispatch killactive
 sleep 4

@@ -1,0 +1,95 @@
+#!/bin/bash
+# jscamp-memory - Wrapper para flujo de memoria JSCamp con Engram
+# Uso: jscamp-memory {save|search|context|lesson|pattern|session} ...
+
+set -e
+
+PROJECT="jscamp"
+BIN="${ENGRAM_BIN:-engram}"
+
+# Colores
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+usage() {
+  cat <<EOF
+jscamp-memory - Gestión de memoria Engram para JSCamp
+
+Uso:
+  jscamp-memory save <titulo> <mensaje> [--type TYPE]
+  jscamp-memory lesson <titulo> <mensaje>
+  jscamp-memory pattern <titulo> <mensaje>
+  jscamp-memory session <resumen>
+  jscamp-memory search <query>
+  jscamp-memory context
+  jscamp-memory stats
+  jscamp-memory timeline <obs_id>
+  jscamp-memory list
+
+Tipos: lesson, pattern, architecture, decision, bug, config, snippet, session-summary
+Proyecto por defecto: jscamp (override con -p)
+EOF
+}
+
+case ${1:-} in
+  save)
+    shift
+    TITLE="${1:-}"
+    MSG="${2:-}"
+    TYPE="lesson"
+    if [[ "${3:-}" == "--type" ]]; then TYPE="${4:-lesson}"; fi
+    [[ -z "$TITLE" || -z "$MSG" ]] && { usage; exit 1; }
+    $BIN save "$TITLE" "$MSG" --type "$TYPE" --project "$PROJECT"
+    echo -e "${GREEN}✓ Guardado en Engram ($PROJECT)${NC}"
+    ;;
+  lesson)
+    shift
+    TITLE="${1:-}"
+    MSG="${2:-}"
+    [[ -z "$TITLE" || -z "$MSG" ]] && { usage; exit 1; }
+    $BIN save "Lección: $TITLE" "$MSG" --type lesson --project "$PROJECT"
+    echo -e "${GREEN}✓ Lección guardada${NC}"
+    ;;
+  pattern)
+    shift
+    TITLE="${1:-}"
+    MSG="${2:-}"
+    [[ -z "$TITLE" || -z "$MSG" ]] && { usage; exit 1; }
+    $BIN save "Patrón: $TITLE" "$MSG" --type pattern --project "$PROJECT"
+    echo -e "${GREEN}✓ Patrón guardado${NC}"
+    ;;
+  session)
+    shift
+    MSG="${1:-}"
+    [[ -z "$MSG" ]] && { usage; exit 1; }
+    $BIN save "Resumen de sesión" "$MSG" --type session-summary --project "$PROJECT"
+    echo -e "${GREEN}✓ Resumen de sesión guardado${NC}"
+    ;;
+  search)
+    shift
+    QUERY="${1:-}"
+    [[ -z "$QUERY" ]] && { usage; exit 1; }
+    $BIN search "$QUERY" --project "$PROJECT"
+    ;;
+  context)
+    $BIN context --project "$PROJECT"
+    ;;
+  stats)
+    $BIN stats --project "$PROJECT"
+    ;;
+  timeline)
+    shift
+    OBS_ID="${1:-}"
+    [[ -z "$OBS_ID" ]] && { usage; exit 1; }
+    $BIN timeline "$OBS_ID" --project "$PROJECT"
+    ;;
+  list)
+    $BIN search "" --project "$PROJECT" 2>/dev/null | head -20
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

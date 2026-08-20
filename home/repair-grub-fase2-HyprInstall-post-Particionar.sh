@@ -81,7 +81,7 @@ cat <<"EOF"
 
 ╔══════════════════════════════════════════════════════════════════════╗
 ║        🚀 INSTALACIÓN ULTRA-FAST HYPRLAND 🚀                         ║
-║   COPIA DE GRUB MINE-CRAFT extraida de: fase2-HyprInstall-full.sh    ║
+║            VERSIÓN OPTIMIZADA SIN COMPILACIONES                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
 EOF
@@ -89,11 +89,28 @@ EOF
 echo -e "${GREEN}${BOLD}Esta instalación incluye:${NC}"
 echo "  • Configuraciones de Grub Mine-Craft"
 echo "  • Algunos scripts de Omarchy [webpack, arch install]"
+echo "  • Hyprland + Waybar + Rofi + Dunst + Swaync"
+echo "  • Audio: PipeWire + EasyEffects"
+echo "  • Gaming: Steam, Lutris, Wine (INTERACTIVO)"
+echo "  • Apps: Brave, Spotify, OBS, Discord, YouTube Music"
+echo "  • Editor: VSCode/Cursor/Antigravity (INTERACTIVO)"
+echo "  • Dev: Docker, Node.js, Rust, Python, Neovim, Ollama + IA"
+echo "  • Utilidades: zsh, tmux, fastfetch, yazi, btop, pywal"
+echo "  • Widgets: Eww (esencial), Quickshell + Caelestia (OPCIONAL)"
+echo "  • Iconos/Glyphs: Nerd Fonts, Rofimoji || Launchers: Fuzzel [rofi], Vicinae (Raycast para Hyprland)"
+echo "  • Extras: Input Remapper, Wine Dark Theme, Kafka Cursor"
+echo "  • Temas: Oh-My-Posh, Rofimoji, Qt/GTK automático"
 echo "  • Servicios: Gemini, Espanso, Kanata, GDrive mounts, ydotool"
 echo "  • Dotfiles dizzi1222"
 echo
 echo -e "${RED}${BOLD}OPTIMIZACIONES:${NC}"
 echo "  • Solo paquetes -bin (precompilados)"
+echo "  • Caelestia/Quickshell: OPCIONAL (compilación ~30min)"
+echo "  • Stremio: OPCIONAL (compilación ~10-15min)"
+echo "  • Gemini CLI: OPCIONAL (omitir si ya configurado)"
+echo "  • Eww: ESENCIAL (instalación rápida)"
+echo "  • Bottles: OMITIDO (compila 1+ hora)"
+echo "  • Stremio, discord-rpc (redundante si uso customRP en wine), qt5-webengine: OMITIDOS (compilan mucho)"
 echo
 echo -e "${YELLOW}${BOLD}Duración estimada: 25-35 minutos${NC}"
 echo
@@ -166,7 +183,7 @@ sudo chsh -s $(which zsh) $USER 2>/dev/null || print_warning "Cambio de shell ma
 # ═══════════════════════════════════════════════════════════
 # PASO 17: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
+print_step "18/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
@@ -175,6 +192,21 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules ]]; then
     print_package "Symlink: DualSense (PS5)"
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules /etc/udev/rules.d/
+  fi
+
+  # Config de Sudoers POWER para systemctl reboot --force --force
+  if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
+    print_package "Symlink: Sudoers POWER"
+    # sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
+    # como root ejecuta: su - # &
+    # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
+  fi
+
+  # TIMESHIFT Snapshots config
+  if [[ -f ~/dotfiles-dizzi/etc/timeshift/timeshift.json ]]; then
+    print_package "Symlink: Timeshift Snapshots"
+    sudo mkdir -p /etc/timeshift
+    sudo ln -sf ~/dotfiles-dizzi/etc/timeshift/timeshift.json /etc/timeshift/timeshift.json
   fi
 
   if [[ -f ~/dotfiles-dizzi/etc/udev/rules.d/99-ds4-controllers.rules ]]; then
@@ -222,6 +254,27 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
     sudo pacman -S gnome-keyring --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
+  fi
+  # Para SDDM THEME
+  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && {
+    print_package "Symlink: SDDM Theme de Jake"
+    sudo pacman -S sddm --needed --noconfirm
+    sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf
+  }
+
+  # Para reparar problemas con WIFI
+  if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
+    print_package "Symlink: WIFI reparar problemas"
+    sudo ln -sf ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf /etc/modprobe.d/iwlwifi.conf
+    # sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi 11n_disable=1 swcrypto=1
+    # sudo modprobe -r iwlwifi
+    sudo modprobe iwlwifi power_save=0
+    # print_status "Recuerda usar:
+    ip link show
+    nmcli device status
+    sudo dmesg | grep iwlwifi
+    # Esto comprueba si hay problemas con el WIFI o las BIOS
   fi
 
   # Para reparar problemas con WIFI
@@ -324,36 +377,6 @@ fi # 🔴 ESTE FI FALTABA
 print_status "Actualizando cachés..."
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
 gtk-update-icon-cache -f ~/.local/share/icons 2>/dev/null || true
-
-# ═══════════════════════════════════════════════════════════
-# PASO 16: DOTFILES
-# ═══════════════════════════════════════════════════════════
-print_step "16/35: Dotfiles dizzi1222"
-if [[ ! -d ~/dotfiles-dizzi ]]; then
-  print_installing "Clonando dotfiles desde GitHub"
-  git clone https://github.com/dizzi1222/dotfiles-dizzi.git ~/dotfiles-dizzi || {
-    print_warning "Error clonando dotfiles"
-  }
-fi
-
-if [[ -d ~/dotfiles-dizzi ]]; then
-  cd ~/dotfiles-dizzi
-
-  print_status "Inicializando submódulos git..."
-  git submodule update --init --recursive 2>/dev/null || print_warning "No hay submódulos o falló su actualización"
-
-  print_status "Aplicando dotfiles con stow..."
-
-  for pkg in kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart copyq dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons firefox vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
-    if [[ -d $pkg ]]; then
-      print_package "Stow: $pkg"
-      stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
-    fi
-  done
-
-  cd ~
-  print_success "Dotfiles aplicados"
-fi
 
 # ═══════════════════════════════════════════════════════════
 # PASO 19: SERVICIOS DEL SISTEMA
@@ -1232,24 +1255,49 @@ print_success "Automatización configurada"
 # ═══════════════════════════════════════════════════════════
 # PASO 25: GRUVBOX (CORREGIDO - Cierre de bloques)
 # ═══════════════════════════════════════════════════════════
-print_step "25/35: Gruvbox Ecosystem"
 
 echo
 read -p "¿Instalar Gruvbox Icon Pack? [S/n]: " install_gruvbox_icons
 read -p " [💀DURA 1H☠️] ¿Instalar Gruvbox GTK Theme? [S/n]: " install_gruvbox_gtk
 
-# Icons
-if [[ ! "$install_gruvbox_icons" =~ ^[Nn]$ ]]; then
-  print_header "Instalando Gruvbox Icons"
+  echo
+  echo -e "${BOLD}${YELLOW}╔═══════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}${YELLOW}║          💾 CONFIGURACIÓN AUTOMÁTICA DE SWAP 💾           ║${NC}"
+  echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
+  echo
+  # Detectar RAM total del sistema
+  local TOTAL_RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+  local TOTAL_RAM_GB=$((TOTAL_RAM_KB / 1024 / 1024))
+  local CURRENT_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+  local CURRENT_SWAP_GB=$((CURRENT_SWAP_KB / 1024 / 1024))
 
-  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    gruvbox-plus-icon-theme 2>/dev/null || print_warning "Gruvbox icons falló"
+  echo -e "${CYAN}Sistema detectado:${NC}"
+  echo -e "  ${MAGENTA}•${NC} RAM total: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swap actual: ${BOLD}${CURRENT_SWAP_GB}GB${NC}"
+  # Calcular swap recomendado
+  local RECOMMENDED_SWAP
+  if [[ $TOTAL_RAM_GB -le 8 ]]; then
+    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2)) # 2x RAM si ≤8GB
+  elif [[ $TOTAL_RAM_GB -le 16 ]]; then
+    RECOMMENDED_SWAP=$TOTAL_RAM_GB # 1x RAM si ≤16GB
+  else
+    RECOMMENDED_SWAP=16 # Máximo 16GB si >16GB RAM
+  fi
 
-  gsettings set org.gnome.desktop.interface icon-theme 'gruvbox-plus-icon-pack' 2>/dev/null || true
+  echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
+  # Verificar espacio libre en disco
+  local FREE_SPACE_KB=$(df / | tail -1 | awk '{print $4}')
+  local FREE_SPACE_GB=$((FREE_SPACE_KB / 1024 / 1024))
+  echo -e "  ${MAGENTA}•${NC} Espacio libre en /: ${BOLD}${FREE_SPACE_GB}GB${NC}"
 
-  if [[ -f ~/.config/hypr/hyprland.conf ]]; then
-    if ! grep -q "GTK_ICON_THEME.*gruvbox" ~/.config/hypr/hyprland.conf; then
-      echo "env = GTK_ICON_THEME,gruvbox-plus-icon-pack" >>~/.config/hypr/hyprland.conf
+  # Verificar si ya hay suficiente swap
+  if [[ $CURRENT_SWAP_GB -ge $RECOMMENDED_SWAP ]]; then
+    echo
+    echo -e "${GREEN}✓ Swap actual (${CURRENT_SWAP_GB}GB) es suficiente${NC}"
+    read -p "¿Configurar swap adicional de todos modos? [s/N]: " force_swap
+    if [[ ! "$force_swap" =~ ^[Ss]$ ]]; then
+      print_warning "Configuración de swap omitida"
+      return
     fi
   fi
 
@@ -1836,51 +1884,380 @@ EOL
     fi
   fi
 
-  # Configurar GTK para tema oscuro
-  print_installing "Configurando GTK"
+  echo
+  echo -e "${CYAN}Opciones de swap:${NC}"
+  echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
+  echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
+  echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
+  echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
+  echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
+  echo
+  read -p "Seleccionar opción [1-5]: " swap_choice
 
-  gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark' 2>/dev/null || true
-  gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+  case "$swap_choice" in
+  4)
+    print_header "Eliminando Swap Completamente"
+    echo
+    print_warning "⚠️  ADVERTENCIA: Esto desactivará hibernation"
+    read -p "¿Estás seguro? [s/N]: " confirm_delete
 
-  # Si existe tema Colloid en dotfiles, aplicarlo
-  if [[ -d ~/.themes/Colloid-Dark ]]; then
-    gsettings set org.gnome.desktop.interface gtk-theme 'Colloid-Dark' 2>/dev/null || true
+    if [[ "$confirm_delete" =~ ^[Ss]$ ]]; then
+      # Desactivar swap
+      print_status "Desactivando swap..."
+      sudo swapoff -a 2>/dev/null || true
+      print_success "Swap desactivado"
+
+      # Eliminar swapfile
+      if [[ -f /swapfile ]]; then
+        print_status "Eliminando /swapfile..."
+        sudo rm -f /swapfile
+        print_success "Swapfile eliminado"
+      fi
+
+      # Limpiar /etc/fstab
+      if grep -q "/swapfile" /etc/fstab 2>/dev/null; then
+        print_status "Removiendo entrada de fstab..."
+        sudo sed -i '/\/swapfile/d' /etc/fstab
+        print_success "Línea removida de /etc/fstab"
+      fi
+
+      # Limpiar parámetros de hibernation en GRUB
+      if [[ -f /etc/default/grub ]]; then
+        if grep -q "resume=" /etc/default/grub; then
+          print_status "Removiendo parámetros de hibernation de GRUB..."
+          sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+          sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+          sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+          sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null
+          print_success "GRUB actualizado"
+        fi
+      fi
+
+      # Mostrar espacio recuperado
+      echo
+      FREE_SPACE=$(df -h / | tail -1 | awk '{print $4}')
+      echo -e "${GREEN}✓ Swap eliminado completamente${NC}"
+      echo -e "${CYAN}Espacio libre ahora: ${BOLD}$FREE_SPACE${NC}"
+      echo
+      # Marcar para saltar hibernation
+      SKIP_HIBERNATION=true
+    else
+      print_warning "Eliminación cancelada"
+    fi
+    ;;
+  1 | 3)
+    print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
+    # Verificar si ya existe swapfile
+    if [[ -f /swapfile ]]; then
+      print_warning "Ya existe /swapfile"
+      sudo swapoff /swapfile 2>/dev/null || true
+      sudo rm -f /swapfile
+      print_status "Swapfile anterior eliminado"
+    fi
+    # Crear swapfile con fallocate (más rápido que dd)
+    print_installing "Creando swapfile de ${RECOMMENDED_SWAP}GB"
+    if sudo fallocate -l ${RECOMMENDED_SWAP}G /swapfile 2>/dev/null; then
+      print_success "Swapfile creado con fallocate"
+    else
+      print_status "fallocate falló, usando dd..."
+      sudo dd if=/dev/zero of=/swapfile bs=1M count=$((RECOMMENDED_SWAP * 1024)) status=progress
+    fi
+    # Configurar permisos y formato
+    print_status "Configurando swapfile..."
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+
+    # Agregar a /etc/fstab si no existe
+    if ! grep -q "/swapfile" /etc/fstab; then
+      echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+      print_success "Swapfile agregado a /etc/fstab"
+    fi
+
+    print_success "Swapfile de ${RECOMMENDED_SWAP}GB configurado"
+    ;;
+  esac
+
+  case "$swap_choice" in
+  2 | 3)
+    print_header "Configurando Zswap (Compresión en RAM)"
+
+    # Verificar soporte del kernel
+    if [[ ! -f /sys/module/zswap/parameters/enabled ]]; then
+      print_warning "Zswap no soportado por el kernel actual"
+    else
+      # Habilitar zswap
+      print_installing "Habilitando zswap"
+      echo 1 | sudo tee /sys/module/zswap/parameters/enabled
+
+      # Configurar algoritmo de compresión (lz4 es más rápido)
+      echo lz4 | sudo tee /sys/module/zswap/parameters/compressor 2>/dev/null || true
+      echo zbud | sudo tee /sys/module/zswap/parameters/zpool 2>/dev/null || true
+
+      # Configurar porcentaje de RAM para zswap (20% por defecto)
+      echo 20 | sudo tee /sys/module/zswap/parameters/max_pool_percent
+
+      # Hacer permanente agregando a kernel parameters
+      if [[ -f /etc/default/grub ]]; then
+        if ! grep -q "zswap.enabled=1" /etc/default/grub; then
+          sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="zswap.enabled=1 zswap.compressor=lz4 zswap.max_pool_percent=20 /' /etc/default/grub
+          print_status "Parámetros zswap agregados a GRUB"
+          print_warning "Ejecuta 'sudo grub-mkconfig -o /boot/grub/grub.cfg' después del reinicio"
+        fi
+      fi
+
+      print_success "Zswap configurado (20% RAM, compresión lz4)"
+    fi
+    ;;
+  esac
+
+  if [[ "$swap_choice" == "5" ]]; then
+    print_warning "Configuración de swap omitida"
+  else
+    # Configurar swappiness (agresividad del swap)
+    print_status "Configurando swappiness..."
+
+    # Swappiness recomendado según RAM
+    if [[ $TOTAL_RAM_GB -ge 16 ]]; then
+      SWAPPINESS=10 # Menos agresivo con mucha RAM
+    elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
+      SWAPPINESS=20 # Moderado con RAM media
+    else
+      SWAPPINESS=60 # Más agresivo con poca RAM
+    fi
+
+    echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
+    sudo sysctl vm.swappiness=$SWAPPINESS
+
+    print_success "Swappiness configurado a $SWAPPINESS"
+
+    # Mostrar estado final
+    echo
+    echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
+    echo
+    NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+    NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
+    echo -e "${CYAN}Estado actual:${NC}"
+    echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
+
+    if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
+      ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
+      echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
+    fi
+
+    echo
+    echo -e "${YELLOW}Comandos útiles:${NC}"
+    echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
+    echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
+    echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
+    echo
+  fi
+}
+
+# Llamar la función de swap
+configure_swap
+
+# PASO 33.5: CONFIGURAR HIBERNATION (SLEEP TO DISK)
+function configure_hibernation() {
+  # Verificar si se saltó por eliminación de swap
+  if [[ "$SKIP_HIBERNATION" == "true" ]]; then
+    print_warning "Hibernation omitido (swap eliminado)"
+    return 0
   fi
 
-  print_success "Temas configurados"
-else
-  print_warning "Configuración de temas omitida"
-fi
+  print_step "33.5/35: Configurar Hibernation (Sleep to Disk)"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 32.5: DESACTIVAR GESTOR DE LOGIN ACTUAL
 # ═══════════════════════════════════════════════════════════
 print_step "32.5/35: Desactivar Display Manager Actual"
 
-# Detectar gestor actual
-CURRENT_DM=""
-if systemctl is-enabled gdm &>/dev/null; then
-  CURRENT_DM="gdm"
-elif systemctl is-enabled sddm &>/dev/null; then
-  CURRENT_DM="sddm"
-elif systemctl is-enabled lightdm &>/dev/null; then
-  CURRENT_DM="lightdm"
-fi
-
-if [[ -n "$CURRENT_DM" ]]; then
-  print_warning "Gestor actual detectado: $CURRENT_DM"
-
-  read -p "¿Desactivar $CURRENT_DM antes de instalar nuevo gestor? [S/n]: " disable_dm
-
-  if [[ ! "$disable_dm" =~ ^[Nn]$ ]]; then
-    print_status "Desactivando $CURRENT_DM..."
-    sudo systemctl stop $CURRENT_DM 2>/dev/null || true
-    sudo systemctl disable $CURRENT_DM
-    print_success "$CURRENT_DM desactivado"
+  # Verificar si systemctl soporta hibernation
+  if ! systemctl hibernate --dry-run &>/dev/null; then
+    print_warning "Hibernation NO soportado en este kernel"
+    print_warning "Saltando configuración de hibernation"
+    return
   fi
-else
-  print_status "No se detectó ningún gestor de login activo"
-fi
+
+  read -p "¿Configurar Hibernation? [S/n]: " setup_hibernation
+  [[ "$setup_hibernation" =~ ^[Nn]$ ]] && return
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 1: Obtener offset del swapfile
+  # ───────────────────────────────────────────────────────────
+  print_header "Calculando OFFSET del swapfile"
+
+  if [[ ! -f /swapfile ]]; then
+    print_error "No existe /swapfile. Hibernation requiere swap configurado."
+    return
+  fi
+
+  SWAP_OFFSET=$(sudo filefrag -v /swapfile 2>/dev/null | grep "0:" | awk '{print $4}' | cut -d. -f1)
+
+  if [[ -z "$SWAP_OFFSET" ]]; then
+    print_error "No se pudo calcular el offset. Saltando hibernation."
+    return
+  fi
+
+  print_success "Offset calculado: $SWAP_OFFSET"
+  echo -e "${CYAN}Guardando en ${YELLOW}/root/.hibernation_offset${NC}"
+  echo "$SWAP_OFFSET" | sudo tee /root/.hibernation_offset >/dev/null
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 2: Detectar bootloader
+  # ───────────────────────────────────────────────────────────
+  print_status "Detectando bootloader..."
+
+  BOOTLOADER="none"
+  if [[ -f /etc/default/grub ]]; then
+    BOOTLOADER="grub"
+    print_success "GRUB detectado"
+  elif [[ -d /boot/loader/entries ]]; then
+    BOOTLOADER="systemd-boot"
+    print_warning "systemd-boot detectado (hibernation manual)"
+  fi
+
+  if [[ "$BOOTLOADER" == "none" ]]; then
+    print_warning "No se detectó bootloader conocido"
+    return
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 3: Configurar GRUB (si aplica)
+  # ───────────────────────────────────────────────────────────
+  if [[ "$BOOTLOADER" == "grub" ]]; then
+    print_header "Configurando GRUB para Hibernation"
+
+    echo
+    echo -e "${YELLOW}Opciones:${NC}"
+    echo -e "  ${MAGENTA}1.${NC} ${GREEN}Automático${NC} (editar GRUB automáticamente)"
+    echo -e "  ${MAGENTA}2.${NC} ${YELLOW}Manual${NC} (mostrar instrucciones)"
+    echo -e "  ${MAGENTA}3.${NC} ${RED}Omitir${NC}"
+    echo
+    read -p "Seleccionar [1-3]: " grub_choice
+
+    case "$grub_choice" in
+    1)
+      print_status "Editando /etc/default/grub..."
+
+      # Hacer backup
+      sudo cp /etc/default/grub /etc/default/grub.backup.$(date +%s)
+      print_success "Backup creado"
+
+      # Buscar la línea GRUB_CMDLINE_LINUX_DEFAULT
+      if grep -q "GRUB_CMDLINE_LINUX_DEFAULT=" /etc/default/grub; then
+        # Remover parámetros resume antiguos (si existen)
+        sudo sed -i 's/ resume=[^ ]*//' /etc/default/grub
+        sudo sed -i 's/ resume_offset=[^ ]*//' /etc/default/grub
+
+        # Agregar parámetros nuevos
+        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"resume=\/swapfile resume_offset=$SWAP_OFFSET /" /etc/default/grub
+
+        print_success "Parámetros agregados a GRUB"
+      else
+        print_warning "No se encontró GRUB_CMDLINE_LINUX_DEFAULT"
+        echo "resume=/swapfile resume_offset=$SWAP_OFFSET" | sudo tee -a /etc/default/grub
+      fi
+
+      # Mostrar configuración
+      echo
+      echo -e "${CYAN}Nueva configuración:${NC}"
+      grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub
+      echo
+
+      # Actualizar GRUB
+      print_status "Actualizando GRUB..."
+      sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+      if [[ $? -eq 0 ]]; then
+        print_success "GRUB actualizado exitosamente"
+      else
+        print_error "Error actualizando GRUB"
+        print_warning "Restaurar backup: sudo cp /etc/default/grub.backup.* /etc/default/grub"
+      fi
+      ;;
+    2)
+      echo
+      echo -e "${YELLOW}${BOLD}CONFIGURACIÓN MANUAL DE GRUB${NC}"
+      echo
+      echo -e "  ${CYAN}1. Abre el archivo con:${NC}"
+      echo -e "     ${YELLOW}sudo nano /etc/default/grub${NC}"
+      echo
+      echo -e "  ${CYAN}2. Busca la línea:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"...\"${NC}"
+      echo
+      echo -e "  ${CYAN}3. Agrega al final (antes del cierre \"):${NC}"
+      echo -e "     ${GREEN}resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+      echo
+      echo -e "  ${CYAN}Ejemplo:${NC}"
+      echo -e "     ${YELLOW}GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet resume=/swapfile resume_offset=$SWAP_OFFSET\"${NC}"
+      echo
+      echo -e "  ${CYAN}4. Guarda (Ctrl+O, Enter, Ctrl+X)"
+      echo
+      echo -e "  ${CYAN}5. Actualiza GRUB:${NC}"
+      echo -e "     ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+      echo
+      read -p "Presiona Enter cuando hayas completado los pasos..."
+      ;;
+    3)
+      print_warning "GRUB no configurado"
+      ;;
+    esac
+  fi
+
+  if [[ "$BOOTLOADER" == "systemd-boot" ]]; then
+    echo
+    echo -e "${YELLOW}${BOLD}systemd-boot detectado${NC}"
+    echo -e "${CYAN}Para hibernation en systemd-boot:${NC}"
+    echo
+    echo -e "  ${MAGENTA}1.${NC} Edita ${YELLOW}/boot/loader/entries/arch.conf${NC}:"
+    echo -e "     Agrega: ${GREEN}options resume=/swapfile resume_offset=$SWAP_OFFSET${NC}"
+    echo
+    echo -e "  ${MAGENTA}2.${NC} O usa ${YELLOW}bootctl edit arch${NC} (más seguro)"
+    echo
+    read -p "Presiona Enter cuando completes..."
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 4: Configurar systemd-sleep (duraciones)
+  # ───────────────────────────────────────────────────────────
+  print_header "Configurando systemd-sleep"
+
+  print_status "Permitir hibernation sin sudo (opcional)..."
+
+  read -p "¿Crear permisos sudo para systemctl hibernate? [S/n]: " setup_sudo
+  if [[ ! "$setup_sudo" =~ ^[Nn]$ ]]; then
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl hibernate" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    echo "%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl suspend" | sudo tee -a /etc/sudoers.d/hibernation >/dev/null
+    print_success "Permisos configurados en /etc/sudoers.d/hibernation"
+  fi
+
+  # ───────────────────────────────────────────────────────────
+  # PASO 5: Mostrar resumen
+  # ───────────────────────────────────────────────────────────
+  echo
+  echo -e "${GREEN}${BOLD}✨ HIBERNATION CONFIGURADO ✨${NC}"
+  echo
+  echo -e "${CYAN}Comandos para usar:${NC}"
+  echo -e "  ${YELLOW}systemctl hibernate${NC}      # Dormir a disco"
+  echo -e "  ${YELLOW}systemctl suspend${NC}        # Dormir en RAM"
+  echo -e "  ${YELLOW}systemctl suspend-then-hibernate${NC}  # RAM→Disco (timeout)"
+  echo
+  echo -e "${CYAN}Variables guardadas:${NC}"
+  echo -e "  ${MAGENTA}•${NC} Offset: ${BOLD}$SWAP_OFFSET${NC}"
+  echo -e "  ${MAGENTA}•${NC} Swapfile: ${BOLD}/swapfile${NC}"
+  echo -e "  ${MAGENTA}•${NC} Bootloader: ${BOLD}$BOOTLOADER${NC}"
+  echo
+  echo -e "${YELLOW}${BOLD}⚠️  IMPORTANTE:${NC}"
+  echo -e "  ${CYAN}•${NC} ${YELLOW}Reinicia el sistema${NC} para que los cambios tomen efecto"
+  echo -e "  ${CYAN}•${NC} Si GRUB se corrompe, usa: ${YELLOW}sudo grub-mkconfig -o /boot/grub/grub.cfg${NC}"
+  echo
+}
+
+# Llamar la función de hibernation
+configure_hibernation
 
 # ═══════════════════════════════════════════════════════════
 # PASO 33: CONFIGURAR SWAP DE +16GB RAM ( O LOS QUE TENGA )
@@ -2379,15 +2756,9 @@ echo -e "${CYAN}Opciones disponibles:${NC}"
 echo
 echo -e "${BOLD}${GREEN}1. GDM (GNOME Display Manager)${NC}"
 echo -e "  ${MAGENTA}•${NC} Interfaz limpia y moderna"
-echo -e "  ${MAGENTA}•${NC} Soporte Wayland nativo"
-echo -e "  ${MAGENTA}•${NC} Más ligero (~100MB RAM)"
 echo
 echo -e "${BOLD}${GREEN}2. SDDM + Astronaut Theme (MEJORADO)${NC}"
-echo -e "  ${MAGENTA}•${NC} ${BOLD}Setup.sh interactivo funcional${NC}"
 echo -e "  ${MAGENTA}•${NC} 10 temas visuales pre-hechos"
-echo -e "  ${MAGENTA}•${NC} Wallpapers animados"
-echo -e "  ${MAGENTA}•${NC} Teclado virtual integrado"
-echo -e "  ${MAGENTA}•${NC} Instalación robusta y confiable"
 echo
 echo -e "${BOLD}${GREEN}3. Ninguno${NC} (mantener actual)"
 echo
@@ -2400,9 +2771,15 @@ if [[ "$dm_choice" == "2" ]]; then
   print_installing "SDDM + Dependencias Qt6"
   sudo pacman -S --needed --noconfirm \
     sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
-
+  # Fix 1 - graphical target
+  sudo systemctl set-default graphical.target
+  sudo reboot
+  # Fix 2 - restaurar desktop files
+  sudo pacman -S hyprland # reinstalación restauró hyprland.desktop
+  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
+  #  Fix 3 - restaurar sddm.service
+  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
   print_success "SDDM instalado"
-
   # Paso 2: Limpiar instalación anterior si existe
   print_status "Limpiando instalaciones previas del tema..."
   sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
@@ -2444,14 +2821,6 @@ if [[ "$dm_choice" == "2" ]]; then
     echo -e "${CYAN}║  • Configurar wallpaper                               ║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════╝${NC}"
     echo
-    echo -e "${YELLOW}${BOLD}Temas disponibles:${NC}"
-    echo -e "  ${GREEN}1.${NC} classic           ${GREEN}6.${NC} penguin"
-    echo -e "  ${GREEN}2.${NC} astronaut         ${GREEN}7.${NC} jake_the_dog"
-    echo -e "  ${GREEN}3.${NC} future            ${GREEN}8.${NC} rick_and_morty"
-    echo -e "  ${GREEN}4.${NC} cyberpunk         ${GREEN}9.${NC} space_ship"
-    echo -e "  ${GREEN}5.${NC} nixos            ${GREEN}10.${NC} custom"
-    echo
-    echo -e "${CYAN}${BOLD}Presiona Enter para continuar con la configuración...${NC}"
     read -p ""
 
     # Ejecutar setup.sh con sudo (necesario para copiar a /usr/share)
@@ -2505,10 +2874,15 @@ EOF
 
 elif [[ "$dm_choice" == "1" ]]; then
   print_header "Instalando GDM"
-
   print_installing "GDM (GNOME Display Manager)"
   sudo pacman -S --needed --noconfirm gdm
   sudo systemctl enable gdm
+  sudo systemctl set-default graphical.target
+  sudo reboot
+  sudo pacman -S hyprland # reinstalación restauró hyprland.desktop
+  sudo chmod 644 /usr/share/wayland-sessions/hyprland.desktop
+  #  Fix 4 - restaurar gdm.service
+  sudo ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
   print_success "GDM habilitado"
 else
   print_warning "Display Manager omitido (manteniendo actual)"
@@ -2541,10 +2915,8 @@ print_success "Limpieza completada"
 # RESUMEN
 # ═══════════════════════════════════════════════════════════
 kill $SUDO_PID 2>/dev/null || true
-
 clear
 cat <<"EOF"
-
 ╔══════════════════════════════════════════════════════════════════════╗
 ║              🎉 INSTALACIÓN ULTRA-FAST COMPLETADA 🎉                 ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -2561,7 +2933,6 @@ cat <<"EOF"
 ║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
 EOF
-
 echo -e "${GREEN}${BOLD}Siguiente paso:${NC}"
 echo -e "  ${CYAN}1.${NC} ${RED}CERRAR SESIÓN Y VOLVER A ENTRAR${NC} (crucial para grupos)"
 echo -e "  ${CYAN}2.${NC} ${YELLOW}reboot${NC}"
@@ -2579,12 +2950,9 @@ echo -e "  ${CYAN}•${NC} Pywal: ${YELLOW}wal -i ~/wallpapers/tu-imagen.jpg${NC
 echo -e "  ${CYAN}•${NC} Music Presence: ${YELLOW}source ~/.zshrc && musicpresence${NC}"
 echo -e "  ${CYAN}•${NC} Rclone: ${YELLOW}~/montar_gdrive.sh${NC} (si configuraste)"
 echo
-echo -e "${YELLOW}${BOLD}Instalación manual (si omitiste):${NC}"
-echo -e "  ${CYAN}•${NC} Bottles: ${YELLOW}yay -S bottles${NC} (1+ hora)"
-echo -e "  ${CYAN}•${NC} Caelestia: ${YELLOW}yay -S caelestia-shell${NC} (30min)"
-echo -e "  ${CYAN}•${NC} Quickshell: ${YELLOW}yay -S quickshell-git${NC} (15min)"
-echo -e "  ${CYAN}•${NC} Stremio: ${YELLOW}yay -S stremio${NC} (10-15min)"
-echo -e "  ${CYAN}•${NC} Ollama: ${YELLOW}sudo pacman -S ollama && ollama pull qwen2.5:0.5b${NC}"
+echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
+echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
+echo -e "  ${CYAN}•${NC} Espacio snapshots: ${YELLOW}~10-20GB${NC} para 50 snapshots (con compresión)"
 echo
 echo -e "${YELLOW}${BOLD}Hibernation y Snapshots:${NC}"
 echo -e "  ${CYAN}•${NC} Dormir a disco: ${YELLOW}systemctl hibernate${NC}"
@@ -2598,12 +2966,8 @@ echo -e "  ${MAGENTA}•${NC} Hibernation: Verifica con ${YELLOW}systemctl hiber
 echo -e "  ${MAGENTA}•${NC} Snapshots: Rollback desde GRUB en 'Arch Linux snapshots'"
 echo -e "  ${CYAN}•${NC}   PROBLEMAS CON LA CPU al 100%? # Ver CPU de otros procesos
   htop # --> Usa F6 para ordenar por CPU
-  sudo intel_gpu_top # Ver GPU en tiempo real de Intel [latitude 7440]
-
-  # O para ver CPU de otros procesos con grep (busca por nombre)
   # ...
   Btw ya parche y mejore los intervalos de waybar, eww, hypr, scripts etc.
   ps aux --sort=-%cpu | grep -E "eww | hypr | waybar | dunst | swaync | swww | caelestia" | head -20.${NC}"
 echo
 echo -e "${GREEN}¡Disfruta tu setup Hyprland perfeccionado con SDDM Astronaut! 🚀${NC}"
-echo

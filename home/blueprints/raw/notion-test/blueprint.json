@@ -1,0 +1,478 @@
+{
+  "meta": {
+    "url": "https://notion.so",
+    "extracted_at": "2026-04-08T23:10:50.925514",
+    "title": "The AI workspace that works for you. | Notion"
+  },
+  "detection": {
+    "category": "figma",
+    "mood": [
+      "dark",
+      "gradient"
+    ],
+    "tags": []
+  },
+  "colors": {
+    "hex": [
+      "#ff8a33",
+      "#ff83dd",
+      "#097fe8",
+      "#ad6ded",
+      "#2537b1",
+      "#000",
+      "#1aae39",
+      "#f64932",
+      "#2a9d99",
+      "#ffb110",
+      "#fff"
+    ],
+    "gradients": [],
+    "css_vars": [
+      {
+        "name": "direction",
+        "value": "1"
+      },
+      {
+        "name": "typography-font",
+        "value": "var(--typography-sans-100-medium-font)"
+      },
+      {
+        "name": "typography-font-sm",
+        "value": "var(--typography-sans-100-medium-font)"
+      },
+      {
+        "name": "typography-letter-spacing",
+        "value": "var(--typography-sans-100-medium-letter-spacing)"
+      },
+      {
+        "name": "typography-letter-spacing-sm",
+        "value": "var(--typography-sans-100-medium-letter-spacing)"
+      },
+      {
+        "name": "typography-color",
+        "value": "inherit\">Product</span><span class=\"globalNavigati"
+      },
+      {
+        "name": "graphic-icon-size",
+        "value": "var(--spacing-20)"
+      },
+      {
+        "name": "graphic-icon-size-md",
+        "value": "var(--spacing-48)"
+      },
+      {
+        "name": "graphic-frame-size",
+        "value": "var(--spacing-32)"
+      },
+      {
+        "name": "graphic-frame-size-md",
+        "value": "var(--spacing-80)"
+      },
+      {
+        "name": "graphic-border-radius",
+        "value": "var(--border-radius-200)"
+      },
+      {
+        "name": "graphic-border-radius-md",
+        "value": "var(--border-radius-500)\" aria-hidden=\"true\"><svg "
+      },
+      {
+        "name": "graphic-icon-size",
+        "value": "var(--spacing-20)"
+      },
+      {
+        "name": "graphic-frame-size",
+        "value": "var(--spacing-32)"
+      },
+      {
+        "name": "graphic-border-radius",
+        "value": "var(--border-radius-200)\" aria-hidden=\"true\"><svg "
+      }
+    ],
+    "glassmorphism": false
+  },
+  "structure": {
+    "sections": [
+      {
+        "name": "globalNavigation_globalNavigationWrapper__dUhMe globalNaviga",
+        "elements": 313,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_container__x43sE",
+        "elements": 309,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_logoContainer__BR_e9",
+        "elements": 5,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownContainer__8i441",
+        "elements": 134,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownGrid__fmbJC",
+        "elements": 125,
+        "has_grid": true
+      },
+      {
+        "name": "surface surfaceNeutral",
+        "elements": 31,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_bannerStart__7_zJX",
+        "elements": 8,
+        "has_grid": false
+      },
+      {
+        "name": "flex flex-col",
+        "elements": 21,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_footerWhatsNewContainer__0k4lL",
+        "elements": 8,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownContainer__8i441",
+        "elements": 54,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownGrid__fmbJC",
+        "elements": 45,
+        "has_grid": true
+      },
+      {
+        "name": "globalNavigation_bannerAi__rrj9J",
+        "elements": 1,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownContainer__8i441",
+        "elements": 48,
+        "has_grid": false
+      },
+      {
+        "name": "globalNavigation_dropdownGrid__fmbJC",
+        "elements": 39,
+        "has_grid": true
+      },
+      {
+        "name": "globalNavigation_dropdownContainer__8i441",
+        "elements": 45,
+        "has_grid": false
+      }
+    ],
+    "navigation": [
+      [
+        "NotionYour AI workspace",
+        "Notion Calendar",
+        "Notion Mail",
+        "Notion AIAI tools for wor",
+        "AgentsNewAutomate busywor",
+        "AI Meeting NotesPerfectly",
+        "Enterprise SearchFind ans"
+      ],
+      [
+        "About us",
+        "Careers"
+      ]
+    ],
+    "hero": null
+  },
+  "components": {
+    "buttons": [
+      {
+        "text": "See what’s new→",
+        "href": "/releases",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "linkText_linkText__527kz",
+          "linkText_colorThemePrimary__R4r7b",
+          "linkText_hasArrow__2BwWV"
+        ]
+      },
+      {
+        "text": "Notion App→",
+        "href": "/download",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "linkText_linkText__527kz",
+          "linkText_colorThemePrimary__R4r7b",
+          "linkText_hasArrow__2BwWV"
+        ]
+      },
+      {
+        "text": "Get Notion free",
+        "href": "/signup",
+        "primary": false,
+        "classes": [
+          "button_button__atjat",
+          "button_buttonVariantPrimary__mUFQZ",
+          "button_buttonSizeM__NexGD"
+        ]
+      },
+      {
+        "text": "Get Notion free",
+        "href": "/signup",
+        "primary": true,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "HeroCTA_cta__hOE_c"
+        ]
+      },
+      {
+        "text": "Request a demo",
+        "href": "/contact-sales",
+        "primary": true,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "HeroCTA_cta__hOE_c"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/openai",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/figma",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/ramp",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/cursor",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/vercel",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/clay",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/remote",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/faire",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": "/customers/toyota",
+        "primary": false,
+        "classes": [
+          "semanticTypography_semanticTypography__mWJkv",
+          "semanticTypography_variantInteractionButtonMedium__HCJEu",
+          "button_button__bge_I",
+          "logoWallMarquee_logoWallMarqueeItem__Y3_iz"
+        ]
+      },
+      {
+        "text": "",
+        "href": null,
+        "primary": false,
+        "classes": [
+          "carouselPreviousNextButton_button__KERn9",
+          "carouselPreviousNextButton_previous__ANlT7",
+          "bentoCarouselSlides_controlButton__bGsKd",
+          "bentoCarouselSlides_hidden__Ys_cL"
+        ]
+      }
+    ],
+    "cards": [
+      "Notion Calendar Notion Mail",
+      "See what Custom Agents can do Triage product feedback → Resolve support tickets in Slack → Respond t",
+      "Triage product feedback → Resolve support tickets in Slack → Respond to security alerts faster → Aut",
+      "Triage product feedback →",
+      "Resolve support tickets in Slack →",
+      "Respond to security alerts faster →",
+      "Automate weekly reporting →",
+      "Create your own Custom Agent →",
+      "There’s power in a single platform where you can do all your work. Notion is that single place. Read"
+    ],
+    "images": [
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fshared%2Fnavigation%2Fai_group.png&w=384&q=75",
+        "alt": "Sin descripción",
+        "lazy": true
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/check.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fbook.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/gmail.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fglobe.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/hubspot.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Ffiles-v2.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/amplitude.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fmailbox.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/github.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fcheckmark.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/slack.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Flight_bulb.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/chart.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fapple.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/front-static/agents/tasks/branch.svg",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://notion.so/_next/image?url=%2Ffront-static%2Fagents%2Fsign.png&w=96&q=75",
+        "alt": "Sin descripción",
+        "lazy": false
+      },
+      {
+        "src": "https://images.ctfassets.net/spoqsaf9291f/4MHGeZRO6fDOLPVyJsLoyQ/73cf5bcef2edb384dc8989ebddd7975e/Company_openai__Colorway_White.svg",
+        "alt": "OpenAI",
+        "lazy": false
+      },
+      {
+        "src": "https://images.ctfassets.net/spoqsaf9291f/5JgmuggsW4KO8pYqbKUUeW/9d4781445ff35516224384dc1c4f417c/figma-white.svg",
+        "alt": "Figma",
+        "lazy": false
+      },
+      {
+        "src": "https://images.ctfassets.net/spoqsaf9291f/1DEacqNIZ316cGgB4hhZRL/d77ff0228469f25ee2c76af41ef2e6ac/Company_Ramp__Colorway_White.svg",
+        "alt": "Ramp",
+        "lazy": false
+      }
+    ]
+  },
+  "typography": {
+    "fonts": [],
+    "weights": []
+  },
+  "effects": {
+    "shadows": [],
+    "animations": []
+  }
+}

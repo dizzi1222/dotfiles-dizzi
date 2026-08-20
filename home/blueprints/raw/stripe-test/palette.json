@@ -1,0 +1,40 @@
+{
+  "palette": [
+    {
+      "hex": "#ED5153",
+      "sat": 62,
+      "light": 81
+    },
+    {
+      "hex": "#A4CE4E",
+      "sat": 56,
+      "light": 57
+    },
+    {
+      "hex": "#95BF47",
+      "sat": 51,
+      "light": 48
+    },
+    {
+      "hex": "#A11D2B",
+      "sat": 37,
+      "light": 69
+    },
+    {
+      "hex": "#EA4335",
+      "sat": 56,
+      "light": 81
+    },
+    {
+      "hex": "#34A853",
+      "sat": 43,
+      "light": 53
+    },
+    {
+      "hex": "#FAFBFD",
+      "sat": 99,
+      "light": 43
+    }
+  ],
+  "total": 30
+}

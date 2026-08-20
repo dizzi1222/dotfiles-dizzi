@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Hostinger [Hosting]
+Comment=Open Hostinger [Hosting]
+Exec=zen-browser --new-window --kiosk https://www.hostinger.com/es
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Hostinger_[Hosting].png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Hostinger_[Hosting]
