@@ -258,21 +258,66 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
 
   # opencode: npm NO funciona en Termux (postinstall busca opencode-android-arm64,
   # que no existe; el binario linux-arm64 es glibc no-PIE => e_type: 2).
-  # Se usa el build nativo comunitario (guysoft/opencode-termux) vía dpkg.
+  # Se usa el build nativo comunitario (guysoft/opencode-termux).
+  # OJO: las URLs del README (releases/latest/download/opencode-aarch64.deb) están
+  # STALE — los assets son versionados => resolver vía API.
+  # Layout esperado (README Opción 1): wrapper->$PREFIX/bin, bin->$PREFIX/libexec/opencode,
+  # libs->$PREFIX/lib. Si el bin cae en modo Bun pelado (--version=1.2.13, la versión
+  # de Bun pineada), el artefacto está roto => fallback al ZIP con ese layout.
   read -p "¿Instalar opencode (build nativo Termux)? [S/n]: " oc_install
   if [[ ! "$oc_install" =~ ^[Nn]$ ]]; then
     print_installing "opencode (guysoft/opencode-termux)..."
-    pkg install -y ripgrep >/dev/null 2>&1
-    # El asset es versionado (opencode_X.Y.Z_aarch64.deb): resolver URL real vía API
-    DEB_URL=$(curl -s https://api.github.com/repos/guysoft/opencode-termux/releases/latest \
-      | grep -o '"browser_download_url": *"[^"]*aarch64\.deb"' | head -1 | cut -d'"' -f4)
+    pkg install -y ripgrep unzip >/dev/null 2>&1
+
+    oc_ok() { # 0 si opencode responde como OpenCode (no como Bun sin module graph)
+      command -v opencode &>/dev/null || return 1
+      [[ "$(opencode --version 2>/dev/null)" == "1.2.13" ]] && return 1
+      opencode --help 2>&1 | head -1 | grep -qi '^Bun ' && return 1
+      return 0
+    }
+    oc_libs_fix() { # el wrapper busca libs en ../lib, $PREFIX/lib y $dir (no en libexec)
+      mkdir -p "$PREFIX/lib"
+      for l in libtagfix.so libc++_shared.so libopentui.so; do
+        [[ -f "$PREFIX/lib/$l" ]] || cp "$PREFIX/libexec/opencode/$l" "$PREFIX/lib/" 2>/dev/null
+      done
+    }
+
+    GH_API=https://api.github.com/repos/guysoft/opencode-termux/releases/latest
+    DEB_URL=$(curl -s "$GH_API" | grep -o '"browser_download_url": *"[^"]*aarch64\.deb"' | head -1 | cut -d'"' -f4)
+    ZIP_URL=$(curl -s "$GH_API" | grep -o '"browser_download_url": *"[^"]*android-aarch64\.zip"' | head -1 | cut -d'"' -f4)
+
     if [[ -n "$DEB_URL" ]] && curl -fsSL --retry 3 --retry-all-errors -C - -o ~/opencode.deb "$DEB_URL"; then
       dpkg -i ~/opencode.deb >/dev/null 2>&1 || apt-get install -f -y >/dev/null 2>&1
       rm -f ~/opencode.deb
-      command -v opencode &>/dev/null && print_success "opencode instalado" \
-        || print_warning "opencode falló, usa: proot-distro"
+      oc_libs_fix
+    fi
+
+    if ! oc_ok; then
+      print_warning ".deb roto (cae en modo Bun); probando ZIP (Opción 1 del README)..."
+      if [[ -n "$ZIP_URL" ]] && curl -fsSL --retry 3 --retry-all-errors -C - -o ~/opencode.zip "$ZIP_URL"; then
+        rm -rf ~/oc-zip && mkdir ~/oc-zip && unzip -q ~/opencode.zip -d ~/oc-zip
+        # soportar tanto layout plano como anidado
+        if [[ ! -f ~/oc-zip/opencode ]]; then
+          SUB=$(dirname "$(find ~/oc-zip -type f -name opencode.bin 2>/dev/null | head -1)" 2>/dev/null)
+          [[ -n "$SUB" && -d "$SUB" ]] && mv "$SUB"/* ~/oc-zip/
+        fi
+        if [[ -f ~/oc-zip/opencode && -f ~/oc-zip/opencode.bin ]]; then
+          mkdir -p "$PREFIX/bin" "$PREFIX/libexec/opencode" "$PREFIX/lib"
+          install -m 755 ~/oc-zip/opencode "$PREFIX/bin/opencode"
+          install -m 755 ~/oc-zip/opencode.bin "$PREFIX/libexec/opencode/opencode.bin"
+          install -m 644 ~/oc-zip/libtagfix.so ~/oc-zip/libc++_shared.so ~/oc-zip/libopentui.so "$PREFIX/lib/" 2>/dev/null
+          oc_libs_fix
+        else
+          print_warning "ZIP con layout inesperado"
+        fi
+        rm -rf ~/oc-zip ~/opencode.zip
+      fi
+    fi
+
+    if oc_ok; then
+      print_success "opencode $(opencode --version 2>/dev/null) instalado"
     else
-      print_warning "Descarga falló. Alternativa: proot-distro (Ubuntu) + npm i -g opencode-ai"
+      print_warning "Artefactos de guysoft rotos. Alternativa: proot-distro (Ubuntu) + npm i -g opencode-ai"
     fi
   fi
 
