@@ -108,6 +108,7 @@ print_success "CLI modernas"
 # ═══════════════════════════════════════════════════════════
 print_step "7/23: GitHub CLI"
 pkg install -y gh >/dev/null 2>&1
+gh extension install meiji163/gh-notify >/dev/null 2>&1 || true
 print_success "gh instalado"
 print_info "Autenticar: gh auth login"
 
@@ -119,7 +120,13 @@ read -p "¿Instalar Zsh+Plugins? [S/n]: " zsh_install
 
 if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
   pkg install -y zsh >/dev/null 2>&1
-  
+
+  # Zsh como shell por defecto de Termux (fix: sin esto arranca bash)
+  if [[ "$(basename "${SHELL:-}")" != "zsh" ]]; then
+    chsh -s zsh && print_success "zsh es ahora tu shell por defecto (reabrí Termux)" \
+      || print_warning "chsh falló — corré manualmente: chsh -s zsh"
+  fi
+
   if [[ ! -d ~/.oh-my-zsh ]]; then
     print_installing "Oh-My-Zsh..."
     RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null 2>&1
@@ -165,7 +172,10 @@ case "$prompt_choice" in
   1)
     pkg install -y starship >/dev/null 2>&1
     mkdir -p ~/.config
-    [[ ! -f ~/.config/starship.toml ]] && starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
+    # NO generar preset si ya hay config propia (stow usa ~/.config/starship/starship.toml)
+    if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
+      starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
+    fi
     print_success "Starship instalado"
     ;;
   2)
@@ -256,9 +266,9 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
     # El asset es versionado (opencode_X.Y.Z_aarch64.deb): resolver URL real vía API
     DEB_URL=$(curl -s https://api.github.com/repos/guysoft/opencode-termux/releases/latest \
       | grep -o '"browser_download_url": *"[^"]*aarch64\.deb"' | head -1 | cut -d'"' -f4)
-    if [[ -n "$DEB_URL" ]] && curl -fsSL -o /tmp/opencode.deb "$DEB_URL"; then
-      dpkg -i /tmp/opencode.deb >/dev/null 2>&1 || apt-get install -f -y >/dev/null 2>&1
-      rm -f /tmp/opencode.deb
+    if [[ -n "$DEB_URL" ]] && curl -fsSL --retry 3 --retry-all-errors -C - -o ~/opencode.deb "$DEB_URL"; then
+      dpkg -i ~/opencode.deb >/dev/null 2>&1 || apt-get install -f -y >/dev/null 2>&1
+      rm -f ~/opencode.deb
       command -v opencode &>/dev/null && print_success "opencode instalado" \
         || print_warning "opencode falló, usa: proot-distro"
     else
@@ -275,13 +285,14 @@ print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
 print_step "17/23: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
-if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/fonts/FiraCodeNerdFont-Regular.ttf ]]; then
+if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   pkg install -y wget unzip >/dev/null 2>&1
   mkdir -p ~/.termux/fonts; cd ~/.termux/fonts
   wget -q https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip && \
     unzip -q FiraCode.zip && rm FiraCode.zip
+  # Termux solo lee ~/.termux/font.ttf (singular) — sin esto no hay íconos nerd
+  cp FiraCodeNerdFont-Regular.ttf ~/.termux/font.ttf && print_success "Fira Code Nerd activada (~/.termux/font.ttf)"
   cd ~
-  print_success "Fira Code"
 fi
 
 print_step "18/23: Stow + Dotfiles"
@@ -342,6 +353,10 @@ HIST
   
   command -v starship &> /dev/null && ! grep -q "starship init" ~/.zshrc && \
     echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >> ~/.zshrc
+
+  # Usar la config de starship del repo (stoweada), no el preset genérico
+  ! grep -q "STARSHIP_CONFIG" ~/.zshrc && [[ -f ~/.config/starship/starship.toml ]] && \
+    echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >> ~/.zshrc
   
   print_success ".zshrc parchado"
 fi
