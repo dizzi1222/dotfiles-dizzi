@@ -37,14 +37,14 @@ read -p "Presiona Enter..."
 # ═══════════════════════════════════════════════════════════
 # PASO 1: Sistema
 # ═══════════════════════════════════════════════════════════
-print_step "1/22: Sistema"
+print_step "1/23: Sistema"
 pkg update -y >/dev/null 2>&1 && pkg upgrade -y >/dev/null 2>&1
 print_success "Sistema actualizado"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 2: Básicos
 # ═══════════════════════════════════════════════════════════
-print_step "2/22: Básicos"
+print_step "2/23: Básicos"
 pkg install -y git curl wget openssh coreutils findutils grep sed gawk \
   tar gzip bzip2 xz-utils unzip zip procps less man ncurses-utils termux-api >/dev/null 2>&1
 print_success "Herramientas básicas"
@@ -52,7 +52,7 @@ print_success "Herramientas básicas"
 # ═══════════════════════════════════════════════════════════
 # PASO 3: Git Config (AUTO PUSH)
 # ═══════════════════════════════════════════════════════════
-print_step "3/22: Git Configuración"
+print_step "3/23: Git Configuración"
 print_installing "Configurando git..."
 
 # Auto-setup remote branches (FIX del git push --set-upstream)
@@ -77,7 +77,7 @@ print_info "Auto-push habilitado (no más --set-upstream)"
 # ═══════════════════════════════════════════════════════════
 # PASO 4: Desarrollo
 # ═══════════════════════════════════════════════════════════
-print_step "4/22: Desarrollo"
+print_step "4/23: Desarrollo"
 pkg install -y clang make cmake python nodejs-lts rust golang >/dev/null 2>&1
 print_success "Entorno de desarrollo"
 print_info "pyenv NO recomendado en Termux"
@@ -85,7 +85,7 @@ print_info "pyenv NO recomendado en Termux"
 # ═══════════════════════════════════════════════════════════
 # PASO 5: Editores
 # ═══════════════════════════════════════════════════════════
-print_step "5/22: Editores"
+print_step "5/23: Editores"
 pkg install -y neovim vim nano micro >/dev/null 2>&1
 mkdir -p ~/bin
 cat > ~/bin/termux-file-editor << 'EDITOR'
@@ -99,14 +99,14 @@ print_success "Editores instalados"
 # ═══════════════════════════════════════════════════════════
 # PASO 6: CLI Modernas
 # ═══════════════════════════════════════════════════════════
-print_step "6/22: CLI Modernas"
+print_step "6/23: CLI Modernas"
 pkg install -y bat eza fd ripgrep fzf jq tree htop ncdu duf dust zoxide >/dev/null 2>&1
 print_success "CLI modernas"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 7: GitHub CLI
 # ═══════════════════════════════════════════════════════════
-print_step "7/22: GitHub CLI"
+print_step "7/23: GitHub CLI"
 pkg install -y gh >/dev/null 2>&1
 print_success "gh instalado"
 print_info "Autenticar: gh auth login"
@@ -114,7 +114,7 @@ print_info "Autenticar: gh auth login"
 # ═══════════════════════════════════════════════════════════
 # PASO 8: Zsh Plugins
 # ═══════════════════════════════════════════════════════════
-print_step "8/22: Zsh + Plugins"
+print_step "8/23: Zsh + Plugins"
 read -p "¿Instalar Zsh+Plugins? [S/n]: " zsh_install
 
 if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
@@ -154,7 +154,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 9: Prompts
 # ═══════════════════════════════════════════════════════════
-print_step "9/22: Prompts"
+print_step "9/23: Prompts"
 echo "Elige tu prompt:"
 echo "  1) Starship (recomendado - ligero)"
 echo "  2) Oh-My-Posh (más features)"
@@ -180,7 +180,7 @@ esac
 # ═══════════════════════════════════════════════════════════
 # PASO 10: Pokemon (CON FIX)
 # ═══════════════════════════════════════════════════════════
-print_step "10/22: Pokemon-colorscripts"
+print_step "10/23: Pokemon-colorscripts"
 read -p "¿Instalar pokemon? [S/n]: " pokemon_install
 if [[ ! "$pokemon_install" =~ ^[Nn]$ ]]; then
   if ! command -v pokemon-colorscripts &> /dev/null; then
@@ -202,7 +202,7 @@ POKE
 fi
 
 # Resto de pasos (11-18) - igual que antes
-print_step "11/22: Tmux"
+print_step "11/23: Tmux"
 pkg install -y tmux >/dev/null 2>&1
 [[ ! -f ~/.tmux.conf ]] && cat > ~/.tmux.conf << 'TMUX'
 set -g mouse on
@@ -210,26 +210,26 @@ set -g base-index 1
 TMUX
 print_success "Tmux"
 
-print_step "12/22: Yazi"
+print_step "12/23: Yazi"
 pkg install -y yazi >/dev/null 2>&1
 print_success "Yazi"
 
-print_step "13/22: Fastfetch"
+print_step "13/23: Fastfetch"
 pkg install -y fastfetch 2>/dev/null || pkg install -y neofetch 2>/dev/null
 print_success "System info"
 
-print_step "14/22: Termux-API"
+print_step "14/23: Termux-API"
 pkg install -y termux-api >/dev/null 2>&1
 print_success "termux-api"
 
-print_step "15/22: Aliases"
+print_step "15/23: Aliases"
 [[ ! -f ~/.termux_aliases ]] && cat > ~/.termux_aliases << 'ALIASES'
 alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
 ALIASES
 print_success "Aliases"
 
-print_step "16/22: IA Tools"
+print_step "16/23: IA Tools"
 read -p "¿Instalar IA Tools? [S/n]: " ia_install
 if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
   # tgpt: los binarios de GitHub releases NO son PIE => error e_type: 2 en Android.
@@ -271,7 +271,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
 fi
 print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
-print_step "17/22: Fira Code"
+print_step "17/23: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
 if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/fonts/FiraCodeNerdFont-Regular.ttf ]]; then
   pkg install -y wget unzip >/dev/null 2>&1
@@ -282,7 +282,7 @@ if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/fonts/FiraCodeNerdFont
   print_success "Fira Code"
 fi
 
-print_step "18/22: Stow + Dotfiles"
+print_step "18/23: Stow + Dotfiles"
 read -p "¿Configurar dotfiles? [S/n]: " stow_install
 if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
   pkg install -y stow >/dev/null 2>&1
@@ -319,7 +319,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 19: Parchar .zshrc
 # ═══════════════════════════════════════════════════════════
-print_step "19/22: Silenciar Avisos"
+print_step "19/23: Silenciar Avisos"
 read -p "¿Parchar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
   cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
@@ -347,7 +347,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 20: Crear .gitignore Seguro
 # ═══════════════════════════════════════════════════════════
-print_step "20/22: .gitignore Seguro"
+print_step "20/23: .gitignore Seguro"
 for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
   if [[ -d "$dir" ]]; then
     cd "$dir"
@@ -373,7 +373,7 @@ done
 # ═══════════════════════════════════════════════════════════
 # PASO 21: Rama Termux
 # ═══════════════════════════════════════════════════════════
-print_step "21/22: Rama Termux"
+print_step "21/23: Rama Termux"
 read -p "¿Crear rama termux? [S/n]: " create_branch
 if [[ ! "$create_branch" =~ ^[Nn]$ ]]; then
   for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
@@ -394,9 +394,34 @@ if [[ ! "$create_branch" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22: Finalización
+# PASO 22: Workspace + Discord RPC
 # ═══════════════════════════════════════════════════════════
-print_step "22/22: Finalización"
+print_step "22/23: Workspace + Discord RPC"
+read -p "¿Clonar workspace e instalar discord-rpc? [S/n]: " ws_install
+if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
+  if [[ ! -d ~/workspace/.git ]]; then
+    print_installing "Clonando workspace (con submodules)..."
+    git clone --recurse-submodules https://github.com/dhardi007/workspace.git ~/workspace \
+      || git -C ~/workspace submodule update --init --recursive
+  fi
+  if [[ -d ~/workspace/opencode-discord-rpc ]]; then
+    print_installing "Compilando opencode-discord-rpc..."
+    (cd ~/workspace/opencode-discord-rpc && npm install --silent && npm run build --silent) \
+      && print_success "discord-rpc compilado" || print_warning "build falló, revisa npm"
+    # Registrar plugin en la config global de opencode (si falta)
+    OC_JSON=~/.config/opencode/opencode.json
+    if [[ -f "$OC_JSON" ]] && ! grep -q "opencode-discord-rpc" "$OC_JSON"; then
+      sed -i 's|"\$schema": "https://opencode.ai/config.json",|"$schema": "https://opencode.ai/config.json",\n  "plugin": ["/data/data/com.termux/files/home/workspace/opencode-discord-rpc"],|' "$OC_JSON"
+      print_success "Plugin registrado en opencode.json"
+    fi
+    print_info "Rich Presence activo al abrir opencode (requiere Discord)"
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 23: Finalización
+# ═══════════════════════════════════════════════════════════
+print_step "23/23: Finalización"
 
 clear
 cat <<'FINAL'
@@ -408,6 +433,7 @@ cat <<'FINAL'
 ║  ✅ Starship/Oh-My-Posh                                 ║
 ║  ✅ IA Tools                                            ║
 ║  ✅ .gitignore seguro                                   ║
+║  ✅ Workspace + Discord RPC                             ║
 ║  ✅ pyenv removido                                      ║
 ╚══════════════════════════════════════════════════════════╝
 FINAL
