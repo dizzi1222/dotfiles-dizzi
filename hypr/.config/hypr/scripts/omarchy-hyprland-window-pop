@@ -1,0 +1,216 @@
+#!/bin/bash
+# Versión que SOLO funciona con ventanas que tienen "Picture-in-Picture" en el título
+
+# ============================================
+# CONFIGURACIÓN
+# ============================================
+# width=${1:-1300}
+# height=${2:-900}
+x=${3:-}
+y=${4:-}
+
+# ============================================
+# LISTA DE EXCLUSIONES (apps que NO deben flotar)
+# ============================================
+# EXCLUDED_CLASSES=(
+# === FILE MANAGERS & DESKTOPS ===
+#   "nemo"
+#   "nemo-desktop"
+#   "thunar"
+#   "nautilus"
+#   "dolphin"
+#   "pcmanfm"
+#
+#   # === TERMINALS ===
+#   "kitty"
+#   "ghostty"
+#   "alacritty"
+#   "foot"
+#   "wezterm"
+#   "konsole"
+#   "gnome-terminal"
+#   "xterm"
+#   "urxvt"
+#
+#   # === LAUNCHERS & MENUS ===
+#   "rofi"
+#   "wofi"
+#   "fuzzel"
+#   "dmenu"
+#   "ulauncher"
+#   "albert"
+#
+#   # === BARS & PANELS ===
+#   "waybar"
+#   "eww"
+#   "polybar"
+#   "plank"
+#   "latte-dock"
+#
+#   # === NOTIFICATIONS ===
+#   "dunst"
+#   "mako"
+#   "swaync"
+#
+#   # === CLIPBOARD MANAGERS ===
+#   "copyq"
+#   "clipman"
+#   "parcellite"
+#
+#   # === SYSTEM MONITORS ===
+#   "btop"
+#   "htop"
+#   "gnome-system-monitor"
+#   "ksysguard"
+#   "stacer"
+#
+#   # === AUDIO/VIDEO SETTINGS ===
+#   "pavucontrol"
+#   "easyeffects"
+#   "helvum"
+#   "qpwgraph"
+#   "blueman-manager"
+#
+#   # === SCREENSHOT/PICKER TOOLS ===
+#   "hyprpicker"
+#   "satty"
+#   "flameshot"
+#   "spectacle"
+#   "grim"
+#   "slurp"
+#
+#   # === MUSIC PLAYERS (excluye Spotify porque tiene ventanas flotantes propias) ===
+#   "spotify"
+#   "cmus"
+#   "ncmpcpp"
+#   "musikcube"
+#   "audacious"
+#   "rhythmbox"
+#   "strawberry"
+#   "lollypop"
+#   "youtube-music"
+#
+#   # === VIDEO PLAYERS (VLC/MPV tienen su propio PiP) ===
+#   # Comentado porque podrías querer hacer pop-out de estos
+#   # "vlc"
+#   # "mpv"
+#
+#   # === EDITORS (los quieres tiled normalmente) ===
+#   "neovim"
+#   "nvim"
+#   "vim"
+#   "nano"
+#   "gedit"
+#   "kate"
+#
+#   # === DOWNLOADERS ===
+#   "transmission-gtk"
+#   "qbittorrent"
+#   "deluge"
+#
+#   # === SYSTEM TOOLS ===
+#   "gparted"
+#   "partitionmanager"
+#   "ufw"
+#   "android-file-transfer"
+#
+#   # === GAMING ===
+#   "lutris"
+#   "steam"
+#   "heroic"
+#   "bottles"
+#   "gamescope"
+#
+#   # === VIRTUALIZACIÓN ===
+#   "virt-manager"
+#   "virtualbox"
+#   "qemu"
+#
+#   # === MISC ===
+#   "cmatrix"
+#   "cava"
+#   "ranger"
+#   "yazi"
+#   "gucharmap"
+# )
+
+# ============================================
+# OBTENER INFORMACIÓN DE VENTANA ACTIVA
+# ============================================
+active=$(hyprctl activewindow -j)
+pinned=$(echo "$active" | jq -r ".pinned")
+addr=$(echo "$active" | jq -r ".address")
+window_class=$(echo "$active" | jq -r ".class")
+window_title=$(echo "$active" | jq -r ".title")
+initial_title=$(echo "$active" | jq -r ".initialTitle")
+
+# ============================================
+# VALIDACIÓN: Verificar que hay ventana activa
+# ============================================
+if [[ -z "$addr" || "$addr" == "null" ]]; then
+  # notify-send -u low "Window Pop" "No active window found"
+  exit 0
+fi
+
+# ============================================
+# VERIFICAR EXCLUSIONES
+# ============================================
+for excluded in "${EXCLUDED_CLASSES[@]}"; do
+  if [[ "$window_class" =~ $excluded ]]; then
+    # notify-send -u normal "Window Pop" "❌ '$window_class' is excluded"
+    exit 0
+  fi
+done
+
+# ============================================
+# VERIFICAR SI ES PICTURE-IN-PICTURE
+# ============================================
+# Buscar "Picture-in-Picture" en title o initialTitle (case insensitive)
+is_pip=false
+
+if [[ "$window_title" =~ [Pp]icture.?in.?[Pp]icture ]]; then
+  is_pip=true
+elif [[ "$initial_title" =~ [Pp]icture.?in.?[Pp]icture ]]; then
+  is_pip=true
+elif [[ "$initial_title" =~ [Ii]magen.?en.?[Ii]magen ]]; then
+  is_pip=true
+fi
+
+# Si NO es PiP, rechazar
+if [[ "$is_pip" == "false" ]]; then
+  # notify-send -u normal "Window Pop" "This script only works with Picture-in-Picture windows"
+  hyprctl dispatch togglefloating
+  exit 0
+fi
+
+# ============================================
+# LÓGICA PRINCIPAL: Toggle pin/floating
+# ============================================
+
+# Si la ventana ya está pinned, deshacerlo
+if [[ "$pinned" == "true" ]]; then
+  hyprctl -q --batch \
+    "dispatch pin address:$addr;" \
+    "dispatch togglefloating address:$addr;" \
+    "dispatch tagwindow -pop address:$addr;"
+
+  # notify-send -u low "PiP" "Picture-in-Picture unpinned"
+
+# Si NO está pinned, hacer pop-out
+else
+  hyprctl dispatch togglefloating address:$addr
+  hyprctl dispatch resizeactive exact $width $height
+
+  if [[ -n "$x" && -n "$y" ]]; then
+    hyprctl dispatch moveactive exact $x $y
+  else
+    hyprctl dispatch centerwindow
+  fi
+
+  hyprctl -q --batch \
+    "dispatch pin address:$addr;" \
+    "dispatch alterzorder top address:$addr;" \
+    "dispatch tagwindow +pop address:$addr;"
+
+  # notify-send -u low "PiP" "Picture-in-Picture pinned (${width}x${height})"
+fi

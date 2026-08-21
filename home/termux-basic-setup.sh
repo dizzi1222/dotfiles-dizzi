@@ -232,15 +232,44 @@ print_success "Aliases"
 print_step "16/22: IA Tools"
 read -p "¿Instalar IA Tools? [S/n]: " ia_install
 if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
-  curl -sSL https://github.com/aandrew-me/tgpt/releases/latest/download/tgpt-linux-arm64 \
-    -o /data/data/com.termux/files/usr/bin/tgpt 2>/dev/null && chmod +x /data/data/com.termux/files/usr/bin/tgpt
+  # tgpt: los binarios de GitHub releases NO son PIE => error e_type: 2 en Android.
+  # Compilar con Go produce binario Bionic/PIE válido. Fallback: paquete de Termux.
+  if ! command -v tgpt &>/dev/null; then
+    print_installing "tgpt via go install (PIE-safe)..."
+    if go install github.com/aandrew-me/tgpt/v2@latest &>/dev/null && [[ -x ~/go/bin/tgpt ]]; then
+      ln -sf ~/go/bin/tgpt "$PREFIX/bin/tgpt"
+      print_success "tgpt (go build)"
+    elif pkg install -y tgpt &>/dev/null; then
+      print_success "tgpt (pkg)"
+    else
+      print_warning "tgpt no pudo instalarse"
+    fi
+  fi
+
+  # opencode: npm NO funciona en Termux (postinstall busca opencode-android-arm64,
+  # que no existe; el binario linux-arm64 es glibc no-PIE => e_type: 2).
+  # Se usa el build nativo comunitario (guysoft/opencode-termux) vía dpkg.
+  read -p "¿Instalar opencode (build nativo Termux)? [S/n]: " oc_install
+  if [[ ! "$oc_install" =~ ^[Nn]$ ]]; then
+    print_installing "opencode (guysoft/opencode-termux)..."
+    pkg install -y ripgrep >/dev/null 2>&1
+    if curl -fsSL -o /tmp/opencode.deb \
+        https://github.com/guysoft/opencode-termux/releases/latest/download/opencode-aarch64.deb 2>/dev/null; then
+      dpkg -i /tmp/opencode.deb >/dev/null 2>&1 || apt-get install -f -y >/dev/null 2>&1
+      rm -f /tmp/opencode.deb
+      command -v opencode &>/dev/null && print_success "opencode instalado" \
+        || print_warning "opencode falló, usa: proot-distro"
+    else
+      print_warning "Descarga falló. Alternativa: proot-distro (Ubuntu) + npm i -g opencode-ai"
+    fi
+  fi
+
   npm install -g opencommit 2>/dev/null
   pip install pywal --break-system-packages 2>/dev/null
-  # pip install anthropic --break-system-packages 2>/dev/null
   pkg install -y proot-distro imagemagick >/dev/null 2>&1
   print_success "IA Tools"
 fi
-print_success "No existe Claude Code, Gemini..F o usa proot-distro para usar Ubuntu y quizas puedas instalarlos."
+print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
 print_step "17/22: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
@@ -257,13 +286,34 @@ print_step "18/22: Stow + Dotfiles"
 read -p "¿Configurar dotfiles? [S/n]: " stow_install
 if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
   pkg install -y stow >/dev/null 2>&1
+
+  DOTFILES=""
   for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
-    [[ -d "$dir" ]] && cd "$dir" && break
+    [[ -d "$dir/.git" ]] && DOTFILES="$dir" && break
   done
-  [[ -d nvim ]] && stow nvim --adopt 2>&1 | grep -v "BUG" || true
-  [[ -d starship ]] && stow starship --adopt 2>&1 | grep -v "BUG" || true
-  cd ~
-  print_success "Dotfiles"
+
+  # Si no existe el repo, clonarlo CON submodules (sin esto nvim queda vacío)
+  if [[ -z "$DOTFILES" ]]; then
+    print_installing "Clonando dotfiles-dizzi (con submodules)..."
+    if git clone --recurse-submodules https://github.com/dizzi1222/dotfiles-dizzi.git ~/dotfiles-dizzi; then
+      DOTFILES=~/dotfiles-dizzi
+    else
+      print_warning "Clone falló, revisa conexión/auth"
+    fi
+  fi
+
+  if [[ -n "$DOTFILES" ]]; then
+    cd "$DOTFILES"
+    git checkout termux 2>/dev/null || true
+    # CRÍTICO: sincronizar submodules (nvim) — fix "submodule initialized but empty"
+    git submodule update --init --recursive
+    # Stow desde la raíz: cada paquete del repo tiene estructura .config/
+    for pkg in nvim starship zsh tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+      [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
+    done
+    cd ~
+    print_success "Dotfiles ($DOTFILES)"
+  fi
 fi
 
 # ═══════════════════════════════════════════════════════════
@@ -274,7 +324,8 @@ read -p "¿Parchar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
   cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
   
-  sed -i 's/^eval "$(oh-my-posh/command -v oh-my-posh \&>\/dev\/null \&\& eval "$(oh-my-posh/' ~/.zshrc 2>/dev/null
+  # oh-my-posh: envolver en guard (rompe el prompt si no está instalado)
+  sed -i 's|^eval "$(oh-my-posh init zsh)"|command -v oh-my-posh >/dev/null 2>\&\& eval "$(oh-my-posh init zsh)"|' ~/.zshrc
   sed -i 's/^eval "$(pyenv/# eval "$(pyenv  # pyenv no funciona/' ~/.zshrc 2>/dev/null
   sed -i 's|^source ~/\.api-keys\.sh|\[ -f ~/\.api-keys\.sh \] \&\& source ~/\.api-keys\.sh|' ~/.zshrc 2>/dev/null
   
