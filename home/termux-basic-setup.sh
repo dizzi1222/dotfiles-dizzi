@@ -253,8 +253,10 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
   if [[ ! "$oc_install" =~ ^[Nn]$ ]]; then
     print_installing "opencode (guysoft/opencode-termux)..."
     pkg install -y ripgrep >/dev/null 2>&1
-    if curl -fsSL -o /tmp/opencode.deb \
-        https://github.com/guysoft/opencode-termux/releases/latest/download/opencode-aarch64.deb 2>/dev/null; then
+    # El asset es versionado (opencode_X.Y.Z_aarch64.deb): resolver URL real vía API
+    DEB_URL=$(curl -s https://api.github.com/repos/guysoft/opencode-termux/releases/latest \
+      | grep -o '"browser_download_url": *"[^"]*aarch64\.deb"' | head -1 | cut -d'"' -f4)
+    if [[ -n "$DEB_URL" ]] && curl -fsSL -o /tmp/opencode.deb "$DEB_URL"; then
       dpkg -i /tmp/opencode.deb >/dev/null 2>&1 || apt-get install -f -y >/dev/null 2>&1
       rm -f /tmp/opencode.deb
       command -v opencode &>/dev/null && print_success "opencode instalado" \
