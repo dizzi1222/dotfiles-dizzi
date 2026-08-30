@@ -236,7 +236,12 @@ print_step "15/23: Aliases"
 [[ ! -f ~/.termux_aliases ]] && cat > ~/.termux_aliases << 'ALIASES'
 alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
+alias dot='cd ~/dotfiles-dizzi'
+alias ddot='cd ~/dotfiles-dizzi'
 ALIASES
+# Cargar aliases en shells (bash y zsh)
+grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.bashrc
+grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.zshrc
 print_success "Aliases"
 
 print_step "16/23: IA Tools"
@@ -317,7 +322,14 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
     if oc_ok; then
       print_success "opencode $(opencode --version 2>/dev/null) instalado"
     else
-      print_warning "Artefactos de guysoft rotos. Alternativa: proot-distro (Ubuntu) + npm i -g opencode-ai"
+      print_warning "Artefactos de guysoft rotos (Bun pelado)."
+      print_info "Ruta A (recomendada, sin proot): bun-termux + binario oficial."
+      print_info "  curl -fsSL https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/manager | bash -s install"
+      print_info "  curl -LO https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz"
+      print_info "  mkdir -p ~/.opencode/bin && tar -xzf opencode-linux-arm64.tar.gz -C ~/.opencode/bin/"
+      print_info "  python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode"
+      print_info "  export PATH=\"\$HOME/.opencode/bin:\$PATH\"  → agregar a ~/.zshrc"
+      print_info "Verificar: opencode --version debe dar ≥1.18 (no la versión de Bun)."
     fi
   fi
 
@@ -402,6 +414,18 @@ HIST
   # Usar la config de starship del repo (stoweada), no el preset genérico
   ! grep -q "STARSHIP_CONFIG" ~/.zshrc && [[ -f ~/.config/starship/starship.toml ]] && \
     echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >> ~/.zshrc
+
+  # Starship: silenciar configs órfanas con claves desconocidas (p.ej. [battery] de StarshipRoot)
+  if command -v starship >/dev/null 2>&1 && [[ -f ~/.config/starship.toml ]] \
+     && ! grep -q "\[battery\]" ~/.config/starship.toml; then
+    echo -e '\n[battery]\ndisabled = true' >> ~/.config/starship.toml
+  fi
+
+  # Fastfetch: el .zshrc heredado del laptop arranca wallpaper-prompt-fastfetch (depende de
+  # swww/Hyprland, que NO existen en Termux) → cae en fallback sin la config del repo.
+  # Reemplazar por llamada portable: config stoweada (~/.config/fastfetch/config.jsonc).
+  grep -q "wallpaper-prompt-fastfetch" ~/.zshrc && \
+    sed -i 's|^.*wallpaper-prompt-fastfetch.*$|command -v fastfetch >/dev/null 2>\&1 \&\& fastfetch --config ~/.config/fastfetch/config.jsonc|' ~/.zshrc
   
   print_success ".zshrc parchado"
 fi
@@ -463,9 +487,25 @@ read -p "¿Clonar workspace e instalar discord-rpc? [S/n]: " ws_install
 if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
   if [[ ! -d ~/workspace/.git ]]; then
     print_installing "Clonando workspace (con submodules)..."
-    git clone --recurse-submodules https://github.com/dhardi007/workspace.git ~/workspace \
-      || git -C ~/workspace submodule update --init --recursive
+    if git clone --recurse-submodules https://github.com/dhardi007/workspace.git ~/workspace 2>/dev/null; then
+      print_success "workspace clonado"
+    else
+      git -C ~/workspace submodule update --init --recursive >/dev/null 2>&1
+    fi
   fi
+
+  # Repos independientes PTD-Talento (CIC): origin=CIC, dizzi1222=fork personal
+  for repo in ptd-talento-back ptd-talento-front; do
+    if [[ ! -d ~/workspace/$repo/.git ]]; then
+      print_installing "Clonando $repo (CIC + fork dizzi1222)..."
+      if git clone https://github.com/dhardi007/$repo.git ~/workspace/$repo 2>/dev/null; then
+        git -C ~/workspace/$repo remote add dizzi1222 https://github.com/dizzi1222/$repo.git
+        print_success "$repo con remote dizzi1222"
+      else
+        print_warning "$repo: clone falló"
+      fi
+    fi
+  done
   if [[ -d ~/workspace/opencode-discord-rpc ]]; then
     print_installing "Compilando opencode-discord-rpc..."
     (cd ~/workspace/opencode-discord-rpc && npm install --silent && npm run build --silent) \
