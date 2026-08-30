@@ -1,10 +1,31 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "figma": {
+      "command": [
+        "npx",
+        "-y",
+        "figma-developer-mcp",
+        "--figma-api-key={env:FIGMA_API_KEY}",
+        "--stdio"
+      ],
+      "enabled": true,
+      "type": "local"
+    },
+    "composio-connect": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "enabled": true,
+      "headers": {
+        "x-api-key": "{env:COMPOSIO_API_KEY}"
+      }
+    }
+  },
   "plugin": [
     "/data/data/com.termux/files/home/workspace/opencode-discord-rpc"
   ],
   "theme": "opencode",
-  "model": "ollama/deepseek-v3.1:671b",
+  "model": "anthropic/claude-sonnet-4-20250514",
   // "theme": "gemini",
   // "model": "gemini-3-flash-previewi",
   //  "model": "deepseek-chat",
