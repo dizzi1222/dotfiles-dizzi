@@ -56,17 +56,21 @@ ensure_zshrc() {
   [[ -f ~/.zshrc ]] && return 0
   cat > ~/.zshrc << 'ZSH'
 # Termux .zshrc generado por termux-basic-setup.sh
-export ZSH="$HOME/.oh-my-zsh"
-export ZSH_CUSTOM="$ZSH/custom"
-plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-completions zsh-history-substring-search)
-[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
-[[ -d ~/.zsh/zsh-autocomplete ]] && source ~/.zsh/zsh-autocomplete
-[[ -d ~/.zsh/fzf-tab ]] && source ~/.zsh/fzf-tab
-
+# --- Historial ANTES de los plugins: zsh-autosuggestions lee HISTFILE al cargar ---
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY SHARE_HISTORY
+setopt INC_APPEND_HISTORY HIST_IGNORE_ALL_DUPS HIST_SAVE_NO_DUPS
+
+export ZSH="$HOME/.oh-my-zsh"
+export ZSH_CUSTOM="$ZSH/custom"
+plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-completions zsh-history-substring-search)
+[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
+# Predictivo: lo da zsh-autosuggestions (ya en plugins OMZ). NO cargar
+# zsh-autocomplete (marlonrichert): compite con autosuggestions y anula las
+# sugerencias grises. Receta basada en core-termux (DevCoreXOfficial).
+[[ -d ~/.zsh/fzf-tab ]] && source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
 export PATH="$HOME/.local/bin:$HOME/go/bin:$HOME/.opencode/bin:$PATH"
 [[ -f ~/.termux_aliases ]] && source ~/.termux_aliases
@@ -204,9 +208,9 @@ if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
     git clone --depth 1 -q https://github.com/zsh-users/zsh-history-substring-search.git "$ZSH_CUSTOM/plugins/zsh-history-substring-search" 2>/dev/null
   
   mkdir -p ~/.zsh
-  [[ ! -d ~/.zsh/zsh-autocomplete ]] && \
-    git clone --depth 1 -q https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete 2>/dev/null
-  
+  # zsh-autocomplete (marlonrichert) NO se instala: compite con zsh-autosuggestions
+  # y anula el predictivo. Receta core-termux: solo autosuggestions como predictor.
+
   [[ ! -d ~/.zsh/fzf-tab ]] && \
     git clone --depth 1 -q https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null
   
