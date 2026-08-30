@@ -73,7 +73,9 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$HOME/.opencode/bin:$PATH"
 
 [[ -f ~/.config/starship/starship.toml ]] && export STARSHIP_CONFIG=~/.config/starship/starship.toml
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
-command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh)"
+# Oh-My-Posh: sin --config real, Termux imprime "CONFIG NOT FOUND" (no hay tema integrado).
+# Bajar el tema que usa main y apuntarlo con --config.
+command -v oh-my-posh >/dev/null 2>&1 && { mkdir -p ~/.config/oh-my-posh; [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] || curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json" >/dev/null 2>&1; eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"; }
 
 command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }
 ZSH
@@ -241,10 +243,15 @@ case "$prompt_choice" in
     ;;
   2)
     pkg install -y oh-my-posh >/dev/null 2>&1
-    # Activar oh-my-posh en .zshrc (con su tema integrado — un --config inexistente
-    # imprime "CONFIG NOT FOUND" en cada prompt)
-    grep -q "oh-my-posh init" ~/.zshrc 2>/dev/null || \
-      echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh)"' >> ~/.zshrc
+    # Tema local obligatorio: sin --config real, oh-my-posh de Termux imprime
+    # "CONFIG NOT FOUND" (el "tema integrado" no existe). Bajar el tema que usa main.
+    mkdir -p ~/.config/oh-my-posh
+    [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] || \
+      curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json \
+        "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json"
+    # Reemplazar CUALQUIER línea oh-my-posh vieja (sin --config o con URL remota)
+    sed -i '/oh-my-posh init/d' ~/.zshrc
+    echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"' >> ~/.zshrc
     print_success "Oh-My-Posh instalado"
     ;;
   *)
