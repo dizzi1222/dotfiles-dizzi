@@ -97,14 +97,14 @@ ensure_zshrc_force() {
 # ═══════════════════════════════════════════════════════════
 # PASO 1: Sistema
 # ═══════════════════════════════════════════════════════════
-print_step "1/22: Sistema"
+print_step "1/23: Sistema"
 pkg update -y >/dev/null 2>&1 && pkg upgrade -y >/dev/null 2>&1
 print_success "Sistema actualizado"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 2: Básicos
 # ═══════════════════════════════════════════════════════════
-print_step "2/22: Básicos"
+print_step "2/23: Básicos"
 pkg install -y git curl wget openssh coreutils findutils grep sed gawk \
   tar gzip bzip2 xz-utils unzip zip procps less man ncurses-utils termux-api >/dev/null 2>&1
 print_success "Herramientas básicas"
@@ -112,7 +112,7 @@ print_success "Herramientas básicas"
 # ═══════════════════════════════════════════════════════════
 # PASO 3: Git Config (AUTO PUSH)
 # ═══════════════════════════════════════════════════════════
-print_step "3/22: Git Configuración"
+print_step "3/23: Git Configuración"
 print_installing "Configurando git..."
 
 # Auto-setup remote branches (FIX del git push --set-upstream)
@@ -137,7 +137,7 @@ print_info "Auto-push habilitado (no más --set-upstream)"
 # ═══════════════════════════════════════════════════════════
 # PASO 4: Desarrollo
 # ═══════════════════════════════════════════════════════════
-print_step "4/22: Desarrollo"
+print_step "4/23: Desarrollo"
 pkg install -y clang make cmake python nodejs-lts rust golang >/dev/null 2>&1
 print_success "Entorno de desarrollo"
 print_info "pyenv NO recomendado en Termux"
@@ -145,7 +145,7 @@ print_info "pyenv NO recomendado en Termux"
 # ═══════════════════════════════════════════════════════════
 # PASO 5: Editores
 # ═══════════════════════════════════════════════════════════
-print_step "5/22: Editores"
+print_step "5/23: Editores"
 pkg install -y neovim vim nano micro >/dev/null 2>&1
 mkdir -p ~/bin
 cat > ~/bin/termux-file-editor << 'EDITOR'
@@ -159,14 +159,14 @@ print_success "Editores instalados"
 # ═══════════════════════════════════════════════════════════
 # PASO 6: CLI Modernas
 # ═══════════════════════════════════════════════════════════
-print_step "6/22: CLI Modernas"
+print_step "6/23: CLI Modernas"
 pkg install -y bat eza fd ripgrep fzf jq tree htop ncdu duf dust zoxide >/dev/null 2>&1
 print_success "CLI modernas"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 7: GitHub CLI
 # ═══════════════════════════════════════════════════════════
-print_step "7/22: GitHub CLI"
+print_step "7/23: GitHub CLI"
 pkg install -y gh >/dev/null 2>&1
 gh extension install meiji163/gh-notify >/dev/null 2>&1 || true
 print_success "gh instalado"
@@ -175,7 +175,7 @@ print_info "Autenticar: gh auth login"
 # ═══════════════════════════════════════════════════════════
 # PASO 8: Zsh Plugins
 # ═══════════════════════════════════════════════════════════
-print_step "8/22: Zsh + Plugins"
+print_step "8/23: Zsh + Plugins"
 read -p "¿Instalar Zsh+Plugins? [S/n]: " zsh_install
 
 if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
@@ -221,7 +221,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 9: Prompts
 # ═══════════════════════════════════════════════════════════
-print_step "9/22: Prompts"
+print_step "9/23: Prompts"
 echo "Elige tu prompt:"
 echo "  1) Starship (recomendado - ligero)"
 echo "  2) Oh-My-Posh (más features)"
@@ -266,7 +266,7 @@ esac
 # ═══════════════════════════════════════════════════════════
 # PASO 10: Pokemon (CON FIX)
 # ═══════════════════════════════════════════════════════════
-print_step "10/22: Pokemon-colorscripts"
+print_step "10/23: Pokemon-colorscripts"
 read -p "¿Instalar pokemon? [S/n]: " pokemon_install
 if [[ ! "$pokemon_install" =~ ^[Nn]$ ]]; then
   if ! command -v pokemon-colorscripts &> /dev/null; then
@@ -288,7 +288,7 @@ POKE
 fi
 
 # Resto de pasos (11-18) - igual que antes
-print_step "11/22: Tmux"
+print_step "11/23: Tmux"
 pkg install -y tmux >/dev/null 2>&1
 [[ ! -f ~/.tmux.conf ]] && cat > ~/.tmux.conf << 'TMUX'
 set -g mouse on
@@ -296,22 +296,22 @@ set -g base-index 1
 TMUX
 print_success "Tmux"
 
-print_step "12/22: Yazi"
+print_step "12/23: Yazi"
 pkg install -y yazi >/dev/null 2>&1
 print_success "Yazi"
 
-print_step "13/22: Fastfetch"
+print_step "13/23: Fastfetch"
 pkg install -y fastfetch 2>/dev/null || pkg install -y neofetch 2>/dev/null
 # Lanzar fastfetch portable al abrir cada shell (config del repo si stow la aplicó)
 grep -q "fastfetch --config" ~/.zshrc 2>/dev/null || \
   echo 'command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }' >> ~/.zshrc
 print_success "System info"
 
-print_step "14/22: Termux-API"
+print_step "14/23: Termux-API"
 pkg install -y termux-api >/dev/null 2>&1
 print_success "termux-api"
 
-print_step "15/22: Aliases"
+print_step "15/23: Aliases"
 [[ ! -f ~/.termux_aliases ]] && cat > ~/.termux_aliases << 'ALIASES'
 alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
@@ -323,7 +323,7 @@ grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases
 grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.zshrc
 print_success "Aliases"
 
-print_step "16/22: IA Tools"
+print_step "16/23: IA Tools"
 read -p "¿Instalar IA Tools? [S/n]: " ia_install
 if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
   # tgpt: los binarios de GitHub releases NO son PIE => error e_type: 2 en Android.
@@ -473,7 +473,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
 fi
 print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
-print_step "17/22: Fira Code"
+print_step "17/23: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
 if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   pkg install -y wget unzip >/dev/null 2>&1
@@ -485,7 +485,7 @@ if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   cd ~
 fi
 
-print_step "18/22: Stow + Dotfiles"
+print_step "18/23: Stow + Dotfiles"
 read -p "¿Configurar dotfiles? [S/n]: " stow_install
 if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
   pkg install -y stow >/dev/null 2>&1
@@ -525,7 +525,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 19: Parchar .zshrc
 # ═══════════════════════════════════════════════════════════
-print_step "19/22: Silenciar Avisos"
+print_step "19/23: Silenciar Avisos"
 read -p "¿Reparar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
   # Si el .zshrc proviene del LAPTOP (oh-my-posh con URL remota, powerlevel10k, swww,
@@ -558,7 +558,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 20: Crear .gitignore Seguro
 # ═══════════════════════════════════════════════════════════
-print_step "20/22: .gitignore Seguro"
+print_step "20/23: .gitignore Seguro"
 for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
   if [[ -d "$dir" ]]; then
     cd "$dir"
@@ -584,7 +584,7 @@ done
 # ═══════════════════════════════════════════════════════════
 # PASO 21: Workspace + Discord RPC
 # ═══════════════════════════════════════════════════════════
-print_step "21/22: Workspace + Discord RPC"
+print_step "21/23: Workspace + Discord RPC"
 read -p "¿Clonar workspace e instalar discord-rpc? [S/n]: " ws_install
 if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
   if [[ ! -d ~/workspace/.git ]]; then
@@ -623,9 +623,39 @@ if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22: Finalización
+# PASO 22: Core-Termux (Modular Dev Env) + OpenCode
+# ───────────────────────────────────────────────────────────
+# Android 16+ ignora el PT_INTERP glibc y fuerza linker64 (bionic)
+# → "Could not find a PHDR: broken executable?" (fallan los loaders
+#   glibc: helper C nativo, bun-termux, ld-linux directo).
+# Vías que esquivan el kernel (proot hace su propio ELF loading):
+#   Nivel 1: core install ai --opencode → "glibc + proot" (ligero)
+#   Nivel 2: core install ai --opencode → proot-distro ubuntu
 # ═══════════════════════════════════════════════════════════
-print_step "22/22: Finalización"
+print_step "22/23: Core-Termux"
+read -p "¿Instalar Core-Termux (DevCoreXOfficial)? [S/n]: " ct_install
+if [[ ! "$ct_install" =~ ^[Nn]$ ]]; then
+  print_installing "Instalando Core-Termux..."
+  if curl -fsSL https://raw.githubusercontent.com/DevCoreXOfficial/core-termux/main/install.sh | bash; then
+    print_success "Core-Termux instalado (comando: core)"
+    print_info "Módulos: lang | db | ai | editor | dev | npm | shell | ui | auto"
+  else
+    print_warning "Core-Termux: instalación falló (revisa red/git)"
+  fi
+
+  read -p "¿Instalar OpenCode vía core? [S/n]: " oc_install
+  if [[ ! "$oc_install" =~ ^[Nn]$ ]] && command -v core >/dev/null 2>&1; then
+    rm -f $PREFIX/bin/opencode   # quitar helper roto (PHDR) para que core no diga "ya instalado"
+    print_warning "Elige en el selector: 'glibc + proot (bad system call)' — evita el linker64 del kernel"
+    print_installing "core install ai --opencode"
+    core install ai --opencode || print_warning "Falló; reintenta eligiendo 'proot-distro (ubuntu)'"
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 23: Finalización
+# ═══════════════════════════════════════════════════════════
+print_step "23/23: Finalización"
 
 clear
 cat <<'FINAL'
@@ -636,6 +666,7 @@ cat <<'FINAL'
 ║  ✅ Zsh + Plugins                                       ║
 ║  ✅ Starship/Oh-My-Posh                                 ║
 ║  ✅ IA Tools                                            ║
+║  ✅ Core-Termux + OpenCode                              ║
 ║  ✅ .gitignore seguro                                   ║
 ║  ✅ Workspace + Discord RPC                             ║
 ║  ✅ pyenv removido                                      ║
@@ -655,6 +686,27 @@ echo -e "  ${CYAN}1.${NC} source ~/.zshrc  ${GREEN}# (automático, ver abajo)${N
 echo -e "  ${CYAN}2.${NC} gh auth login"
 echo -e "  ${CYAN}3.${NC} git push  ${GREEN}# ¡Sin --set-upstream!${NC}"
 echo ""
+
+# ─────────────────────────────────────────────────────────────
+# Core-Termux: comandos del README (core --help para todos)
+# ─────────────────────────────────────────────────────────────
+if command -v core >/dev/null 2>&1; then
+  echo -e "\n${MAGENTA}${BOLD}🧰 Core-Termux — Comandos principales${NC}"
+  echo -e "  ${CYAN}core --version${NC}              Versión"
+  echo -e "  ${CYAN}core install <módulo>${NC}       Instalar módulo (lang|db|ai|editor|dev|npm|shell|ui|auto)"
+  echo -e "  ${CYAN}core install ai --opencode --ollama${NC}  Solo esos agentes"
+  echo -e "  ${CYAN}core list ai${NC}                Ver agentes y estado"
+  echo -e "  ${CYAN}core show ai --opencode${NC}     Doc de un tool"
+  echo -e "  ${CYAN}core update core${NC}            Actualizar framework"
+  echo -e "  ${CYAN}core reinstall ai --opencode${NC} Reinstalar sin desinstalar todo"
+  echo -e "  ${CYAN}core agent ask -p \"...\"${NC}     Asistente IA local"
+  echo -e "  ${CYAN}core brain save/search${NC}      Memoria (second brain)"
+  echo -e "  ${CYAN}core env set${NC}                Variables env (API keys)"
+  echo -e "  ${CYAN}core pg start${NC}               Postgres"
+  echo -e "  ${CYAN}core init next|react|nest|express${NC}  Configurar proyecto"
+  echo -e "  ${CYAN}core voice opencode${NC}         Voz → opencode"
+  echo ""
+fi
 
 # Recargar zsh con el .zshrc nuevo (mata el prompt fantasma de oh-my-posh viejo).
 # Si se cancela, el usuario recarga manualmente con `exec zsh`.
