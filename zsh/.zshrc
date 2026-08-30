@@ -181,6 +181,11 @@ fi
 # Sugerencia y autocompleta en gris [Control+E]
 source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
+# zsh-autocomplete + OMZ: compinit de oh-my-zsh corre antes y las funciones de
+# Completions no quedan autoload. Forzamos el autoload para evitar
+# "_autocomplete__history_lines: command not found" / "_autocomplete__unambiguous".
+autoload -Uz _autocomplete__history_lines _autocomplete__unambiguous 2>/dev/null
+
 #Búsqueda interactiva: Cuando presionas Tab para autocompletar un comando, argumento o archivo [tab o ArrowUp o ArrowDown]
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
@@ -908,3 +913,5 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+# Added by core-termux bun installer
+export PATH="/data/data/com.termux/files/home/.cache/.bun/bin:$PATH"
