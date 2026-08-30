@@ -80,6 +80,14 @@ ZSH
   print_success ".zshrc generado"
 }
 
+# Versión forzada: respalda y regenera el .zshrc SIEMPRE (útil cuando el heredado
+# del laptop lo rompe: oh-my-posh con URL remota, powerlevel10k, etc.)
+ensure_zshrc_force() {
+  [[ -f ~/.zshrc ]] && cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
+  rm -f ~/.zshrc
+  ensure_zshrc
+}
+
 # ═══════════════════════════════════════════════════════════
 # PASO 1: Sistema
 # ═══════════════════════════════════════════════════════════
@@ -233,9 +241,10 @@ case "$prompt_choice" in
     ;;
   2)
     pkg install -y oh-my-posh >/dev/null 2>&1
-    # Activar oh-my-posh en .zshrc
+    # Activar oh-my-posh en .zshrc (con su tema integrado — un --config inexistente
+    # imprime "CONFIG NOT FOUND" en cada prompt)
     grep -q "oh-my-posh init" ~/.zshrc 2>/dev/null || \
-      echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/omp.toml)"' >> ~/.zshrc
+      echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh)"' >> ~/.zshrc
     print_success "Oh-My-Posh instalado"
     ;;
   *)
@@ -384,27 +393,41 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       print_warning "Artefactos de guysoft rotos (Bun pelado)."
       print_info "Fallback: Ruta A (bun-termux + binario oficial) ejecutándose..."
       # Ruta A — se ejecuta aquí, no solo se imprime
-      pkg install -y git curl python make clang >/dev/null 2>&1
-      if [[ ! -x ~/.opencode/bin/opencode ]]; then
+      # Dependencias reales de bun-termux (gue README oficial)
+      pkg install -y git curl clang make glibc-repo python >/dev/null 2>&1
+      pkg install -y glibc-runner >/dev/null 2>&1
+      # 1) Clonar bun-termux (necesario para helper_scripts/replace_runtime.py)
+      [[ ! -d ~/bun-termux/.git ]] && \
+        git clone --depth 1 https://github.com/Happ1ness-dev/bun-termux.git ~/bun-termux >/dev/null 2>&1 || true
+      # 2) Manager oficial del repo (ruta correcta: helper_scripts/bun-termux-manager, NO manager)
+      if [[ ! -x ~/.bun/bin/bun ]]; then
         print_installing "bun-termux (loader sin proot)..."
-        curl -fsSL https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/manager | bash -s install >/dev/null 2>&1 || \
+        touch ~/.bashrc
+        curl -fsSL "https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/helper_scripts/bun-termux-manager" | bash -s install >/dev/null 2>&1 || \
           print_warning "manager bun-termux falló (revisa manual)"
+      fi
+      # 3) Binario oficial de opencode (arm64) → ~/.opencode/bin
+      if [[ ! -x ~/.opencode/bin/opencode ]]; then
         print_installing "opencode oficial (arm64)..."
         mkdir -p ~/.opencode/bin
         curl -fL --retry 3 --retry-all-errors -C - \
           -o ~/opencode-linux-arm64.tar.gz \
           https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz \
-          && tar -xzf ~/opencode-linux-arm64.tar.gz -C ~/.opencode/bin/ && rm -f ~/opencode-linux-arm64.tar.gz \
+          && tar -xzf ~/opencode-linux-arm64.tar.gz -C ~/.opencode/bin/ opencode \
+          && rm -f ~/opencode-linux-arm64.tar.gz \
           || print_warning "descarga opencode falló"
-        if [[ -f ~/bun-termux/helper_scripts/replace_runtime.py ]]; then
-          python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode >/dev/null 2>&1 || true
-        fi
       fi
-      # PATH estable (en .zshrc y en la sesión actual)
+      # 4) Parchar el binario para usar el wrapper (sin esto: e_type: 2 al ejecutar)
+      if [[ -f ~/bun-termux/helper_scripts/replace_runtime.py && -x ~/.opencode/bin/opencode ]]; then
+        print_installing "Parcheando opencode (replace_runtime.py)..."
+        python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode >/dev/null 2>&1 || true
+      fi
+      # 5) PATH estable (en .zshrc y en la sesión actual)
       grep -q '.opencode/bin' ~/.zshrc 2>/dev/null || \
         echo 'export PATH="$HOME/.opencode/bin:$PATH"' >> ~/.zshrc
       export PATH="$HOME/.opencode/bin:$PATH"
-      if command -v opencode &>/dev/null && [[ "$(opencode --version 2>/dev/null)" != "1.2.13" ]]; then
+      if command -v opencode &>/dev/null && [[ "$(opencode --version 2>/dev/null)" != "1.2.13" ]] \
+         && ! opencode --help 2>&1 | head -1 | grep -qi '^Bun '; then
         print_success "opencode vía Ruta A: $(opencode --version 2>/dev/null)"
       else
         print_warning "Ruta A no quedó funcional — seguí la guía manual (AGENT.MD, OpenCode Termux)"
@@ -456,8 +479,11 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     git checkout termux 2>/dev/null || true
     # CRÍTICO: sincronizar submodules (nvim) — fix "submodule initialized but empty"
     git submodule update --init --recursive
-    # Stow desde la raíz: cada paquete del repo tiene estructura .config/
-    for pkg in nvim starship zsh tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+# Stow desde la raíz: cada paquete del repo tiene estructura .config/
+    # NOTA: "zsh" NO se stow — su .zshrc es el del LAPTOP (oh-my-posh con URL remota,
+    # powerlevel10k, swww) y rompe el prompt de Termux. En Termux se genera desde
+    # ~/.zshrc propio (ver PASO 8 / PASO 19).
+    for pkg in nvim starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
     cd ~
@@ -469,44 +495,33 @@ fi
 # PASO 19: Parchar .zshrc
 # ═══════════════════════════════════════════════════════════
 print_step "19/22: Silenciar Avisos"
-read -p "¿Parchar .zshrc? [S/n]: " patch_zshrc
+read -p "¿Reparar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
-  cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
-  
-  # oh-my-posh: envolver en guard (rompe el prompt si no está instalado)
-  sed -i 's|^eval "$(oh-my-posh init zsh)"|command -v oh-my-posh >/dev/null 2>\&\& eval "$(oh-my-posh init zsh)"|' ~/.zshrc
-  sed -i 's/^eval "$(pyenv/# eval "$(pyenv  # pyenv no funciona/' ~/.zshrc 2>/dev/null
-  sed -i 's|^source ~/\.api-keys\.sh|\[ -f ~/\.api-keys\.sh \] \&\& source ~/\.api-keys\.sh|' ~/.zshrc 2>/dev/null
-  
-  ! grep -q "HISTFILE=" ~/.zshrc && cat >> ~/.zshrc << 'HIST'
+  # Si el .zshrc proviene del LAPTOP (oh-my-posh con URL remota, powerlevel10k, swww,
+  # prompt de Arch), NO parchear: regenerar uno limpio de Termux.
+  LAPTOP_MARKS=("oh-my-posh init zsh --config 'http" "POWERLEVEL9K" "powerlevel10k" "wallpaper-prompt-fastfetch" "ARCH LINUX")
+  is_laptop=""
+  for mark in "${LAPTOP_MARKS[@]}"; do
+    if grep -qF "$mark" ~/.zshrc; then
+      is_laptop=1
+      break
+    fi
+  done
+
+  if [[ -n "$is_laptop" ]]; then
+    print_warning "Detecté .zshrc del laptop → genero uno limpio para Termux."
+    ensure_zshrc_force
+  else
+    cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
+    ! grep -q "HISTFILE=" ~/.zshrc && cat >> ~/.zshrc << 'HIST'
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY SHARE_HISTORY
 HIST
-  
-  ! grep -q "go/bin" ~/.zshrc && echo 'export PATH=$PATH:~/go/bin:~/.local/bin' >> ~/.zshrc
-  
-  command -v starship &> /dev/null && ! grep -q "starship init" ~/.zshrc && \
-    echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >> ~/.zshrc
-
-  # Usar la config de starship del repo (stoweada), no el preset genérico
-  ! grep -q "STARSHIP_CONFIG" ~/.zshrc && [[ -f ~/.config/starship/starship.toml ]] && \
-    echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >> ~/.zshrc
-
-  # Starship: silenciar configs órfanas con claves desconocidas (p.ej. [battery] de StarshipRoot)
-  if command -v starship >/dev/null 2>&1 && [[ -f ~/.config/starship.toml ]] \
-     && ! grep -q "\[battery\]" ~/.config/starship.toml; then
-    echo -e '\n[battery]\ndisabled = true' >> ~/.config/starship.toml
+    ! grep -q "go/bin" ~/.zshrc && echo 'export PATH=$PATH:~/go/bin:~/.local/bin' >> ~/.zshrc
+    print_success ".zshrc parchado"
   fi
-
-  # Fastfetch: el .zshrc heredado del laptop arranca wallpaper-prompt-fastfetch (depende de
-  # swww/Hyprland, que NO existen en Termux) → cae en fallback sin la config del repo.
-  # Reemplazar por llamada portable: config stoweada (~/.config/fastfetch/config.jsonc).
-  grep -q "wallpaper-prompt-fastfetch" ~/.zshrc && \
-    sed -i 's|^.*wallpaper-prompt-fastfetch.*$|command -v fastfetch >/dev/null 2>\&1 \&\& fastfetch --config ~/.config/fastfetch/config.jsonc|' ~/.zshrc
-  
-  print_success ".zshrc parchado"
 fi
 
 # ═══════════════════════════════════════════════════════════
