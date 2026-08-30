@@ -35,16 +35,62 @@ BANNER
 read -p "Presiona Enter..."
 
 # ═══════════════════════════════════════════════════════════
+# MODO REINSTALAR: --reinstall / -r regenera configs desde cero
+# ═══════════════════════════════════════════════════════════
+REINSTALL=0
+[[ "$1" == "--reinstall" || "$1" == "-r" ]] && REINSTALL=1
+if [[ "$REINSTALL" == "1" ]]; then
+  print_warning "Modo REINSTALAR: se regenerarán .zshrc/.termux_aliases y configs de dotfiles"
+  read -p "¿Continuar? [S/n]: " re_ok
+  if [[ "$re_ok" =~ ^[Nn]$ ]]; then
+    exit 0
+  fi
+  rm -f ~/.zshrc ~/.termux_aliases
+  rm -rf ~/.oh-my-zsh ~/.zsh
+  print_info "Configs viejas limpiadas"
+fi
+
+# Genera un .zshrc funcional para Termux (si no existe).
+# Incluye OMZ, plugins, history, PATH, aliases, prompt y fastfetch.
+ensure_zshrc() {
+  [[ -f ~/.zshrc ]] && return 0
+  cat > ~/.zshrc << 'ZSH'
+# Termux .zshrc generado por termux-basic-setup.sh
+export ZSH="$HOME/.oh-my-zsh"
+export ZSH_CUSTOM="$ZSH/custom"
+plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-completions zsh-history-substring-search)
+[[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
+[[ -d ~/.zsh/zsh-autocomplete ]] && source ~/.zsh/zsh-autocomplete
+[[ -d ~/.zsh/fzf-tab ]] && source ~/.zsh/fzf-tab
+
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY SHARE_HISTORY
+
+export PATH="$HOME/.local/bin:$HOME/go/bin:$HOME/.opencode/bin:$PATH"
+[[ -f ~/.termux_aliases ]] && source ~/.termux_aliases
+
+[[ -f ~/.config/starship/starship.toml ]] && export STARSHIP_CONFIG=~/.config/starship/starship.toml
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh)"
+
+command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }
+ZSH
+  print_success ".zshrc generado"
+}
+
+# ═══════════════════════════════════════════════════════════
 # PASO 1: Sistema
 # ═══════════════════════════════════════════════════════════
-print_step "1/23: Sistema"
+print_step "1/22: Sistema"
 pkg update -y >/dev/null 2>&1 && pkg upgrade -y >/dev/null 2>&1
 print_success "Sistema actualizado"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 2: Básicos
 # ═══════════════════════════════════════════════════════════
-print_step "2/23: Básicos"
+print_step "2/22: Básicos"
 pkg install -y git curl wget openssh coreutils findutils grep sed gawk \
   tar gzip bzip2 xz-utils unzip zip procps less man ncurses-utils termux-api >/dev/null 2>&1
 print_success "Herramientas básicas"
@@ -52,7 +98,7 @@ print_success "Herramientas básicas"
 # ═══════════════════════════════════════════════════════════
 # PASO 3: Git Config (AUTO PUSH)
 # ═══════════════════════════════════════════════════════════
-print_step "3/23: Git Configuración"
+print_step "3/22: Git Configuración"
 print_installing "Configurando git..."
 
 # Auto-setup remote branches (FIX del git push --set-upstream)
@@ -77,7 +123,7 @@ print_info "Auto-push habilitado (no más --set-upstream)"
 # ═══════════════════════════════════════════════════════════
 # PASO 4: Desarrollo
 # ═══════════════════════════════════════════════════════════
-print_step "4/23: Desarrollo"
+print_step "4/22: Desarrollo"
 pkg install -y clang make cmake python nodejs-lts rust golang >/dev/null 2>&1
 print_success "Entorno de desarrollo"
 print_info "pyenv NO recomendado en Termux"
@@ -85,7 +131,7 @@ print_info "pyenv NO recomendado en Termux"
 # ═══════════════════════════════════════════════════════════
 # PASO 5: Editores
 # ═══════════════════════════════════════════════════════════
-print_step "5/23: Editores"
+print_step "5/22: Editores"
 pkg install -y neovim vim nano micro >/dev/null 2>&1
 mkdir -p ~/bin
 cat > ~/bin/termux-file-editor << 'EDITOR'
@@ -99,14 +145,14 @@ print_success "Editores instalados"
 # ═══════════════════════════════════════════════════════════
 # PASO 6: CLI Modernas
 # ═══════════════════════════════════════════════════════════
-print_step "6/23: CLI Modernas"
+print_step "6/22: CLI Modernas"
 pkg install -y bat eza fd ripgrep fzf jq tree htop ncdu duf dust zoxide >/dev/null 2>&1
 print_success "CLI modernas"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 7: GitHub CLI
 # ═══════════════════════════════════════════════════════════
-print_step "7/23: GitHub CLI"
+print_step "7/22: GitHub CLI"
 pkg install -y gh >/dev/null 2>&1
 gh extension install meiji163/gh-notify >/dev/null 2>&1 || true
 print_success "gh instalado"
@@ -115,7 +161,7 @@ print_info "Autenticar: gh auth login"
 # ═══════════════════════════════════════════════════════════
 # PASO 8: Zsh Plugins
 # ═══════════════════════════════════════════════════════════
-print_step "8/23: Zsh + Plugins"
+print_step "8/22: Zsh + Plugins"
 read -p "¿Instalar Zsh+Plugins? [S/n]: " zsh_install
 
 if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
@@ -155,13 +201,13 @@ if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
     git clone --depth 1 -q https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null
   
   print_success "Plugins instalados"
-  print_warning "Tu .zshrc NO ha sido modificado"
+  ensure_zshrc
 fi
 
 # ═══════════════════════════════════════════════════════════
 # PASO 9: Prompts
 # ═══════════════════════════════════════════════════════════
-print_step "9/23: Prompts"
+print_step "9/22: Prompts"
 echo "Elige tu prompt:"
 echo "  1) Starship (recomendado - ligero)"
 echo "  2) Oh-My-Posh (más features)"
@@ -176,10 +222,20 @@ case "$prompt_choice" in
     if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
       starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
     fi
+    # Activar starship en .zshrc (si no está ya)
+    grep -q "starship init" ~/.zshrc 2>/dev/null || \
+      echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >> ~/.zshrc
+    # Usar la config del repo (stow) si existe
+    if [[ -f ~/.config/starship/starship.toml ]] && ! grep -q "STARSHIP_CONFIG" ~/.zshrc 2>/dev/null; then
+      echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >> ~/.zshrc
+    fi
     print_success "Starship instalado"
     ;;
   2)
     pkg install -y oh-my-posh >/dev/null 2>&1
+    # Activar oh-my-posh en .zshrc
+    grep -q "oh-my-posh init" ~/.zshrc 2>/dev/null || \
+      echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/omp.toml)"' >> ~/.zshrc
     print_success "Oh-My-Posh instalado"
     ;;
   *)
@@ -190,7 +246,7 @@ esac
 # ═══════════════════════════════════════════════════════════
 # PASO 10: Pokemon (CON FIX)
 # ═══════════════════════════════════════════════════════════
-print_step "10/23: Pokemon-colorscripts"
+print_step "10/22: Pokemon-colorscripts"
 read -p "¿Instalar pokemon? [S/n]: " pokemon_install
 if [[ ! "$pokemon_install" =~ ^[Nn]$ ]]; then
   if ! command -v pokemon-colorscripts &> /dev/null; then
@@ -212,7 +268,7 @@ POKE
 fi
 
 # Resto de pasos (11-18) - igual que antes
-print_step "11/23: Tmux"
+print_step "11/22: Tmux"
 pkg install -y tmux >/dev/null 2>&1
 [[ ! -f ~/.tmux.conf ]] && cat > ~/.tmux.conf << 'TMUX'
 set -g mouse on
@@ -220,19 +276,22 @@ set -g base-index 1
 TMUX
 print_success "Tmux"
 
-print_step "12/23: Yazi"
+print_step "12/22: Yazi"
 pkg install -y yazi >/dev/null 2>&1
 print_success "Yazi"
 
-print_step "13/23: Fastfetch"
+print_step "13/22: Fastfetch"
 pkg install -y fastfetch 2>/dev/null || pkg install -y neofetch 2>/dev/null
+# Lanzar fastfetch portable al abrir cada shell (config del repo si stow la aplicó)
+grep -q "fastfetch --config" ~/.zshrc 2>/dev/null || \
+  echo 'command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }' >> ~/.zshrc
 print_success "System info"
 
-print_step "14/23: Termux-API"
+print_step "14/22: Termux-API"
 pkg install -y termux-api >/dev/null 2>&1
 print_success "termux-api"
 
-print_step "15/23: Aliases"
+print_step "15/22: Aliases"
 [[ ! -f ~/.termux_aliases ]] && cat > ~/.termux_aliases << 'ALIASES'
 alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
@@ -244,7 +303,7 @@ grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases
 grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.zshrc
 print_success "Aliases"
 
-print_step "16/23: IA Tools"
+print_step "16/22: IA Tools"
 read -p "¿Instalar IA Tools? [S/n]: " ia_install
 if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
   # tgpt: los binarios de GitHub releases NO son PIE => error e_type: 2 en Android.
@@ -323,13 +382,33 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       print_success "opencode $(opencode --version 2>/dev/null) instalado"
     else
       print_warning "Artefactos de guysoft rotos (Bun pelado)."
-      print_info "Ruta A (recomendada, sin proot): bun-termux + binario oficial."
-      print_info "  curl -fsSL https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/manager | bash -s install"
-      print_info "  curl -LO https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz"
-      print_info "  mkdir -p ~/.opencode/bin && tar -xzf opencode-linux-arm64.tar.gz -C ~/.opencode/bin/"
-      print_info "  python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode"
-      print_info "  export PATH=\"\$HOME/.opencode/bin:\$PATH\"  → agregar a ~/.zshrc"
-      print_info "Verificar: opencode --version debe dar ≥1.18 (no la versión de Bun)."
+      print_info "Fallback: Ruta A (bun-termux + binario oficial) ejecutándose..."
+      # Ruta A — se ejecuta aquí, no solo se imprime
+      pkg install -y git curl python make clang >/dev/null 2>&1
+      if [[ ! -x ~/.opencode/bin/opencode ]]; then
+        print_installing "bun-termux (loader sin proot)..."
+        curl -fsSL https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/manager | bash -s install >/dev/null 2>&1 || \
+          print_warning "manager bun-termux falló (revisa manual)"
+        print_installing "opencode oficial (arm64)..."
+        mkdir -p ~/.opencode/bin
+        curl -fL --retry 3 --retry-all-errors -C - \
+          -o ~/opencode-linux-arm64.tar.gz \
+          https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz \
+          && tar -xzf ~/opencode-linux-arm64.tar.gz -C ~/.opencode/bin/ && rm -f ~/opencode-linux-arm64.tar.gz \
+          || print_warning "descarga opencode falló"
+        if [[ -f ~/bun-termux/helper_scripts/replace_runtime.py ]]; then
+          python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode >/dev/null 2>&1 || true
+        fi
+      fi
+      # PATH estable (en .zshrc y en la sesión actual)
+      grep -q '.opencode/bin' ~/.zshrc 2>/dev/null || \
+        echo 'export PATH="$HOME/.opencode/bin:$PATH"' >> ~/.zshrc
+      export PATH="$HOME/.opencode/bin:$PATH"
+      if command -v opencode &>/dev/null && [[ "$(opencode --version 2>/dev/null)" != "1.2.13" ]]; then
+        print_success "opencode vía Ruta A: $(opencode --version 2>/dev/null)"
+      else
+        print_warning "Ruta A no quedó funcional — seguí la guía manual (AGENT.MD, OpenCode Termux)"
+      fi
     fi
   fi
 
@@ -340,7 +419,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
 fi
 print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
-print_step "17/23: Fira Code"
+print_step "17/22: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
 if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   pkg install -y wget unzip >/dev/null 2>&1
@@ -352,7 +431,7 @@ if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   cd ~
 fi
 
-print_step "18/23: Stow + Dotfiles"
+print_step "18/22: Stow + Dotfiles"
 read -p "¿Configurar dotfiles? [S/n]: " stow_install
 if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
   pkg install -y stow >/dev/null 2>&1
@@ -389,7 +468,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 19: Parchar .zshrc
 # ═══════════════════════════════════════════════════════════
-print_step "19/23: Silenciar Avisos"
+print_step "19/22: Silenciar Avisos"
 read -p "¿Parchar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
   cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
@@ -433,7 +512,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 20: Crear .gitignore Seguro
 # ═══════════════════════════════════════════════════════════
-print_step "20/23: .gitignore Seguro"
+print_step "20/22: .gitignore Seguro"
 for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
   if [[ -d "$dir" ]]; then
     cd "$dir"
@@ -457,32 +536,9 @@ IGNORE
 done
 
 # ═══════════════════════════════════════════════════════════
-# PASO 21: Rama Termux
+# PASO 21: Workspace + Discord RPC
 # ═══════════════════════════════════════════════════════════
-print_step "21/23: Rama Termux"
-read -p "¿Crear rama termux? [S/n]: " create_branch
-if [[ ! "$create_branch" =~ ^[Nn]$ ]]; then
-  for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
-    [[ -d "$dir" ]] && cd "$dir" && break
-  done
-  
-  if git rev-parse --git-dir >/dev/null 2>&1; then
-    if ! git show-ref --verify --quiet refs/heads/termux; then
-      git checkout -b termux 2>/dev/null
-      mkdir -p termux zsh-termux
-      [[ -f ~/.zshrc ]] && cp ~/.zshrc zsh-termux/.zshrc
-      git add . 2>/dev/null
-      git commit -m "feat: rama termux" 2>/dev/null || true
-      print_success "Rama creada"
-    fi
-  fi
-  cd ~
-fi
-
-# ═══════════════════════════════════════════════════════════
-# PASO 22: Workspace + Discord RPC
-# ═══════════════════════════════════════════════════════════
-print_step "22/23: Workspace + Discord RPC"
+print_step "21/22: Workspace + Discord RPC"
 read -p "¿Clonar workspace e instalar discord-rpc? [S/n]: " ws_install
 if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
   if [[ ! -d ~/workspace/.git ]]; then
@@ -521,9 +577,9 @@ if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 23: Finalización
+# PASO 22: Finalización
 # ═══════════════════════════════════════════════════════════
-print_step "23/23: Finalización"
+print_step "22/22: Finalización"
 
 clear
 cat <<'FINAL'
