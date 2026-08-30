@@ -349,10 +349,12 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
     print_installing "opencode (guysoft/opencode-termux)..."
     pkg install -y ripgrep unzip >/dev/null 2>&1
 
-    oc_ok() { # 0 si opencode responde como OpenCode (no como Bun sin module graph)
+    oc_ok() { # 0 si opencode responde como OpenCode (no como Bun sin module graph, ni roto e_type:2)
       command -v opencode &>/dev/null || return 1
-      [[ "$(opencode --version 2>/dev/null)" == "1.2.13" ]] && return 1
-      opencode --help 2>&1 | head -1 | grep -qi '^Bun ' && return 1
+      local v
+      v="$(opencode --version 2>&1)" || return 1   # binario roto (e_type:2) no puede ni ejecutarse
+      [[ "$v" == "1.2.13" ]] && return 1
+      echo "$v" | grep -qi '^Bun ' && return 1
       return 0
     }
     oc_libs_fix() { # el wrapper busca libs en ../lib, $PREFIX/lib y $dir (no en libexec)
@@ -433,8 +435,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       grep -q '.opencode/bin' ~/.zshrc 2>/dev/null || \
         echo 'export PATH="$HOME/.opencode/bin:$PATH"' >> ~/.zshrc
       export PATH="$HOME/.opencode/bin:$PATH"
-      if command -v opencode &>/dev/null && [[ "$(opencode --version 2>/dev/null)" != "1.2.13" ]] \
-         && ! opencode --help 2>&1 | head -1 | grep -qi '^Bun '; then
+      if oc_ok; then
         print_success "opencode vía Ruta A: $(opencode --version 2>/dev/null)"
       else
         print_warning "Ruta A no quedó funcional — seguí la guía manual (AGENT.MD, OpenCode Termux)"
@@ -627,7 +628,12 @@ echo -e "  ${CYAN}NUNCA commitear .opencommit o *api-keys*${NC}"
 echo -e "  ${CYAN}Usar variables de entorno en ~/.zshrc${NC}"
 
 echo -e "\n${GREEN}Siguiente:${NC}"
-echo -e "  ${CYAN}1.${NC} source ~/.zshrc"
+echo -e "  ${CYAN}1.${NC} source ~/.zshrc  ${GREEN}# (automático, ver abajo)${NC}"
 echo -e "  ${CYAN}2.${NC} gh auth login"
 echo -e "  ${CYAN}3.${NC} git push  ${GREEN}# ¡Sin --set-upstream!${NC}"
 echo ""
+
+# Recargar zsh con el .zshrc nuevo (mata el prompt fantasma de oh-my-posh viejo).
+# Si se cancela, el usuario recarga manualmente con `exec zsh`.
+echo -e "${CYAN}🔄 Recargando zsh con la config nueva...${NC}"
+exec zsh
