@@ -816,10 +816,12 @@ alias gitclean='bash ~/scripts/git_clean.sh'
 # ═══════════════════════════════════════════════════════════
 # PYMACRO RECORD (LOCAL CONFIG)
 # ═══════════════════════════════════════════════════════════
-# Pyenv configuration
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# Pyenv configuration (solo se activa si pyenv está instalado)
+if [[ -d "$HOME/.pyenv" ]]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  command -v pyenv >/dev/null && eval "$(pyenv init -)"
+fi
 # COMANDOS DE OMARCHY
 alias omarchy-launch-webapp='bash ~/omarchy-arch-bin/omarchy-launch-webapp'
 alias omarchy-webapp-install='bash ~/omarchy-arch-bin/omarchy-webapp-install'

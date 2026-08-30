@@ -1,6 +1,27 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "autoupdate": true,
+  "instructions": [
+    ".opencode/rules.md"
+  ],
   "mcp": {
+    "composio-connect": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "enabled": true,
+      "headers": {
+        "x-api-key": "{env:COMPOSIO_API_KEY}"
+      }
+    },
+    "engram": {
+      "command": [
+        "/data/data/com.termux/files/home/.local/bin/engram",
+        "mcp",
+        "--tools=agent"
+      ],
+      "enabled": true,
+      "type": "local"
+    },
     "figma": {
       "command": [
         "npx",
@@ -11,33 +32,16 @@
       ],
       "enabled": true,
       "type": "local"
-    },
-    "composio-connect": {
-      "type": "remote",
-      "url": "https://connect.composio.dev/mcp",
-      "enabled": true,
-      "headers": {
-        "x-api-key": "{env:COMPOSIO_API_KEY}"
-      }
     }
   },
-  "plugin": [
-    "/data/data/com.termux/files/home/workspace/opencode-discord-rpc"
-  ],
-  "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-20250514",
-  // "theme": "gemini",
-  // "model": "gemini-3-flash-previewi",
-  //  "model": "deepseek-chat",
-  //  "model": "claude-opus-4-5",
-  //  "model": "claude-haiku-4-5",
-  //  "model": "claude-sonnet-4-5",
-  "autoupdate": true,
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
     "mdns": true,
-    "cors": ["http://localhost:5170"]
+    "cors": [
+      "http://localhost:5170"
+    ]
   },
-  "instructions": [".opencode/rules.md"]
+  "theme": "opencode"
 }

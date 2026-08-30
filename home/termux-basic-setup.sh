@@ -192,28 +192,28 @@ if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
     RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null 2>&1
   fi
   
-  ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  
-  print_installing "Plugins..."
-  [[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]] && \
-    git clone --depth 1 -q https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" 2>/dev/null
-  
-  [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]] && \
-    git clone --depth 1 -q https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null
-  
-  [[ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]] && \
-    git clone --depth 1 -q https://github.com/zsh-users/zsh-completions.git "$ZSH_CUSTOM/plugins/zsh-completions" 2>/dev/null
-  
-  [[ ! -d "$ZSH_CUSTOM/plugins/zsh-history-substring-search" ]] && \
-    git clone --depth 1 -q https://github.com/zsh-users/zsh-history-substring-search.git "$ZSH_CUSTOM/plugins/zsh-history-substring-search" 2>/dev/null
-  
-  mkdir -p ~/.zsh
-  # zsh-autocomplete (marlonrichert) NO se instala: compite con zsh-autosuggestions
-  # y anula el predictivo. Receta core-termux: solo autosuggestions como predictor.
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
+  # git-flow (AVH Edition) → comando `git flow` (tu config ya define gitflow())
+  pkg install -y gitflow-avh >/dev/null 2>&1 || true
+
+  # IMPORTANTE: los plugins se configuran con `core install shell` (instala en
+  # ~/.zsh-plugins + Oh-My-Zsh + persistent session). Reemplaza el clonado
+  # manual de plugins. DESPUÉS se enlaza tu .zshrc de dotfiles (PASO 18).
+  print_installing "core install shell (plugins)..."
+  if command -v core >/dev/null 2>&1; then
+    bash -c "core install shell" >/dev/null 2>&1 || true
+  else
+    print_warning "core no está en PATH — los plugins quedan pendientes (corré: core install shell)"
+  fi
+
+  # Tu .zshrc (dotfiles) sourcea estos desde ~/.zsh/ → asegurarlos:
+  mkdir -p ~/.zsh
+  [[ ! -d ~/.zsh/zsh-autocomplete ]] && \
+    git clone --depth 1 -q https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete 2>/dev/null || true
   [[ ! -d ~/.zsh/fzf-tab ]] && \
-    git clone --depth 1 -q https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null
-  
+    git clone --depth 1 -q https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null || true
+
   print_success "Plugins instalados"
   ensure_zshrc
 fi
@@ -473,6 +473,35 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
 fi
 print_info "Claude Code/Gemini CLI: solo vía proot-distro (Ubuntu/Debian)"
 
+# ─── Engram (memoria persistente MCP) ─────────────────────────────────────
+read -p "¿Configurar Engram (memoria MCP)? [S/n]: " engram_install
+if [[ ! "$engram_install" =~ ^[Nn]$ ]]; then
+  ENGRAM_VER=$(curl -s https://api.github.com/repos/Gentleman-Programming/engram/releases/latest | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
+  [[ -z "$ENGRAM_VER" ]] && ENGRAM_VER="v1.20.0"
+  ARCH="$(uname -m)"
+  if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_arm64.tar.gz"
+  elif [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_amd64.tar.gz"
+  else print_warning "engram: arch no soportado ($ARCH)"; fi
+  if [[ -n "$ENGRAM_TGZ" ]]; then
+    mkdir -p ~/.local/bin
+    TMPD=$(mktemp -d)
+    curl -fsSL --retry 3 --retry-all-errors -C - \
+      -o "$TMPD/engram.tar.gz" \
+      "https://github.com/Gentleman-Programming/engram/releases/download/$ENGRAM_VER/$ENGRAM_TGZ" \
+      && tar -xzf "$TMPD/engram.tar.gz" -C "$TMPD" engram \
+      && install -m 755 "$TMPD/engram" ~/.local/bin/engram \
+      && print_success "engram $ENGRAM_VER instalado (~/.local/bin/engram)" \
+      || print_warning "descarga de engram falló"
+    rm -rf "$TMPD"
+    # MCP + plugin para OpenCode (escribe ~/.config/opencode/)
+    if command -v opencode >/dev/null 2>&1 || [[ -d ~/.config/opencode ]]; then
+      ~/.local/bin/engram setup opencode >/dev/null 2>&1 && \
+        print_success "engram conectado a OpenCode (MCP + plugin)" || \
+        print_warning "engram setup opencode no completó — reiniciá opencode"
+    fi
+  fi
+fi
+
 print_step "17/23: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
 if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
@@ -517,6 +546,18 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     for pkg in nvim starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
+    # zsh: el .zshrc del repo en rama termux ES el funcional (p10k de ~/.zsh-plugins
+    # + ~/.termux_aliases + git-flow). Se enlaza directo; se aplica de forma
+    # idempotente el fix de p10k (gitstatusd no corre en aarch64 → git nativo,
+    # sin wizard) y el link de ~/.p10k.zsh. En ramas NO-termux el .zshrc es del
+    # laptop y rompe Termux → ahí NO enlazar (queda el generado por ensure_zshrc).
+    if [[ -f "zsh/.zshrc" ]] && ! grep -qE "oh-my-posh init zsh --config 'http|ARCH LINUX" "zsh/.zshrc"; then
+      ln -sfn "$DOTFILES/zsh/.zshrc" ~/.zshrc
+      [[ -f "zsh/.p10k.zsh" ]] && ln -sfn "$DOTFILES/zsh/.p10k.zsh" ~/.p10k.zsh
+      grep -q "POWERLEVEL9K_DISABLE_GITSTATUS" ~/.zshrc 2>/dev/null || \
+        printf '\n# p10k en Termux: gitstatusd no disponible (aarch64) → git nativo\ntypeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true\ntypeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\n' >> ~/.zshrc
+    fi
+    [[ -f "zsh/.zshenv" ]] && ln -sfn "$DOTFILES/zsh/.zshenv" ~/.zshenv
     cd ~
     print_success "Dotfiles ($DOTFILES)"
   fi
@@ -528,16 +569,19 @@ fi
 print_step "19/23: Silenciar Avisos"
 read -p "¿Reparar .zshrc? [S/n]: " patch_zshrc
 if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
-  # Si el .zshrc proviene del LAPTOP (oh-my-posh con URL remota, powerlevel10k, swww,
-  # prompt de Arch), NO parchear: regenerar uno limpio de Termux.
-  LAPTOP_MARKS=("oh-my-posh init zsh --config 'http" "POWERLEVEL9K" "powerlevel10k" "wallpaper-prompt-fastfetch" "ARCH LINUX")
+  # Si ~/.zshrc es el symlink mantenido del repo (rama termux, p10k adaptado)
+  # se parchea normal; solo se regenera cuando el archivo es un .zshrc real de
+  # laptop (oh-my-posh con URL remota, swww, prompt de Arch) que rompe Termux.
+  LAPTOP_MARKS=("oh-my-posh init zsh --config 'http" "wallpaper-prompt-fastfetch" "ARCH LINUX" "bspwm" "swww")
   is_laptop=""
-  for mark in "${LAPTOP_MARKS[@]}"; do
-    if grep -qF "$mark" ~/.zshrc; then
-      is_laptop=1
-      break
-    fi
-  done
+  if [[ ! -L ~/.zshrc ]]; then
+    for mark in "${LAPTOP_MARKS[@]}"; do
+      if grep -qF "$mark" ~/.zshrc; then
+        is_laptop=1
+        break
+      fi
+    done
+  fi
 
   if [[ -n "$is_laptop" ]]; then
     print_warning "Detecté .zshrc del laptop → genero uno limpio para Termux."
@@ -650,6 +694,23 @@ if [[ ! "$ct_install" =~ ^[Nn]$ ]]; then
     print_installing "core install ai --opencode"
     core install ai --opencode || print_warning "Falló; reintenta eligiendo 'proot-distro (ubuntu)'"
   fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 22b: Módulos Core (complemento)
+# ───────────────────────────────────────────────────────────
+# Instala los módulos restantes del framework. Editor se omite (se usa nvim).
+print_step "22b/23: Módulos Core"
+read -p "¿Instalar módulos de core (lang, db, ai, dev, npm, shell, ui, auto)? [S/n]: " core_mods
+if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
+  for m in lang db ai dev npm shell ui auto; do
+    print_installing "core install $m..."
+    if timeout 120 bash -c "core install $m"; then
+      print_success "$m instalado"
+    else
+      print_warning "$m falló o se saltó"
+    fi
+  done
 fi
 
 # ═══════════════════════════════════════════════════════════
