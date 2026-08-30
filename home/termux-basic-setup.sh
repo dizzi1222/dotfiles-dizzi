@@ -402,18 +402,29 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       print_warning "Artefactos de guysoft rotos (Bun pelado)."
       print_info "Fallback: Ruta A (bun-termux + binario oficial) ejecutándose..."
       # Ruta A — se ejecuta aquí, no solo se imprime
-      # Dependencias reales de bun-termux (gue README oficial)
-      pkg install -y git curl clang make glibc-repo python >/dev/null 2>&1
-      pkg install -y glibc-runner >/dev/null 2>&1
+      # Dependencias reales de bun-termux (gue README oficial).
+      # OJO: el paquete glibc-repo NO existe en espejos como termux.net → se agrega el repo
+      # glibc a mano; sin esto, ni pkg ni el manager encuentran glibc-runner.
+      mkdir -p $PREFIX/etc/apt/sources.list.d
+      grep -q termux-glibc $PREFIX/etc/apt/sources.list.d/glibc.list 2>/dev/null || \
+        echo "deb [trusted=yes] https://packages-cf.termux.dev/apt/termux-glibc glibc stable" \
+          > $PREFIX/etc/apt/sources.list.d/glibc.list
+      pkg update >/dev/null 2>&1 || true
+      pkg install -y git curl clang make >/dev/null 2>&1 || true
+      pkg install -y glibc glibc-runner >/dev/null 2>&1 || true
       # 1) Clonar bun-termux (necesario para helper_scripts/replace_runtime.py)
       [[ ! -d ~/bun-termux/.git ]] && \
         git clone --depth 1 https://github.com/Happ1ness-dev/bun-termux.git ~/bun-termux >/dev/null 2>&1 || true
-      # 2) Manager oficial del repo (ruta correcta: helper_scripts/bun-termux-manager, NO manager)
+      # 2) Instalar Bun + wrapper (vía manual ya probada en el campo; el manager
+      #    busca el paquete glibc-repo y aborta aunque el repo manual ya esté).
       if [[ ! -x ~/.bun/bin/bun ]]; then
         print_installing "bun-termux (loader sin proot)..."
         touch ~/.bashrc
-        curl -fsSL "https://raw.githubusercontent.com/Happ1ness-dev/bun-termux/main/helper_scripts/bun-termux-manager" | bash -s install >/dev/null 2>&1 || \
-          print_warning "manager bun-termux falló (revisa manual)"
+        curl -fsSL https://bun.sh/install | bash >/dev/null 2>&1
+        if [[ -x ~/.bun/bin/bun ]]; then
+          ( cd ~/bun-termux && make >/dev/null 2>&1 && make install >/dev/null 2>&1 )
+        fi
+        [[ -x ~/.bun/bin/bun ]] || print_warning "bun-termux falló (revisa manual)"
       fi
       # 3) Binario oficial de opencode (arm64) → ~/.opencode/bin
       if [[ ! -x ~/.opencode/bin/opencode ]]; then
@@ -429,7 +440,13 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       # 4) Parchar el binario para usar el wrapper (sin esto: e_type: 2 al ejecutar)
       if [[ -f ~/bun-termux/helper_scripts/replace_runtime.py && -x ~/.opencode/bin/opencode ]]; then
         print_installing "Parcheando opencode (replace_runtime.py)..."
-        python ~/bun-termux/helper_scripts/replace_runtime.py ~/.opencode/bin/opencode >/dev/null 2>&1 || true
+        # Usar output explícito: si la primera vez quedó un .bak (modo default crea backup),
+        # el script aborta con "Backup already exists". Con output a .patched nunca bloquea.
+        python ~/bun-termux/helper_scripts/replace_runtime.py \
+          ~/.opencode/bin/opencode ~/.opencode/bin/opencode.patched >/dev/null 2>&1 \
+          && mv -f ~/.opencode/bin/opencode ~/.opencode/bin/opencode.unpatched \
+          && mv -f ~/.opencode/bin/opencode.patched ~/.opencode/bin/opencode \
+          || print_warning "replace_runtime.py no aplicó (revisa manual)"
       fi
       # 5) PATH estable (en .zshrc y en la sesión actual)
       grep -q '.opencode/bin' ~/.zshrc 2>/dev/null || \
@@ -437,6 +454,8 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       export PATH="$HOME/.opencode/bin:$PATH"
       if oc_ok; then
         print_success "opencode vía Ruta A: $(opencode --version 2>/dev/null)"
+      elif ~/.opencode/bin/opencode --version &>/dev/null; then
+        print_success "opencode vía Ruta A (ruta explícita): $(~/.opencode/bin/opencode --version 2>/dev/null)"
       else
         print_warning "Ruta A no quedó funcional — seguí la guía manual (AGENT.MD, OpenCode Termux)"
       fi
