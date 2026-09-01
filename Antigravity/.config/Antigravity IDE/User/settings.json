@@ -1,0 +1,7 @@
+{
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1,
+  },
+  "google.cloud.project": "cic-ptd-dev",
+  "workbench.colorTheme": "Aura Soft Dark",
+}
