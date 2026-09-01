@@ -1,1 +1,1 @@
-/nix/store/v3jblx00prrm5k7pciv2pf90yp6zbry8-zsh-autosuggestions-0.7.1/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
+source ${0:A:h}/zsh-autosuggestions.zsh

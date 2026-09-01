@@ -1,1 +1,1 @@
-fpath+=("/home/diego/.oh-my-zsh/custom/plugins/zsh-completions" $fpath)
+fpath+="${0:A:h}/src"
