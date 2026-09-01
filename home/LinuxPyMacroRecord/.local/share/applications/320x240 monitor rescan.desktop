@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Set Resolution 320x240
-Comment=Cambia la resolución de Hyprland a 320x240
-Exec=bash -c 'hyprctl keyword monitor eDP-1,320x240,0x0,1'
-Icon=display
-Terminal=false
-Type=Application
-Categories=Utility;

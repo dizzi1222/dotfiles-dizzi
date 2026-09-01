@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Icon=edit-find
-Name=Fuzzel Looking
-Exec=/home/diego/.config/scripts-plasma-windows-desktop/fuzzel-looking.sh
-NoDisplay=true
-Hidden=true

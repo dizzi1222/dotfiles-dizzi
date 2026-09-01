@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Launcher for the writable Cursor runtime (~/.cursor/runtime), set up by
-# home-manager activation `cursorWritable`. The Nix store copy is read-only,
-# which breaks custom-ui-style's runtime patching of resources/app/out.
-RUNTIME="$HOME/.cursor/runtime"
-if [ -x "$RUNTIME/bin/cursor" ]; then
-  exec "$RUNTIME/bin/cursor" "$@"
-fi
-exec cursor "$@"
