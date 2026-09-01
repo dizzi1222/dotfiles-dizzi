@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PyMacroRecord
+Comment=Record and replay macros (TinyTask for Linux)
+Exec=pymacrorecord
+Icon=input-keyboard
+Terminal=false
+Type=Application
+Categories=Utility;Accessibility;
+Keywords=macro;automation;record;tinytask;

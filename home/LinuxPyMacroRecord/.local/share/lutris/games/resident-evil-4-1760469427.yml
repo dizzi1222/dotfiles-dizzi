@@ -1,0 +1,6 @@
+game:
+  exe: /home/diego/.wine-re4/drive_c/Games/Resident Evil 4/re4.exe
+  prefix: /home/diego/.wine-re4
+  working_dir: /home/diego/.wine-re4/drive_c/Games/Resident Evil 4/
+wine:
+  esync: false

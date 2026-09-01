@@ -1,0 +1,17 @@
+game:
+  appid: '349040'
+  exe: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Naruto
+    Shippuden Ultimate Ninja Storm 4/NSUNS4.exe
+  run_without_steam: false
+  working_dir: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Naruto
+    Shippuden Ultimate Ninja Storm 4/
+game_slug: naruto-shippuden-ultimate-ninja-storm-4
+name: 'NARUTO SHIPPUDEN: Ultimate Ninja STORM 4'
+script:
+  game:
+    appid: 349040
+service: steam
+service_id: 349040
+slug: naruto-shippuden-ultimate-nin-proton
+version: Proton
+year: 2016

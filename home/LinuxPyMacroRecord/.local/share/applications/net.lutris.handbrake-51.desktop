@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/handbrake.png
+Type=Application
+Hidden=true
+# ; ↑ 󱞼 ¡ Añade esto! para ocultar el botón de inicio en el launcher [Rofi, Caelestia etc.]
+Name=Handbrake
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/51
+Categories=Game
+TryExec=lutris

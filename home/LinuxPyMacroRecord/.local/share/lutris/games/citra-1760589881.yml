@@ -1,0 +1,4 @@
+game:
+  args: ''
+  exe: /home/diego/.local/share/lutris/runners/citra/citra-qt
+  working_dir: /home/diego/.local/share/lutris/runners/citra/

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=CustomRP
+Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/users/diego/AppData/Roaming/CustomRP/CustomRP.exe"
+Type=Application
+StartupNotify=true
+Path=/home/diego/.wine/drive_c/users/diego/AppData/Roaming/CustomRP
+Icon=72DC_CustomRP.0
+StartupWMClass=customrp.exe
+Name[es_ES]=CustomRP

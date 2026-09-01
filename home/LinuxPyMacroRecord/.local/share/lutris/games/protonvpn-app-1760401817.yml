@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/protonvpn-app
+  working_dir: /usr/bin/

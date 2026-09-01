@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/pamac-manager
+  working_dir: /usr/bin/

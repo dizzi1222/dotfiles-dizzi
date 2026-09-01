@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/lxappearance-themes.png
+Type=Application
+Name=Ajustes LXAppearance
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/56
+Categories=Game
+TryExec=lutris

@@ -1,0 +1,10 @@
+game:
+  exe: /home/diego/.wine-11/drive_c/Games/Dragon Ball Sparking ZERO/SparkingZERO.exe
+  prefix: /home/diego/.SparkingZERO/.SparkingZERO
+  working_dir: /home/diego/.wine-11/drive_c/Games/Dragon Ball Sparking ZERO/
+wine:
+  Desktop: true
+  WineDesktop: 1368x768
+  dgvoodoo2: false
+  system_winetricks: false
+  version: ge-proton

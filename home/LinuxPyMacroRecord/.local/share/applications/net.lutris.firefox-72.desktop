@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/firefox.png
+Type=Application
+Name=Firefox
+Hidden=false
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/72
+Categories=Game
+TryExec=lutris

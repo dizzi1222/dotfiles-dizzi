@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SNES9X
+Comment=Emulador de Nintendo SNES (vía Lutris Runner)
+Exec=snes9x-gtk
+Hidden=true
+Icon=snes9x
+Categories=Game;Emulator;
+Terminal=false
+StartupNotify=true

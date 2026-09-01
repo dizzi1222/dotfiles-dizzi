@@ -1,0 +1,23 @@
+{
+  "paths": {
+    "wallpaperDir": "~/wallpapers/wallpapers"
+  },
+  "services": {
+    "wallpaper": false
+  },
+  "appearance": {
+    "font": {
+      "family": {
+        "material": "Material Symbols Rounded",
+        "mono": "mononoki",
+        "sans": "mononoki"
+      }
+    },
+    "theme": {
+      "gtk": "Colloid-Purple-Dark",
+      "icon": "Gruvbox-Plus-Dark",
+      "cursor": "Kafka",
+      "qt": "kvantum-dark"
+    }
+  }
+}

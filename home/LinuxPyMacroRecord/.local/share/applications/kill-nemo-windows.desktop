@@ -1,0 +1,12 @@
+
+# Nemo Windows 󰖳
+[Desktop Entry]
+Type=Application
+Name=Matar Nemo Windows Desktop
+Comment=Kill Desktop, Windows 10, XP, 11, Vista, 7, 8, 8.1, 10, 11, Escritorio
+Exec=sh -c 'pkill nemo-desktop 2'
+# Icon=nemo
+Icon=/home/diego/.local/share/icons/mrdWindows10-dogshit.png
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

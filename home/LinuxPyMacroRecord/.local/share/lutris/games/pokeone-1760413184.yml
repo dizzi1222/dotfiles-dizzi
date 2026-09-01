@@ -1,0 +1,4 @@
+game:
+  exe: /home/diego/.wine-11/drive_c/Games/PokeOne/Launcher.exe
+  prefix: ''
+  working_dir: /home/diego/.wine-11/drive_c/Games/PokeOne/

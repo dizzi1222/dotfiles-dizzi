@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Gmail - (dhardi)
+Comment=Open Gmail - (dhardi)
+Exec=brave --app="https://mail.google.com/mail/u/1/#inbox"
+# Exec=zen-browser --new-window --kiosk "https://mail.google.com/mail/u/1/#inbox"
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Gmail_-_(sanakyds).png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Gmail_-_(sanakyds)

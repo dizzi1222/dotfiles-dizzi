@@ -1,0 +1,6 @@
+game:
+  exe: /home/diego/.local/bin/juegos/pokeone.sh
+  working_dir: ''
+system:
+  env:
+    WINEDEBUG: -all

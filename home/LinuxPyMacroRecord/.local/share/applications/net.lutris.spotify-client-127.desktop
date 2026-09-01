@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/spotify-client.png
+Type=Application
+Name=Spotify
+Comment=Spotify instalado con Lutris y parcheado en Spicetify
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/127
+Categories=Game
+TryExec=lutris

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Steam Windows
+Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine-11/drive_c/Program Files (x86)/Steam/steam.exe"
+Type=Application
+StartupNotify=true
+Hidden=true
+Path=/home/diego/.wine/drive_c/Program Files (x86)/Steam
+Icon=5026_steam.0
+StartupWMClass=steam.exe

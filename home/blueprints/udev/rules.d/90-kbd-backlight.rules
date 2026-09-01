@@ -1,0 +1,2 @@
+# Dell Keyboard Backlight - Dar permisos al grupo wheel
+SUBSYSTEM=="leds", KERNEL=="dell::kbd_backlight", ACTION=="add", RUN+="/usr/bin/chmod 664 /sys/class/leds/dell::kbd_backlight/brightness", RUN+="/usr/bin/chgrp wheel /sys/class/leds/dell::kbd_backlight/brightness"

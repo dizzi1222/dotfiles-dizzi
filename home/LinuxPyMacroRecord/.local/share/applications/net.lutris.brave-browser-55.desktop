@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/brave-browser.png
+Type=Application
+Name=Brave
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/55
+Hidden=false
+Categories=Game
+TryExec=lutris

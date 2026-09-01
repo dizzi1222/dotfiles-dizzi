@@ -1,0 +1,325 @@
+#!/bin/bash
+# /025   autopress -> ../../dotfiles-dizzi/local/.local/bin/autopress
+# /003   omarchy-autopress
+# Auto-press: Mantener tecla presionada automáticamente
+
+# ═══════════════════════════════════════════════════════════
+# COLORES Y FORMATO
+# ═══════════════════════════════════════════════════════════
+RESET='\033[0m'
+BOLD='\033[1m'
+DIM='\033[2m'
+CYAN='\033[96m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+RED='\033[91m'
+BLUE='\033[94m'
+MAGENTA='\033[95m'
+
+PIDFILE="/tmp/ydotool-autopress.pid"
+
+# ═══════════════════════════════════════════════════════════
+# VERIFICAR DEPENDENCIAS
+# ═══════════════════════════════════════════════════════════
+check_deps() {
+  for cmd in gum ydotool; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo -e "${RED}${BOLD}❌ Error:${RESET} ${YELLOW}$cmd${RESET} no está instalado"
+      [[ "$cmd" == "gum" ]] && echo -e "${DIM}Instala con: ${YELLOW}yay -S gum${RESET}"
+      [[ "$cmd" == "ydotool" ]] && echo -e "${DIM}Instala con: ${YELLOW}sudo pacman -S ydotool${RESET}"
+      return 1
+    fi
+  done
+  return 0
+}
+
+# ═══════════════════════════════════════════════════════════
+# MAPEO DE TECLAS (Códigos de ydotool)
+# ═══════════════════════════════════════════════════════════
+get_keycode() {
+  local key="$1"
+
+  case "$key" in
+  # Letras
+  a) echo "30" ;;
+  b) echo "48" ;;
+  c) echo "46" ;;
+  d) echo "32" ;;
+  e) echo "18" ;;
+  f) echo "33" ;;
+  g) echo "34" ;;
+  h) echo "35" ;;
+  i) echo "23" ;;
+  j) echo "36" ;;
+  k) echo "37" ;;
+  l) echo "38" ;;
+  m) echo "50" ;;
+  n) echo "49" ;;
+  o) echo "24" ;;
+  p) echo "25" ;;
+  q) echo "16" ;;
+  r) echo "19" ;;
+  s) echo "31" ;;
+  t) echo "20" ;;
+  u) echo "22" ;;
+  v) echo "47" ;;
+  w) echo "17" ;;
+  x) echo "45" ;;
+  y) echo "21" ;;
+  z) echo "44" ;;
+
+  # Teclas especiales
+  space) echo "57" ;;
+  enter) echo "28" ;;
+  shift) echo "42" ;;
+  ctrl) echo "29" ;;
+  alt) echo "56" ;;
+  tab) echo "15" ;;
+  esc) echo "1" ;;
+
+  # Números
+  1) echo "2" ;;
+  2) echo "3" ;;
+  3) echo "4" ;;
+  4) echo "5" ;;
+  5) echo "6" ;;
+  6) echo "7" ;;
+  7) echo "8" ;;
+  8) echo "9" ;;
+  9) echo "10" ;;
+  0) echo "11" ;;
+
+  *) echo "" ;;
+  esac
+}
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIONES DE CONTROL
+# ═══════════════════════════════════════════════════════════
+start_pressing() {
+  local key="$1"
+  local interval="${2:-100}"
+
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    if kill -0 "$pid" 2>/dev/null; then
+      echo -e "${YELLOW}⚠️  Auto-press ya está corriendo${RESET} ${DIM}(PID: $pid)${RESET}"
+      gum confirm "¿Detener y reiniciar?" && stop_pressing || exit 0
+    else
+      rm -f "$PIDFILE"
+    fi
+  fi
+
+  # Obtener código de tecla
+  local keycode=$(get_keycode "$key")
+
+  if [[ -z "$keycode" ]]; then
+    echo -e "${RED}${BOLD}❌ Tecla no válida:${RESET} ${YELLOW}$key${RESET}"
+    exit 1
+  fi
+
+  echo -e "${BLUE}⌨️  Iniciando Auto-Press${RESET}"
+  echo -e "${DIM}   Tecla: ${YELLOW}$key${RESET}"
+  echo -e "${DIM}   Intervalo: ${YELLOW}${interval}ms${RESET}"
+
+  # Loop en background
+  (
+    while true; do
+      ydotool key "$keycode:1" "$keycode:0" # Press y release
+      sleep "0.$(printf '%03d' $interval)"
+    done
+  ) &
+
+  local pid=$!
+  echo $pid >"$PIDFILE"
+
+  echo -e "${GREEN}${BOLD}✅ Auto-Press iniciado${RESET} ${DIM}(PID: $pid)${RESET}"
+  echo -e "${CYAN}   Detener con:${RESET} ${YELLOW}$(basename $0) stop${RESET} ${DIM}o${RESET} ${YELLOW}F9${RESET}"
+}
+
+stop_pressing() {
+  if [[ ! -f "$PIDFILE" ]]; then
+    echo -e "${YELLOW}⚠️  Auto-press no está corriendo${RESET}"
+    exit 0
+  fi
+
+  local pid=$(cat "$PIDFILE")
+
+  if kill -0 "$pid" 2>/dev/null; then
+    kill "$pid" 2>/dev/null
+    echo -e "${GREEN}${BOLD}✅ Auto-Press detenido${RESET} ${DIM}(PID: $pid)${RESET}"
+  else
+    echo -e "${YELLOW}⚠️  Proceso no encontrado${RESET} ${DIM}(limpiando...)${RESET}"
+  fi
+
+  rm -f "$PIDFILE"
+}
+
+status_pressing() {
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    if kill -0 "$pid" 2>/dev/null; then
+      echo -e "${GREEN}${BOLD}✅ Auto-Press corriendo${RESET} ${DIM}(PID: $pid)${RESET}"
+      return 0
+    else
+      echo -e "${RED}❌ Proceso muerto${RESET} ${DIM}(limpiando...)${RESET}"
+      rm -f "$PIDFILE"
+      return 1
+    fi
+  else
+    echo -e "${YELLOW}⚠️  Auto-Press detenido${RESET}"
+    return 1
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# MENÚ INTERACTIVO
+# ═══════════════════════════════════════════════════════════
+interactive_menu() {
+  echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
+  echo -e "${CYAN}${BOLD}║        ⌨️  AUTO-PRESS CON YDOTOOL ⌨️             ║${RESET}"
+  echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════╝${RESET}\n"
+
+  # Verificar estado actual
+  local is_running=false
+  if [[ -f "$PIDFILE" ]]; then
+    local pid=$(cat "$PIDFILE")
+    if kill -0 "$pid" 2>/dev/null; then
+      is_running=true
+      echo -e "${GREEN}${BOLD}Estado:${RESET} ${GREEN}●${RESET} Corriendo ${DIM}(PID: $pid)${RESET}\n"
+    else
+      rm -f "$PIDFILE"
+    fi
+  fi
+
+  if [[ "$is_running" == false ]]; then
+    echo -e "${YELLOW}${BOLD}Estado:${RESET} ${DIM}○${RESET} Detenido\n"
+  fi
+
+  # Menú principal
+  if [[ "$is_running" == true ]]; then
+    local action=$(gum choose \
+      "⏹️  Detener auto-press" \
+      "🔄 Reiniciar con nueva tecla" \
+      "❌ Salir" \
+      --header "¿Qué deseas hacer?")
+
+    case "$action" in
+    *Detener*)
+      stop_pressing
+      ;;
+    *Reiniciar*)
+      stop_pressing
+      sleep 0.5
+      select_key
+      ;;
+    *)
+      exit 0
+      ;;
+    esac
+  else
+    select_key
+  fi
+}
+
+select_key() {
+  echo -e "\n${BLUE}${BOLD}Selecciona tecla:${RESET}\n"
+
+  local key_choice=$(gum choose \
+    "🏃 W          (Caminar/Correr)" \
+    "💬 E          (Interactuar)" \
+    "🚀 SPACE      (Saltar/Volar)" \
+    "🔄 R          (Recargar)" \
+    "⚔️  Q          (Habilidad 1)" \
+    "🛡️  F          (Habilidad 2)" \
+    "⌨️  Custom     (Otra tecla)" \
+    --header "Teclas comunes en juegos")
+
+  local selected_key=""
+  case "$key_choice" in
+  *W*) selected_key="w" ;;
+  *E*) selected_key="e" ;;
+  *SPACE*) selected_key="space" ;;
+  *R*) selected_key="r" ;;
+  *Q*) selected_key="q" ;;
+  *F*) selected_key="f" ;;
+  *Custom*)
+    echo -e "\n${MAGENTA}⚙️  Tecla personalizada${RESET}"
+    selected_key=$(gum input \
+      --prompt "Tecla (a-z, 0-9, space, enter, etc.): " \
+      --placeholder "w" \
+      --value "")
+    ;;
+  *)
+    exit 0
+    ;;
+  esac
+
+  # Seleccionar velocidad
+  echo -e "\n${BLUE}${BOLD}Selecciona velocidad:${RESET}\n"
+
+  local speed=$(gum choose \
+    "⚡ Rápido     (50ms)" \
+    "🚀 Normal     (100ms)" \
+    "⏩ Moderado   (200ms)" \
+    "🐌 Lento      (500ms)" \
+    "⚙️  Custom     (especificar)" \
+    --header "Velocidad de presiones")
+
+  local interval=100
+  case "$speed" in
+  *Rápido*) interval=50 ;;
+  *Normal*) interval=100 ;;
+  *Moderado*) interval=200 ;;
+  *Lento*) interval=500 ;;
+  *Custom*)
+    echo -e "\n${MAGENTA}⚙️  Intervalo personalizado${RESET}"
+    interval=$(gum input \
+      --prompt "Intervalo en milisegundos (ms): " \
+      --placeholder "100" \
+      --value "100")
+
+    if ! [[ "$interval" =~ ^[0-9]+$ ]]; then
+      echo -e "${RED}❌ Valor inválido${RESET}"
+      exit 1
+    fi
+    ;;
+  esac
+
+  start_pressing "$selected_key" "$interval"
+}
+
+# ═══════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════
+main() {
+  check_deps || exit 1
+
+  case "${1:-menu}" in
+  start)
+    start_pressing "${2:-w}" "${3:-100}"
+    ;;
+  stop)
+    stop_pressing
+    ;;
+  status)
+    status_pressing
+    ;;
+  menu)
+    interactive_menu
+    ;;
+  *)
+    echo -e "${RED}${BOLD}Uso:${RESET} $(basename $0) ${YELLOW}{start|stop|status|menu}${RESET} ${DIM}[tecla] [intervalo_ms]${RESET}"
+    echo
+    echo -e "${CYAN}Ejemplos:${RESET}"
+    echo -e "  ${DIM}$(basename $0)${RESET}                 ${DIM}# Menú interactivo${RESET}"
+    echo -e "  ${DIM}$(basename $0) start w 100${RESET}    ${DIM}# Auto-W (100ms)${RESET}"
+    echo -e "  ${DIM}$(basename $0) start space 50${RESET} ${DIM}# Auto-SPACE (50ms)${RESET}"
+    echo -e "  ${DIM}$(basename $0) stop${RESET}           ${DIM}# Detener${RESET}"
+    echo -e "  ${DIM}$(basename $0) status${RESET}         ${DIM}# Ver estado${RESET}"
+    exit 1
+    ;;
+  esac
+}
+
+main "$@"

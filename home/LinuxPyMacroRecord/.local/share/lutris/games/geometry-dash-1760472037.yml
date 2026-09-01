@@ -1,0 +1,8 @@
+game:
+  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Geometry Dash
+    v2.11/GeometryDash.exe
+  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Geometry
+    Dash v2.11/
+system:
+  env:
+    WINEDEBUG: -all

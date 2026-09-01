@@ -1,0 +1,12 @@
+game:
+  exe: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Dragon
+    Ball Sparking ZERO/SparkingZERO.exe
+  prefix: ''
+  working_dir: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Dragon
+    Ball Sparking ZERO/
+wine:
+  Desktop: true
+  ShowCrashDialog: true
+  autoconf_joypad: true
+  custom_wine_path: /home/diego/.local/share/lutris/runners/wine/GE-Proton10-20/version
+  version: Proton 9.0 (Beta)

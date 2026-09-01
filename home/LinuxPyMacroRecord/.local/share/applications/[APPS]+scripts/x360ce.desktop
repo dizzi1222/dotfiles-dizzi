@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=x360ce Controller
+Comment=Gamepad to keyboard mapper (via Bottles)
+Exec=/home/diego/.local/bin/x360ce-launch.sh
+Icon=input-gaming
+Terminal=false
+Type=Application
+Categories=Game;Utility;
+Keywords=joystick;gamepad;controller;mapping;
+StartupNotify=false

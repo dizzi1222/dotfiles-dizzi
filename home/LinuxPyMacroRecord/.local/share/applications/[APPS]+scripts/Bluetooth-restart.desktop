@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Type=Application
+Name=Bluetooth-restart [for Gamepad PS3]
+Comment=Restart Bluetooth service for PS3 gamepad
+Exec=kitty -e /home/diego/.local/bin/bluetooth-restart.sh
+Icon=bluetooth
+Categories=System;Utility;
+Terminal=false
+StartupNotify=false

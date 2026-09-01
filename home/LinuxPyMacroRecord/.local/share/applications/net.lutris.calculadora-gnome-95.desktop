@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/calculadora-gnome.png
+Type=Application
+Name=Calculadora Gnome
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/95
+Categories=Game
+TryExec=lutris

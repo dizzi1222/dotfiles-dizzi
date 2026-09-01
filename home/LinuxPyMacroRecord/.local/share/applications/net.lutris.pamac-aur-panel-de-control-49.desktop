@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/pamac-aur-panel-de-control.png
+Type=Application
+Name=PAMAC AUR [Panel de Control]
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/49
+Categories=Game
+TryExec=lutris

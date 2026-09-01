@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Citra
+Comment=Emulador de Nintendo 3DS (vía Lutris Runner)
+Exec=/home/diego/.local/share/lutris/runners/citra/citra-qt
+Icon=citra
+Categories=Game;Emulator;
+Terminal=false
+StartupNotify=true

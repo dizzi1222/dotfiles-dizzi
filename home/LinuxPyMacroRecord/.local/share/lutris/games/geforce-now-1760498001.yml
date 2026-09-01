@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/geforce-infinity
+  working_dir: /usr/bin/

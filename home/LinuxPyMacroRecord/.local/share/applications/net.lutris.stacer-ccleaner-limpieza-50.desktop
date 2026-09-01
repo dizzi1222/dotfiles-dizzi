@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/stacer-ccleaner-limpieza.png
+Type=Application
+Name=CCleaner [Stacer] ~ Limpieza
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/50
+Categories=Game
+TryExec=lutris

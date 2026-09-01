@@ -1,0 +1,11 @@
+game:
+  arch: auto
+  args: bash -c 'cd "/run/media/diego/ext.Fp 2/Games/Dead Cells (2018)/Dead Cells"
+    && wine deadcells.exe'
+  desktop_integration: false
+  exe: /run/media/diego/0828-67C1/Games/Dead Cells (2018)/Dead Cells/deadcells.exe
+  prefix: /home/diego/.wine
+  working_dir: /run/media/diego/0828-67C1/Games/Dead Cells (2018)
+wine:
+  system_winetricks: false
+  version: wine-ge-8-26-x86_64
