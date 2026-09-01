@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/musicpresence.png
+Type=Application
+Name=musicpresence
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/58
+Categories=Game
+TryExec=lutris

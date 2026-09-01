@@ -1,0 +1,9 @@
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/lutris.png
+Type=Application
+Name=Lutris
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/48
+Hidden=true
+Categories=Game
+TryExec=lutris

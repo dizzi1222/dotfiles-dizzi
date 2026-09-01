@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Steam
+Comment=Game platform
+Exec=/usr/bin/steam %U
+Icon=steam
+Terminal=false
+Hidden=true
+Type=Application
+Categories=Game;
+MimeType=x-scheme-handler/steam;x-scheme-handler/steamlink;
+StartupWMClass=Steam
+PrefersNonDefaultGPU=true
+X-KDE-RunOnDiscreteGpu=true

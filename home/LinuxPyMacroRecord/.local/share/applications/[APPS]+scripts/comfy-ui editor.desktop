@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ComfyUI [Localhost] Custom Version
+Comment=AI Image Generation - Opens browser automatically, --CPU for INTEL GPUs DRIVER
+Exec=/home/diego/scripts/ComfyUI/launch-comfyui.sh
+Icon=/home/diego/.local/share/icons/ComfyUI-Ai-Logo-SVG.png
+Terminal=false
+Categories=Graphics;AI;
+StartupNotify=true

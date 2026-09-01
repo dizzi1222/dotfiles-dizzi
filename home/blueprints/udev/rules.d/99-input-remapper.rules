@@ -1,0 +1,3 @@
+# Dar acceso a los dispositivos de entrada al grupo input
+SUBSYSTEM=="input", GROUP="input", MODE="0660"
+KERNEL=="uinput", GROUP="input", MODE="0660"

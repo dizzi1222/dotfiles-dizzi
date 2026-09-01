@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Input Remapper
+Comment=[Pide Password] Remap keyboard and mouse inputs
+Exec=/home/diego/.local/bin/input-remapper-gtk.sh
+Terminal=false
+Icon=input-remapper
+Categories=System;Utility;Settings;

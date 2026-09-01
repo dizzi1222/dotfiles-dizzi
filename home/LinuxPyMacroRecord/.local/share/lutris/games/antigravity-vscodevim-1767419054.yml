@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/antigravity
+  working_dir: /usr/bin/

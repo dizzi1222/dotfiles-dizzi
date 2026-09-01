@@ -1,0 +1,10 @@
+[Desktop Entry]
+# Exec=bottles-cli run -p Deadcells -b 'gaming' -- %u
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/46
+Type=Application
+Terminal=false
+Categories=Application;
+Comment=Launch Deadcells using Bottles.
+StartupWMClass=Deadcells
+Name=Deadcells
+Icon=/home/diego/.local/share/xdg-desktop-portal/icons/256x256/com.usebottles.bottles.App_1eadef9942fcd82bfd97471418fa86a728fc2519.png

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Cemu
+Comment=Emulador de Wii U (vía Lutris Runner)
+Exec=/home/diego/.local/share/lutris/runners/cemu/Cemu ✅
+Icon=/home/diego/.local/share/icons/Cemu_Emulator_logo.png
+# Icon=/home/diego/.local/share/lutris/coverart/Cemu_Emulator_logo.png
+Categories=Game;Emulator;
+Terminal=false
+StartupNotify=true

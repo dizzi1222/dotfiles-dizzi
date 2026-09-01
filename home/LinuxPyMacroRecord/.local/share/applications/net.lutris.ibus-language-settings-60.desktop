@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/ibus-language-settings.png
+Type=Application
+Name=IBUS Language Settings
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/60
+Hidden=true
+Categories=Game
+TryExec=lutris

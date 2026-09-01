@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Fix BT — Vogek Bluetooth Headphones, Auriculaes.
+Comment=Reconectar Headphones Bluetooth Vogek 094, Auriculaes, etc.
+Exec=kitty /home/diego/scripts/fix-bt.sh
+Icon=/home/diego/.local/share/icons/vogek.png
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;
+# Name[es_ES]=fix-bt-vogek.desktop

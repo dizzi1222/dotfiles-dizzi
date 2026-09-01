@@ -1,0 +1,11 @@
+
+# Wine 󰖳
+[Desktop Entry]
+Type=Application
+Name=Wine Manager
+Comment=[Uninstaller/Installer]
+Exec=wine Uninstaller
+Icon=wine
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

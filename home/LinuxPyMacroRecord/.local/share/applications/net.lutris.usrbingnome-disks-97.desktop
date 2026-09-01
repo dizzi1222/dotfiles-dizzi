@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/usrbingnome-disks.png
+Type=Application
+Name=Gestor de Discos
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/97
+Categories=Game
+TryExec=lutris

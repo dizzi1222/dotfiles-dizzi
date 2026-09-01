@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/protonvpn-app.png
+Type=Application
+Name=ProtonVPN
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/62
+Hidden=true
+Categories=Game
+TryExec=lutris

@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/stacer
+  working_dir: /usr/bin/

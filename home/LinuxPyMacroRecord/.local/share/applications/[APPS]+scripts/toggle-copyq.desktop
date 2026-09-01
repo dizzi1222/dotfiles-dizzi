@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Toggle CopyQ
+Comment=Show/hide CopyQ clipboard manager
+Exec=/home/diego/.config/hypr/scripts/toggle_copyq.sh
+Icon=copyq
+Terminal=false
+Type=Application
+Categories=Utility;

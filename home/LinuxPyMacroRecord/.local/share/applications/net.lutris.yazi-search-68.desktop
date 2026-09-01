@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/yazi-search.png
+Type=Application
+Name=Yazi Search File
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/68
+Categories=Game
+TryExec=lutris

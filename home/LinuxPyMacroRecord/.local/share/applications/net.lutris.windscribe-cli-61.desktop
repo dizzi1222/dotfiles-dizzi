@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/windscribe-cli.png
+Type=Application
+Name=Windscribe VPN
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/61
+Hidden=true
+# ; ↑ 󱞼 ¡ Añade esto! para ocultar el botón de inicio en el launcher [Rofi, Caelestia etc.]
+Categories=Game
+TryExec=lutris

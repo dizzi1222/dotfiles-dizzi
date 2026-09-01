@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/nwg-look
+  working_dir: /usr/bin/

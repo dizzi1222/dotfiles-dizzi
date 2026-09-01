@@ -1,0 +1,9 @@
+game:
+  args: ''
+  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Dead Cells (2018)/Dead
+    Cells/deadcells.exe
+  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Dead
+    Cells (2018)/Dead Cells/
+system:
+  env:
+    WINEDEBUG: -all

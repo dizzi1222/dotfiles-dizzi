@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/mp3tag.png
+Type=Application
+Name=Mp3tag
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/80
+Categories=Game
+TryExec=lutris

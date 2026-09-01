@@ -1,0 +1,7 @@
+game:
+  args: ''
+  exe: pokemmo-launcher
+  working_dir: ''
+system:
+  env:
+    WINEDEBUG: -all

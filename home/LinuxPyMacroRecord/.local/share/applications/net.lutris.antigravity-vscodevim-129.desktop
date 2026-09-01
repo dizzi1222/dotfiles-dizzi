@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/antigravity-vscodevim.png
+Type=Application
+Name=Antigravity VScodeVim
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/129
+Categories=Game
+TryExec=lutris

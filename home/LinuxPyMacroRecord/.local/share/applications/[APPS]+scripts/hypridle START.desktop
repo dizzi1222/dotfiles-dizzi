@@ -1,0 +1,10 @@
+# Hypridle 
+[Desktop Entry]
+Type=Application
+Name=Hypridle Start󰊴 - wine over [PS3, Gamepad]
+Comment=Despues de terminar la sesion con juegos WINE
+Exec=/home/diego/.config/hypr/scripts/restart-hypridle.sh
+Icon=/home/diego/.local/share/icons/Hyprland_logo.png
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=LimpiarCaché Pacman/Yay [Clean]
+Comment=Script interactivo para limpiar caché y dependencias en Arch Linux
+Exec=bash -c "~/scripts/limpiar_cache.sh"
+Icon=system-run
+Terminal=true
+Categories=Utility;
+StartupNotify=true

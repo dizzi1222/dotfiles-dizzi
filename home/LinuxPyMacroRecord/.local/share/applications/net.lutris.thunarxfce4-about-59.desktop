@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Name=Ajustes Thunar (XFCE4)
+Hidden=true
+Icon=lutris_xfce4-about
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/59
+Categories=Game
+TryExec=lutris

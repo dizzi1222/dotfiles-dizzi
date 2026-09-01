@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Notepad
+Comment=Editor de texto simple (Gedit)
+Icon=gedit
+Exec=gedit %U
+Terminal=false
+StartupNotify=true
+MimeType=text/plain;
+Categories=Utility;TextEditor;
+Keywords=Text;Editor;Notepad;

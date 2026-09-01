@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/geforce-infinity.png
+Type=Application
+Name=GeForce Infinity[G?]
+Comment=Se abre con geforce-infinity ~ Mediante Gamescope
+# Hidden=true
+# Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/125
+Exec=gamescope -W 1920 -H 1080 -w 1920 -h 1080 --force-grab-cursor -s 1.5 -- geforce-infinity
+Categories=Game
+TryExec=lutris

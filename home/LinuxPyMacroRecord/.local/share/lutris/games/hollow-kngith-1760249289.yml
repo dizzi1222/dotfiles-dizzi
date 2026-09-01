@@ -1,0 +1,4 @@
+game:
+  args: wine "/run/media/diego/ext.Fp 2/Games/Hollow Knight/hollow_knight.exe"
+  exe: /run/media/diego/0828-67C1/Games/Hollow Knight/hollow_knight.exe
+  working_dir: /run/media/diego/0828-67C1/Games/Hollow Knight

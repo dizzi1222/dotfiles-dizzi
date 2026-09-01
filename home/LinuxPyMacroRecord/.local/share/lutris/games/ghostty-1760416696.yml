@@ -1,0 +1,3 @@
+game:
+  exe: /home/diego/.local/bin/ghostty-x11
+  working_dir: /home/diego/.local/bin/ghostty-x11
