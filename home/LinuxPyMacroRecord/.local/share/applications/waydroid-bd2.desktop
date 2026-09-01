@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Phantom KeyMapper Brown Dust 2 (Waydroid)
-Comment=Lanza Waydroid con Phantom para jugar Brown Dust 2
-Exec=kitty --hold -e /home/diego/scripts/waydroid-bd2.sh
-Icon=waydroid
-Type=Application
-Categories=Game;

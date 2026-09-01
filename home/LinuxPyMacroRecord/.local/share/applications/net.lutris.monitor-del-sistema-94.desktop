@@ -1,9 +1,0 @@
-
-[Desktop Entry]
-Icon=/home/diego/.local/share/lutris/coverart/monitor-del-sistema.png
-Type=Application
-Name=Monitor del Sistema
-Hidden=true
-Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/94
-Categories=Game
-TryExec=lutris

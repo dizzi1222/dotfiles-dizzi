@@ -1,7 +1,0 @@
-#!/bin/bash
-
-adb kill-server 2>/dev/null
-fusermount -u /home/diego/cel 2>/dev/null
-nohup simple-mtpfs /home/diego/cel >/dev/null 2>&1 &
-sleep 2
-nemo /home/diego/cel

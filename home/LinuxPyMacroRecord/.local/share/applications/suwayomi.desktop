@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Suwayomi (Manga Reader)
-Comment=Open Suwayomi manga reader web UI
-Exec=suwayomi-launcher
-Icon=/home/diego/.local/share/icons/suwayomi-light.png
-Categories=Network;WebBrowser;
-Terminal=false

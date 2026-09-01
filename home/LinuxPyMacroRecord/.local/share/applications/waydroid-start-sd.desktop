@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Waydroid PIP pop-up PIN SD 
-Comment=Inicia Waydroid en 926x806 SD quality
-Exec=kitty --hold -e /home/diego/.local/bin/waydroid-start.sh half 
-Icon=waydroid
-Terminal=false
-Type=Application
-Categories=System;Emulator;

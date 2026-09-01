@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Fix BT — PS3 Controller Bluetooth
-Comment=Reconectar mando PS3 DualShock 3 como gamepad
-Exec=kitty /home/diego/scripts/fix-bt-ps3.sh
-Icon=/home/diego/.local/share/icons/sony-ps3.png
-Terminal=false
-Type=Application
-Categories=Game;
