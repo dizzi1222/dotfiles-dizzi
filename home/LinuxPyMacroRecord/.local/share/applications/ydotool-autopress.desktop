@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Ydotool Press Key (Auto)
+Comment=Mantener tecla presionada automáticamente
+Exec=kitty -e /home/diego/wrapper/autopress-menu
+Icon=input-keyboard
+Terminal=false
+Type=Application
+Categories=Utility;Game;
+Keywords=autopress;key;press;gaming;farming;macro;

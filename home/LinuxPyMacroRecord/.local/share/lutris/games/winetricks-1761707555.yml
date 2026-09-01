@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/winetricks
+  working_dir: /usr/bin/

@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/youtube-music
+  working_dir: /usr/bin/

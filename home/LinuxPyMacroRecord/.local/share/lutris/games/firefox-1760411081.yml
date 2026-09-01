@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/firefox
+  working_dir: /usr/bin/

@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/spotify
+  working_dir: /usr/bin/

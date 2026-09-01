@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/obs
+  working_dir: /usr/bin/

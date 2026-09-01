@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Yuzu [Switch]
+Comment=Emulador de Nintendo Switch (vía Lutris Runner) O Citron
+# Exec=/home/diego/.local/share/lutris/runners/yuzu/yuzu-mainline.AppImage ✅
+# Hidden=true
+Exec=/usr/bin/citron
+Icon=yuzu
+Categories=Game;Emulator;
+Terminal=false
+StartupNotify=true

@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/qt6ct-themes.png
+Type=Application
+Name=Ajustes Qt6ct
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/52
+Hidden=true
+Categories=Game
+TryExec=lutris

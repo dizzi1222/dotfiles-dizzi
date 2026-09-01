@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/krita.png
+Type=Application
+Hidden=true
+Name=Krita
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/66
+Categories=Game
+TryExec=lutris

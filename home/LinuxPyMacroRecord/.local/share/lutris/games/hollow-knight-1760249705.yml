@@ -1,0 +1,8 @@
+game:
+  args: ''
+  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow Knight/hollow_knight.exe
+  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow
+    Knight/
+system:
+  env:
+    WINEDEBUG: -all

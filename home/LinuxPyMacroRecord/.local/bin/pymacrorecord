@@ -1,0 +1,19 @@
+#!/bin/bash
+# Launcher de PyMacroRecord con verificación de permisos
+
+# Verificar permisos básicos
+if [[ ! -r /dev/uinput ]]; then
+  echo "⚠️  Advertencia: Sin permisos para /dev/uinput"
+  echo "   Ejecutando con sudo..."
+  cd ~/.local/share/pymacro
+  source venv/bin/activate
+  cd src
+  sudo python main.py
+  exit $?
+fi
+
+# Todo OK, ejecutar normalmente
+cd ~/.local/share/pymacro
+source venv/bin/activate
+cd src
+python main.py

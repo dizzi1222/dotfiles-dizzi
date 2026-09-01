@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# === Token de Gyazo ===
+API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+# === Ruta temporal para la imagen ===
+IMG_PATH="/tmp/gyazo_$(date +%s).png"
+
+# === Menu: Seleccionar modo con rofi ===
+option=$(printf "📷 Captura Completa\n🔲 Seleccionar Área\n Ventana Activa" | rofi -dmenu -p "Tipo de captura")
+
+# === Salir si no se elige nada ===
+[ -z "$option" ] && notify-send "❌ Cancelado" && exit 1
+
+# === Captura de pantalla ===
+if [[ "$option" == *Completa* ]]; then
+  # Añadir un delay de 1.5 segundos (puedes ajustar este valor)
+  sleep 1
+  grim "$IMG_PATH"
+elif [[ "$option" == *Área* ]]; then
+  hyprshot -m region -o "$IMG_PATH"
+elif [[ "$option" == *Ventana* ]]; then
+    "Active Window")
+    hyprshot -m window ;;
+else
+  notify-send -i dialog-error "❌ Opción inválida"
+  exit 1
+fi
+
+# === Verifica conexión a Internet ===
+if ping -c 1 -W 1 gyazo.com &>/dev/null; then
+  # Subida a Gyazo
+  response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
+    -F "access_token=$API_TOKEN" \
+    -F "imagedata=@$IMG_PATH")
+
+  # Extraer link
+  link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+
+  if [ -n "$link" ]; then
+    wl-copy --type image/png <"$IMG_PATH"
+    echo -n "$link" | wl-copy --primary
+    xdg-open "$link" &
+    notify-send "Screenshot Saved" "$link" --icon="$IMG_PATH"
+    # else
+    # notify-send -i dialog-error "❌ Error al subir a Gyazo"
+  fi
+else
+  # Sin Internet: solo guardar y notificar
+  wl-copy --type image/png <"$IMG_PATH"
+  notify-send -i camera-photo "📸 Captura guardada sin subir" "$IMG_PATH"
+fi

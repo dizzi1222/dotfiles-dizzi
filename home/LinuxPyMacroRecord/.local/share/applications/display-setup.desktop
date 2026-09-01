@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Display Setup
+GenericName=Configurar Monitores
+Comment=Configura modo de monitores: extend, mirror, laptop, hdmi
+Exec=display-setup
+Icon=video-display
+Terminal=false
+Type=Application
+Categories=Utility;Settings;HardwareSettings;
+Keywords=monitor;display;hdmi;edp;dual;extend;mirror;screen;

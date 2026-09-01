@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=RyujinX
+Comment=Emulador de Nintendo Switch (vía Lutris Runner)
+# Exec=/home/diego/.local/share/lutris/runners/ryujinx/publish/Ryujinx
+Exec=/usr/bin/ryujinx
+Hidden=true
+Icon=ryujinx
+Categories=Game;Emulator;
+Terminal=false
+StartupNotify=true

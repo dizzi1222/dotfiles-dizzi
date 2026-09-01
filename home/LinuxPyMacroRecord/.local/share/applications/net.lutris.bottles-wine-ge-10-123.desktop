@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/bottles-wine-ge-10.png
+Type=Application
+Name=Bottles [Proton GE-10]
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/123
+Categories=Game
+TryExec=lutris

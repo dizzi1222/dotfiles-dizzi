@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/qt5ct
+  working_dir: /usr/bin/

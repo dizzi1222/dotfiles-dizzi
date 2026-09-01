@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/gnome-calculator
+  working_dir: /usr/bin/

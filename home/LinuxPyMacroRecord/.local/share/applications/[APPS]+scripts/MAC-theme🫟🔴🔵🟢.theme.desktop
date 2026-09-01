@@ -1,0 +1,12 @@
+# MAC-theme🫟🔴🔵🟢
+# RECUERDA QUE ESTO HAY QUE REINSTALARLO CADA VEZ QUE BORRAS EL CACHE
+[Desktop Entry]
+Type=Application
+Name=Instalar MAC-theme🫟🔴🔵🟢 [ES cache .theme]
+Comment=Instalar MAC-theme🫟🔴🔵🟢 ~ tras borrar el cache.. O usar STACER.
+Exec=kitty -e /home/diego/.local/bin/MAC-theme🫟🔴🔵🟢
+# Icon=nwg-look
+Icon=/home/diego/.local/share/icons/mac-theme.png
+Terminal=false
+Categories=Utility; # Opcional: Define categorías para organizarlo
+StartupNotify=true

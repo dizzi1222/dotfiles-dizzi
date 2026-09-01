@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Vercel [Hosting]
+Comment=Open Vercel [Hosting]
+Exec=zen-browser --new-window --kiosk https://vercel.com/dizzi
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/Vercel_[Hosting].png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Vercel_[Hosting]

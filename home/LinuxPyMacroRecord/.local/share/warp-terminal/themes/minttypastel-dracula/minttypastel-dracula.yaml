@@ -1,0 +1,26 @@
+name: Minttypastel-dracula
+background: '#282A36'
+foreground: '#9083C7'
+cursor: '#BD93F9'
+details: darker
+accent: '#BD93F9' # Usamos el color del cursor como acento
+
+terminal_colors:
+  normal:
+    black: '#282A36'
+    blue: '#89B4FA'
+    cyan: '#94E2D5'
+    green: '#A6E3A1'
+    magenta: '#C6A0F6'
+    red: '#FF695F'
+    white: '#EEEEEE'
+    yellow: '#F9E2AF'
+  bright:
+    black: '#FFFFFF'
+    blue: '#ADD8FF'
+    cyan: '#B7F2EB'
+    green: '#C3F5AA'
+    magenta: '#DDBDFF'
+    red: '#FF8782'
+    white: '#FFFFFF'
+    yellow: '#FFF1AA'

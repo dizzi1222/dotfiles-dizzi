@@ -1,0 +1,10 @@
+[Desktop Entry]
+# Exec=bottles-cli run -p 'Hollow Knight Silksong' -b 'gaming' -- %u
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74
+Type=Application
+Terminal=false
+Categories=Application;
+Comment=Launch Hollow Knight Silksong using Bottles.
+StartupWMClass=Hollow Knight Silksong
+Name=Hollow Knight Silksong
+Icon=/home/diego/.local/share/xdg-desktop-portal/icons/256x256/com.usebottles.bottles.App_6bf8815da3beb214487f458a64bab238cbb6952f.png

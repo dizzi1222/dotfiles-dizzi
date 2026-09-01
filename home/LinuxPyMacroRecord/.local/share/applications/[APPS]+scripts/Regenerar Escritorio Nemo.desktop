@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Regenerar Escritorio Nemo Desktop Windows
+Comment=Script para Regenerar el escritorio de Nemo-desktop Windows
+Exec=bash "/home/diego/dotfiles-dizzi/home/scripts/- [13] Regenerar Escritorio+Apps {Nemo Desktop}.sh"
+# Icon=system-run
+Icon=/home/diego/.local/share/icons/Windows-7.png
+Terminal=true
+Categories=Utility;
+StartupNotify=true
+

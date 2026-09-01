@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ~/.local/share/macro-tool
+source venv/bin/activate
+python3 AutoClicker.py

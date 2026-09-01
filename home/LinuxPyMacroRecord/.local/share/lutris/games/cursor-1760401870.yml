@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/cursor
+  working_dir: /usr/bin/

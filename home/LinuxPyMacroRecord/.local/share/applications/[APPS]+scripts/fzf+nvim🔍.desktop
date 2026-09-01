@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Version=1.0
+Name=FZF Nvim
+Comment=Abrir nvim con FZF search
+Exec=/home/diego/.config/hypr/scripts/open_nvim_fzf.sh
+Icon=nvim
+Terminal=false
+Type=Application
+Categories=Utility;

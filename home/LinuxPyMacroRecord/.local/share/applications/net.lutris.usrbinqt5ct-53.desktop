@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Icon=/home/diego/.local/share/lutris/coverart/usrbinqt5ct.png
+Type=Application
+Name=Ajuste de Qt5ct
+Hidden=true
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/53
+Categories=Game
+TryExec=lutris

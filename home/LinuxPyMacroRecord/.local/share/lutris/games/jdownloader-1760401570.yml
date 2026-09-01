@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/JDownloader
+  working_dir: /usr/bin/

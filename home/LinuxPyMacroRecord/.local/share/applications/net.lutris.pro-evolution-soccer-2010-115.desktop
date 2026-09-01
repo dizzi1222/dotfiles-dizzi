@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Name=Pro Evolution Soccer 2006 (PES6)
+Icon=lutris_pro-evolution-soccer-2010
+# ASI LO EJECUTO EN SUNSHINE:
+# Exec=env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine "/home/diego/.wine/drive_c/Games/KONAMI/Pro Evolution Soccer 6/PES6.exe"
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/115
+Categories=Game
+TryExec=lutris
