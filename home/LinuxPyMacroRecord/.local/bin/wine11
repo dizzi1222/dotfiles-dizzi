@@ -1,2 +1,0 @@
-#!/bin/bash
-WINEPREFIX=~/.wine-11 wine "$@"

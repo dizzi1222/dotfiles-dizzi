@@ -1,3 +1,0 @@
-
-#!/bin/bash
-env -u WAYLAND_DISPLAY GDK_BACKEND=x11 ghostty "$@"
