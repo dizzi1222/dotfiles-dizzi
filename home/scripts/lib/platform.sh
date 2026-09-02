@@ -21,3 +21,17 @@ wm_spawn() {
     setsid "$@" &>/dev/null &
   fi
 }
+
+wm_monitor_scale() {
+  local mon="$1"
+  local scale="$2"
+
+  if [ -n "$NIRI_SOCKET" ]; then
+    niri msg output "$mon" scale "$scale"
+  elif [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+    hyprctl keyword monitor "$mon,preferred,auto,1,$scale" || hyprctl keyword monitor "$mon,preferred,auto,$scale"
+  else
+    echo "wm_monitor_scale: WM no soportado (niri/hyprland)" >&2
+    return 1
+  fi
+}
