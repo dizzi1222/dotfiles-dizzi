@@ -16,7 +16,7 @@ wm_spawn() {
   if [ -n "$NIRI_SOCKET" ]; then
     niri msg action spawn -- "$@"
   elif [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-    hyprctl dispatch exec "[float; size ${geom/ /x}]" "$@"
+    hyprctl dispatch exec "[float; size $geom] $*"
   else
     setsid "$@" &>/dev/null &
   fi
