@@ -1,3 +1,4 @@
 {
-  "/home/diego/dotfiles-dizzi": "TRUST_PARENT"
+  "/home/diego/dotfiles-dizzi": "TRUST_PARENT",
+  "/data/data/com.termux/files/home": "TRUST_FOLDER"
 }

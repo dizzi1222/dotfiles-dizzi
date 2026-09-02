@@ -1,3 +1,6 @@
 {
-  "tipsShown": 5
+  "tipsShown": 6,
+  "startupWarningCounts": {
+    "home-directory": 1
+  }
 }
