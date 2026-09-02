@@ -31,7 +31,6 @@ for p in "${PROTECTED[@]}"; do
     git rm -rq -- "$p" 2>/dev/null || true
   fi
 done
-git add -A
 
 if git diff --cached --quiet; then
   echo "Sin cambios de origin/main para sync; cachyos ya está al día."
