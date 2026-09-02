@@ -1,26 +1,21 @@
-# git config --global user.name "dizzi1222"
-# git config --global user.email "diegosamuel042@gmail.com"
-[user]
-    name = dizzi1222
-    email = diegosamuel042@gmail.com
-[credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
-
-[core]
-	editor = nvim
-	filemode = true
-	quotepath = false
-	precomposeunicode = true
-[i18n]
-	commitencoding = utf-8
-	logoutputencoding = utf-8
 [push]
 	autoSetupRemote = true
 [init]
 	defaultBranch = main
 [pull]
 	rebase = false
+[user]
+	name = dizzi1222
+	email = diegosamuel042@gmail.com
+[credential "https://github.com"]
+	helper = 
+	helper = !/data/data/com.termux/files/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/data/data/com.termux/files/usr/bin/gh auth git-credential
+[core]
+	quotepath = false
+	precomposeunicode = true
+[i18n]
+	commitencoding = utf-8
+	logoutputencoding = utf-8
