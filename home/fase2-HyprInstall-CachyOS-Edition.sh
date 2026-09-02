@@ -1397,7 +1397,7 @@ print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx pyenv \
   docker rust \
-  llvm clang patchelf git github-cli tgpt glow expect  # expect: Para unbuffer, glow: para los colores 
+  llvm clang patchelf git github-cli tgpt glow expect lazygit  # expect: Para unbuffer, glow: para los colores, lazygit: TUI git (nvim <leader>gg) 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat
@@ -1408,6 +1408,23 @@ python -m pip install --user --break-system-packages pynvim 'python-lsp-server[a
 
 print_installing "Node packages (neovim)"
 npm install -g neovim 2>/dev/null || true
+
+print_installing "Lazygit shell wrapper (nvim <leader>gg)"
+if [ ! -f ~/.local/bin/lazygit-shell ]; then
+  if [ -f "$HOME/dotfiles-dizzi/local/.local/bin/lazygit-shell" ]; then
+    cp "$HOME/dotfiles-dizzi/local/.local/bin/lazygit-shell" ~/.local/bin/lazygit-shell
+  else
+    cat >~/.local/bin/lazygit-shell <<'EOL'
+#!/bin/bash
+if [ "$1" = "-c" ]; then
+  shift
+fi
+cmd="$*"
+zsh -ic "$cmd; exit"
+EOL
+  fi
+fi
+chmod +x ~/.local/bin/lazygit-shell 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════════
 # ENGRAM - Memoria persistente para agentes IA
