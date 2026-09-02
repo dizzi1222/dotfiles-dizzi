@@ -1,6 +1,7 @@
 {
   "projects": {
     "/home/diego/dotfiles-dizzi": "dotfiles-dizzi",
-    "/home/diego/clawd": "clawd"
+    "/home/diego/clawd": "clawd",
+    "/data/data/com.termux/files/home": "home"
   }
 }
