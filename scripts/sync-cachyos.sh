@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROTECTED=(zsh fish nixconf)
+PROTECTED=(zsh fish nixconf home/scripts/lib)
 BRANCH=cachyos
 
 cd "$(dirname "$0")/.." || exit 1
