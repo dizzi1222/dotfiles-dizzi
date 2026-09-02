@@ -4,8 +4,11 @@
 #######################################################################################
 
 # Directorio de wallpapers
-WALL_DIR="$HOME/wallpapers/wallpapers/wallpapers/"
+# ~/wallpapers ya apunta a dotfiles-dizzi/wallpapers/wallpapers, así que las
+# imágenes quedan dos niveles: ~/wallpapers/wallpapers/
+WALL_DIR="$HOME/wallpapers/wallpapers/"
 CACHE_DIR="$HOME/.cache/wallpaper"
+shopt -s nullglob
 cd "$WALL_DIR" || exit
 
 # Selección desde Rofi con previews
