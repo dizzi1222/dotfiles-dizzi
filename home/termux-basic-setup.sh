@@ -553,7 +553,7 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     # NOTA: "zsh" NO se stow — su .zshrc es el del LAPTOP (oh-my-posh con URL remota,
     # powerlevel10k, swww) y rompe el prompt de Termux. En Termux se genera desde
     # ~/.zshrc propio (ver PASO 8 / PASO 19).
-    for pkg in nvim starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+    for pkg in nvim nixconf assets home bun-termux Antigravity starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
     # zsh: el .zshrc del repo en rama termux ES el funcional (p10k de ~/.zsh-plugins
