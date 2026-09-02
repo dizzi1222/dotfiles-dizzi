@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
 # TERMUX SETUP COMPLETO - Versión Final con Git Config
@@ -6,9 +5,14 @@
 
 set -e
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-BLUE='\033[0;34m'; MAGENTA='\033[0;35m'; CYAN='\033[0;36m'
-BOLD='\033[1m'; NC='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 print_step() { echo -e "\n${MAGENTA}${BOLD}▶ PASO $1${NC}"; }
 print_installing() { echo -e "${BLUE}  📦 $1${NC}"; }
@@ -54,7 +58,7 @@ fi
 # Incluye OMZ, plugins, history, PATH, aliases, prompt y fastfetch.
 ensure_zshrc() {
   [[ -f ~/.zshrc ]] && return 0
-  cat > ~/.zshrc << 'ZSH'
+  cat >~/.zshrc <<'ZSH'
 # Termux .zshrc generado por termux-basic-setup.sh
 # --- Historial ANTES de los plugins: zsh-autosuggestions lee HISTFILE al cargar ---
 HISTFILE=~/.zsh_history
@@ -147,13 +151,15 @@ print_info "pyenv NO recomendado en Termux"
 # ═══════════════════════════════════════════════════════════
 print_step "5/23: Editores"
 pkg install -y neovim vim nano micro >/dev/null 2>&1
+# lazygit [Leader +gg]
+pkg install -y lazygit >/dev/null 2>&1
 mkdir -p ~/bin
-cat > ~/bin/termux-file-editor << 'EDITOR'
+cat >~/bin/termux-file-editor <<'EDITOR'
 #!/bin/bash
 nvim "$@"
 EDITOR
 chmod +x ~/bin/termux-file-editor
-grep -q "EDITOR=nvim" ~/.bashrc 2>/dev/null || echo 'export EDITOR=nvim' >> ~/.bashrc
+grep -q "EDITOR=nvim" ~/.bashrc 2>/dev/null || echo 'export EDITOR=nvim' >>~/.bashrc
 print_success "Editores instalados"
 
 # ═══════════════════════════════════════════════════════════
@@ -183,16 +189,16 @@ if [[ ! "$zsh_install" =~ ^[Nn]$ ]]; then
 
   # Zsh como shell por defecto de Termux (fix: sin esto arranca bash)
   if [[ "$(basename "${SHELL:-}")" != "zsh" ]]; then
-    chsh -s zsh && print_success "zsh es ahora tu shell por defecto (reabrí Termux)" \
-      || print_warning "chsh falló — corré manualmente: chsh -s zsh"
+    chsh -s zsh && print_success "zsh es ahora tu shell por defecto (reabrí Termux)" ||
+      print_warning "chsh falló — corré manualmente: chsh -s zsh"
   fi
 
   if [[ ! -d ~/.oh-my-zsh ]]; then
     print_installing "Oh-My-Zsh..."
     RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null 2>&1
   fi
-  
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+  ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
   # git-flow (AVH Edition) → comando `git flow` (tu config ya define gitflow())
   pkg install -y gitflow-avh >/dev/null 2>&1 || true
@@ -209,9 +215,9 @@ ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
   # Tu .zshrc (dotfiles) sourcea estos desde ~/.zsh/ → asegurarlos:
   mkdir -p ~/.zsh
-  [[ ! -d ~/.zsh/zsh-autocomplete ]] && \
+  [[ ! -d ~/.zsh/zsh-autocomplete ]] &&
     git clone --depth 1 -q https://github.com/marlonrichert/zsh-autocomplete.git ~/.zsh/zsh-autocomplete 2>/dev/null || true
-  [[ ! -d ~/.zsh/fzf-tab ]] && \
+  [[ ! -d ~/.zsh/fzf-tab ]] &&
     git clone --depth 1 -q https://github.com/Aloxaf/fzf-tab.git ~/.zsh/fzf-tab 2>/dev/null || true
 
   print_success "Plugins instalados"
@@ -229,38 +235,38 @@ echo "  3) Ninguno"
 read -p "Opción [1-3]: " prompt_choice
 
 case "$prompt_choice" in
-  1)
-    pkg install -y starship >/dev/null 2>&1
-    mkdir -p ~/.config
-    # NO generar preset si ya hay config propia (stow usa ~/.config/starship/starship.toml)
-    if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
-      starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
-    fi
-    # Activar starship en .zshrc (si no está ya)
-    grep -q "starship init" ~/.zshrc 2>/dev/null || \
-      echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >> ~/.zshrc
-    # Usar la config del repo (stow) si existe
-    if [[ -f ~/.config/starship/starship.toml ]] && ! grep -q "STARSHIP_CONFIG" ~/.zshrc 2>/dev/null; then
-      echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >> ~/.zshrc
-    fi
-    print_success "Starship instalado"
-    ;;
-  2)
-    pkg install -y oh-my-posh >/dev/null 2>&1
-    # Tema local obligatorio: sin --config real, oh-my-posh de Termux imprime
-    # "CONFIG NOT FOUND" (el "tema integrado" no existe). Bajar el tema que usa main.
-    mkdir -p ~/.config/oh-my-posh
-    [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] || \
-      curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json \
-        "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json"
-    # Reemplazar CUALQUIER línea oh-my-posh vieja (sin --config o con URL remota)
-    sed -i '/oh-my-posh init/d' ~/.zshrc
-    echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"' >> ~/.zshrc
-    print_success "Oh-My-Posh instalado"
-    ;;
-  *)
-    print_warning "Prompts omitidos"
-    ;;
+1)
+  pkg install -y starship >/dev/null 2>&1
+  mkdir -p ~/.config
+  # NO generar preset si ya hay config propia (stow usa ~/.config/starship/starship.toml)
+  if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
+    starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
+  fi
+  # Activar starship en .zshrc (si no está ya)
+  grep -q "starship init" ~/.zshrc 2>/dev/null ||
+    echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >>~/.zshrc
+  # Usar la config del repo (stow) si existe
+  if [[ -f ~/.config/starship/starship.toml ]] && ! grep -q "STARSHIP_CONFIG" ~/.zshrc 2>/dev/null; then
+    echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >>~/.zshrc
+  fi
+  print_success "Starship instalado"
+  ;;
+2)
+  pkg install -y oh-my-posh >/dev/null 2>&1
+  # Tema local obligatorio: sin --config real, oh-my-posh de Termux imprime
+  # "CONFIG NOT FOUND" (el "tema integrado" no existe). Bajar el tema que usa main.
+  mkdir -p ~/.config/oh-my-posh
+  [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] ||
+    curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json \
+      "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json"
+  # Reemplazar CUALQUIER línea oh-my-posh vieja (sin --config o con URL remota)
+  sed -i '/oh-my-posh init/d' ~/.zshrc
+  echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"' >>~/.zshrc
+  print_success "Oh-My-Posh instalado"
+  ;;
+*)
+  print_warning "Prompts omitidos"
+  ;;
 esac
 
 # ═══════════════════════════════════════════════════════════
@@ -269,12 +275,12 @@ esac
 print_step "10/23: Pokemon-colorscripts"
 read -p "¿Instalar pokemon? [S/n]: " pokemon_install
 if [[ ! "$pokemon_install" =~ ^[Nn]$ ]]; then
-  if ! command -v pokemon-colorscripts &> /dev/null; then
+  if ! command -v pokemon-colorscripts &>/dev/null; then
     if timeout 30 git clone --depth 1 https://gitlab.com/phoneybadger/pokemon-colorscripts.git /tmp/pokemon 2>/dev/null; then
       cd /tmp/pokemon
       timeout 30 ./install.sh >/dev/null 2>&1 && print_success "Pokemon OK" || {
         mkdir -p ~/.local/bin
-        cat > ~/.local/bin/pokemon-colorscripts << 'POKE'
+        cat >~/.local/bin/pokemon-colorscripts <<'POKE'
 #!/bin/bash
 POKEMONS=("⚡ Pikachu" "🔥 Charizard" "🌱 Bulbasaur")
 echo "${POKEMONS[$RANDOM % ${#POKEMONS[@]}]}"
@@ -282,7 +288,8 @@ POKE
         chmod +x ~/.local/bin/pokemon-colorscripts
         print_warning "Pokemon simple"
       }
-      cd ~; rm -rf /tmp/pokemon
+      cd ~
+      rm -rf /tmp/pokemon
     fi
   fi
 fi
@@ -290,7 +297,7 @@ fi
 # Resto de pasos (11-18) - igual que antes
 print_step "11/23: Tmux"
 pkg install -y tmux >/dev/null 2>&1
-[[ ! -f ~/.tmux.conf ]] && cat > ~/.tmux.conf << 'TMUX'
+[[ ! -f ~/.tmux.conf ]] && cat >~/.tmux.conf <<'TMUX'
 set -g mouse on
 set -g base-index 1
 TMUX
@@ -303,8 +310,8 @@ print_success "Yazi"
 print_step "13/23: Fastfetch"
 pkg install -y fastfetch 2>/dev/null || pkg install -y neofetch 2>/dev/null
 # Lanzar fastfetch portable al abrir cada shell (config del repo si stow la aplicó)
-grep -q "fastfetch --config" ~/.zshrc 2>/dev/null || \
-  echo 'command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }' >> ~/.zshrc
+grep -q "fastfetch --config" ~/.zshrc 2>/dev/null ||
+  echo 'command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }' >>~/.zshrc
 print_success "System info"
 
 print_step "14/23: Termux-API"
@@ -312,15 +319,15 @@ pkg install -y termux-api >/dev/null 2>&1
 print_success "termux-api"
 
 print_step "15/23: Aliases"
-[[ ! -f ~/.termux_aliases ]] && cat > ~/.termux_aliases << 'ALIASES'
+[[ ! -f ~/.termux_aliases ]] && cat >~/.termux_aliases <<'ALIASES'
 alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
 alias dot='cd ~/dotfiles-dizzi'
 alias ddot='cd ~/dotfiles-dizzi'
 ALIASES
 # Cargar aliases en shells (bash y zsh)
-grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.bashrc
-grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >> ~/.zshrc
+grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases' >>~/.bashrc
+grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >>~/.zshrc
 print_success "Aliases"
 
 print_step "16/23: IA Tools"
@@ -356,7 +363,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
     oc_ok() { # 0 si opencode responde como OpenCode (no como Bun sin module graph, ni roto e_type:2)
       command -v opencode &>/dev/null || return 1
       local v
-      v="$(opencode --version 2>&1)" || return 1   # binario roto (e_type:2) no puede ni ejecutarse
+      v="$(opencode --version 2>&1)" || return 1 # binario roto (e_type:2) no puede ni ejecutarse
       [[ "$v" == "1.2.13" ]] && return 1
       echo "$v" | grep -qi '^Bun ' && return 1
       return 0
@@ -410,14 +417,14 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
       # OJO: el paquete glibc-repo NO existe en espejos como termux.net → se agrega el repo
       # glibc a mano; sin esto, ni pkg ni el manager encuentran glibc-runner.
       mkdir -p $PREFIX/etc/apt/sources.list.d
-      grep -q termux-glibc $PREFIX/etc/apt/sources.list.d/glibc.list 2>/dev/null || \
+      grep -q termux-glibc $PREFIX/etc/apt/sources.list.d/glibc.list 2>/dev/null ||
         echo "deb [trusted=yes] https://packages-cf.termux.dev/apt/termux-glibc glibc stable" \
-          > $PREFIX/etc/apt/sources.list.d/glibc.list
+          >$PREFIX/etc/apt/sources.list.d/glibc.list
       pkg update >/dev/null 2>&1 || true
       pkg install -y git curl clang make >/dev/null 2>&1 || true
       pkg install -y glibc glibc-runner >/dev/null 2>&1 || true
       # 1) Clonar bun-termux (necesario para helper_scripts/replace_runtime.py)
-      [[ ! -d ~/bun-termux/.git ]] && \
+      [[ ! -d ~/bun-termux/.git ]] &&
         git clone --depth 1 https://github.com/Happ1ness-dev/bun-termux.git ~/bun-termux >/dev/null 2>&1 || true
       # 2) Instalar Bun + wrapper (vía manual ya probada en el campo; el manager
       #    busca el paquete glibc-repo y aborta aunque el repo manual ya esté).
@@ -426,7 +433,7 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
         touch ~/.bashrc
         curl -fsSL https://bun.sh/install | bash >/dev/null 2>&1
         if [[ -x ~/.bun/bin/bun ]]; then
-          ( cd ~/bun-termux && make >/dev/null 2>&1 && make install >/dev/null 2>&1 )
+          (cd ~/bun-termux && make >/dev/null 2>&1 && make install >/dev/null 2>&1)
         fi
         [[ -x ~/.bun/bin/bun ]] || print_warning "bun-termux falló (revisa manual)"
       fi
@@ -436,10 +443,10 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
         mkdir -p ~/.opencode/bin
         curl -fL --retry 3 --retry-all-errors -C - \
           -o ~/opencode-linux-arm64.tar.gz \
-          https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz \
-          && tar -xzf ~/opencode-linux-arm64.tar.gz -C ~/.opencode/bin/ opencode \
-          && rm -f ~/opencode-linux-arm64.tar.gz \
-          || print_warning "descarga opencode falló"
+          https://github.com/anomalyco/opencode/releases/latest/download/opencode-linux-arm64.tar.gz &&
+          tar -xzf ~/opencode-linux-arm64.tar.gz -C ~/.opencode/bin/ opencode &&
+          rm -f ~/opencode-linux-arm64.tar.gz ||
+          print_warning "descarga opencode falló"
       fi
       # 4) Parchar el binario para usar el wrapper (sin esto: e_type: 2 al ejecutar)
       if [[ -f ~/bun-termux/helper_scripts/replace_runtime.py && -x ~/.opencode/bin/opencode ]]; then
@@ -447,14 +454,14 @@ if [[ ! "$ia_install" =~ ^[Nn]$ ]]; then
         # Usar output explícito: si la primera vez quedó un .bak (modo default crea backup),
         # el script aborta con "Backup already exists". Con output a .patched nunca bloquea.
         python ~/bun-termux/helper_scripts/replace_runtime.py \
-          ~/.opencode/bin/opencode ~/.opencode/bin/opencode.patched >/dev/null 2>&1 \
-          && mv -f ~/.opencode/bin/opencode ~/.opencode/bin/opencode.unpatched \
-          && mv -f ~/.opencode/bin/opencode.patched ~/.opencode/bin/opencode \
-          || print_warning "replace_runtime.py no aplicó (revisa manual)"
+          ~/.opencode/bin/opencode ~/.opencode/bin/opencode.patched >/dev/null 2>&1 &&
+          mv -f ~/.opencode/bin/opencode ~/.opencode/bin/opencode.unpatched &&
+          mv -f ~/.opencode/bin/opencode.patched ~/.opencode/bin/opencode ||
+          print_warning "replace_runtime.py no aplicó (revisa manual)"
       fi
       # 5) PATH estable (en .zshrc y en la sesión actual)
-      grep -q '.opencode/bin' ~/.zshrc 2>/dev/null || \
-        echo 'export PATH="$HOME/.opencode/bin:$PATH"' >> ~/.zshrc
+      grep -q '.opencode/bin' ~/.zshrc 2>/dev/null ||
+        echo 'export PATH="$HOME/.opencode/bin:$PATH"' >>~/.zshrc
       export PATH="$HOME/.opencode/bin:$PATH"
       if oc_ok; then
         print_success "opencode vía Ruta A: $(opencode --version 2>/dev/null)"
@@ -479,24 +486,26 @@ if [[ ! "$engram_install" =~ ^[Nn]$ ]]; then
   ENGRAM_VER=$(curl -s https://api.github.com/repos/Gentleman-Programming/engram/releases/latest | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
   [[ -z "$ENGRAM_VER" ]] && ENGRAM_VER="v1.20.0"
   ARCH="$(uname -m)"
-  if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_arm64.tar.gz"
-  elif [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_amd64.tar.gz"
+  if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
+    ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_arm64.tar.gz"
+  elif [[ "$ARCH" == "x86_64" || "$ARCH" == "amd64" ]]; then
+    ENGRAM_TGZ="engram_${ENGRAM_VER#v}_linux_amd64.tar.gz"
   else print_warning "engram: arch no soportado ($ARCH)"; fi
   if [[ -n "$ENGRAM_TGZ" ]]; then
     mkdir -p ~/.local/bin
     TMPD=$(mktemp -d)
     curl -fsSL --retry 3 --retry-all-errors -C - \
       -o "$TMPD/engram.tar.gz" \
-      "https://github.com/Gentleman-Programming/engram/releases/download/$ENGRAM_VER/$ENGRAM_TGZ" \
-      && tar -xzf "$TMPD/engram.tar.gz" -C "$TMPD" engram \
-      && install -m 755 "$TMPD/engram" ~/.local/bin/engram \
-      && print_success "engram $ENGRAM_VER instalado (~/.local/bin/engram)" \
-      || print_warning "descarga de engram falló"
+      "https://github.com/Gentleman-Programming/engram/releases/download/$ENGRAM_VER/$ENGRAM_TGZ" &&
+      tar -xzf "$TMPD/engram.tar.gz" -C "$TMPD" engram &&
+      install -m 755 "$TMPD/engram" ~/.local/bin/engram &&
+      print_success "engram $ENGRAM_VER instalado (~/.local/bin/engram)" ||
+      print_warning "descarga de engram falló"
     rm -rf "$TMPD"
     # MCP + plugin para OpenCode (escribe ~/.config/opencode/)
     if command -v opencode >/dev/null 2>&1 || [[ -d ~/.config/opencode ]]; then
-      ~/.local/bin/engram setup opencode >/dev/null 2>&1 && \
-        print_success "engram conectado a OpenCode (MCP + plugin)" || \
+      ~/.local/bin/engram setup opencode >/dev/null 2>&1 &&
+        print_success "engram conectado a OpenCode (MCP + plugin)" ||
         print_warning "engram setup opencode no completó — reiniciá opencode"
     fi
   fi
@@ -506,8 +515,9 @@ print_step "17/23: Fira Code"
 read -p "¿Instalar Fira Code? [S/n]: " font_install
 if [[ ! "$font_install" =~ ^[Nn]$ ]] && [[ ! -f ~/.termux/font.ttf ]]; then
   pkg install -y wget unzip >/dev/null 2>&1
-  mkdir -p ~/.termux/fonts; cd ~/.termux/fonts
-  wget -q https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip && \
+  mkdir -p ~/.termux/fonts
+  cd ~/.termux/fonts
+  wget -q https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip &&
     unzip -q FiraCode.zip && rm FiraCode.zip
   # Termux solo lee ~/.termux/font.ttf (singular) — sin esto no hay íconos nerd
   cp FiraCodeNerdFont-Regular.ttf ~/.termux/font.ttf && print_success "Fira Code Nerd activada (~/.termux/font.ttf)"
@@ -539,7 +549,7 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     git checkout termux 2>/dev/null || true
     # CRÍTICO: sincronizar submodules (nvim) — fix "submodule initialized but empty"
     git submodule update --init --recursive
-# Stow desde la raíz: cada paquete del repo tiene estructura .config/
+    # Stow desde la raíz: cada paquete del repo tiene estructura .config/
     # NOTA: "zsh" NO se stow — su .zshrc es el del LAPTOP (oh-my-posh con URL remota,
     # powerlevel10k, swww) y rompe el prompt de Termux. En Termux se genera desde
     # ~/.zshrc propio (ver PASO 8 / PASO 19).
@@ -554,8 +564,8 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     if [[ -f "zsh/.zshrc" ]] && ! grep -qE "oh-my-posh init zsh --config 'http|ARCH LINUX" "zsh/.zshrc"; then
       ln -sfn "$DOTFILES/zsh/.zshrc" ~/.zshrc
       [[ -f "zsh/.p10k.zsh" ]] && ln -sfn "$DOTFILES/zsh/.p10k.zsh" ~/.p10k.zsh
-      grep -q "POWERLEVEL9K_DISABLE_GITSTATUS" ~/.zshrc 2>/dev/null || \
-        printf '\n# p10k en Termux: gitstatusd no disponible (aarch64) → git nativo\ntypeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true\ntypeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\n' >> ~/.zshrc
+      grep -q "POWERLEVEL9K_DISABLE_GITSTATUS" ~/.zshrc 2>/dev/null ||
+        printf '\n# p10k en Termux: gitstatusd no disponible (aarch64) → git nativo\ntypeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true\ntypeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\n' >>~/.zshrc
     fi
     [[ -f "zsh/.zshenv" ]] && ln -sfn "$DOTFILES/zsh/.zshenv" ~/.zshenv
     cd ~
@@ -588,13 +598,13 @@ if [[ ! "$patch_zshrc" =~ ^[Nn]$ ]] && [[ -f ~/.zshrc ]]; then
     ensure_zshrc_force
   else
     cp ~/.zshrc ~/.zshrc.backup-$(date +%s)
-    ! grep -q "HISTFILE=" ~/.zshrc && cat >> ~/.zshrc << 'HIST'
+    ! grep -q "HISTFILE=" ~/.zshrc && cat >>~/.zshrc <<'HIST'
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY SHARE_HISTORY
 HIST
-    ! grep -q "go/bin" ~/.zshrc && echo 'export PATH=$PATH:~/go/bin:~/.local/bin' >> ~/.zshrc
+    ! grep -q "go/bin" ~/.zshrc && echo 'export PATH=$PATH:~/go/bin:~/.local/bin' >>~/.zshrc
     print_success ".zshrc parchado"
   fi
 fi
@@ -608,7 +618,7 @@ for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
     cd "$dir"
     if [[ -f .gitignore ]]; then
       if ! grep -q "\.opencommit" .gitignore; then
-        cat >> .gitignore << 'IGNORE'
+        cat >>.gitignore <<'IGNORE'
 
 # Archivos sensibles (NO commitear)
 **/.opencommit
@@ -654,8 +664,8 @@ if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
   done
   if [[ -d ~/workspace/opencode-discord-rpc ]]; then
     print_installing "Compilando opencode-discord-rpc..."
-    (cd ~/workspace/opencode-discord-rpc && npm install --silent && npm run build --silent) \
-      && print_success "discord-rpc compilado" || print_warning "build falló, revisa npm"
+    (cd ~/workspace/opencode-discord-rpc && npm install --silent && npm run build --silent) &&
+      print_success "discord-rpc compilado" || print_warning "build falló, revisa npm"
     # Registrar plugin en la config global de opencode (si falta)
     OC_JSON=~/.config/opencode/opencode.json
     if [[ -f "$OC_JSON" ]] && ! grep -q "opencode-discord-rpc" "$OC_JSON"; then
@@ -689,7 +699,7 @@ if [[ ! "$ct_install" =~ ^[Nn]$ ]]; then
 
   read -p "¿Instalar OpenCode vía core? [S/n]: " oc_install
   if [[ ! "$oc_install" =~ ^[Nn]$ ]] && command -v core >/dev/null 2>&1; then
-    rm -f $PREFIX/bin/opencode   # quitar helper roto (PHDR) para que core no diga "ya instalado"
+    rm -f $PREFIX/bin/opencode # quitar helper roto (PHDR) para que core no diga "ya instalado"
     print_warning "Elige en el selector: 'glibc + proot (bad system call)' — evita el linker64 del kernel"
     print_installing "core install ai --opencode"
     core install ai --opencode || print_warning "Falló; reintenta eligiendo 'proot-distro (ubuntu)'"
