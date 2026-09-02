@@ -23,7 +23,14 @@ if ! git merge --no-commit --no-ff origin/main; then
   fi
 fi
 
-git restore --source=HEAD --staged --worktree -- "${PROTECTED[@]}"
+for p in "${PROTECTED[@]}"; do
+  if git ls-tree --name-only HEAD -- "$p" | grep -q .; then
+    git restore --source=HEAD --staged --worktree -- "$p"
+  else
+    echo "  (excluyendo '$p' — no existe en cachyos)"
+    git rm -rq -- "$p" 2>/dev/null || true
+  fi
+done
 git add -A
 
 if git diff --cached --quiet; then
