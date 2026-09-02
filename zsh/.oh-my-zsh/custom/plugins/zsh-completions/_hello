@@ -1,1 +1,19 @@
-/nix/store/f1ziszimjy9b7dhfn9dqhiwx3sp84aj2-zsh-completions-0.36.0/share/zsh/site-functions/_hello
+#compdef hello
+# ------------------------------------------------------------------------------
+# Description
+# -----------
+#
+#  Completion script for GNU hello (https://www.gnu.org/software/hello/).
+#
+# ------------------------------------------------------------------------------
+# Authors
+# -------
+#
+#  * Wu Zhenyu <wuzy01@qq.com>
+#
+# ------------------------------------------------------------------------------
+
+_arguments -s '(- *)'{-h,--help}'[display this help and exit]' \
+  '(- *)'{-v,--version}'[display version information and exit]' \
+  {-t,--traditional}'[use traditional greeting]' \
+  {-g,--greeting=}'[use TEXT as the greeting message]:TEXT'
