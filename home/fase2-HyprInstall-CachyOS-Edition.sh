@@ -1397,14 +1397,21 @@ print_installing "Docker + Node.js + Python + Rust (repos)"
 sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx pyenv \
   docker rust \
+  uv llama-cpp \
   llvm clang patchelf git github-cli tgpt glow expect lazygit  # expect: Para unbuffer, glow: para los colores, lazygit: TUI git (nvim <leader>gg) 
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat
+  claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat \
+  postman-bin
 print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
 print_installing "Python LSP + Neovim support"
 python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
+
+# Runtime de sweep.nvim (proxy llama-cpp-python en :5555). Nix Only en NixOS;
+# en Arch/CachyOS se instala por pip con --break-system-packages.
+print_installing "Sweep.nvim runtime (llama-cpp-python)"
+python -m pip install --user --break-system-packages llama-cpp-python fastapi uvicorn 2>/dev/null || true
 
 print_installing "Node packages (neovim)"
 npm install -g neovim 2>/dev/null || true
