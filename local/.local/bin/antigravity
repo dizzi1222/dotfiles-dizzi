@@ -1,0 +1,44 @@
+#!/bin/bash
+# ~/.local/bin/antigravity (local/.local/bin/antigravity)
+# Wrapper self-healing para Antigravity IDE:
+# el store Nix es read-only (EROFS en extensiones), así que copia el runtime
+# a ~/.antigravity/runtime (writable) y lo repunta, si el store cambió.
+# Ejecuta SIEMPRE desde el runtime. No tocar permisos ni store.
+set -euo pipefail
+
+RUNTIME="$HOME/.antigravity/runtime"
+MARKER="$RUNTIME/.store-path"
+
+# Store path actual del paquete (resolve symlink de nix-profile → /nix/store/.../bin/antigravity-ide)
+STORE_BIN="$(readlink -f "$HOME/.nix-profile/bin/antigravity-ide" 2>/dev/null || true)"
+if [ -z "$STORE_BIN" ]; then
+  echo "antigravity: no se encontró ~/.nix-profile/bin/antigravity-ide en el PATH de Nix" >&2
+  exit 1
+fi
+STORE_DIR="$(dirname "$(dirname "$STORE_BIN")")"
+
+# Re-sincronizar solo si el store cambió o falta el runtime
+if [ ! -d "$RUNTIME" ] || [ ! -f "$MARKER" ] || [ "$(cat "$MARKER" 2>/dev/null)" != "$STORE_DIR" ]; then
+  echo "antigravity: sincronizando runtime writable ($STORE_DIR → $RUNTIME)"
+  rm -rf "$RUNTIME"
+  mkdir -p "$(dirname "$RUNTIME")"
+  cp -a "$STORE_DIR" "$RUNTIME"
+  chmod -R u+w "$RUNTIME"
+
+  # Repunta rutas absolutas del store hacia el runtime (evita EROFS)
+  grep -rIl "$STORE_DIR" "$RUNTIME" 2>/dev/null | while read -r f; do
+    sed -i "s|$STORE_DIR|$RUNTIME|g" "$f"
+  done
+
+  # Dirs de escritura que las extensiones usan (custom-ui-style, etc.)
+  mkdir -p "$RUNTIME/lib/antigravity-ide/resources/app/extensions"
+  mkdir -p "$RUNTIME/lib/antigravity-ide/resources/app/out"
+  rm -rf ~/.gemini/antigravity-cli/settings.json.backup
+
+  echo "$STORE_DIR" >"$MARKER"
+  echo "antigravity: runtime listo en $RUNTIME"
+fi
+
+export ANTIGRAVITY_HOME="$RUNTIME"
+export XDG_DATA_HOME="$HOME/.local/share"
+exec "$RUNTIME/bin/antigravity-ide" "$@"
