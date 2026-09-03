@@ -141,10 +141,34 @@ print_info "Auto-push habilitado (no más --set-upstream)"
 # ═══════════════════════════════════════════════════════════
 # PASO 4: Desarrollo
 # ═══════════════════════════════════════════════════════════
-print_step "4/23: Desarrollo"
-pkg install -y clang make cmake python nodejs-lts rust golang >/dev/null 2>&1
-print_success "Entorno de desarrollo"
-print_info "pyenv NO recomendado en Termux"
+print_step "3/13: Herramientas de Desarrollo (Esenciales para Neovim)"
+print_installing "Python, pip, Node.js, Rust, Go, Clang (para LSP/Mason)"
+
+pkg install -y \
+  clang make cmake \
+  python python-pip \
+  nodejs-lts \
+  rust \
+  golang
+
+# Instalar paquetes pip útiles para Neovim
+print_installing "pynvim (requerido por Neovim)"
+pip install pynvim 2>/dev/null || print_warning "pynvim falló, intenta: pip install pynvim"
+
+# Runtime de sweep.nvim (proxy llama-cpp-python en :5555). Nix Only en NixOS;
+# en termux se instala por pip.
+print_installing "sweep.nvim runtime (llama-cpp-python)"
+pip install llama-cpp-python fastapi uvicorn 2>/dev/null || print_warning "sweep runtime falló, intenta: pip install llama-cpp-python fastapi uvicorn"
+
+# Instalar neovim npm provider
+print_installing "neovim npm provider"
+npm install -g neovim 2>/dev/null || print_warning "neovim npm falló"
+
+print_success "Herramientas de desarrollo instaladas"
+print_info "  • Python + pip → providers Neovim"
+print_info "  • Node.js     → Mason, Copilot, LSPs"
+print_info "  • Rust        → ripgrep, fd, stylua, etc."
+print_info "  • Go          → gopls, gofumpt"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 5: Editores
