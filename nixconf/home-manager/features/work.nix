@@ -4,7 +4,7 @@
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
     # Editors
-    # code-cursor
+    code-cursor
     antigravity
 
     # Languages
@@ -18,6 +18,14 @@
       ps.pillow
       ps.pygobject3
       ps.debugpy
+      # Nix Only — runtime de sweep.nvim (proxy Python en :5555). Puro Nix,
+      # NO mexclar con pip. En caché binaria (14 MiB), no compila:
+      #   ps.llama-cpp-python  # bindings llama.cpp (NO el binario llama-cpp)
+      #   ps.fastapi           # HTTP fallback del proxy
+      #   ps.uvicorn           # servidor del proxy
+      ps.llama-cpp-python
+      ps.fastapi
+      ps.uvicorn
     ]))
     pyenv
     nodejs
@@ -53,6 +61,11 @@
     tig
     gh
     glow
+
+    # Utilidades de desarrollo adicionales
+    uv
+    postman
+    llama-cpp
 
     # AI tools & Agents
     ollama

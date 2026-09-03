@@ -138,6 +138,11 @@ pkg install -y \
 print_installing "pynvim (requerido por Neovim)"
 pip install pynvim 2>/dev/null || print_warning "pynvim falló, intenta: pip install pynvim"
 
+# Runtime de sweep.nvim (proxy llama-cpp-python en :5555). Nix Only en NixOS;
+# en termux se instala por pip.
+print_installing "sweep.nvim runtime (llama-cpp-python)"
+pip install llama-cpp-python fastapi uvicorn 2>/dev/null || print_warning "sweep runtime falló, intenta: pip install llama-cpp-python fastapi uvicorn"
+
 # Instalar neovim npm provider
 print_installing "neovim npm provider"
 npm install -g neovim 2>/dev/null || print_warning "neovim npm falló"
