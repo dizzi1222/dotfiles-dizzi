@@ -738,7 +738,8 @@ gitflow() {
   echo "  12. 🛑 Abortar merge en curso"
   echo "  13. 💾 Savepoint (amend al commit raíz)"
   echo "  14. 🌐 Sincronizar ~/workspace (dual push dizzi1222 + dhardi007)"
-  echo "  15. ❌ Cancelar"
+  echo "  15. 🗣️ Commit (Head) Actual"
+  echo "  16. ❌ Cancelar"
   echo ""
   echo -n "Elige opción: "
   read option
@@ -805,7 +806,12 @@ gitflow() {
         echo "❌ ~/workspace no es un repo git"
       fi
       ;;
-    15) echo "❌ Cancelado" ;;
+    15)
+      echo "🔍 Buscando archivos que empiecen por 'HEAD🗣️'"
+      git rev-list --count HEAD   # debe dar 325
+      git status --short           # working tree limpio
+      ;;
+    16) echo "❌ Cancelado" ;;
     *) echo "❌ Opción inválida" ;;
   esac
 }
