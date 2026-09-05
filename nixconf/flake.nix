@@ -51,6 +51,13 @@
             [ "# wrapGAppsHook direct call removed: runs via fixupPhase" ]
             old.buildCommand;
         });
+        # wine-discord-ipc-bridge: el package.nix de nixpkgs compila el .exe
+        # con mingw (i686-windows) → falla en Linux sin cross-toolchain.
+        # Usamos el paquete local con los binarios precompilados del release
+        # v0.0.3 + el script .sh (ver packages/wine-discord-ipc-bridge.nix).
+        # Uso en Steam → Launch Options por juego:
+        #   winediscordipcbridge-steam.sh %command%
+        wine-discord-ipc-bridge = prev.callPackage ./packages/wine-discord-ipc-bridge.nix { };
       })
     ];
 

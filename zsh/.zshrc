@@ -115,8 +115,8 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # see 'man strftime' for details.
 # HIST_STAMPS="mm/dd/yyyy"
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+# ZSH_CUSTOM must be exported before source $ZSH/oh-my-zsh.sh for OMZ plugins
+export ZSH_CUSTOM="$ZSH/custom"
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -135,7 +135,11 @@ plugins=(
 )
 
 # Esta línea debe estar después de 'plugins=()'
-source $ZSH/oh-my-zsh.sh
+# Guard para evitar doble carga con Home Manager
+if [[ -z "$ZSH_LOADED" ]]; then
+  typeset -g ZSH_LOADED=1
+  source $ZSH/oh-my-zsh.sh
+fi
 
 # User configuration
 
@@ -330,6 +334,18 @@ alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hin
 alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto"
 
 export PATH=$PATH:/home/diego/.spicetify
+
+# NixOS aliases
+alias nixrb='sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2'
+alias hm='home-manager switch --flake ~/dotfiles-dizzi/nixconf#diego@thinkpad-x1e2'
+alias nixos='nix-shell -p'
+alias nixup='nix flake update --flake ~/dotfiles-dizzi/nixconf'
+alias nixgc='sudo nix-collect-garbage -d'
+alias ns='nix search nixpkgs'
+alias rebuild='sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2'
+
+# Zoxide
+eval "$(zoxide init zsh)"
 
 # =============================================================================
 #
@@ -715,7 +731,10 @@ gitflow() {
   echo "  10. ↩️  Deshacer último commit (sin perder cambios)"
   echo "  11. 🔁 Descartar cambios locales (pull remoto)"
   echo "  12. 🛑 Abortar merge en curso"
-  echo "  13. ❌ Cancelar"
+  echo "  13. 💾 Savepoint (amend al commit raíz)"
+  echo "  14. 🌐 Sincronizar ~/workspace (dual push dizzi1222 + dhardi007)"
+  echo "  15. 🗣️ Commit (Head) Actual"
+  echo "  16. ❌ Cancelar"
   echo ""
   echo -n "Elige opción: "
   read option
@@ -756,7 +775,38 @@ gitflow() {
       git merge --abort
       echo "✅ Merge cancelado"
       ;;
-    13) echo "❌ Cancelado" ;;
+    13)
+      echo "💾 Savepoint: aplastando al commit raíz..."
+      git reset --soft 56b2993
+      git add -A
+      git commit --amend --no-edit
+      echo "✅ Savepoint creado: $(git rev-parse --short HEAD) ($(git rev-list --count HEAD) commits)"
+      ;;
+    14)
+      echo "🌐 Sincronizando ~/workspace (dual push)..."
+      if [ -d ~/workspace/.git ]; then
+        (
+          cd ~/workspace
+          echo "📤 Push a origin (dizzi1222)..."
+          git push origin main
+          echo "🔄 Cambiando a cuenta dhardi007..."
+          gh auth switch --user dhardi007
+          echo "📤 Push a dhardi007..."
+          git push dhardi007 main
+          echo "🔄 Volviendo a dizzi1222..."
+          gh auth switch --user dizzi1222
+          echo "✅ Sincronización dual completada"
+        )
+      else
+        echo "❌ ~/workspace no es un repo git"
+      fi
+      ;;
+    15)
+      echo "🔍 Buscando archivos que empiecen por 'HEAD🗣️'"
+      git rev-list --count HEAD   # debe dar 325
+      git status --short           # working tree limpio
+      ;;
+    16) echo "❌ Cancelado" ;;
     *) echo "❌ Opción inválida" ;;
   esac
 }

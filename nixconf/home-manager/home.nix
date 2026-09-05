@@ -77,6 +77,8 @@
       ".config/tmux".source = link "tmux/.config/tmux";
       # OpenCode
       ".config/opencode".source = link "opencode/.config/opencode";
+      # Television
+      ".config/television".source = link "television/.config/television";
       # PipeWire
       ".config/pipewire".source = link "pipewire/.config/pipewire";
       # Niri
@@ -249,6 +251,11 @@
     echo "  GUÍA SECURE BOOT + Flatpak (README):"
     echo "  https://github.com/dizzi1222/dotfiles-dizzi/blob/main/nixconf/README.md#installation-from-nixos-iso"
     echo "════════════════════════════════════════════════════════════════"
+    echo "  SGDBoop (portadas de Steam):"
+    echo "  Para configurarlo, deja el enlace: https://www.steamgriddb.com/boop"
+    echo "  y activa \"Enable the buttons\" (steamgriddb.com boop) para poder"
+    echo "  descargar assets y personalizar juegos que no son de Steam."
+    echo "════════════════════════════════════════════════════════════════"
     echo
   '';
 
@@ -366,6 +373,17 @@
   home.activation.jdownloader = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if ! flatpak info org.jdownloader.JDownloader &>/dev/null 2>&1; then
       flatpak install -y --user flathub org.jdownloader.JDownloader 2>/dev/null || true
+    fi
+  '';
+
+  # ── SGDBoop (flatpak) ────────────────────────────────────
+  # Botón "Boop" de steamgriddb.com (esquema sgdb://) aplica assets de Steam
+  # directamente a la biblioteca de Steam. Tras aplicar, reiniciar Steam.
+  # Configuración: dejar el enlace https://www.steamgriddb.com/boop y activar
+  # "Enable the buttons" para descargar assets y personalizar juegos no-Steam.
+  home.activation.sgdboop = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    if ! flatpak info com.steamgriddb.SGDBoop &>/dev/null 2>&1; then
+      flatpak install -y --user flathub com.steamgriddb.SGDBoop 2>/dev/null || true
     fi
   '';
 

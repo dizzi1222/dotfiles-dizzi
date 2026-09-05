@@ -254,7 +254,23 @@ if [[ "$SWWW_PKG" == "awww" ]]; then
   print_success "Symlinks creados: swww → awww"
 fi
 
-yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset
+yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset xdg-desktop-portal-wlr
+print_installing "Fix ScreenCapture niri (wlr portal UseIn=niri)"
+mkdir -p ~/.local/share/xdg-desktop-portal/portals ~/.config/xdg-desktop-portal
+cat > ~/.local/share/xdg-desktop-portal/portals/wlr-niri.portal <<'EOF'
+[portal]
+DBusName=org.freedesktop.impl.portal.desktop.wlr
+Interfaces=org.freedesktop.impl.portal.Screenshot;org.freedesktop.impl.portal.ScreenCast;
+UseIn=niri
+EOF
+cat > ~/.config/xdg-desktop-portal/niri-portals.conf <<'EOF'
+[preferred]
+ScreenCast=wlr
+Screenshot=wlr
+Settings=gtk;gnome
+default=gtk
+EOF
+print_success "OBS ScreenCapture en niri: wlr portal declarado (UseIn=niri) + niri-portals.conf"
 echo
 echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
 print_success "Hyprland instalado"
@@ -290,7 +306,7 @@ print_step "10/35: Utilidades del Sistema"
 print_installing "Neovim + Zsh + Tmux + Yazi + Btop + Fastfetch"
 sudo pacman -S --needed --noconfirm \
   neovim zsh zsh-autosuggestions zsh-syntax-highlighting \
-  zsh-history-substring-search zsh-completions starship tmux zellij bat eza dust fd ripgrep fzf \
+  zsh-history-substring-search zsh-completions starship tmux zellij bat eza dust fd ripgrep fzf television \
   htop btop bottom ncdu tree jq socat \
   yazi stow ranger imagemagick \
   inotify-tools acpi power-profiles-daemon cpupower \
@@ -358,7 +374,7 @@ echo -e "${BOLD}${YELLOW}╔═════════════════�
 echo -e "${BOLD}${YELLOW}║          🎮 CONFIGURACIÓN DE GAMING 🎮                    ║${NC}"
 echo -e "${BOLD}${YELLOW}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo
-echo -e "${CYAN}Se instalará en 3 categorías (SOLO BINARIOS):${NC}"
+echo -e "${CYAN}Se instalará en 4 categorías (SOLO BINARIOS):${NC}"
 echo
 echo -e "${BOLD}${GREEN}Categoría 1: Plataformas Base${NC} (~2GB)"
 echo -e "  ${MAGENTA}•${NC} Steam"
@@ -380,9 +396,14 @@ echo -e "  ${MAGENTA}•${NC} Ryujinx-bin (precompilado)"
 echo -e "  ${MAGENTA}•${NC} Dolphin (GameCube/Wii)"
 echo -e "  ${MAGENTA}•${NC} SNES9x (Super Nintendo)"
 echo
+echo -e "${BOLD}${GREEN}Categoría 4: Rich Presence${NC} (opcional, AUR)"
+echo -e "  ${MAGENTA}•${NC} SGDBoop (assets SteamGridDB: botón Boop en steamgriddb.com)"
+echo -e "  ${MAGENTA}•${NC} wine-discord-ipc-bridge (presence de juegos Proton/Wine en Discord)"
+echo
 read -p "¿Instalar Plataformas Base (Steam, Lutris, Wine) y Geforce Experience? [S/n]: " install_base
 read -p "¿Instalar Compatibilidad Windows (Proton-GE, VKD3D, DXVK)? [S/n]: " install_compat
 read -p "¿Instalar Emuladores? [S/n]: " install_emu
+read -p "¿Instalar Rich Presence (SGDBoop + wine-discord-ipc-bridge)? [S/n]: " install_richpresence
 
 # ═══════════════════════════════════════════════════════════
 # Categoría 1: Plataformas Base
@@ -439,6 +460,24 @@ if [[ ! "$install_emu" =~ ^[Nn]$ ]]; then
   print_success "Emuladores instalados"
 else
   print_warning "Emuladores omitidos"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# Categoría 4: Rich Presence (opcional)
+# ═══════════════════════════════════════════════════════════
+if [[ ! "$install_richpresence" =~ ^[Nn]$ ]]; then
+  echo
+  print_header "Instalando Rich Presence"
+
+  print_installing "SGDBoop + wine-discord-ipc-bridge"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    wine-discord-ipc-bridge-bin sgdboop-bin \
+    2>/dev/null || print_warning "Algunos paquetes de Rich Presence fallaron"
+
+  print_success "Rich Presence instalado (aplicar assets con SGDBoop y reiniciar Steam)"
+  print_warning "Presence de juegos: añadir 'winediscordipcbridge-steam.sh %command%' en Steam Launch Options"
+else
+  print_warning "Rich Presence omitido"
 fi
 
 print_success "Gaming configurado (sin compilaciones)"
@@ -1160,7 +1199,7 @@ proton-vpn-gtk-app --connect rapid &
 sleep 5
 echo "▶️  Iniciando Yuki-IPTV..."
 yuki-iptv
-EOF
+EOL
     chmod +x ~/.local/bin/yuki-with-vpn.sh
 
     print_success "ProtonVPN instalado"

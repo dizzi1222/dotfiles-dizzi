@@ -9,6 +9,7 @@
     ../../home-manager/features/wallpaper.nix
     ../../home-manager/features/stylix.nix
     ../../home-manager/features/work.nix
+    ../../home-manager/features/cleanup.nix
     inputs.spicetify-nix.homeManagerModules.default
     inputs.zen-browser.homeModules.default
   ];
