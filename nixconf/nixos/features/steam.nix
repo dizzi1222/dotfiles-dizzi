@@ -52,6 +52,9 @@
     prismlauncher
     modrinth-app-unwrapped
 
+    # More Games
+    pokemmo-installer
+
     # Misc gaming
     protontricks
   ];
