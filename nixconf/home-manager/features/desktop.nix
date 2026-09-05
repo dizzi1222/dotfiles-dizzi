@@ -55,6 +55,13 @@ in
     discord
     vencord
     vesktop
+    # wine-discord-ipc-bridge
+    # Rich presence para juegos de Proton/Wine (Steam): bridge IPC entre el
+    # juego y Discord. El .exe corre dentro del wineprefix (compilado para
+    # i686-windows); el .sh `winediscordipcbridge-steam.sh` es Linux y va en
+    # Steam → Launch Options por juego:
+    #   /nix/store/<...>-wine-discord-ipc-bridge-0.0.3/bin/winediscordipcbridge-steam.sh %command%
+    wine-discord-ipc-bridge
 
     # Browsers
     brave
@@ -175,13 +182,15 @@ in
       }
     ];
     # Snippet "Rotating Cover Art" (del mismo backup)
-    enabledSnippets = [ ''
-      @keyframes rotating {from {transform: rotate(0deg);}to {transform: rotate(360deg);}}
-      .cover-art, .main-nowPlayingView-coverArtContainer::after, .main-nowPlayingView-coverArtContainer::before {animation: rotating 10s linear infinite;border-radius: 50%;}
-      .cover-art {clip-path: circle(50% at 50% 50%);}
-      .main-nowPlayingBar-left button {background: transparent;}
-      .main-nowPlayingView-coverArt {box-shadow:none; filter: drop-shadow(0 9px 9px rgba(0,0,0,.271));}
-    '' ];
+    enabledSnippets = [
+      ''
+        @keyframes rotating {from {transform: rotate(0deg);}to {transform: rotate(360deg);}}
+        .cover-art, .main-nowPlayingView-coverArtContainer::after, .main-nowPlayingView-coverArtContainer::before {animation: rotating 10s linear infinite;border-radius: 50%;}
+        .cover-art {clip-path: circle(50% at 50% 50%);}
+        .main-nowPlayingBar-left button {background: transparent;}
+        .main-nowPlayingView-coverArt {box-shadow:none; filter: drop-shadow(0 9px 9px rgba(0,0,0,.271));}
+      ''
+    ];
   };
 
   # ── Zen Browser ────────────────────────────────────────────

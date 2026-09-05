@@ -296,7 +296,7 @@ services.displayManager.sddm.settings.Theme.Current = "sddm-astronaut-theme";
 
 ### Flatpak Apps (automáticos)
 
-GeForce NOW, Podman Desktop, Bottles, MCPE Launcher y **JDownloader2** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
+GeForce NOW, Podman Desktop, Bottles, MCPE Launcher, **JDownloader2** y **SGDBoop** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
 
 Para verificar estado:
 
@@ -306,6 +306,7 @@ flatpak info io.podman_desktop.PodmanDesktop 2>/dev/null && echo "✅ Podman Des
 flatpak info com.usebottles.bottles 2>/dev/null && echo "✅ Bottles" || echo "❌ Bottles"
 flatpak info io.mrarm.mcpelauncher 2>/dev/null && echo "✅ MCPE Launcher (Minecraft Bedrock)" || echo "❌ MCPE Launcher"
 flatpak info org.jdownloader.JDownloader 2>/dev/null && echo "✅ JDownloader2" || echo "❌ JDownloader2"
+flatpak info com.steamgriddb.SGDBoop 2>/dev/null && echo "✅ SGDBoop" || echo "❌ SGDBoop"
 ```
 
 Si fallaron en el primer `home-manager switch` (los activation scripts tienen `|| true` y tragan errores), instalá manual:
@@ -327,6 +328,9 @@ flatpak install -y --user flathub io.mrarm.mcpelauncher
 
 # JDownloader2 (no existe en nixpkgs)
 flatpak install -y --user flathub org.jdownloader.JDownloader
+
+# SGDBoop (assets SteamGridDB → Steam)
+flatpak install -y --user flathub com.steamgriddb.SGDBoop
 ```
 
 O corré de nuevo el rebuild (los scripts chequean `flatpak info` primero, no re-intentan si ya está):
@@ -363,6 +367,67 @@ home-manager switch -b backup --flake ~/dotfiles-dizzi/nixconf#diego@thinkpad-x1
 > es un **bug upstream de mcpelauncher**, no de esta config ni del flatpak. Si el
 > login no avanza, probá cambiar la zona horaria del sistema o usá el
 > [troubleshooting oficial](https://minecraft-linux.github.io/troubleshooting).
+
+### Screen Capture / OBS en niri
+
+El screencast (OBS Screen Capture, Discord/Vesktop Share Screen) **solo fallaba bajo niri**:
+`wayland.nix` forzaba `XDG_CURRENT_DESKTOP/XDG_SESSION_DESKTOP=Hyprland` globalmente, así que
+el portal usaba el perfil Hyprland y `xdg-desktop-portal-gnome` solo exponía `Settings`
+(bug niri #1932). El fix: cada WM declara su identidad (esa variable ya se quitó) y el
+routing del portal se define por WM en `hyprland.nix`.
+
+> ⚠️ **NixOS 26.11:** `xdg-desktop-portal-gnome` 50.0 ya NO implementa ScreenCast/Screenshot
+> sobre niri (log: `Non-compatible display server, exposing settings only`). Por eso ahora se
+> usa **`xdg-desktop-portal-wlr`** (instalado en `base-configuration.nix`, soporta niri vía
+> `wlr-screencopy`).
+
+```nix
+xdg.portal.config = {
+  niri = {
+    default = "gtk";
+    ScreenCast = "wlr";
+    Screenshot = "wlr";
+    Settings = "gtk;gnome"; # en AMBOS es clave: si solo gtk, ScreenCast nunca se expone
+  };
+};
+```
+
+Verificación en sesión niri:
+
+```bash
+echo $XDG_CURRENT_DESKTOP             # → niri
+systemctl --user restart xdg-desktop-portal
+# OBS → Fuentes → Screen Capture (PipeWire) → picker de wlr
+# Discord/Vesktop → llamada → Share Screen
+```
+
+Hyprland se auto-detecta vía `UseIn=Hyprland` (sin regresión).
+
+### Rich Presence Proton (wine-discord-ipc-bridge)
+
+`wine-discord-ipc-bridge` (en `desktop.nix`, sección Communication) muestra el juego de
+Proton/Wine como "playing" en Discord. Por juego en Steam: **Launch Options**:
+
+```
+winediscordipcbridge-steam.sh %command%
+```
+
+### SGDBoop (assets SteamGridDB → Steam)
+
+SGDBoop (flatpak `com.steamgriddb.SGDBoop`) captura el botón **"Boop"** de
+steamgriddb.com (esquema `sgdb://`) y aplica portadas/íconos a la biblioteca real de
+Steam. Tras aplicar assets, **reiniciar Steam**. Requiere el flatpak (see Flatpak Apps).
+
+**Configuración (para aprovechar el paquete):**
+
+1. Dejar abierto el enlace https://www.steamgriddb.com/boop
+2. En la web, activar **"Enable the buttons"** para poder descargar assets
+   con un clic (botones Boop sobre cada portada/ícono).
+3. Con Steam corriendo, hacer clic en el asset deseado — SGDBoop lo aplica y
+   Steam lo recarga pidiendo reinicio.
+
+El activador escribe en `userdata/<steamid>/config/grid/<appid>p.png` (portada) y
+archivos hermanos (`_hero.png`, `_logo.png`, etc.) para juegos no-Steam también.
 
 ### Rclone mounts (systemd user services)
 

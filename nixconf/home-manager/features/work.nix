@@ -38,6 +38,7 @@
     gnumake
     cmake
     pkg-config
+    gnucobol # binario cobc
 
     # Java / C# / PHP
     jdk
@@ -131,6 +132,7 @@
     fd
     fzf
     silver-searcher-ng
+    television # TUI fuzzy-finder (álgebra de consultas tipo tv)
 
     # JSON/YAML
     jq
@@ -166,6 +168,23 @@
     nh
     # n8n comment: hash mismatch, rebuild later
     # n8n
+
+    # ── Debug opcional: toolchains de DAP extras (nvim/nvim-dap/*.lua) ──────
+    # Los adapters (rdbg, ocamlearlybird, local-lua-debugger, haskell-debug-adapter,
+    # erlang-debugger) se COMPILAN desde fuente con `:MasonInstall <adapter>` SOLO
+    # si la toolchain existe; sin ella, Mason reintenta/falla en cada arranque.
+    # Son PESADAS → descomentar a demanda + correr el MasonInstall del adapter.
+    # MAPEO:
+    #   ruby/rdbg           | ruby   (rdbg vive en el stdlib `ruby/debug`)
+    #   ocamlearlybird      | ocaml  (via `opam` y dune es de la toolchain)
+    #   local-lua-debugger  | lua    (local-lua-debugger-vscode)
+    #   haskell-debug-adapter | cabal-install
+    #   erlang-debugger     | rebar3
+    # ruby
+    # ocaml
+    # lua
+    # cabal-install
+    # rebar3
   ];
 
   # ── QA env: forzar binarios de Nix, no downloads de npm ────

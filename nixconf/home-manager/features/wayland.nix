@@ -2,10 +2,12 @@
 
 {
   # ── Wayland Session Variables ───────────────────────────────
+  # XDG_CURRENT_DESKTOP / XDG_SESSION_DESKTOP NO se fuerzan aquí: cada WM
+  # declara su identidad (niri la pone en su wrapper, Hyprland en la suya).
+  # Forzarlas globalmente rompía el screencast bajo niri (el portal usaba el
+  # perfil Hyprland → xdg-desktop-portal-gnome solo exponía Settings).
   home.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_TYPE = "wayland";
-    XDG_SESSION_DESKTOP = "Hyprland";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/diego/.local/share/flatpak/exports/share";
     GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";

@@ -1,7 +1,7 @@
 game:
-  exe: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow Knight
-    Silksong/Hollow Knight Silksong.exe
-  working_dir: /home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/Hollow
+  exe: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
+    Knight Silksong/Hollow Knight Silksong.exe
+  working_dir: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
     Knight Silksong/
 system:
   env:
