@@ -17,7 +17,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/blasphemous.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_274522.png",
             "name": "Blasphemous",
             "output": "",
             "wait-all": true
@@ -28,7 +28,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/cuphead.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_210917.png",
             "name": "Cuphead",
             "output": "",
             "wait-all": true
@@ -39,7 +39,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/dead-cells.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_26855.png",
             "name": "Dead Cells",
             "output": "",
             "wait-all": true
@@ -54,7 +54,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/geometry-dash.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_38693.png",
             "name": "Geometry Dash",
             "output": "",
             "wait-all": true
@@ -65,7 +65,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hades.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_113112.png",
             "name": "Hades",
             "output": "",
             "wait-all": true
@@ -76,7 +76,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_106817.png",
             "name": "Hollow Knight",
             "output": "",
             "wait-all": true
@@ -87,7 +87,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/hollow-knight-silksong.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_372563.png",
             "name": "Hollow Knight Silksong",
             "output": "",
             "wait-all": true
@@ -108,7 +108,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/minecraft.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_121.png",
             "name": "Minecraft Launcher",
             "output": "",
             "wait-all": true
@@ -119,7 +119,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pokemmo.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_127976.png",
             "name": "PokeMMO",
             "output": "",
             "wait-all": true
@@ -130,7 +130,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pokeone.png",
+            "image-path": "/home/diego/dotfiles-dizzi/local/.local/share/bottles/bottles/gaming/icons/PokeOne.png",
             "name": "PokeOne",
             "output": "",
             "wait-all": true
@@ -141,7 +141,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/.config/sunshine/covers/pes6.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_237546.png",
             "name": "Pro Evolution Soccer 6",
             "output": "",
             "wait-all": true
