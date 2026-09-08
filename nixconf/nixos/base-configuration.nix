@@ -170,6 +170,13 @@
                     echo "  GUÍA SECURE BOOT + Flatpak (README):"
                     echo "  https://github.com/dizzi1222/dotfiles-dizzi/blob/main/nixconf/README.md#installation-from-nixos-iso"
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  RUIDO: RNNoise activo (alternativa a RTX Voice / Krisp):"
+                    echo "  Al levantar PipeWire crea la fuente 'Noise Canceling source'."
+                    echo "  En tu app (Meet, Discord, OBS): Ajustes → Audio → Micrófono,"
+                    echo "  elegí 'Noise Canceling source' en vez de tu micrófono físico."
+                    echo "  upgrade ★★★ opcional: Khip (nixos/pkgs/) o nvidia-voice-ai;"
+                    echo "  ver notas en nixconf/nixos/features/pipewire.nix"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                     echo
 
                     export PATH="$PATH:/run/current-system/sw/bin"

@@ -3,6 +3,7 @@
 {
   imports = [
     ../../nixos/base-configuration.nix
+    ../../nixos/features/pipewire.nix
     ../../nixos/features/hyprland.nix
     ../../nixos/features/cinnamon-debug.nix
     ../../nixos/features/steam.nix
