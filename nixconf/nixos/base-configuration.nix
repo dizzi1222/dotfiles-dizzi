@@ -466,10 +466,6 @@
     brightnessctl
     playerctl
     xdg-utils
-    xdg-desktop-portal
-    xdg-desktop-portal-hyprland
-    xdg-desktop-portal-gtk
-    xdg-desktop-portal-wlr
 
     # Codecs
     ffmpeg
