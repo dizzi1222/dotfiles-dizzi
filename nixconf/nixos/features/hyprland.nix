@@ -9,20 +9,50 @@
     package = pkgs.hyprland.override { wrapRuntimeDeps = false; };
   };
 
-  # ── XDG Portal (estilo hermano ghaerdi: gtk+gnome, sin wlr) ─
+  # ── XDG Portal ──────────────────────────────────────────────
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
-    # Mismo setup que el hermano: gtk + gnome como backends extra.
-    # Sin routing manual (config) y sin la configPackages de duplicación.
+    # Backends declarativos (sin duplicación de units):
+    #  - gtk:   portal base (file chooser, settings fallback)
+    #  - gnome: solo expone Settings sobre niri (50.0) — NO ScreenCapture
+    #  - wlr:   ScreenCapture/Screenshot vía wlr-screencopy (niri sí lo soporta)
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
       xdg-desktop-portal-gnome
+      xdg-desktop-portal-wlr
     ];
+    # Routing por WM. En niri, gnome 50 expone su portal UI pero NO captura
+    # ("Non-compatible display server, exposing settings only") → forzar
+    # wlr para ScreenCast/Screenshot; Settings se queda en gtk;gnome.
+    # Hyprland se auto-detecta vía UseIn=Hyprland (portalPackage).
+    config = {
+      niri = {
+        default = "gtk";
+        ScreenCast = "wlr";
+        Screenshot = "wlr";
+        Settings = "gtk;gnome";
+      };
+    };
   };
 
-  # ── Hyprland ecosystem packages ────────────────────────────
+  # ── niri portal fix: hacer que el front detecte wlr bajo niri ─
+  # xdg-desktop-portal-wlr trae wlr.portal con UseIn sin "niri"
+  # (solo wlroots;sway;Wayfire;river;phosh;Hyprland) → el front no selecciona
+  # el backend wlr en sesión niri y la captura queda negra/vacía.
+  # Este .portal adicional declara wlr como backend válido para UseIn=niri.
   environment.systemPackages = with pkgs; [
+    (runCommand "wlr-portal-niri" { } ''
+      mkdir -p $out/share/xdg-desktop-portal/portals
+      cat > $out/share/xdg-desktop-portal/portals/wlr-niri.portal <<'EOF'
+[portal]
+DBusName=org.freedesktop.impl.portal.desktop.wlr
+Interfaces=org.freedesktop.impl.portal.Screenshot;org.freedesktop.impl.portal.ScreenCast;
+UseIn=niri
+EOF
+    '')
+
+    # ── Hyprland ecosystem packages ────────────────────────────
     # Hyprland core
     hyprland
     hyprlock
