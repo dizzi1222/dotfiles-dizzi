@@ -6,6 +6,9 @@
 // Steam Big Picture Mode
 spawn-sh-at-startup "steam -bigpicture"
 
+// Sanear la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
+spawn-at-startup "/home/diego/.local/bin/restart-portals"
+
 // Caelestia quickshell
 // spawn-sh-at-startup "caelestia shell -d"
 // spwan-sh-at-startup "qs -c caelestia"
