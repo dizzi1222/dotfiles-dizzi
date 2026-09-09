@@ -125,7 +125,6 @@ home/musicpresence/
 **/local/.local/share/lutris/runners/
 **/local/.local/share/fonts/**/.uuid
 **/local/.local/share/icons/hicolor/.icon-theme.cache
-**/local/.local/share/applications/gaming--*.desktop
 
 # ═══════════════════════════════════════════════════════════
 # FIREFOX - SOLO mantener perfiles con CSS importantes
