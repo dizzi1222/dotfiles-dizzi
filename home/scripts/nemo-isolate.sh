@@ -14,14 +14,12 @@ if [ -n "$NIRI_SOCKET" ] && command -v jq >/dev/null; then
     sleep 1
   done
   if [ -n "$WID" ]; then
-    # Workspace índice 9 (determinista): enfocarlo lo crea si no existe.
-    # Mover por ÍNDICE (no por nombre) evita colisiones con un "isolated" viejo.
-    niri msg action focus-workspace 9 >/dev/null 2>&1
-    niri msg action set-workspace-name "isolated" >/dev/null 2>&1
-    niri msg action move-window-to-workspace 9 --window-id "$WID" >/dev/null 2>&1
-    # El FLOATING NO siempre lo garantiza la window-rule (open-floating solo
-    # aplica al mapear; post-hibernación/boot frío la ventana llega tiled).
-    # Forzarlo idempotente solo si la ventana NO está flotando ya.
+    # Workspace "isolated" por NOMBRE: la window-rule (open-on-workspace)
+    # lo crea/usar al mapear. Mover por índice es inestable con 2 monitores
+    # (los idx se duplican y "9" cae en un workspace arbitrario).
+    niri msg action move-window-to-workspace "isolated" --window-id "$WID" >/dev/null 2>&1
+    # Force floating idempotente: open-floating de la rule solo aplica al
+    # mapear; post-hibernación/boot frío la ventana puede llegar tiled.
     if [ "$(niri msg --json windows 2>/dev/null | jq -r --argjson wid "$WID" '.[] | select(.id == $wid) | .is_floating')" = "false" ]; then
       niri msg action move-window-to-floating --id "$WID" >/dev/null 2>&1
     fi

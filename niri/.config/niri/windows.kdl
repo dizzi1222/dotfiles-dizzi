@@ -46,6 +46,9 @@ window-rule {
     default-column-width { fixed 1920; }
     default-window-height { fixed 1080; }
     opacity 0.1
+    // Work: anclar por NOMBRE (no por índice): con 2 monitores los idx se
+    // duplican y un "9" numérico mueve a un workspace arbitrario (~idx 3).
+    open-on-workspace "isolated"
 }
 
 // Vesktop
