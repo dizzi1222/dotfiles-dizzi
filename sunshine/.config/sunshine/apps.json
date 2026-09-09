@@ -104,7 +104,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "curseforge",
+            "cmd": "prismlauncher",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
