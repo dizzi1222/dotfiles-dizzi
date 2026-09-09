@@ -80,6 +80,8 @@ binds {
     Alt+F4 repeat=false hotkey-overlay-title="close" { close-window; }
     Mod+F4 hotkey-overlay-title="kill gamescope" { spawn-sh "kitty -e ~/scripts/kill-gamescope"; }
     Mod+Shift+F hotkey-overlay-title="fullscreen" { fullscreen-window; }
+    // F11 maximiza a bordes (mantiene el wallpaper visible tras la transparencia).
+    // [󰢚 Irremplazable 󰀦 ] fullscreen-window dibuja un backdrop negro solido (protocolo Wayland) y esconde el wallpaper.
     F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
     Mod+F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
     Mod+Tab hotkey-overlay-title="maximize" { maximize-column; }
@@ -176,6 +178,8 @@ binds {
     // ═══════════════════════════════════════════════════════════════════════
 
     Mod+Comma hotkey-overlay-title="toggle monitor" { focus-monitor-next; }
+    Mod+Ctrl+Comma hotkey-overlay-title="move window to next monitor" { move-window-to-monitor-next; }
+    Ctrl+Shift+Comma hotkey-overlay-title="move workspace to next monitor" { move-workspace-to-monitor-next; }
     Mod+Shift+Comma hotkey-overlay-title="toggle monitor rotation" { spawn-sh "~/scripts/toggle-monitor-rotation"; }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -309,7 +313,7 @@ Mod+T {
     
     Mod+K { spawn-sh "pkill eww"; }
     Shift+Alt+W { spawn-sh "pkill waybar"; }
-    Ctrl+Shift+W { spawn-sh "/usr/bin/waybar &"; }
+    Ctrl+Shift+W { spawn-sh "waybar -c ~/.config/waybar/config-niri.json &"; }
 
     
     // ═══════════════════════════════════════════════════════════════════════

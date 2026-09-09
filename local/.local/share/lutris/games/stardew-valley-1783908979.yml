@@ -1,6 +1,0 @@
-game:
-  exe: /home/diego/.wine/drive_c/Games/Stardew Valley/StardewModdingAPI.exe
-  working_dir: /home/diego/.wine/drive_c/Games/Stardew Valley/
-system:
-  env:
-    WINEDEBUG: -all
