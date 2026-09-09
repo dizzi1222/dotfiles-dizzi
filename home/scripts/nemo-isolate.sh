@@ -19,6 +19,12 @@ if [ -n "$NIRI_SOCKET" ] && command -v jq >/dev/null; then
     niri msg action focus-workspace 9 >/dev/null 2>&1
     niri msg action set-workspace-name "isolated" >/dev/null 2>&1
     niri msg action move-window-to-workspace 9 --window-id "$WID" >/dev/null 2>&1
+    # El FLOATING NO siempre lo garantiza la window-rule (open-floating solo
+    # aplica al mapear; post-hibernación/boot frío la ventana llega tiled).
+    # Forzarlo idempotente solo si la ventana NO está flotando ya.
+    if [ "$(niri msg --json windows 2>/dev/null | jq -r --argjson wid "$WID" '.[] | select(.id == $wid) | .is_floating')" = "false" ]; then
+      niri msg action move-window-to-floating --id "$WID" >/dev/null 2>&1
+    fi
     niri msg action focus-workspace 1 >/dev/null 2>&1
   fi
 fi
