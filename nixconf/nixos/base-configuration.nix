@@ -353,23 +353,18 @@
     };
   };
 
-  # ── systemd-sleep: no congelar user.slice al hibernar ──────
-  # El cgroup freezer de systemd-sleep congela user.slice antes del hibernate.
-  # Si hay UN proceso en D-state (I/O FUSE/loop USB colgado, ej. vicinae
-  # escaneando un disco muerto) el freeze se cuelga 60s y falla con
-  # "Failed to freeze unit 'user.slice': Connection timed out" → hibernate
-  # muere → poweroff inesperado.
-  # En systemd >= 256 el control de este freeze NO es FreezeUserspace=
-  # (eliminado de sleep.conf: "Unknown key") sino la variable de entorno
-  # SYSTEMD_SLEEP_FREEZE_USER_SESSIONS=false. systemd-sleep entonces salta
-  # el congelamiento de la sesión con el cgroup freezer y el kernel congela
-  # todo en el snapshot (systemd issue #37590/#33083).
+  # ── systemd-sleep: congelar user.slice al hibernar por defecto ──
+  # Se reverteó la variable SYSTEMD_SLEEP_FREEZE_USER_SESSIONS=false
+  # (2026-09-09): dejaba los procesos de usuario vivos durante el
+  # device-suspend, corrompía el state de i915/xHCI y el SEGUNDO hibernate
+  # del mismo boot fallaba ("drm ... already unprepared panel" + usb
+  # "invalid context state") → reboot con "PM: Image not found (-22)".
+  # El prototrador de D-state (vicinae-file-indexer) que motivó el override
+  # ya se mata en /etc/systemd/system-sleep/90-rclone.sh (pre/*) antes del
+  # freeze, así que el congelamiento de user.slice ya no se cuelga 60s.
   systemd.sleep.settings.Sleep = {
     SuspendState = "mem";
   };
-  systemd.services.systemd-hibernate.environment.SYSTEMD_SLEEP_FREEZE_USER_SESSIONS = "false";
-  systemd.services.systemd-suspend.environment.SYSTEMD_SLEEP_FREEZE_USER_SESSIONS = "false";
-  systemd.services.systemd-hybrid-sleep.environment.SYSTEMD_SLEEP_FREEZE_USER_SESSIONS = "false";
 
   # ── Flatpak ───────────────────────────────────────────────
   services.flatpak.enable = true;
