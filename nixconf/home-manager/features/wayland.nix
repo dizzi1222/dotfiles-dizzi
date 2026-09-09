@@ -9,7 +9,6 @@
   home.sessionVariables = {
     XDG_SESSION_TYPE = "wayland";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/diego/.local/share/flatpak/exports/share";
-    GDK_BACKEND = "wayland,x11";
     QT_QPA_PLATFORM = "wayland;xcb";
     QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
