@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Scrcpy Connect - Android Screen Mirror - By Dizzi1222
-Comment=Menú interactivo para conectar Android vía scrcpy (USB / WiFi / Inalámbrico)
-Exec=kitty -e ~/scripts/scrcpy-connect.sh
-Icon=scrcpy
-Terminal=false
-Categories=Utility;
-StartupNotify=true

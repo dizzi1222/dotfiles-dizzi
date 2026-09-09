@@ -22,7 +22,44 @@ if [[ "$option" == *"Click"* ]]; then
   mv "$HYPR_IMG" "$IMG_PATH"
 
 elif [[ "$option" == *"Auto"* ]]; then
-  hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "$IMG_PATH"
+  if [ "$comp" = "hypr" ]; then
+    hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "$IMG_PATH"
+  else
+    # niri: obtener geometría real en pantalla de la ventana enfocada
+    WINDOW_JSON="$(niri msg --json focused-window 2>/dev/null)" \
+      || { notify-send "❌ No se pudo obtener la ventana enfocada"; exit 1; }
+
+    WORKSPACE_ID="$(echo "$WINDOW_JSON" | jq -r '.workspace_id')"
+    IS_FLOATING="$(echo "$WINDOW_JSON" | jq -r '.is_floating')"
+
+    # Obtener output del workspace
+    OUTPUT_NAME="$(niri msg --json workspaces 2>/dev/null | jq -r --argjson wid "$WORKSPACE_ID" '.[] | select(.id == $wid) | .output')" \
+      || { notify-send "❌ No se pudo encontrar el workspace"; exit 1; }
+
+    # Obtener posición lógica del output
+    OUTPUT_POS="$(niri msg --json outputs 2>/dev/null | jq -r --arg oname "$OUTPUT_NAME" '.[$oname].logical | "\(.x) \(.y)"')" \
+      || { notify-send "❌ No se pudo obtener posición del output"; exit 1; }
+    OUT_X="$(echo "$OUTPUT_POS" | awk '{print $1}')"
+    OUT_Y="$(echo "$OUTPUT_POS" | awk '{print $2}')"
+
+    # Calcular geometría según tipo de ventana
+    if [ "$IS_FLOATING" = "true" ]; then
+      # Floating: tile_pos_in_workspace_view + window_offset_in_tile + output_pos
+      GEOM="$(echo "$WINDOW_JSON" | jq -r --argjson ox "$OUT_X" --argjson oy "$OUT_Y" '
+        "\(.layout.tile_pos_in_workspace_view[0] + .layout.window_offset_in_tile[0] + $ox),\(.layout.tile_pos_in_workspace_view[1] + .layout.window_offset_in_tile[1] + $oy) \(.layout.window_size[0])x\(.layout.window_size[1])"
+      ')"
+    else
+      # Tiling: pos_in_scrolling_layout + output_pos (aproximación, no hay viewport en IPC)
+      GEOM="$(echo "$WINDOW_JSON" | jq -r --argjson ox "$OUT_X" --argjson oy "$OUT_Y" '
+        "\(.layout.pos_in_scrolling_layout[0] + $ox),\(.layout.pos_in_scrolling_layout[1] + $oy) \(.layout.window_size[0])x\(.layout.window_size[1])"
+      ')"
+    fi
+
+    [ -n "$GEOM" ] && [ "$GEOM" != "null,null nullxnull" ] \
+      || { notify-send "❌ Geometría inválida"; exit 1; }
+
+    grim -g "$GEOM" "$IMG_PATH"
+  fi
 
 # ← AQUÍ ESTÁ EL CAMBIO PARA OPCIÓN 3
 elif [[ "$option" == *Completa* ]]; then

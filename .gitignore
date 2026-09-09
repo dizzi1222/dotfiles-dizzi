@@ -280,10 +280,33 @@ home/.opencommit
 *.env
 .env.*
 
-# Archivos sensibles
-home/.opencommit
-.opencommit
-**/.opencommit
-*api-keys*
-*.env
-.env.*
+# Replit (app .desktop + icono descargados)
+# local/.local/share/applications/Replit*
+# local/.local/share/icons/Replit*
+
+# ═══════════════════════════════════════════════════════════
+# HOME SCRIPTS - lib/ ES codigo versionable (NO ignorar)
+# La regla Python "lib/" de arriba matchea en cualquier nivel
+# y se traga home/scripts/lib/platform.sh. Re-incluimos:
+# ═══════════════════════════════════════════════════════════
+!/home/scripts/lib/
+!/home/scripts/lib/**
+
+# ═══════════════════════════════════════════════════════════
+# STEAM - Carátulas personalizadas (paquete modular steam/)
+# Re-permitir SOLO la rama userdata/*/config/grid tras la
+# regla "**/.local/share/Steam/" (git no re-incluye archivos
+# si un directorio padre está excluido: hay que re-permitir
+# cada nivel de la cadena).
+# ═══════════════════════════════════════════════════════════
+!**/.local/share/Steam/
+!**/.local/share/Steam/userdata/
+!**/.local/share/Steam/userdata/*/
+!**/.local/share/Steam/userdata/*/config/
+!**/.local/share/Steam/userdata/*/config/grid/
+!**/.local/share/Steam/userdata/*/config/grid/**
+
+# STEAM - Bloquear TODOS los .vdf del config EXCEPTO shortcuts.vdf
+# (localconfig/registry/compat son binarios volátiles que Steam reescribe)
+**/.local/share/Steam/userdata/*/config/*.vdf
+!**/.local/share/Steam/userdata/*/config/shortcuts.vdf
