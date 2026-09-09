@@ -192,7 +192,7 @@ case "$ICON" in
   wm_spawn "800 600" kitty --title "CleanBoot" -- sh -c 'sudo ~/.local/bin/clean-boot; read -p "Presiona Enter para cerrar..."'
   ;;
 "")
-  wm_spawn "1000 700" kitty --title "NixRebuild" -- sh -c '~/.local/bin/nixconf-rebuild; read -p "Presiona Enter para cerrar..."'
+  wm_spawn "1000 700" kitty --title "NixRebuild" -- sh -c '~/.local/bin/nixconf-rebuild 2>&1 | tee ~/.cache/nixconf-rebuild.log; read -p "Presiona Enter para cerrar..."'
   ;;
 "")
   sh ~/scripts/git_clean.sh

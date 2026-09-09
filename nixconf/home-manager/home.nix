@@ -444,7 +444,7 @@
         setup_plugin() {
           local name="$1" pkg="$2"
           local dir="$HOME/.oh-my-zsh/custom/plugins/$name"
-          rm -f "$dir" 2>/dev/null       # remove any previous store symlink
+          rm -rf "$dir" 2>/dev/null  # remove any previous store symlink/dir
           mkdir -p "$dir"
           for item in "$pkg"/*; do
             ln -sfn "$item" "$dir/"
@@ -465,7 +465,7 @@
         setup_plugin zsh-history-substring-search "${pkgs.zsh-history-substring-search}/share/zsh/plugins/zsh-history-substring-search"
 
         # Writable theme dir for p10k
-        rm -f "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" 2>/dev/null
+        rm -rf "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" 2>/dev/null
         mkdir -p "$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
         for item in "${pkgs.zsh-powerlevel10k}/share/zsh/themes/powerlevel10k"/*; do
           ln -sfn "$item" "$HOME/.oh-my-zsh/custom/themes/powerlevel10k/"
