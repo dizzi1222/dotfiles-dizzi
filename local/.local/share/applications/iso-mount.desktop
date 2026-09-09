@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Montar ISO
-Exec=/home/diego/.local/bin/mount-iso.sh %f
-Icon=media-optical
-Terminal=true
-Type=Application
-MimeType=application/x-iso9660-image;application/x-cd-image;application/x-raw-disk-image;
-NoDisplay=false

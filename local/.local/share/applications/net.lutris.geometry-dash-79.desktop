@@ -1,9 +1,0 @@
-#!/usr/bin/env xdg-open
-
-[Desktop Entry]
-Type=Application
-Name=Geometry Dash
-Icon=lutris_geometry-dash
-Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/79
-Categories=Game
-TryExec=lutris

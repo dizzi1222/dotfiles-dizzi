@@ -1,8 +1,0 @@
-game:
-  exe: /home/diego/.local/bin/juegos/pes6.sh
-  working_dir: ''
-system:
-  env:
-    WINEDEBUG: -all
-wine:
-  version: wine-ge-8-26-x86_64

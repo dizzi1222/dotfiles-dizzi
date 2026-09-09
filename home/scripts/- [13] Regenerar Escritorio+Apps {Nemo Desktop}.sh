@@ -57,7 +57,7 @@ declare -a ROOT_FILES=(
   # "Wine-Manager.desktop"
   # "bottles-dbz--Resident Evil 4 2023--1763458955.444143.desktop"
   # "Legcord-wine.desktop"
-  "CustomRP-wine.desktop"
+  "CustomRP.desktop"
   "Discord.desktop"
   "net.lutris.discord-130.desktop"
   # "uTorrent µ-wine.desktop"
@@ -65,7 +65,8 @@ declare -a ROOT_FILES=(
   # "Wine11 Manager [Uninstaller-Installer].desktop"
   # "Wine11 Commands-Comandos.desktop"
   # "net.lutris.dead-cells-46.desktop"
-  # "net.lutris.hollow-knight-47.desktop"
+  "net.lutris.hollow-knight-47.desktop"
+  "net.lutris.hollow-knight-silksong-74.desktop"
   # "nemo-windows.desktop"
   # "kill-nemo-windows.desktop"
   # "bottles-dbz--Dragon Ball Sparking ZERO--1761704150.630538.desktop"
@@ -77,7 +78,6 @@ declare -a ROOT_FILES=(
   # "net.lutris.brave-browser-55.desktop"
   # "bottles-dbz--Hades--1761703565.061601.desktop"
   "net.lutris.handbrake-51.desktop"
-  # "bottles-dbz--Hollow Knight Silksong--1761704399.656596.desktop"
   # "net.lutris.jdownloader-57.desktop"
   # "net.lutris.krita-66.desktop"
   # "net.lutris.lxappearance-themes-56.desktop"
@@ -85,13 +85,13 @@ declare -a ROOT_FILES=(
   # "bottles-dbz--NARUTO SHIPPUDEN: Ultimate Ninja STORM 4--1761704496.291657.desktop"
   # "net.lutris.nwg-look-themes-54.desktop"
   # "net.lutris.obs-studio-67.desktop"
-  # "PokeOne-wine.desktop"
-  # "bottles-dbz--PokeMMO--1761703189.638156.desktop"
+  "net.lutris.pokeone-77.desktop"
+  "net.lutris.pokemmo-78.desktop"
+  "net.lutris.stardew-valley-132.desktop"
   # "net.lutris.sekiro-shadows-die-twice-76.desktop"
   # "bottles-dbz--Silent Hill 2--1761704592.309507.desktop"
   # # "net.lutris.stacer-ccleaner-limpieza-50.desktop"
-  # "steam-wine.desktop"
-  # "bottles-dbz--steam--1761701610.473356.desktop"
+  "Steam.desktop"
   "steam-native.desktop"
   # "net.lutris.winetricks-121.desktop"
   # "net.lutris.yazi-search-68.desktop"
@@ -118,11 +118,12 @@ declare -a ROOT_FILES=(
   # "net.lutris.warp-terminal-63.desktop"
   # "µTorrent.desktop"
   # "net.lutris.pamac-aur-panel-de-control-49.desktop"
-  # "net.lutris.mp3tag-80.desktop"
+  "net.lutris.mp3tag-80.desktop"
   "net.lutris.ghostty-81.desktop"
   # "net.lutris.mega-sync-70.desktop"
   "net.lutris.geforce-now-86.desktop"
-  "net.lutris.geforce-infinity-125.desktop"
+  "Geforce Now Web.desktop"
+  # "net.lutris.geforce-infinity-125.desktop"
   # "net.lutris.blasphemous-85.desktop"
   # "tModLoader.desktop"
   # "WinRAR-wine.desktop"
@@ -180,6 +181,11 @@ done
 # Limpiar symlink de carpeta CustomRP_Icons si existe
 if [ -L "$ESCRITORIO/CustomRP_Icons" ]; then
   rm -v "$ESCRITORIO/CustomRP_Icons" && ((REMOVED_COUNT++))
+fi
+
+# Limpiar symlink de CustomRP_Icons en el Desktop de Wine (para CustomRP/Wine)
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  rm -v "$WINE_DESKTOP/CustomRP_Icons" && ((REMOVED_COUNT++))
 fi
 
 if [ $REMOVED_COUNT -gt 0 ]; then
@@ -276,6 +282,18 @@ else
   print_error "No se pudo crear symlink en Wine"
 fi
 
+# 3.3: Symlink en el Desktop de Wine (para que CustomRP/menús de Windows lo vean)
+print_step "Creando symlink en Desktop de Wine..."
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ] || [ -e "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  rm -rf "$WINE_DESKTOP/CustomRP_Icons"
+fi
+
+if ln -s "$GDRIVE_ICONS" "$WINE_DESKTOP/CustomRP_Icons" 2>/dev/null; then
+  print_success "Symlink creado: C:\\users\\diego\\Desktop\\CustomRP_Icons"
+else
+  print_error "No se pudo crear symlink en Desktop de Wine"
+fi
+
 # =================================================================================
 # PASO 4: COPIAR ARCHIVOS .crp AL DESKTOP DE WINE
 # =================================================================================
@@ -357,6 +375,10 @@ echo -e "  • Archivos .crp en Desktop: ${GREEN}$CRP_TOTAL${NC}"
 if [ -L "$WINE_CUSTOMRP" ]; then
   ICON_COUNT=$(find "$WINE_CUSTOMRP" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | wc -l)
   echo -e "  • Iconos en C:\\CustomRP_Icons: ${GREEN}$ICON_COUNT${NC}"
+fi
+
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  echo -e "  • Desktop de Wine CustomRP_Icons: ${GREEN}✓ Enlazado${NC}"
 fi
 
 echo ""

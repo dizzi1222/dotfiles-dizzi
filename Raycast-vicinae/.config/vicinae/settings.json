@@ -1,0 +1,80 @@
+// This configuration is merged with the default vicinae configuration file, which you can obtain by running the `vicinae config default` command.
+// Every item defined in this file takes precedence over the values defined in the default config or any other imported file.
+//
+// You can make manual edits to this file, however you should keep in mind that this file may be written to by vicinae when a configuration change is made through the GUI.
+// When that happens, any custom comments or formatting will be lost.
+//
+// If you want to maintain a configuration file with your own comments and formatting, you should create a separate file and add it to the 'imports' array.
+//
+// Learn more about configuration at https://docs.vicinae.com/config
+
+{
+   "$schema": "https://vicinae.com/schemas/config.json",
+   "theme": {
+      "light": {
+         "name": "pywal"
+      },
+      "dark": {
+         "name": "catppuccin-mocha"
+      }
+   },
+   "keybinds": {
+      "toggle-action-panel": "control+K"
+   },
+   "favorites": [
+      "applications:wine-discord-ipc-bridge-wine",
+      "clipboard:history",
+      "@knoopx/store.vicinae.nix:packages",
+      "applications:display-setup",
+      "applications:waydroid-start-sd",
+      "applications:Stremio_Web"
+   ],
+   "providers": {
+      "@meshal/store.raycast.antigravity": {
+         "entrypoints": {
+            "open-with-antigravity": {
+               "enabled": false
+            }
+         }
+      },
+      "@sovereign/store.vicinae.awww-switcher": {
+         "preferences": {
+            "wallpaperPath": "/home/diego/dotfiles-dizzi/wallpapers/wallpapers/wallpapers"
+         }
+      },
+      "applications": {
+         "entrypoints": {
+            "Dorion": {
+               "enabled": false
+            },
+            "Shadow_PC": {
+               "enabled": false
+            },
+            "discord": {
+               "enabled": false
+            },
+            "gaming--PokeMMO--1772229200.475779": {
+               "enabled": false
+            },
+            "net.lutris.geforce-infinity-125": {
+               "enabled": false
+            },
+            "net.lutris.geforce-now-86": {
+               "enabled": false
+            },
+            "net.lutris.neovim-124": {
+               "enabled": false
+            },
+            "vim": {
+               "enabled": false
+            },
+            "wine.Programs.CustomRP.CustomRP": {
+               "enabled": false
+            },
+            "wine.Programs.Shadow PC": {
+               "enabled": false
+            }
+         }
+      }
+   }
+}
