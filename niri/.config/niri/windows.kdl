@@ -37,11 +37,14 @@ window-rule {
     opacity 1.0
 }
 
-// Nemo desktop
+// Nemo desktop — SOLO la ventana flotante (title="^nemo-desktop$"),
+// NO la "Desktop" con los iconos (que debe quedar 100% opaca).
+// app-id real: "Nemo-desktop" (case-sensitive).
 window-rule {
-    match app-id=r#"^(nemo-desktop)$"#
-    open-maximized true
-    open-on-workspace "magic"
+    match app-id=r#"^[Nn]emo-desktop$"# title="^nemo-desktop$"
+    open-floating true
+    default-column-width { fixed 1920; }
+    default-window-height { fixed 1080; }
     opacity 0.1
 }
 
