@@ -96,20 +96,20 @@
     };
   };
 
-  # ── Transparencia total del fondo de nemo-desktop ──────────────
-  # El fondo GTK del widget se vuelve transparente (pixels con alpha=0),
-  # de modo que niri descubre el shape y deja ver el wallpaper a través.
-  # Se cubre también el GtkIconView interno (.view) incluyendo el estado
-  # enfocado: sin esto, al enfocar la ventana el icon view pintaba un fondo
-  # negro opaco (#000000) que tapaba el wallpaper.
-  # Se combina con la window-rule `opacity` de niri (windows.kdl).
+  # ── Fondo de nemo-desktop (match con el wallpaper) ─────────────
+  # El widget raíz de la ventana Desktop es el nodo `.nemo-desktop-window`
+  # (verificado en vivo: `window`, `.nemo-desktop`, `#nemo-desktop`,
+  # `#nemo-desktop-window` y `NemoDesktopWindow` NO matchean el fondo;
+  # solo `.nemo-desktop-window` lo pinta).
+  # Al recibir foco la ventana repinta ese nodo con su background-color.
+  # `transparent` NO sirve: esta ventana X11 no tiene visual ARGB, así que
+  # GTK resuelve transparent a negro opaco (#000000) tapando el wallpaper.
+  # La solución: pintar al enfocar el tono dominante del wallpaper, que ya
+  # coincide con lo que se ve cuando la ventana no tiene foco (#1a1b26
+  # Tokyo Night, medido con grim+PIL). Resultado: indistinguible.
   stylix.targets.gtk.extraCss = ''
-    .nemo-desktop,
-    .nemo-desktop .view,
-    .nemo-desktop .view:focus,
-    .nemo-desktop .view:selected,
-    .nemo-desktop .view:selected:focus {
-      background-color: transparent;
+    .nemo-desktop-window {
+      background-color: #1a1b26;
     }
   '';
 
