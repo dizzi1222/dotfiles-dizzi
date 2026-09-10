@@ -403,9 +403,58 @@ systemctl --user restart xdg-desktop-portal
 
 Hyprland se auto-detecta vía `UseIn=Hyprland` (sin regresión).
 
-### Rich Presence Proton (wine-discord-ipc-bridge)
+### Runners Bottles: wine-ge-proton vs GE-Proton
 
-Muestra el juego Wine/Proton como "playing" en Discord. Hay **dos bridges** distintos:
+Cuándo usar cada runner en la botella `gaming` (ver también `home/install-bottles.sh`):
+
+| Runner | Qué es | Cuándo usar | Ejemplos |
+|---|---|---|---|
+| **wine-ge-proton** (Wine-GE) | Wine clásico con parches de GloriousEggroll. Prefix propio por botella + componentes libres (dotnet48, dxvk, vkd3d, winetricks) | **Por defecto.** Juegos no-Steam, apps, instaladores, emuladores, juegos clásicos/medios y **todo juego con mods/.NET en el prefix** | Hollow Knight, Silksong (BepInEx + Rich Presence) |
+| **GE-Proton** (Proton-GE) | Fork de Proton (Valve) + GE. En Bottles llega como "custom tool" (`ge-proton*`, script `proton` + protonfixes). Menos control sobre el prefix | **Solo** cuando Wine-GE no alcanza: AAA/online recientes que exigen los últimos parches de Proton | Sparking Zero, juegos online modernos |
+
+Regla rápida: **mods/manual/.NET → wine-ge-proton** · **AAA online nuevo → GE-Proton**.
+
+La botella `gaming` usa `wine-ge-proton` porque HK/Silksong llevan BepInEx + `.NET` y
+necesitan control del prefix (dotnet48 + Discord bridge instalado en el mismo prefijo).
+
+> ⚠️ Si una botella creada como "custom tool" no aparece como runner Wine normal, ese
+> es un **GE-Proton**; para juegos con mods conviene re-crear/convertir la botella con
+> **wine-ge-proton de runner** (no cambiar el runner de una botella con mods instalados:
+> puede romper BepInEx/.NET por versiones distintas de prefix).
+
+#### Lanzar juegos por la botella (NUNCA `wine` del host)
+
+HK/Silksong y demás juegos con mods deben abrir con el **runner de la botella** + el
+`WINEPREFIX` de `gaming`, no con `wine` del host (`~/.wine` no tiene los mods ni el
+bridge de Discord). Los `.desktop` de Lutris ya apuntan al runner + prefix correctos
+(`net.lutris.hollow-knight*.desktop`).
+
+Para lanzar manualmente desde terminal:
+
+```bash
+WINEPREFIX="$HOME/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming" \
+  "$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/wine-ge-proton8-26/bin/wine64" \
+  "$WINEPREFIX/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe" -force-d3d11
+```
+
+> ⚠️ En NixOS los runners Wine son ELF del host y necesitan libs del store
+> (`libunwind.so.8`, `libfreetype.so.6`, `libXft.so.2`) que el loader no ve por
+> defecto. Si wine64 falla con `could not load ntdll.so: libunwind.so.8` o
+> `Wine cannot find the FreeType font library`, exporta su `LD_LIBRARY_PATH`.
+> `install-bottles.sh` ya lo resuelve automáticamente (PASO 2.1). El warning
+> `/lib/ld-linux.so.2: could not open` (helper i386) y `RLIMIT_NICE` son ruido
+> esperado en NixOS sin multilib — no bloquean (los juegos son x86-64).
+
+### Rich Presence Proton (3 .desktop: wine-discord-ipc-bridge*.desktop)
+
+Muestra el juego Wine/Proton como "playing" en Discord. Hay **dos bridges** distintos y
+**tres** `.desktop` en `local/.local/share/applications/`:
+
+| .desktop | Bridge | Prefijo | Cuándo |
+|---|---|---|---|
+| `wine-discord-ipc-bridge.desktop` | rpc-bridge (1) | Wine + Bottles a la vez | lanzado a mano si el servicio no arrancó |
+| `wine-discord-ipc-bridge-wine.desktop` | 0e4ef622 (2) | `~/.wine` | ANTES de cada juego (MANUAL) |
+| `wine-discord-ipc-bridge-bottles.desktop` | 0e4ef622 (2) | botella `gaming` | ANTES de cada juego (MANUAL) |
 
 **1. enderice2/rpc-bridge (recomendado, el instalado en `~/.wine` como servicio)**
 https://github.com/enderice2/rpc-bridge
@@ -424,13 +473,17 @@ reenvía al socket nativo del host `/run/user/1000/discord-ipc-0`. Logs:
   /path/to/bridge.sh %command%
   ```
 
-- En `~/.wine` (nativo): ya instalado; lanzar manualmente vía el .desktop
-  `wine-discord-ipc-bridge.desktop` (headless) si no arrancó como servicio.
+- En `~/.wine` (nativo): ya instalado; lanzar manualmente vía el `.desktop`
+  `wine-discord-ipc-bridge.desktop` (abre Wine + Bottles a la vez) si no
+  arrancó como servicio.
 - En Bottles (Flatpak): en la botella correspondiente, ejecutar `bridge.exe` → `Install`
   para esa botella. El acceso al socket del host se cubre con el override Flatpak de abajo.
 
-**2. 0e4ef622/wine-discord-ipc-bridge (paquete en `desktop.nix`)**
-Requiere configurar **cada juego** en Steam, **Launch Options**:
+**2. 0e4ef622/wine-discord-ipc-bridge (paquete en `desktop.nix`)** —
+**MANUAL**, no es servicio. Usa los `.desktop` `wine-discord-ipc-bridge-wine.desktop`
+(`~/.wine`) y `wine-discord-ipc-bridge-bottles.desktop` (botella `gaming`), que deben
+lanzarse ANTES de cada juego en el mismo prefijo. En Steam exige configurar **cada
+juego**, **Launch Options**:
 
 ```
 winediscordipcbridge-steam.sh %command%

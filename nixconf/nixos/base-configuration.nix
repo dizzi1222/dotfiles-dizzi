@@ -184,26 +184,42 @@
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                     echo "  RICH PRESENCE Wine/Proton → Discord:"
                     echo
-                    echo "  Son DOS bridges distintos. Para juegos NO-Steam el que"
-                    echo "  corresponde es rpc-bridge (ya instalado)."
+                    echo "  Son DOS bridges distintos. El que se usa es rpc-bridge."
                     echo
-                    echo "  1) rpc-bridge (enderice2) ← el instalado en ~/.wine"
-                    echo "     Instalado dentro del prefijo (bridge.exe → Install) y"
-                    echo "     corre solo como servicio: cubre TODOS los juegos de ese"
-                    echo "     prefijo, sin configurar nada por juego."
-                    echo "     Aplica a: Wine, Lutris vía Wine, Bottles (instalar"
-                    echo "     bridge.exe dentro de cada botella). Steam → ver 3.)"
+                    echo "  1) rpc-bridge (enderice2) ← ya instalado en ~/.wine"
+                    echo "     AUTO. Se registra como servicio de Windows: corre solo"
+                    echo "     y cubre todos los juegos de ESE prefijo. Nada más que"
+                    echo "     hacer en ~/.wine. 1 .desktop para lanzarlo a mano"
+                    echo "     (vía script rpc-bridge.sh) si el servicio no arrancó:"
+                    echo "     - wine-discord-ipc-bridge.desktop → Wine + Bottles a la vez"
+                    echo "     BOTTLES: prefijo distinto → instalar bridge.exe →"
+                    echo "     Install dentro de cada botella (override Flatpak ya OK)."
                     echo
-                    echo "  2) wine-discord-ipc-bridge (0e4ef622)"
-                    echo "     Paquete nixpkgs (desktop.nix). Se usa SOLO en Steam y"
-                    echo "     se configura POR JUEGO. Steam → ver 3.)"
+                    echo "  2) wine-discord-ipc-bridge (0e4ef622) ← NO usado"
+                    echo "     MANUAL. No es servicio, no es automático. Steam: por"
+                    echo "     juego, Launch Options '.../winediscordipcbridge-steam.sh"
+                    echo "     %command%'. Wine/Lutris no-Steam: lanzar winediscordipc-"
+                    echo "     bridge.exe ANTES del juego, en el mismo prefijo. 2"
+                    echo "     .desktop para eso:"
+                    echo "     - wine-discord-ipc-bridge-wine.desktop    → ~/.wine"
+                    echo "     - wine-discord-ipc-bridge-bottles.desktop → gaming"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  BOTTLES: ¿GE-Proton o wine-ge-proton? (ver install-bottles.sh)"
                     echo
-                    echo "  3) STEAM (aplica a cualquiera de los dos bridges):"
-                    echo "     Cada juego necesita la ruta de SU bridge en Launch"
-                    echo "     Options (Properties → Set Launch Options):"
-                    echo "     rpc-bridge:       /path/to/bridge.sh %command%"
-                    echo "     wine-discord-ipc: winediscordipcbridge-steam.sh %command%"
-                    echo "     (bridge.sh debe estar en el mismo dir que su bridge.exe)"
+                    echo "  wine-ge-proton (Wine-GE) ← el runner por defecto"
+                    echo "    Wine clásico con parches GE. Prefix propio + componentes"
+                    echo "    libres (dotnet48, dxvk, winetricks). → juegos no-Steam,"
+                    echo "    apps, instaladores, emuladores, juegos clásicos, y TODOS"
+                    echo "    los que usan mods/.NET en el prefix (HK/Silksong+BepInEx)."
+                    echo
+                    echo "  GE-Proton (Proton-GE) ← solo cuando Wine-GE no alcanza"
+                    echo "    Fork de Proton (Valve)+GE: llega como 'custom tool' con"
+                    echo "    script proton/protonfixes. Menos control del prefix. →"
+                    echo "    AAA/online recientes que exigen los últimos parches de"
+                    echo "    Proton y fallan con Wine-GE (ej. Sparking Zero)."
+                    echo
+                    echo "  Regla: mods/manual/.NET → Wine-GE · AAA online nuevo → Proton."
+                    echo "  La botella gaming usa wine-ge-proton (HK/Silksong moddeados)."
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                     echo
 
@@ -366,8 +382,8 @@
   # ── Firewall ──────────────────────────────────────────────
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 80 443 3000 8080 ];
-    allowedUDPPorts = [ ];
+    allowedTCPPorts = [ 22 80 443 3000 5173 5050 8080 8384 47984 47989 47990 48010 ];
+    allowedUDPPorts = [ 47998 47999 48000 48002 48010 ];
     allowedTCPPortRanges = [ ];
     allowedUDPPortRanges = [ ];
   };

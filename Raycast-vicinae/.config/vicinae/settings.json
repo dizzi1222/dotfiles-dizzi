@@ -22,7 +22,7 @@
       "toggle-action-panel": "control+K"
    },
    "favorites": [
-      "@sovereign/store.vicinae.awww-switcher:wpgrid",
+      "applications:wine-discord-ipc-bridge-wine",
       "clipboard:history",
       "@knoopx/store.vicinae.nix:packages",
       "applications:display-setup",

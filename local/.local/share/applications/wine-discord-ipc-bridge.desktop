@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Wine Discord RPC Bridge
-Comment=Promueve el Rich Presence de juegos Wine/Proton hacia Discord (sockets UNIX)
-Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/windows/system32/discord/bridge.exe"
-Icon=72DC_CustomRP.0
-Type=Application
-Terminal=false
-StartupNotify=false

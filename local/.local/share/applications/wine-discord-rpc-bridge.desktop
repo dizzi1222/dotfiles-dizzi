@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Wine Discord RPC Bridge
+Comment=Instala/lanza el Rich Presence (rpc-bridge) en Wine y Bottles a la vez
+Exec=/home/diego/.local/bin/juegos/rpc-bridge.sh
+# Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/windows/system32/discord/bridge.exe"
+Icon=72DC_CustomRP.0
+Type=Application
+Terminal=false
+StartupNotify=false
