@@ -405,12 +405,49 @@ Hyprland se auto-detecta vía `UseIn=Hyprland` (sin regresión).
 
 ### Rich Presence Proton (wine-discord-ipc-bridge)
 
-`wine-discord-ipc-bridge` (en `desktop.nix`, sección Communication) muestra el juego de
-Proton/Wine como "playing" en Discord. Por juego en Steam: **Launch Options**:
+Muestra el juego Wine/Proton como "playing" en Discord. Hay **dos bridges** distintos:
+
+**1. enderice2/rpc-bridge (recomendado, el instalado en `~/.wine` como servicio)**
+https://github.com/enderice2/rpc-bridge
+
+Funciona instalando un named pipe `\\.\pipe\discord-ipc-0` dentro del prefijo que
+reenvía al socket nativo del host `/run/user/1000/discord-ipc-0`. Logs:
+`C:\windows\logs\bridge.log`. Instalación:
+
+- **Wine/Lutris/Bottles (no-Steam)**: se instala una sola vez por prefijo (doble clic
+  `bridge.exe` → `Install`; se registra como servicio de Windows de Wine y corre solo,
+  con **todos** los juegos del prefijo sin tocar nada por juego).
+- **Steam**: exige configurar **cada juego**, `Properties → Set Launch Options` con la
+  ruta del `bridge.sh` (debe estar en el **mismo directorio** que `bridge.exe`):
+
+  ```
+  /path/to/bridge.sh %command%
+  ```
+
+- En `~/.wine` (nativo): ya instalado; lanzar manualmente vía el .desktop
+  `wine-discord-ipc-bridge.desktop` (headless) si no arrancó como servicio.
+- En Bottles (Flatpak): en la botella correspondiente, ejecutar `bridge.exe` → `Install`
+  para esa botella. El acceso al socket del host se cubre con el override Flatpak de abajo.
+
+**2. 0e4ef622/wine-discord-ipc-bridge (paquete en `desktop.nix`)**
+Requiere configurar **cada juego** en Steam, **Launch Options**:
 
 ```
 winediscordipcbridge-steam.sh %command%
 ```
+
+#### Flatpak (Steam/Lutris/Bottles → Discord nativo/Vesktop)
+
+Los juegos en Flatpak no ven el socket del host `/run/user/1000/discord-ipc-0` por
+defecto. Ya aplicado globalmente (sobre escribe también Vesktop/Discord Flatpak):
+
+```
+flatpak override --user --filesystem=xdg-run/discord-ipc-0 \
+  --filesystem=xdg-run/.flatpak/dev.vencord.Vesktop:create \
+  --filesystem=xdg-run/.flatpak/com.discordapp.Discord:create
+```
+
+(equivalente en Flatseal: añadir esos `xdg-run/...` bajo Filesystems).
 
 ### SGDBoop (assets SteamGridDB → Steam)
 

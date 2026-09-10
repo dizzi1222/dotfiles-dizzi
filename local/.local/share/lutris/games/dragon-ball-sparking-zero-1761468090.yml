@@ -1,8 +1,8 @@
 game:
-  exe: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Dragon
+  exe: /home/diego/.wine/drive_c/Games/Dragon
     Ball Sparking ZERO/SparkingZERO.exe
   prefix: ''
-  working_dir: /home/diego/.local/share/bottles/bottles/Dragon-Ball-Sparking-Zero/drive_c/Games/Dragon
+  working_dir: /home/diego/.wine/drive_c/Games/Dragon
     Ball Sparking ZERO/
 wine:
   Desktop: true

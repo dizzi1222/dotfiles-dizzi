@@ -126,7 +126,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.local/share/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
+            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
