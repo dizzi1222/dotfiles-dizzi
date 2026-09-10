@@ -182,15 +182,28 @@
                     echo "  y activa \"Enable the buttons\" (steamgriddb.com boop) para poder"
                     echo "  descargar assets y personalizar juegos que no son de Steam."
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                    echo "  Rich Presence Wine/Proton → Discord:"
-                    echo "  enderice2/rpc-bridge instalado en ~/.wine. Prefijos Wine/"
-                    echo "  Lutris/Bottles: bridge.exe → Install (servicio, todos los"
-                    echo "  juegos del prefijo). STEAM: por juego, Set Launch Options"
-                    echo "  '/path/to/bridge.sh %command%' (bridge.sh junto al bridge.exe)."
-                    echo "  ...desktop headless: local/.local/share/applications/"
-                    echo "  wine-discord-ipc-bridge.desktop. Log: C:\\windows\\logs\\bridge.log"
-                    echo "  Flatpak (Steam/Lutris/Bottles): override ya global (flatpak"
-                    echo "  override --user --filesystem=xdg-run/discord-ipc-0 + Vesktop)"
+                    echo "  RICH PRESENCE Wine/Proton → Discord:"
+                    echo
+                    echo "  Son DOS bridges distintos. Para juegos NO-Steam el que"
+                    echo "  corresponde es rpc-bridge (ya instalado)."
+                    echo
+                    echo "  1) rpc-bridge (enderice2) ← el instalado en ~/.wine"
+                    echo "     Instalado dentro del prefijo (bridge.exe → Install) y"
+                    echo "     corre solo como servicio: cubre TODOS los juegos de ese"
+                    echo "     prefijo, sin configurar nada por juego."
+                    echo "     Aplica a: Wine, Lutris vía Wine, Bottles (instalar"
+                    echo "     bridge.exe dentro de cada botella). Steam → ver 3.)"
+                    echo
+                    echo "  2) wine-discord-ipc-bridge (0e4ef622)"
+                    echo "     Paquete nixpkgs (desktop.nix). Se usa SOLO en Steam y"
+                    echo "     se configura POR JUEGO. Steam → ver 3.)"
+                    echo
+                    echo "  3) STEAM (aplica a cualquiera de los dos bridges):"
+                    echo "     Cada juego necesita la ruta de SU bridge en Launch"
+                    echo "     Options (Properties → Set Launch Options):"
+                    echo "     rpc-bridge:       /path/to/bridge.sh %command%"
+                    echo "     wine-discord-ipc: winediscordipcbridge-steam.sh %command%"
+                    echo "     (bridge.sh debe estar en el mismo dir que su bridge.exe)"
                     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                     echo
 
