@@ -398,12 +398,13 @@ echo -e "  ${MAGENTA}•${NC} SNES9x (Super Nintendo)"
 echo
 echo -e "${BOLD}${GREEN}Categoría 4: Rich Presence${NC} (opcional, AUR)"
 echo -e "  ${MAGENTA}•${NC} SGDBoop (assets SteamGridDB: botón Boop en steamgriddb.com)"
-echo -e "  ${MAGENTA}•${NC} wine-discord-ipc-bridge (presence de juegos Proton/Wine en Discord)"
+echo -e "  ${MAGENTA}•${NC} wine-discord-ipc-bridge + rpc-bridge (presence de juegos Proton/Wine en Discord)"
+echo -e "  ${MAGENTA}•${NC} vesktop (cliente Discord con Vencord integrado)"
 echo
 read -p "¿Instalar Plataformas Base (Steam, Lutris, Wine) y Geforce Experience? [S/n]: " install_base
 read -p "¿Instalar Compatibilidad Windows (Proton-GE, VKD3D, DXVK)? [S/n]: " install_compat
 read -p "¿Instalar Emuladores? [S/n]: " install_emu
-read -p "¿Instalar Rich Presence (SGDBoop + wine-discord-ipc-bridge)? [S/n]: " install_richpresence
+read -p "¿Instalar Rich Presence (SGDBoop + bridges Wine/Discord + vesktop)? [S/n]: " install_richpresence
 
 # ═══════════════════════════════════════════════════════════
 # Categoría 1: Plataformas Base
@@ -469,13 +470,13 @@ if [[ ! "$install_richpresence" =~ ^[Nn]$ ]]; then
   echo
   print_header "Instalando Rich Presence"
 
-  print_installing "SGDBoop + wine-discord-ipc-bridge"
+  print_installing "SGDBoop + rpc-bridge + wine-discord-ipc-bridge + vesktop"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-    wine-discord-ipc-bridge-bin sgdboop-bin \
+    rpc-bridge-bin wine-discord-ipc-bridge-git vesktop-bin sgdboop-bin \
     2>/dev/null || print_warning "Algunos paquetes de Rich Presence fallaron"
 
-  print_success "Rich Presence instalado (aplicar assets con SGDBoop y reiniciar Steam)"
-  print_warning "Presence de juegos: añadir 'winediscordipcbridge-steam.sh %command%' en Steam Launch Options"
+  print_success "Rich Presence + vesktop instalados (aplicar assets con SGDBoop y reiniciar Steam)"
+  print_warning "Presence Steam: añadir '/opt/rpc-bridge/bridge.sh %command%' en Launch Options"
 else
   print_warning "Rich Presence omitido"
 fi
