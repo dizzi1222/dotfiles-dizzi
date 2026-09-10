@@ -172,6 +172,29 @@ echo -e "  ${MAGENTA}•${NC} Wine-GE 8: ${GREEN}Mejor para Steam, apps Windows 
 echo -e "  ${MAGENTA}•${NC} Proton-GE 10: ${GREEN}Mejor para juegos (Sparking Zero, etc)${NC}"
 echo -e "  ${MAGENTA}•${NC} Puedes cambiar el runner cuando quieras${NC}"
 echo
+echo -e "${BOLD}${CYAN}¿WINE-GE o GE-PROTON? Cómo elegir el runner:${NC}"
+echo
+echo -e "  ${GREEN}wine-ge-proton (Wine-GE)${NC} — ${BOLD}el runner por defecto${NC}"
+echo -e "    Es Wine clásico (wineboot/wineserver) con los parches de GloriousEggroll."
+echo -e "    Cada botella tiene su propio prefix y puedes instalar cualquier componente"
+echo -e "    (dotnet48, dxvk, vkd3d, winetricks) de forma independiente al runner."
+echo -e "    → USALO PARA: juegos no-Steam, apps/productividad, INSTALADORES,"
+echo -e "      emuladores, juegos clásicos/medios, launchers custom, y cualquier"
+echo -e "      juego con MODS dentro del prefijo (ej. Hollow Knight/Silksong con"
+echo -e "      BepInEx + .NET: necesitan dotnet48 + control del prefix)."
+echo
+echo -e "  ${GREEN}GE-Proton (Proton-GE)${NC} — ${BOLD}solo cuando Wine-GE no alcanza${NC}"
+echo -e "    Es el fork de Proton (Valve) + GE. En Bottles llega como 'custom"
+echo -e "    tool' (ge-proton*) con script 'proton' y protonfixes. Usa el modelo"
+echo -e "    Proton de Valve: menos control sobre los componentes del prefix."
+echo -e "    → USALO SOLO PARA: juegos AAA/online recientes que piden los últimos"
+echo -e "      parches de Proton y no arrancan o fallan con Wine-GE (ej. Sparking"
+echo -e "      Zero, juegos con anti-cheat moderno online)."
+echo
+echo -e "  ${YELLOW}Regla rápida:${NC} si el juego usa mods/manual (.NET, BepInEx, prefix"
+echo -e "  tuneado) → ${GREEN}Wine-GE${NC}. Si es un AAA online reciente que necesita los"
+echo -e "  últimos fixes de Valve → ${GREEN}GE-Proton${NC}."
+echo
 read -p "¿Continuar? [S/n]: " confirm
 [[ "$confirm" =~ ^[Nn]$ ]] && exit 0
 
@@ -293,6 +316,55 @@ else
 fi
 
 print_success "Dependencias listas"
+
+# ═══════════════════════════════════════════════════════════
+# PASO 2.1: LIBS DE WINE PARA NIXOS (libunwind/freetype/libxft)
+# ═══════════════════════════════════════════════════════════
+# Los runners de Bottles (wine/wine64) son ELF del host: al arrancar buscan
+# libunwind.so.8, libfreetype.so.6 y libXft.so.2 en el runtime. En NixOS esas
+# libs viven en /nix/store pero NO están en la cache del loader dinámico, así
+# que wine64 muere con:
+#   could not load ntdll.so: libunwind.so.8 → ... not found
+#   Wine cannot find the FreeType font library (libfreetype/libxft)
+# Este paso las localiza en el system actual y las exporta vía LD_LIBRARY_PATH
+# para que wine, wineboot y winetricks (PASO 2.5 y PASO 6) las encuentren.
+print_header "PASO 2.1: Exportar libs de Wine (NixOS)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: las libs de wine vienen del sistema, no hace falta este paso."
+else
+  print_status "Resolviendo libs de Wine en /nix/store (system actual)..."
+  reqs="$(nix-store -q --requisites /run/current-system/sw 2>/dev/null || true)"
+  WINE_SYSTEM_LIBS=""
+
+  for lib in libunwind.so.8 libfreetype.so.6 libXft.so.2; do
+    libdir="$(echo "$reqs" | while read -r p; do
+      [[ -f "$p/lib/$lib" ]] && echo "$p/lib" && break
+    done)"
+
+    # Fallback: buscar directamente en el store si no está en el system actual
+    if [[ -z "$libdir" ]]; then
+      found_so="$(find /nix/store -maxdepth 3 -path "*lib/$lib" -print -quit 2>/dev/null)"
+      [[ -n "$found_so" ]] && libdir="$(dirname "$found_so")"
+    fi
+
+    if [[ -n "$libdir" ]]; then
+      WINE_SYSTEM_LIBS="$WINE_SYSTEM_LIBS:$libdir"
+      print_success "$lib → $libdir"
+    else
+      print_warning "$lib NO encontrada — wine/winetricks pueden fallar al cargarla."
+      print_info "  Si vuelve a fallar: nix store / nix-shell -p libunwind freetype libxft primero."
+    fi
+  done
+
+  WINE_SYSTEM_LIBS="${WINE_SYSTEM_LIBS#:}"
+  if [[ -n "$WINE_SYSTEM_LIBS" ]]; then
+    export LD_LIBRARY_PATH="$WINE_SYSTEM_LIBS${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    print_success "LD_LIBRARY_PATH exportado para Wine: $WINE_SYSTEM_LIBS"
+  else
+    print_warning "No se exportó LD_LIBRARY_PATH (ninguna lib resuelta)."
+  fi
+fi
 
 # ═══════════════════════════════════════════════════════════
 # PASO 2.5: WINE PREFIX (~/.wine) — Cross-platform
