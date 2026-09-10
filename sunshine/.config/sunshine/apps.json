@@ -72,35 +72,25 @@
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/47",
+            "cmd": "wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight/hollow_knight.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/igdb_106817.png",
             "name": "Hollow Knight",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/47",
             "wait-all": true
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74",
+            "cmd": "wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe\"",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/igdb_372563.png",
             "name": "Hollow Knight Silksong",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/74",
             "wait-all": true
-        },
-        {
-            "image-path": "desktop.png",
-            "name": "Low Res Desktop",
-            "prep-cmd": [
-                {
-                    "do": "xrandr --output HDMI-1 --mode 1920x1080",
-                    "undo": "xrandr --output HDMI-1 --mode 1920x1200"
-                }
-            ]
         },
         {
             "auto-detach": true,
