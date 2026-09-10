@@ -264,6 +264,11 @@
     echo "  y activa \"Enable the buttons\" (steamgriddb.com boop) para poder"
     echo "  descargar assets y personalizar juegos que no son de Steam."
     echo "════════════════════════════════════════════════════════════════"
+    echo "  Rich Presence Wine/Proton → Discord:"
+    echo "  Lanza 'Wine Discord RPC Bridge' (o el .desktop homónimo) y el"
+    echo "  bridge.exe de ~/.wine redirige los sockets IPC de los juegos"
+    echo "  hacia Discord (vesktop/Flatpak). Log: C:\\windows\\logs\\bridge.log"
+    echo "════════════════════════════════════════════════════════════════"
     echo
   '';
 
@@ -400,6 +405,9 @@
     # open-webui
     xdg-terminal-exec
     oklch-color-picker
+    # Bridge Rich Presence: juegos Wine/Proton → Discord (vesktop/Flatpak).
+    # .desktop headless: local/.local/share/applications/wine-discord-ipc-bridge.desktop
+    wine-discord-ipc-bridge
   ];
 
   # ── Cinnamon dconf ────────────────────────────────────────
