@@ -264,10 +264,27 @@
     echo "  y activa \"Enable the buttons\" (steamgriddb.com boop) para poder"
     echo "  descargar assets y personalizar juegos que no son de Steam."
     echo "════════════════════════════════════════════════════════════════"
-    echo "  Rich Presence Wine/Proton → Discord:"
-    echo "  Lanza 'Wine Discord RPC Bridge' (o el .desktop homónimo) y el"
-    echo "  bridge.exe de ~/.wine redirige los sockets IPC de los juegos"
-    echo "  hacia Discord (vesktop/Flatpak). Log: C:\\windows\\logs\\bridge.log"
+    echo "  RICH PRESENCE Wine/Proton → Discord:"
+    echo
+    echo "  Son DOS bridges distintos. Para juegos NO-Steam el que"
+    echo "  corresponde es rpc-bridge (ya instalado)."
+    echo
+    echo "  1) rpc-bridge (enderice2) ← el instalado en ~/.wine"
+    echo "     Instalado dentro del prefijo (bridge.exe → Install) y corre"
+    echo "     solo como servicio: cubre TODOS los juegos de ese prefijo,"
+    echo "     sin configurar nada por juego."
+    echo "     Aplica a: Wine, Lutris vía Wine, Bottles (instalar bridge.exe"
+    echo "     dentro de cada botella). Para Steam → ver punto 3.)
+    echo
+    echo "  2) wine-discord-ipc-bridge (0e4ef622)"
+    echo "     Paquete nixpkgs (desktop.nix). Se usa SOLO en Steam y se"
+    echo "     configura POR JUEGO. Para Steam → ver punto 3.)"
+    echo
+    echo "  3) STEAM (aplica a cualquiera de los dos bridges):"
+    echo "     Cada juego necesita la ruta de SU bridge en Launch Options:"
+    echo "     rpc-bridge:       /path/to/bridge.sh %command%"
+    echo "     wine-discord-ipc: winediscordipcbridge-steam.sh %command%"
+    echo "     (el bridge.sh debe estar en el mismo dir que su bridge.exe)"
     echo "════════════════════════════════════════════════════════════════"
     echo
   '';
