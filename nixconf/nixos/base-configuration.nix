@@ -423,6 +423,7 @@
     sbctl
     grub2_efi
     (pkgs.sddm-astronaut.override { embeddedTheme = "jake_the_dog"; })
+    (pkgs.callPackage ./pkgs/pokemmo-launcher.nix { })
     kdePackages.qtmultimedia
 
     # Xephyr: servidor X anidado, lo pide el healthcheck de Cinnamon

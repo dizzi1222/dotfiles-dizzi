@@ -110,6 +110,9 @@
       ".config/networkmanager-fuzzel".source = link "networkmanager-fuzzel/.config/networkmanager-fuzzel";
       # Nwg-panel (GTK3/4)
       ".config/nwg-panel".source = link "nwg-gtk-4.0/.config/nwg-panel";
+      # GTK Bookmarks (file managers GTK: Nemo/Thunar/Dolphin-GTK). settings.ini
+      # y gtk.css los maneja el module gtk (stylix.nix); aquí solo bookmarks.
+      ".config/gtk-3.0/bookmarks".source = link "nwg-gtk-3.0/.config/gtk-3.0/bookmarks";
       # Input Remapper
       ".config/input-remapper".source = link "input-remapper/.config/input-remapper";
       # Kew
@@ -412,9 +415,20 @@
   '';
 
   # ── Bottles (flatpak) ─────────────────────────────────────
+  # Override idempotente: solo se aplica si el override local no menciona ya
+  # ~/Descargas (y los mounts de medios). flatpak mergea con el archivo existente.
   home.activation.bottles = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if ! flatpak info com.usebottles.bottles &>/dev/null 2>&1; then
       flatpak install -y --user flathub com.usebottles.bottles 2>/dev/null || true
+    fi
+    OVERRIDE="$HOME/.local/share/flatpak/overrides/com.usebottles.bottles"
+    if [ -f "$OVERRIDE" ] && ! grep -q '~/Descargas' "$OVERRIDE" 2>/dev/null; then
+      flatpak override --user \
+        --filesystem="~/Descargas" \
+        --filesystem=/mnt \
+        --filesystem=/media/diego \
+        --filesystem=/run/media/diego \
+        com.usebottles.bottles 2>/dev/null || true
     fi
   '';
 

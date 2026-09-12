@@ -43,6 +43,13 @@
       keybinds = {
         toggle-action-panel = "control+K";
       };
+      # 'top' layer en niri queda DETRÁS de las ventanas fullscreen.
+      # 'overlay' sí se dibuja encima de fullscreen (ver docs vicinae FAQ).
+      launcher_window = {
+        layer_shell = {
+          layer = "overlay";
+        };
+      };
       favorites = [
         "clipboard:history"
         "@knoopx/store.vicinae.nix:packages"

@@ -1,3 +1,4 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
 Name=PokeOne
 # Exec=bottles-cli run -p "PokeOne" -b "gaming" -- %u
