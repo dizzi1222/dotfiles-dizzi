@@ -4,7 +4,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Steam Big Picture Mode
-spawn-sh-at-startup "steam -bigpicture"
+// spawn-sh-at-startup "steam -bigpicture"
+spawn-sh-at-startup "steam"
 
 // Sanear la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
 spawn-at-startup "/home/diego/.local/bin/restart-portals"
@@ -13,8 +14,8 @@ spawn-at-startup "/home/diego/.local/bin/restart-portals"
 // spawn-sh-at-startup "caelestia shell -d"
 // spwan-sh-at-startup "qs -c caelestia"
 
-// Quickshell # PARA LOS BORDER
-spawn-sh-at-startup "qs"
+// Quickshell # PARA LOS BORDER — DESACTIVADO (overlay tapea fullscreen en cualquier app)
+// spawn-sh-at-startup "qs"
 
 // Power management
 spawn-sh-at-startup "powerprofilesctl set performance" // Usa balanced si quieres ahorrar batería

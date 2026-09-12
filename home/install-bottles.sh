@@ -79,6 +79,180 @@ function apply_wine_dark_theme() {
 }
 
 # ═══════════════════════════════════════════════════════════
+# FUNCIÓN: FIX ICU.DLL STALE EN UN PREFIX
+# ═══════════════════════════════════════════════════════════
+# Uso: fix_stale_icu_dll <prefix> <etiqueta>
+# Corrige el crash "module not found for forward 'icuucNN...'" (Error: 127 /
+# c0000409) que aparece al migrar un prefix de wine-ge-* a sys-wine (Wine 11):
+# el prefix conserva un icu.dll VIEJO que forwardea a una libicu que ya no
+# existe en el runtime, y ese .dll shadowea al builtin del runner actual.
+function fix_stale_icu_dll() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  local fixed=false
+  for dir in system32 syswow64; do
+    local icu_dll="$prefix/drive_c/windows/$dir/icu.dll"
+    if [[ -f "$icu_dll" ]]; then
+      local bad="$(grep -aoE 'icuuc[0-9]+' "$icu_dll" 2>/dev/null | head -1)"
+      if [[ -n "$bad" ]] && [[ "$bad" != "icuuc" ]]; then
+        print_warning "$label: icu.dll ($dir) stale forwardeando a $bad → moviendo a .bak"
+        mv "$icu_dll" "$icu_dll.bak.$(date +%Y%m%d)"
+        fixed=true
+      else
+        print_info "$label: icu.dll ($dir) sin forward extraño (OK)"
+      fi
+    fi
+  done
+
+  if [[ "$fixed" == true ]]; then
+    print_success "$label: icu.dll stale resuelto (Wine 11 usa libicuuc del runtime, no necesita el .dll del prefix)"
+  else
+    print_info "$label: sin icu.dll stale (OK)"
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIÓN: INSTALAR SHIMS CLR .NET 4.8 NATIVOS EN UN PREFIX
+# ═══════════════════════════════════════════════════════════
+# Uso: install_ms_shims_dotnet48 <prefix> <etiqueta>
+# PokeOne (app WPF/.NET 4.8) muere con "Wine Mono is not installed" porque
+# el builtin mscoree.dll de Wine hostea wine-mono. Para que la app use el
+# CLR NATIVO (clr.dll 4.8 instalado por winetricks dotnet48) se copian los
+# shims MS REALES (mscoreei/mscoreeis x64+x86 del instalador NDP48, y
+# mscoree.dll nativo del sistema) y se fuerzan overrides native.
+# Los DLL se cachean en ~/.cache/dotnet48-shims/ (descarga/extracción 1 vez).
+# NOTA: el helper get_ms_shim funiona extrayendo UN archivo por vez del cab
+#        con 7z (extraer varios en un mismo comando vuelca todo el cab).
+function get_ms_shim() {
+  local cabfile="$1"   # path al .cab (contiene el archivo)
+  local inner_path="$2" # ruta interna dentro del cab
+  local target="$3"     # archivo destino
+  if [[ -f "$target" ]]; then return 0; fi
+  mkdir -p "$(dirname "$target")"
+  if 7z e "$cabfile" -o"$(dirname "$target")" -y -- "$inner_path" >/dev/null 2>&1; then
+    [[ -f "$target" ]] && return 0
+  fi
+  # fallback: extraer el cab completo y buscar el archivo
+  local tmpdir
+  tmpdir="$(mktemp -d /tmp/cabdump.XXXXXX)"
+  ( cd "$tmpdir" && 7z e "$cabfile" -y -- "$inner_path" >/dev/null 2>&1 )
+  find "$tmpdir" -name "$(basename "$inner_path")" -exec cp {} "$target" \; 2>/dev/null
+  rm -rf "$tmpdir"
+  [[ -f "$target" ]]
+}
+
+function install_ms_shims_dotnet48() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  local www="$prefix/drive_c/windows"
+  local cache="$HOME/.cache/dotnet48-shims"
+  local work
+  work="$(mktemp -d /tmp/ndp48.XXXXXX)"
+
+  # ¿Ya instalados los shims nativos? (mscoreei no-builtin de Wine = señal)
+  if [[ -f "$www/system32/mscoreei.dll" ]] && [[ ! "$(file -b "$www/system32/mscoreei.dll" 2>/dev/null)" =~ for\ WINE ]]; then
+    print_success "$label: shims CLR .NET 4.8 ya nativos (OK)"
+    rm -rf "$work"
+    return 0
+  fi
+
+  print_status "$label: instalando shims CLR .NET 4.8 nativos..."
+
+  # 0) Descargar NDP48 una sola vez (cache en ~/.cache)
+  if [[ ! -f "$cache/ndp48.exe" ]]; then
+    print_status "Descargando instalador .NET 4.8 (~121MB, una sola vez)..."
+    mkdir -p "$cache"
+    curl -L --fail --retry 2 -o "$cache/ndp48.exe" \
+      "https://go.microsoft.com/fwlink/?linkid=2088631" || {
+        print_error "No se pudo descargar NDP48. Manual: https://go.microsoft.com/fwlink/?linkid=2088631"
+        return 1
+      }
+  fi
+
+  # 1) Extraer del instalador SOLO los cabs x64/x86 de Win10 (contienen los shims)
+  7z x "$cache/ndp48.exe" -o"$work" -y 'x64-Windows10.0-KB4486129-x64.cab' \
+    'Windows10.0-KB4486129-x86.cab' >/dev/null 2>&1 || true
+
+  # 2) Extraer mscoreei/mscoreeis (x64 y x86)
+  get_ms_shim "$work/x64-Windows10.0-KB4486129-x64.cab" \
+    "amd64_netfx4-mscoreei_dll_b03f5f7f11d50a3a_4.0.15744.551_none_2c50ee0715d57ff8/mscoreei.dll" \
+    "$cache/x64/mscoreei.dll"
+  get_ms_shim "$work/x64-Windows10.0-KB4486129-x64.cab" \
+    "amd64_netfx4-mscoreeis_dll_b03f5f7f11d50a3a_4.0.15744.161_none_dd9b58148c09a150/mscoreeis.dll" \
+    "$cache/x64/mscoreeis.dll"
+  get_ms_shim "$work/Windows10.0-KB4486129-x86.cab" \
+    "x86_netfx4-mscoreei_dll_b03f5f7f11d50a3a_4.0.15744.551_none_73fe24de2a51a8fe/mscoreei.dll" \
+    "$cache/x86/mscoreei.dll"
+  get_ms_shim "$work/Windows10.0-KB4486129-x86.cab" \
+    "x86_netfx4-mscoreeis_dll_b03f5f7f11d50a3a_4.0.15744.161_none_25488eeba085ca56/mscoreeis.dll" \
+    "$cache/x86/mscoreeis.dll"
+
+  # 3) mscoree.dll MS nativo (NO viene en NDP48 — es parte del OS). Fuentes
+  #    posibles (se prueban ambas arquitecturas por separado):
+  #      1) cache antigua de ~/.cache/dotnet48-shims
+  #      2) ~/.wine (prefix con dotnet nativo instalado previamente)
+  #      3) la propia botella gaming (si ya se corrigió antes manualmente)
+  mkdir -p "$cache/x64" "$cache/x86"
+  for bits in x64 x86; do
+    if [[ -f "$cache/$bits/mscoree.dll" ]]; then
+      continue
+    fi
+    for arch in system32 syswow64; do
+      for src in \
+        "$HOME/.wine/drive_c/windows/$arch/mscoree.dll" \
+        "$BOTTLES_BASE/bottles/gaming/drive_c/windows/$arch/mscoree.dll"
+      do
+        [[ -f "$src" ]] || continue
+        if file -b "$src" 2>/dev/null | grep -q "for WINE"; then
+          continue
+        fi
+        # x64 → system32/cache x64; x86 → syswow64/cache x86
+        if [[ "$bits" == "x64" ]] && file -b "$src" 2>/dev/null | grep -q "x86-64"; then
+          cp -f "$src" "$cache/x64/mscoree.dll"
+          break
+        elif [[ "$bits" == "x86" ]] && ! file -b "$src" 2>/dev/null | grep -q "x86-64"; then
+          cp -f "$src" "$cache/x86/mscoree.dll"
+          break
+        fi
+      done
+      [[ -f "$cache/$bits/mscoree.dll" ]] && break
+    done
+  done
+  if [[ ! -f "$cache/x64/mscoree.dll" || ! -f "$cache/x86/mscoree.dll" ]]; then
+    print_warning "mscoree.dll MS nativo (x64/x86) no encontrado en fuentes locales"
+    print_info "Búscalo en: sistema Windows real (C:\\Windows\\System32) o un prefix con dotnet nativo."
+  fi
+
+  # 4) Copiar los shims al prefix (los que existan)
+  local has_any=false
+  mkdir -p "$www/system32" "$www/syswow64"
+  for f in mscoreei.dll mscoreeis.dll mscoree.dll; do
+    if [[ -f "$cache/x64/$f" ]]; then
+      cp -f "$cache/x64/$f" "$www/system32/$f" && has_any=true
+    fi
+    if [[ -f "$cache/x86/$f" ]]; then
+      cp -f "$cache/x86/$f" "$www/syswow64/$f" && has_any=true
+    fi
+  done
+
+  rm -rf "$work"
+
+  if [[ "$has_any" == true ]]; then
+    print_success "$label: shims CLR .NET 4.8 nativos instalados en system32/syswow64"
+  else
+    print_warning "$label: no se copiaron shims (revisar cache ~/.cache/dotnet48-shims y fuentes)"
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
 # DETECCIÓN DE DISTRO Y VARIABLES DE ENTORNO
 # ═══════════════════════════════════════════════════════════
 # Soporta Arch (nativo, yay/pacman) y NixOS (flatpak).
@@ -294,6 +468,95 @@ elif [[ "$current_bits" == "32" ]]; then
   fi
 else
   print_info "valor actual: ${current_bits} (no requiere cambio)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.7: FIX ICU.DLL STALE EN PREFIXES (NixOS/Wine 11)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: al lanzar un exe en una botella, Wine muere con:
+#   err:module:find_forwarded_export module not found for forward
+#     'icuuc68.u_charsToUChars_68' used by L"C:\windows\system32\icu.dll"
+#   Cannot get symbol u_charsToUChars from libicuuc → Error: 127 → c0000409
+#
+# Causa raiz (NixOS, sep 2026 — PokeOne p1setup.exe):
+#   - El prefix de la botella conserva un icu.dll VIEJO (de la era wine-ge
+#     runner) que forwardea a libicuuc.so.68 (icuuc68).
+#   - sys-wine-11.0 (Wine 11 del runtime / host) usa libicuuc.so.77 y NO trae
+#     icu.dll propio en /app — el runtime lo provee como ELF libicuuc.so.77.
+#   - El icu.dll stale del prefix gana prioridad en el loader → forward inválido.
+# Fix: respaldar y quitar el icu.dll stale de system32+syswow64 del prefix.
+# Además: el sandbox flatpak NO ve ~/Descargas por defecto → dar override.
+print_header "PASO 1.7: Fix ICU.dll stale en prefixes (NixOS/Wine 11)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: runtime libicu del sistema coincide con los runners, no aplica."
+else
+  # 1) Acceso flatpak a ~/Descargas (donde suelen vivir los instaladores)
+  if ! flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+    print_status "Dando acceso flatpak a ~/Descargas (instaladores)..."
+    flatpak override --user --filesystem="$HOME/Descargas" com.usebottles.bottles
+    if flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+      print_success "Bottles ya puede ver ~/Descargas"
+    else
+      print_warning "Override aplicado pero flatpak info no lo refleja aún."
+    fi
+  else
+    print_success "Bottles ya tiene acceso a ~/Descargas"
+  fi
+
+  # 2) Escanear botellas existentes y limpiar icu.dll stale
+  if [[ -d "$BOTTLES_BASE/bottles" ]]; then
+    for prefix in "$BOTTLES_BASE"/bottles/*/; do
+      [[ -d "$prefix/drive_c/windows" ]] || continue
+      fix_stale_icu_dll "${prefix%/}" "Botella $(basename "$prefix")"
+    done
+  else
+    print_warning "No hay botellas aún en $BOTTLES_BASE/bottles (este paso corre la próxima vez)."
+  fi
+
+  # 3) Mismo fix para el prefix ~/.wine si existe (Wine directo)
+  if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
+    fix_stale_icu_dll "$HOME/.wine" "Wine (~/.wine)"
+  fi
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.8: SHIMS CLR .NET 4.8 NATIVOS PARA POKEONE (Y APPS WPF)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: Launcher.exe (PokeOne) muere con:
+#   err:ole:CoCreateInstance apartment not initialised / Wine Mono is not installed
+#   (la app es WPF/.NET 4.8 y el builtin mscoree.dll de Wine hostea wine-mono)
+#
+# Causa raiz:
+#   - winetricks dotnet48 instala el CLR nativo (clr.dll en Framework64/
+#     v4.0.30319) PERO NO reemplaza los shims builtin en system32/syswow64.
+#   - mscoree/mscoreei/mscoreeis.dll nativos MS viven en el instalador NDP48
+#     (los mscoreei/mscoreeis) y el OS (mscoree.dll NO viene en NDP48).
+#   - Con los shims MS + override native, Wine usa el CLR real (4.0.30319)
+#     en vez de Wine Mono. Verificado: launcher corre, 92 hilos, red OK.
+# Fix: copiar los shims MS nativos a system32/syswow64 y forzar override native.
+print_header "PASO 1.8: Shims CLR .NET 4.8 nativos (fix PokeOne WPF)"
+
+# La botella con PokeOne
+POKEONE_BOTTLE="$BOTTLES_BASE/bottles/gaming"
+if [[ -f "$POKEONE_BOTTLE/drive_c/Games/PokeOne/Launcher.exe" ]]; then
+  install_ms_shims_dotnet48 "$POKEONE_BOTTLE" "Botella gaming (PokeOne)"
+
+  # Forzar overrides native en bottle.yml (idempotente)
+  BOTTLE_YML="$POKEONE_BOTTLE/bottle.yml"
+  if [[ -f "$BOTTLE_YML" ]] && ! grep -q "mscoree" "$BOTTLE_YML" 2>/dev/null; then
+    print_status "Agregando DLL_Overrides mscoree/mscoreei/mscoreeis=native en bottle.yml..."
+    sed -i 's/^DLL_Overrides: {}$/DLL_Overrides:\n    mscoree: native\n    mscoreei: native\n    mscoreeis: native/' "$BOTTLE_YML"
+    if grep -q "mscoree: native" "$BOTTLE_YML" 2>/dev/null; then
+      print_success "Override mscoree=native aplicado en bottle.yml"
+    else
+      print_warning "Revisa bottle.yml manualmente: DLL_Overrides vacío aun."
+    fi
+  elif grep -q "mscoree: native" "$BOTTLE_YML" 2>/dev/null; then
+    print_success "Override mscoree=native ya presente en bottle.yml"
+  fi
+else
+  print_warning "No se encontró PokeOne en botella gaming — el fix aplicará cuando exista la ruta."
 fi
 
 # ═══════════════════════════════════════════════════════════

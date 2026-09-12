@@ -86,6 +86,7 @@ declare -a ROOT_FILES=(
   # "net.lutris.nwg-look-themes-54.desktop"
   # "net.lutris.obs-studio-67.desktop"
   "net.lutris.pokeone-77.desktop"
+  "net.lutris.pokemmo-78.desktop"
   "net.lutris.stardew-valley-132.desktop"
   # "net.lutris.sekiro-shadows-die-twice-76.desktop"
   # "bottles-dbz--Silent Hill 2--1761704592.309507.desktop"

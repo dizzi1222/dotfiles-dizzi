@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Name=PokeMMO
+Icon=pokemmo-installer
+# Icon=lutris_pokemmo
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/78
+# Exec=pokemmo-launcher
+Categories=Game
+TryExec=lutris
+Hidden=true

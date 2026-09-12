@@ -43,30 +43,45 @@ case "$CHOICE" in
   ;;
 "")
   cd /$HOME
-  if pgrep -x "niri" >/dev/null; then
+  case "$(wm_detect)" in
+  niri)
     niri msg action quit
-    # Niri: mata el proceso principal (equivale a "exit")
     pkill niri
     pkill -TERM niri
     sleep 2
     pkill -KILL niri # Por si no respondió al TERM
-  elif pgrep -x "Hyprland" >/dev/null; then
-    hyprctl dispatch exit
-  elif pgrep -x "plasmashell" >/dev/null; then
+    ;;
+  hyprland)
+    # hyprctl necesita HYPRLAND_INSTANCE_SIGNATURE; si rofi no lo exportó,
+    # lo derivamos del socket de la instancia en XDG_RUNTIME_DIR
+    sig="${HYPRLAND_INSTANCE_SIGNATURE:-}"
+    if [ -z "$sig" ]; then
+      hypr_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/hypr"
+      sig="$(ls "$hypr_dir" 2>/dev/null | head -1)"
+    fi
+    if [ -n "$sig" ]; then
+      HYPRLAND_INSTANCE_SIGNATURE="$sig" hyprctl dispatch exit
+      sleep 3
+    fi
+    if pgrep -x "Hyprland" >/dev/null; then
+      pkill -TERM -x Hyprland
+      sleep 2
+      pkill -KILL -x Hyprland # Por si no respondió al TERM
+    fi
+    ;;
+  plasma)
     qdbus org.kde.ksmserver /KSMServer logout 0 0 0
-  elif pgrep -x "gnome-shell" >/dev/null; then
+    ;;
+  gnome)
     gnome-session-quit --no-prompt
-  elif pgrep -x "cinnamon" >/dev/null; then
+    ;;
+  cinnamon)
     cinnamon-session-quit --logout --no-prompt
-  elif pgrep -x "mate-session" >/dev/null; then
-    mate-session-save --force-logout
-  elif pgrep -x "xfce4-session" >/dev/null; then
-    xfce4-session-logout --logout
-  elif pgrep -x "sway" >/dev/null; then
-    swaymsg exit
-  else
+    ;;
+  *)
     loginctl terminate-session "$XDG_SESSION_ID"
-  fi
+    ;;
+  esac
   ;;
 *)
   exit 1
