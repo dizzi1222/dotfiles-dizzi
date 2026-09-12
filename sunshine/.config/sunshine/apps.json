@@ -2,13 +2,13 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "/home/diego/dotfiles-dizzi/local/.local/bin/juegos/stardew.sh",
+            "cmd": "steam steam://rungameid/9813346792119468032",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/stardew-valley.png",
             "name": " Stardew Valley",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132",
             "wait-all": true
         },
         {
@@ -72,7 +72,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight/hollow_knight.exe\"",
+            "cmd": "steam steam://rungameid/16142108676189061120",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
@@ -83,7 +83,7 @@
         },
         {
             "auto-detach": true,
-            "cmd": "wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe\"",
+            "cmd": "steam steam://rungameid/11348340293796626432",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,

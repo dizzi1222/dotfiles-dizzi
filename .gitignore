@@ -304,3 +304,8 @@ local/.local/share/applications/mimeinfo.cache
 !**/.local/share/Steam/userdata/*/config/
 !**/.local/share/Steam/userdata/*/config/grid/
 !**/.local/share/Steam/userdata/*/config/grid/**
+
+# STEAM - Bloquear TODOS los .vdf del config EXCEPTO shortcuts.vdf
+# (localconfig/registry/compat son binarios volátiles que Steam reescribe)
+**/.local/share/Steam/userdata/*/config/*.vdf
+!**/.local/share/Steam/userdata/*/config/shortcuts.vdf
