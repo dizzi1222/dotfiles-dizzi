@@ -50,13 +50,13 @@
         },
         {
             "auto-detach": true,
-            "cmd": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/79",
+            "cmd": "steam steam://rungameid/12762026872309547008",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/igdb_38693.png",
             "name": "Geometry Dash",
-            "output": "",
+            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/79",
             "wait-all": true
         },
         {
@@ -105,24 +105,24 @@
         },
         {
             "auto-detach": true,
-            "cmd": "pokemmo-launcher",
+            "cmd": "steam steam://rungameid/14209540248173543424",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/igdb_127976.png",
             "name": "PokeMMO",
-            "output": "",
+            "output": "pokemmo-launcher",
             "wait-all": true
         },
         {
             "auto-detach": true,
-            "cmd": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
+            "cmd": "steam steam://rungameid/10182079247833628672",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/dotfiles-dizzi/local/.local/share/bottles/bottles/gaming/icons/PokeOne.png",
             "name": "PokeOne",
-            "output": "",
+            "output": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
             "wait-all": true
         },
         {
