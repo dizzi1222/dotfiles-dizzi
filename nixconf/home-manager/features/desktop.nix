@@ -105,6 +105,7 @@ in
     rquickshare
     filezilla
     transmission_4-gtk
+    megasync
     copyq
     gpick
 
