@@ -6,7 +6,7 @@
     enable = true;
     xwayland.enable = true;
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
-    package = pkgs.hyprland.override { wrapRuntimeDeps = false; };
+    package = pkgs.hyprland.override { wrapRuntimeDeps = true; };
   };
 
   # ── XDG Portal ──────────────────────────────────────────────
@@ -40,7 +40,7 @@
     # Waybar + widgets
     waybar
     eww
-    inputs.quickshell.packages.${pkgs.system}.default
+    quickshell
 
     # Launchers
     wofi

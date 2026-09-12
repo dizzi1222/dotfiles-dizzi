@@ -176,6 +176,8 @@ binds {
     // ═══════════════════════════════════════════════════════════════════════
 
     Mod+Comma hotkey-overlay-title="toggle monitor" { focus-monitor-next; }
+    Mod+Ctrl+Comma hotkey-overlay-title="move window to next monitor" { move-window-to-monitor-next; }
+    Ctrl+Shift+Comma hotkey-overlay-title="move workspace to next monitor" { move-workspace-to-monitor-next; }
     Mod+Shift+Comma hotkey-overlay-title="toggle monitor rotation" { spawn-sh "~/scripts/toggle-monitor-rotation"; }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -309,7 +311,7 @@ Mod+T {
     
     Mod+K { spawn-sh "pkill eww"; }
     Shift+Alt+W { spawn-sh "pkill waybar"; }
-    Ctrl+Shift+W { spawn-sh "/usr/bin/waybar &"; }
+    Ctrl+Shift+W { spawn-sh "waybar &"; }
 
     
     // ═══════════════════════════════════════════════════════════════════════

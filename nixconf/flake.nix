@@ -17,9 +17,6 @@
     swww = {
       url = "github:LGFae/swww";
     };
-  quickshell = {
-    url = "github:outfoxxed/quickshell";
-  };
     niri-flake = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,7 +30,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, stylix, zen-browser, swww, quickshell, spicetify-nix, vicinae, niri-flake, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, stylix, zen-browser, swww, spicetify-nix, vicinae, niri-flake, ... }@inputs:
   let
     system = "x86_64-linux";
 

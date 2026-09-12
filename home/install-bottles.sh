@@ -79,6 +79,43 @@ function apply_wine_dark_theme() {
 }
 
 # ═══════════════════════════════════════════════════════════
+# FUNCIÓN: FIX ICU.DLL STALE EN UN PREFIX
+# ═══════════════════════════════════════════════════════════
+# Uso: fix_stale_icu_dll <prefix> <etiqueta>
+# Corrige el crash "module not found for forward 'icuucNN...'" (Error: 127 /
+# c0000409) que aparece al migrar un prefix de wine-ge-* a sys-wine (Wine 11):
+# el prefix conserva un icu.dll VIEJO que forwardea a una libicu que ya no
+# existe en el runtime, y ese .dll shadowea al builtin del runner actual.
+function fix_stale_icu_dll() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  local fixed=false
+  for dir in system32 syswow64; do
+    local icu_dll="$prefix/drive_c/windows/$dir/icu.dll"
+    if [[ -f "$icu_dll" ]]; then
+      local bad="$(grep -aoE 'icuuc[0-9]+' "$icu_dll" 2>/dev/null | head -1)"
+      if [[ -n "$bad" ]] && [[ "$bad" != "icuuc" ]]; then
+        print_warning "$label: icu.dll ($dir) stale forwardeando a $bad → moviendo a .bak"
+        mv "$icu_dll" "$icu_dll.bak.$(date +%Y%m%d)"
+        fixed=true
+      else
+        print_info "$label: icu.dll ($dir) sin forward extraño (OK)"
+      fi
+    fi
+  done
+
+  if [[ "$fixed" == true ]]; then
+    print_success "$label: icu.dll stale resuelto (Wine 11 usa libicuuc del runtime, no necesita el .dll del prefix)"
+  else
+    print_info "$label: sin icu.dll stale (OK)"
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
 # DETECCIÓN DE DISTRO Y VARIABLES DE ENTORNO
 # ═══════════════════════════════════════════════════════════
 # Soporta Arch (nativo, yay/pacman) y NixOS (flatpak).
@@ -294,6 +331,56 @@ elif [[ "$current_bits" == "32" ]]; then
   fi
 else
   print_info "valor actual: ${current_bits} (no requiere cambio)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.7: FIX ICU.DLL STALE EN PREFIXES (NixOS/Wine 11)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: al lanzar un exe en una botella, Wine muere con:
+#   err:module:find_forwarded_export module not found for forward
+#     'icuuc68.u_charsToUChars_68' used by L"C:\windows\system32\icu.dll"
+#   Cannot get symbol u_charsToUChars from libicuuc → Error: 127 → c0000409
+#
+# Causa raiz (NixOS, sep 2026 — PokeOne p1setup.exe):
+#   - El prefix de la botella conserva un icu.dll VIEJO (de la era wine-ge
+#     runner) que forwardea a libicuuc.so.68 (icuuc68).
+#   - sys-wine-11.0 (Wine 11 del runtime / host) usa libicuuc.so.77 y NO trae
+#     icu.dll propio en /app — el runtime lo provee como ELF libicuuc.so.77.
+#   - El icu.dll stale del prefix gana prioridad en el loader → forward inválido.
+# Fix: respaldar y quitar el icu.dll stale de system32+syswow64 del prefix.
+# Además: el sandbox flatpak NO ve ~/Descargas por defecto → dar override.
+print_header "PASO 1.7: Fix ICU.dll stale en prefixes (NixOS/Wine 11)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: runtime libicu del sistema coincide con los runners, no aplica."
+else
+  # 1) Acceso flatpak a ~/Descargas (donde suelen vivir los instaladores)
+  if ! flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+    print_status "Dando acceso flatpak a ~/Descargas (instaladores)..."
+    flatpak override --user --filesystem="$HOME/Descargas" com.usebottles.bottles
+    if flatpak info --show-permissions com.usebottles.bottles 2>/dev/null | grep -q "Descargas"; then
+      print_success "Bottles ya puede ver ~/Descargas"
+    else
+      print_warning "Override aplicado pero flatpak info no lo refleja aún."
+    fi
+  else
+    print_success "Bottles ya tiene acceso a ~/Descargas"
+  fi
+
+  # 2) Escanear botellas existentes y limpiar icu.dll stale
+  if [[ -d "$BOTTLES_BASE/bottles" ]]; then
+    for prefix in "$BOTTLES_BASE"/bottles/*/; do
+      [[ -d "$prefix/drive_c/windows" ]] || continue
+      fix_stale_icu_dll "${prefix%/}" "Botella $(basename "$prefix")"
+    done
+  else
+    print_warning "No hay botellas aún en $BOTTLES_BASE/bottles (este paso corre la próxima vez)."
+  fi
+
+  # 3) Mismo fix para el prefix ~/.wine si existe (Wine directo)
+  if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
+    fix_stale_icu_dll "$HOME/.wine" "Wine (~/.wine)"
+  fi
 fi
 
 # ═══════════════════════════════════════════════════════════

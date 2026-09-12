@@ -4,7 +4,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Steam Big Picture Mode
-spawn-sh-at-startup "steam -bigpicture"
+// spawn-sh-at-startup "steam -bigpicture"
+spawn-sh-at-startup "steam"
 
 // Sanear la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
 spawn-at-startup "/home/diego/.local/bin/restart-portals"
