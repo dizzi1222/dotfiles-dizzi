@@ -131,7 +131,7 @@
 
     # Dev tools
     opencode
-    opencode-desktop
+    # opencode-desktop
 
     # Qt/GTK Wayland
     qt5.qtwayland

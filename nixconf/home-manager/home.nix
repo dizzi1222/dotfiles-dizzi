@@ -177,6 +177,17 @@
       ".local/share/bottles".source = link "local/.local/share/bottles";
       # Lutris (game manager)
       ".local/share/lutris".source = link "local/.local/share/lutris";
+      # Steam - Carátulas personalizadas (grid)
+      ".local/share/Steam/userdata/1187856367/config/grid".source =
+        link "local/.local/share/Steam/userdata/1187856367/config/grid";
+      # Steam - Shortcuts no-Steam (juegos wine/lutris), symlink directo
+      # force = true: Steam reescribe el archivo con rename, rompiendo el
+      # symlink. Con force, HM sobrescribe sin intentar backup (evita
+      # colisión con shortcuts.vdf.backup existente).
+      ".local/share/Steam/userdata/1187856367/config/shortcuts.vdf" = {
+        force = true;
+        source = link "local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf";
+      };
 
       # Omarchy (Arch/CachyOS scripts — available on NixOS as helper stubs)
       "omarchy-arch-bin".source = link "home/omarchy-arch-bin";
@@ -231,6 +242,17 @@
   # on every home-manager switch
   home.activation.initSubmodules = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     cd ~/dotfiles-dizzi && git submodule update --init --recursive 2>/dev/null || true
+  '';
+
+  # ── Steam shortcuts.vdf symlink fix ───────────────────────
+  # Steam reescribe el archivo con rename al guardar un shortcut,
+  # destruyendo el symlink a dotfiles. Este fix re-sincroniza y
+  # restaura el symlink tras el linkGeneration (los symlinks de
+  # home.file ya deben existir).
+  home.activation.steamShortcutFix = config.lib.dag.entryAfter [ "linkGeneration" ] ''
+    if [ ! -L "$HOME/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf" ]; then
+      "$HOME/.local/bin/steam-sync-shortcut" >/dev/null 2>&1 || true
+    fi
   '';
 
   # ── mcp-hub (neovim plugin dependency, not in nixpkgs) ───
