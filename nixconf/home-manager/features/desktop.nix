@@ -21,6 +21,37 @@ let
   zen-browser = pkgs.writeShellScriptBin "zen-browser" ''
     exec ${config.programs.zen-browser.finalPackage}/bin/zen-beta "$@"
   '';
+
+  # Discord nativo + bridge 0e4ef622 (Rich Presence): al abrir Discord se levanta
+  # el bridge IPC en ~/.wine para que CustomRP/juegos Wine conecten al socket nativo
+  # del host (/run/user/<uid>/discord-ipc-*). El bridge es la pestilla del método 2.
+  #
+  # ⚠️ CONFIG IDEAL (concluido): el wrapper de Discord es NECESARIO. Setup:
+  #   1) Discord nativo SIEMPRE corriendo MINIMIZADO (sostiene el socket IPC y el bridge)
+  #   2) Vesktop + Discord se lanzan juntos en el startup
+  # El bridge 0e4ef622 se ancla al socket IPC MÁS RECIENTE y NO se re-mapea solo si
+  # ese peer muere: si se cierra Discord, reiniciar el bridge. Para publicar via
+  # Vesktop: cerrar Discord nativo y relanzar el bridge con solo Vesktop arriba.
+  discord-bridge-wrapped = pkgs.writeShellScriptBin "discord" ''
+    # 1) arranca el Discord nativo (paquete real de nixpkgs)
+    ${pkgs.discord}/bin/discord "$@" &
+    DISCORD_PID=$!
+
+    # 2) espera el socket IPC nativo (máx ~15s)
+    RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+    for _ in $(seq 1 30); do
+      [ -S "$RUNTIME_DIR/discord-ipc-0" ] && break
+      sleep 0.5
+    done
+
+    # 3) levanta el bridge 0e4ef622 en ~/.wine (CustomRP → Discord nativo)
+    nohup "$HOME/.local/bin/juegos/wine-discord-ipc-bridge.sh" wine >/dev/null 2>&1 &
+
+    # 4) levanta el bridge 0e4ef622 en la botella "gaming" de Bottles
+    nohup "$HOME/.local/bin/juegos/wine-discord-ipc-bridge.sh" bottles >/dev/null 2>&1 &
+
+    wait "$DISCORD_PID"
+  '';
 in
 {
   # ── GUI Applications ───────────────────────────────────────
@@ -52,7 +83,7 @@ in
     # Communication
     signal-desktop
     telegram-desktop
-    discord
+    discord-bridge-wrapped
     vencord
     vesktop
     # wine-discord-ipc-bridge
