@@ -5,7 +5,7 @@
   home.packages = with pkgs; [
     # Editors
     code-cursor
-    antigravity
+    antigravity-ide
 
     # Languages
     # python3 env con debugpy (para nvim-dap: `python3 -m debugpy.adapter`).
