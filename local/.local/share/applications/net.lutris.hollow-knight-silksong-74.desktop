@@ -4,6 +4,6 @@
 Type=Application
 Name=Hollow Knight Silksong
 Icon=lutris_hollow-knight-silksong
-Exec=wine "/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe"
+Exec=env WINEPREFIX="/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming" wine "/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe"
 Categories=Game
-TryExec=lutris
+TryExec=wine

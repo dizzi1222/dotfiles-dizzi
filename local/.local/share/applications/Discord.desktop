@@ -4,7 +4,8 @@ Name=Discord
 # Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/130
 # Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/portapps/discord-portable/discord-portable.exe"
 # El wrapper `discord` (desktop.nix) levanta el bridge 0e4ef622 antes del socket nativo.
-Exec=discord --start-minimized
+Exec=sh -c 'pkill -x discord || true; exec discord --start-minimized'
+# Exec=discord --start-minimized
 Type=Application
 StartupNotify=true
 Hidden=false
@@ -12,4 +13,4 @@ Comment=Discord - https://discord.com
 # Path=/home/diego/.wine/drive_c/users/diego/AppData/Local/Discord/app-1.0.9034
 # Icon=7082_app.0
 Icon=/home/diego/.local/share/lutris/coverart/discord.png
-StartupWMClass=update.exe
+StartupWMClass=discord

@@ -140,7 +140,10 @@
       # Antigravity IDE (VSCode extension config)
       ".config/Antigravity IDE".source = link "Antigravity/.config/Antigravity IDE";
       # Antigravity CLI Settings
-      ".gemini/antigravity-cli/settings.json".source = link "Antigravity/.gemini/antigravity-cli/settings.json";
+      ".gemini/antigravity-cli/settings.json" = {
+        source = link "Antigravity/.gemini/antigravity-cli/settings.json";
+        force = true;
+      };
       # Antimicrox (gamepad mapper)
       ".config/antimicrox".source = link "antimicrox/.config/antimicrox";
       # Cursor/Editor (VS Code-based editor settings)
@@ -363,7 +366,7 @@
   # (writable) y repuntamos el wrapper. El shim
   # ~/.local/bin/antigravity (local/.local/bin/antigravity) escribe al runtime.
   home.activation.antigravityWritable = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-    ANTIGRAVITY_SOURCE="${pkgs.antigravity}"
+    ANTIGRAVITY_SOURCE="${pkgs.antigravity-ide}"
     RUNTIME="$HOME/.antigravity/runtime"
     MARKER="$RUNTIME/.store-path"
     if [ -d "$RUNTIME" ] && [ -f "$MARKER" ] && [ "$(cat "$MARKER" 2>/dev/null)" = "$ANTIGRAVITY_SOURCE" ]; then
