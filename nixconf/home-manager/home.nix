@@ -469,6 +469,16 @@
     fi
   '';
 
+  # ── PokeMMO (flatpak) ──────────────────────────────────────
+  # Reemplaza al wrapper nix (pokemmo-launcher / pokemmo-installer): instala
+  # el launcher oficial com.pokemmo.PokeMMO. Datos del juego en
+  # ~/.var/app/com.pokemmo.PokeMMO.
+  home.activation.pokemmo = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    if ! flatpak info com.pokemmo.PokeMMO &>/dev/null 2>&1; then
+      flatpak install -y --user flathub com.pokemmo.PokeMMO 2>/dev/null || true
+    fi
+  '';
+
   # ── Open WebUI ────────────────────────────────────────────
   home.packages = with pkgs; [
     # open-webui

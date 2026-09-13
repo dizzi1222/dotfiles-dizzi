@@ -3,7 +3,8 @@
 [Desktop Entry]
 Type=Application
 Name=PokeMMO
-Icon=pokemmo-installer
+# Icon=pokemmo-installer
+Icon=com.pokemmo.PokeMMO
 # Icon=lutris_pokemmo
 Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/78
 # Exec=pokemmo-launcher

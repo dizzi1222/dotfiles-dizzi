@@ -296,7 +296,7 @@ services.displayManager.sddm.settings.Theme.Current = "sddm-astronaut-theme";
 
 ### Flatpak Apps (automáticos)
 
-GeForce NOW, Podman Desktop, Bottles, MCPE Launcher, **JDownloader2** y **SGDBoop** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
+GeForce NOW, Podman Desktop, Bottles, MCPE Launcher, **JDownloader2**, **SGDBoop** y **PokeMMO** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
 
 Para verificar estado:
 
@@ -307,6 +307,7 @@ flatpak info com.usebottles.bottles 2>/dev/null && echo "✅ Bottles" || echo "�
 flatpak info io.mrarm.mcpelauncher 2>/dev/null && echo "✅ MCPE Launcher (Minecraft Bedrock)" || echo "❌ MCPE Launcher"
 flatpak info org.jdownloader.JDownloader 2>/dev/null && echo "✅ JDownloader2" || echo "❌ JDownloader2"
 flatpak info com.steamgriddb.SGDBoop 2>/dev/null && echo "✅ SGDBoop" || echo "❌ SGDBoop"
+flatpak info com.pokemmo.PokeMMO 2>/dev/null && echo "✅ PokeMMO" || echo "❌ PokeMMO"
 ```
 
 Si fallaron en el primer `home-manager switch` (los activation scripts tienen `|| true` y tragan errores), instalá manual:
@@ -331,6 +332,9 @@ flatpak install -y --user flathub org.jdownloader.JDownloader
 
 # SGDBoop (assets SteamGridDB → Steam)
 flatpak install -y --user flathub com.steamgriddb.SGDBoop
+
+# PokeMMO (launcher oficial; datos en ~/.var/app/com.pokemmo.PokeMMO)
+flatpak install -y --user flathub com.pokemmo.PokeMMO
 ```
 
 O corré de nuevo el rebuild (los scripts chequean `flatpak info` primero, no re-intentan si ya está):
