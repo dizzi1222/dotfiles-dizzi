@@ -1,5 +1,5 @@
 s=("Howdy my Sigma!" "Consider taking a bath?" "Arch is so GOATed UwU" "Neovim > VScode FrFr")
-scripttext=~/.config/hypr/scripts/text_animation/scripttext
+scripttext="/tmp/hypr_scripttext"
 ptx=0
 
 while [ $ptx -lt ${#s[@]} ]; do

@@ -23,6 +23,17 @@ let
     ];
 
     runScript = writeShellScript "pokemmo-run" ''
+      # Asegurar DISPLAY: bajo niri/Hypr el Xwayland puede estar caído y java
+      # muere con HeadlessException. Lo levantamos si no hay X activo.
+      if [ -z "''${DISPLAY:-}" ]; then
+        [ -S /tmp/.X11-unix/X0 ] || systemctl --user start xwayland-satellite.service 2>/dev/null || true
+        for _ in $(seq 1 20); do
+          [ -S /tmp/.X11-unix/X0 ] && break
+          sleep 0.5
+        done
+        export DISPLAY=:0
+      fi
+
       POKEMMO_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/pokemmo"
       mkdir -p "$POKEMMO_DIR"
       cd "$POKEMMO_DIR"

@@ -53,7 +53,9 @@
     modrinth-app-unwrapped
 
     # More Games
-    pokemmo-installer
+    (pkgs.callPackage ../pkgs/pokemmo-flatpak.nix { })
+    # (pkgs.callPackage ../pkgs/pokemmo-launcher.nix { })
+    # pokemmo-installer
 
     # Misc gaming
     protontricks

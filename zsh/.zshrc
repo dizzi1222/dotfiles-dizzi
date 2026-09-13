@@ -777,7 +777,7 @@ gitflow() {
       ;;
     13)
       echo "💾 Savepoint: aplastando al commit raíz..."
-      git reset --soft 56b2993
+      git reset --soft 7646a7bc
       git add -A
       git commit --amend --no-edit
       echo "✅ Savepoint creado: $(git rev-parse --short HEAD) ($(git rev-list --count HEAD) commits)"
