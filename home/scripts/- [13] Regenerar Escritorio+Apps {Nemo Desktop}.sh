@@ -122,6 +122,7 @@ declare -a ROOT_FILES=(
   "net.lutris.ghostty-81.desktop"
   # "net.lutris.mega-sync-70.desktop"
   "net.lutris.geforce-now-86.desktop"
+  "Geforce Now Web.desktop"
   "net.lutris.geforce-infinity-125.desktop"
   # "net.lutris.blasphemous-85.desktop"
   # "tModLoader.desktop"
@@ -180,6 +181,11 @@ done
 # Limpiar symlink de carpeta CustomRP_Icons si existe
 if [ -L "$ESCRITORIO/CustomRP_Icons" ]; then
   rm -v "$ESCRITORIO/CustomRP_Icons" && ((REMOVED_COUNT++))
+fi
+
+# Limpiar symlink de CustomRP_Icons en el Desktop de Wine (para CustomRP/Wine)
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  rm -v "$WINE_DESKTOP/CustomRP_Icons" && ((REMOVED_COUNT++))
 fi
 
 if [ $REMOVED_COUNT -gt 0 ]; then
@@ -276,6 +282,18 @@ else
   print_error "No se pudo crear symlink en Wine"
 fi
 
+# 3.3: Symlink en el Desktop de Wine (para que CustomRP/menús de Windows lo vean)
+print_step "Creando symlink en Desktop de Wine..."
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ] || [ -e "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  rm -rf "$WINE_DESKTOP/CustomRP_Icons"
+fi
+
+if ln -s "$GDRIVE_ICONS" "$WINE_DESKTOP/CustomRP_Icons" 2>/dev/null; then
+  print_success "Symlink creado: C:\\users\\diego\\Desktop\\CustomRP_Icons"
+else
+  print_error "No se pudo crear symlink en Desktop de Wine"
+fi
+
 # =================================================================================
 # PASO 4: COPIAR ARCHIVOS .crp AL DESKTOP DE WINE
 # =================================================================================
@@ -357,6 +375,10 @@ echo -e "  • Archivos .crp en Desktop: ${GREEN}$CRP_TOTAL${NC}"
 if [ -L "$WINE_CUSTOMRP" ]; then
   ICON_COUNT=$(find "$WINE_CUSTOMRP" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | wc -l)
   echo -e "  • Iconos en C:\\CustomRP_Icons: ${GREEN}$ICON_COUNT${NC}"
+fi
+
+if [ -L "$WINE_DESKTOP/CustomRP_Icons" ]; then
+  echo -e "  • Desktop de Wine CustomRP_Icons: ${GREEN}✓ Enlazado${NC}"
 fi
 
 echo ""

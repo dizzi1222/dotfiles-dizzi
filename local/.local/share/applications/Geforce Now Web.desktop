@@ -6,7 +6,8 @@ Exec=brave --app="https://play.geforcenow.com"
 # Exec=zen-browser --new-window --kiosk "https://play.geforcenow.com"
 Terminal=false
 Type=Application
-Icon=/home/diego/.local/share/lutris/coverart/geforce-now.png
+# Icon=/home/diego/.local/share/lutris/coverart/geforce-now.png
+Icon=/home/diego/.local/share/lutris/coverart/geforce-infinity.png
 Categories=Network;
 StartupNotify=true
 StartupWMClass=Geforce_Now

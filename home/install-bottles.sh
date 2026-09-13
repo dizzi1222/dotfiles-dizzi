@@ -559,6 +559,11 @@ else
   print_warning "No se encontró PokeOne en botella gaming — el fix aplicará cuando exista la ruta."
 fi
 
+# Mismo fix para el prefix ~/.wine (Wine directo: CustomRP y otras apps WPF/.NET 4.8)
+if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
+  install_ms_shims_dotnet48 "$HOME/.wine" "Wine (~/.wine)"
+fi
+
 # ═══════════════════════════════════════════════════════════
 # PASO 2: VERIFICAR DEPENDENCIAS
 # ═══════════════════════════════════════════════════════════

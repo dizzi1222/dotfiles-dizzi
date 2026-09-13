@@ -77,14 +77,14 @@ restart_nemo() {
   niri)
     niri msg action spawn-workspace "magic"
     nemo-desktop &
-    sleep 1 && niri msg action focus-workspace 1
+    # sleep 1 && niri msg action focus-workspace 1
     ;;
   *) nemo-desktop & ;;
   esac
 }
 
 # ── Selección con rofi ──────────────────────────────────────────────────────────────
-CHOICE=$(echo -e "󰍹 󰯎  Vertical\n󰍹 󰯍  Horizontal" | rofi -dmenu -p "Rotación del monitor" -selected-row 1 -timeout 10 -theme-str 'window {width: 300px;}' 2>/dev/null)
+CHOICE=$(echo -e "󰍹 󰯎  Vertical\n󰍹 󰯍  Horizontal" | rofi -dmenu -p "Rotación del monitor" -selected-row 1 -timeout-delay 3 -timeout-action "kb-accept-entry" -theme-str 'window {width: 300px;}' 2>/dev/null)
 
 # ── Main ─────────────────────────────────────────────────────────────────────────────
 COMPOSITOR=$(detect_compositor)

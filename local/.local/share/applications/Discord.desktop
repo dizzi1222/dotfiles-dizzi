@@ -2,7 +2,9 @@
 Name=Discord
 # Exec=env "WINEPREFIX=/home/diego/.wine" wine "C:\\\\users\\\\diego\\\\AppData\\\\Roaming\\\\Microsoft\\\\Windows\\\\Start Menu\\\\Programs\\\\Discord Inc\\\\Discord.lnk"
 # Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/130
-Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/portapps/discord-portable/discord-portable.exe"
+# Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/portapps/discord-portable/discord-portable.exe"
+# El wrapper `discord` (desktop.nix) levanta el bridge 0e4ef622 antes del socket nativo.
+Exec=discord --start-minimized
 Type=Application
 StartupNotify=true
 Hidden=false
