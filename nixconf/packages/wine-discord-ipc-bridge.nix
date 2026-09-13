@@ -29,6 +29,7 @@ stdenvNoCC.mkDerivation {
     mkdir -p $out/bin
     cp $src $out/bin/winediscordipcbridge.exe
     cp $steamSh $out/bin/winediscordipcbridge-steam.sh
+    chmod +x $out/bin/winediscordipcbridge.exe
     chmod +x $out/bin/winediscordipcbridge-steam.sh
     runHook postInstall
   '';

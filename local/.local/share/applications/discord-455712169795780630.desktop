@@ -4,4 +4,4 @@ Exec=/nix/store/3zmzaz8p1anzlcj2gvpmpznswznlvrkb-dolphin-emu-2606/bin/.dolphin-e
 Type=Application
 NoDisplay=true
 Categories=Discord;Games;
-MimeType=x-scheme-handler/discord-455712169795780630;
+MimeType=x-scheme-handler/discord-45571216979578063;

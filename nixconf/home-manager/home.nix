@@ -140,7 +140,10 @@
       # Antigravity IDE (VSCode extension config)
       ".config/Antigravity IDE".source = link "Antigravity/.config/Antigravity IDE";
       # Antigravity CLI Settings
-      ".gemini/antigravity-cli/settings.json".source = link "Antigravity/.gemini/antigravity-cli/settings.json";
+      ".gemini/antigravity-cli/settings.json" = {
+        source = link "Antigravity/.gemini/antigravity-cli/settings.json";
+        force = true;
+      };
       # Antimicrox (gamepad mapper)
       ".config/antimicrox".source = link "antimicrox/.config/antimicrox";
       # Cursor/Editor (VS Code-based editor settings)
@@ -363,7 +366,7 @@
   # (writable) y repuntamos el wrapper. El shim
   # ~/.local/bin/antigravity (local/.local/bin/antigravity) escribe al runtime.
   home.activation.antigravityWritable = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-    ANTIGRAVITY_SOURCE="${pkgs.antigravity}"
+    ANTIGRAVITY_SOURCE="${pkgs.antigravity-ide}"
     RUNTIME="$HOME/.antigravity/runtime"
     MARKER="$RUNTIME/.store-path"
   
@@ -478,6 +481,16 @@
   home.activation.sgdboop = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if ! flatpak info com.steamgriddb.SGDBoop &>/dev/null 2>&1; then
       flatpak install -y --user flathub com.steamgriddb.SGDBoop 2>/dev/null || true
+    fi
+  '';
+
+  # ── PokeMMO (flatpak) ──────────────────────────────────────
+  # Reemplaza al wrapper nix (pokemmo-launcher / pokemmo-installer): instala
+  # el launcher oficial com.pokemmo.PokeMMO. Datos del juego en
+  # ~/.var/app/com.pokemmo.PokeMMO.
+  home.activation.pokemmo = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    if ! flatpak info com.pokemmo.PokeMMO &>/dev/null 2>&1; then
+      flatpak install -y --user flathub com.pokemmo.PokeMMO 2>/dev/null || true
     fi
   '';
 

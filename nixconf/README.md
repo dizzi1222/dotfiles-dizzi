@@ -296,7 +296,7 @@ services.displayManager.sddm.settings.Theme.Current = "sddm-astronaut-theme";
 
 ### Flatpak Apps (automáticos)
 
-GeForce NOW, Podman Desktop, Bottles, MCPE Launcher, **JDownloader2** y **SGDBoop** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
+GeForce NOW, Podman Desktop, Bottles, MCPE Launcher, **JDownloader2**, **SGDBoop** y **PokeMMO** se instalan automáticamente en el primer `home-manager switch` via activation scripts en `home.nix`. No requiere comandos manuales.
 
 Para verificar estado:
 
@@ -307,6 +307,7 @@ flatpak info com.usebottles.bottles 2>/dev/null && echo "✅ Bottles" || echo "�
 flatpak info io.mrarm.mcpelauncher 2>/dev/null && echo "✅ MCPE Launcher (Minecraft Bedrock)" || echo "❌ MCPE Launcher"
 flatpak info org.jdownloader.JDownloader 2>/dev/null && echo "✅ JDownloader2" || echo "❌ JDownloader2"
 flatpak info com.steamgriddb.SGDBoop 2>/dev/null && echo "✅ SGDBoop" || echo "❌ SGDBoop"
+flatpak info com.pokemmo.PokeMMO 2>/dev/null && echo "✅ PokeMMO" || echo "❌ PokeMMO"
 ```
 
 Si fallaron en el primer `home-manager switch` (los activation scripts tienen `|| true` y tragan errores), instalá manual:
@@ -331,6 +332,9 @@ flatpak install -y --user flathub org.jdownloader.JDownloader
 
 # SGDBoop (assets SteamGridDB → Steam)
 flatpak install -y --user flathub com.steamgriddb.SGDBoop
+
+# PokeMMO (launcher oficial; datos en ~/.var/app/com.pokemmo.PokeMMO)
+flatpak install -y --user flathub com.pokemmo.PokeMMO
 ```
 
 O corré de nuevo el rebuild (los scripts chequean `flatpak info` primero, no re-intentan si ya está):
@@ -422,28 +426,45 @@ necesitan control del prefix (dotnet48 + Discord bridge instalado en el mismo pr
 > **wine-ge-proton de runner** (no cambiar el runner de una botella con mods instalados:
 > puede romper BepInEx/.NET por versiones distintas de prefix).
 
-#### Lanzar juegos por la botella (NUNCA `wine` del host)
+#### Lanzar juegos por la botella (NUNCA `wine` del host sin WINEPREFIX)
 
-HK/Silksong y demás juegos con mods deben abrir con el **runner de la botella** + el
-`WINEPREFIX` de `gaming`, no con `wine` del host (`~/.wine` no tiene los mods ni el
-bridge de Discord). Los `.desktop` de Lutris ya apuntan al runner + prefix correctos
-(`net.lutris.hollow-knight*.desktop`).
+HK/Silksong y demás juegos con mods deben abrirse apuntando al **`WINEPREFIX` de la
+botella `gaming`**, que contiene DXVK, los mods y el bridge de Discord.
+Los `.desktop` en `local/.local/share/applications/net.lutris.hollow-knight*.desktop`
+ya lo hacen correctamente.
 
-Para lanzar manualmente desde terminal:
+**Opción A — `wine` del host + `WINEPREFIX` (recomendado, más simple):**
+
+```bash
+env WINEPREFIX="/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming" \
+  wine "/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe"
+```
+
+`wine` del sistema encuentra automáticamente `d3d11.dll` y `dxgi.dll` (DXVK) dentro de
+`WINEPREFIX/drive_c/windows/system32/`. No hace falta el runner de la botella ni ajustar
+`LD_LIBRARY_PATH`. Este es el patrón usado en los `.desktop` actuales.
+
+**Opción B — runner interno de la botella (Wine-GE):**
 
 ```bash
 WINEPREFIX="$HOME/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming" \
   "$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/wine-ge-proton8-26/bin/wine64" \
-  "$WINEPREFIX/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe" -force-d3d11
+  "$WINEPREFIX/drive_c/Games/Hollow Knight Silksong/Hollow Knight Silksong.exe"
 ```
 
-> ⚠️ En NixOS los runners Wine son ELF del host y necesitan libs del store
+> ⚠️ En NixOS los runners Wine-GE son ELF del host y necesitan libs del store
 > (`libunwind.so.8`, `libfreetype.so.6`, `libXft.so.2`) que el loader no ve por
 > defecto. Si wine64 falla con `could not load ntdll.so: libunwind.so.8` o
 > `Wine cannot find the FreeType font library`, exporta su `LD_LIBRARY_PATH`.
 > `install-bottles.sh` ya lo resuelve automáticamente (PASO 2.1). El warning
 > `/lib/ld-linux.so.2: could not open` (helper i386) y `RLIMIT_NICE` son ruido
 > esperado en NixOS sin multilib — no bloquean (los juegos son x86-64).
+
+**Opción C — Bottles CLI (Flatpak, idéntico a abrir desde la UI):**
+
+```bash
+flatpak run --command=bottles-cli com.usebottles.bottles run -b gaming -p "Hollow Knight Silksong"
+```
 
 ### Rich Presence Proton (3 .desktop: wine-discord-ipc-bridge*.desktop)
 
