@@ -7,6 +7,9 @@
 // spawn-sh-at-startup "steam -bigpicture"
 spawn-sh-at-startup "steam"
 
+// Discord nativo minimizado al tray (mantiene el socket IPC para CustomRP y Rich Presence)
+spawn-sh-at-startup "discord --start-minimized"
+
 // Sanear la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
 spawn-at-startup "/home/diego/.local/bin/restart-portals"
 

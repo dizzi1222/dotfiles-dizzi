@@ -3,7 +3,7 @@
 [Desktop Entry]
 Icon=/home/diego/.local/share/lutris/coverart/geforce-now.png
 Type=Application
-Name=Geforce Now[G?] 
+Name=Geforce Nvidia Now[G] 
 Comment=Se abre con Geforce Now ~ Mediante Gamescope
 # Hidden=true
 # Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/86
