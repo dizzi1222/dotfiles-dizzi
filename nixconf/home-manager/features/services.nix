@@ -78,6 +78,31 @@ in
     target = "mi_gdlibros";
   };
 
+  # ── Steam shortcuts.vdf sync (Steam → repo) ─────────────
+  # Steam es dueño del vivo (~/.local/share/Steam/.../shortcuts.vdf) y
+  # lo reescribe con rename (rompe symlinks). Este timer copia la última
+  # versión de Steam al repo versionado cada 10 min. El script se
+  # desplega en ~/.local/bin (home.nix → local/.local/bin) y también
+  # corre en cada home-manager switch (activation steamShortcutFix).
+  systemd.user.services."steam-sync-shortcut" = {
+    Unit.Description = "Sync Steam shortcuts.vdf (Steam → dotfiles repo)";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "%h/.local/bin/steam-sync-shortcut";
+    };
+  };
+
+  systemd.user.timers."steam-sync-shortcut" = {
+    Unit.Description = "Periodic Steam shortcuts.vdf sync (each 10 min)";
+    Timer = {
+      OnBootSec = "1min";
+      OnUnitActiveSec = "10min";
+      Persistent = true;
+      Unit = "steam-sync-shortcut.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+
   # ── Services packages ──────────────────────────────────────
   home.packages = with pkgs; [
     # Clipboard

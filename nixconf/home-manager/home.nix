@@ -144,6 +144,12 @@
         source = link "Antigravity/.gemini/antigravity-cli/settings.json";
         force = true;
       };
+      # Antigravity CLI Keybindings (el CLI reescribe el archivo con rename,
+      # destruyendo el symlink; force = true lo re-aplica sin backup)
+      ".gemini/antigravity-cli/keybindings.json" = {
+        source = link "Antigravity/.gemini/antigravity-cli/keybindings.json";
+        force = true;
+      };
       # Antimicrox (gamepad mapper)
       ".config/antimicrox".source = link "antimicrox/.config/antimicrox";
       # Cursor/Editor (VS Code-based editor settings)
@@ -186,14 +192,13 @@
       # Steam - Carátulas personalizadas (grid)
       ".local/share/Steam/userdata/1187856367/config/grid".source =
         link "local/.local/share/Steam/userdata/1187856367/config/grid";
-      # Steam - Shortcuts no-Steam (juegos wine/lutris), symlink directo
-      # force = true: Steam reescribe el archivo con rename, rompiendo el
-      # symlink. Con force, HM sobrescribe sin intentar backup (evita
-      # colisión con shortcuts.vdf.backup existente).
-      ".local/share/Steam/userdata/1187856367/config/shortcuts.vdf" = {
-        force = true;
-        source = link "local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf";
-      };
+      # Steam - Shortcuts no-Steam (juegos wine/lutris)
+      # NO declarativo aquí: Steam reescribe el archivo con rename y rompería
+      # el symlink. Steam es dueño del vivo; steam-sync-shortcut (timer en
+      # features/services.nix) copia la última versión al repo. El repo es
+      # semilla inicial y espejo versionado.
+      ".local/share/Steam/userdata/1187856367/config/shortcuts.vdf".source =
+        link "local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf";
 
       # Omarchy (Arch/CachyOS scripts — available on NixOS as helper stubs)
       "omarchy-arch-bin".source = link "home/omarchy-arch-bin";
@@ -250,15 +255,13 @@
     cd ~/dotfiles-dizzi && git submodule update --init --recursive 2>/dev/null || true
   '';
 
-  # ── Steam shortcuts.vdf symlink fix ───────────────────────
-  # Steam reescribe el archivo con rename al guardar un shortcut,
-  # destruyendo el symlink a dotfiles. Este fix re-sincroniza y
-  # restaura el symlink tras el linkGeneration (los symlinks de
-  # home.file ya deben existir).
+  # ── Steam shortcuts.vdf sync ─────────────────────────────
+  # Steam es la fuente de verdad: reescribe el archivo real con
+  # rename (rompe cualquier symlink). El repo es el espejo versionado.
+  # Este fix corre en cada switch + un systemd user timer (services.nix)
+  # copia la última versión de Steam al repo automáticamente.
   home.activation.steamShortcutFix = config.lib.dag.entryAfter [ "linkGeneration" ] ''
-    if [ ! -L "$HOME/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf" ]; then
-      "$HOME/.local/bin/steam-sync-shortcut" >/dev/null 2>&1 || true
-    fi
+    "$HOME/.local/bin/steam-sync-shortcut" >/dev/null 2>&1 || true
   '';
 
   # ── mcp-hub (neovim plugin dependency, not in nixpkgs) ───
