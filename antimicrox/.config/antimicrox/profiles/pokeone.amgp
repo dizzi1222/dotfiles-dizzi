@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamecontroller configversion="19" appversion="3.5.1">
     <!--The SDL name for a joystick is included for informational purposes only.-->
-    <sdlname>Microsoft Xbox One</sdlname>
+    <sdlname>8BitDo Ultimate 2C</sdlname>
     <!--The Unique ID for a joystick is included for informational purposes only.-->
-    <uniqueID>03008d205e040000ea020000080400001118746</uniqueID>
+    <uniqueID>0500a769c82d00001b300000010000001172012315</uniqueID>
     <stickAxisAssociation index="1" xAxis="1" yAxis="2"/>
     <stickAxisAssociation index="2" xAxis="3" yAxis="4"/>
     <vdpadButtonAssociations index="1">
@@ -19,14 +19,6 @@
     <sets>
         <set index="1">
             <stick index="2">
-                <stickbutton index="1">
-                    <slots>
-                        <slot>
-                            <code>1</code>
-                            <mode>mousemovement</mode>
-                        </slot>
-                    </slots>
-                </stickbutton>
                 <stickbutton index="7">
                     <slots>
                         <slot>
@@ -51,24 +43,16 @@
                         </slot>
                     </slots>
                 </stickbutton>
+                <stickbutton index="1">
+                    <slots>
+                        <slot>
+                            <code>1</code>
+                            <mode>mousemovement</mode>
+                        </slot>
+                    </slots>
+                </stickbutton>
             </stick>
             <dpad index="1">
-                <dpadbutton index="1">
-                    <slots>
-                        <slot>
-                            <code>4</code>
-                            <mode>mousebutton</mode>
-                        </slot>
-                    </slots>
-                </dpadbutton>
-                <dpadbutton index="8">
-                    <slots>
-                        <slot>
-                            <code>6</code>
-                            <mode>mousebutton</mode>
-                        </slot>
-                    </slots>
-                </dpadbutton>
                 <dpadbutton index="4">
                     <slots>
                         <slot>
@@ -81,6 +65,22 @@
                     <slots>
                         <slot>
                             <code>7</code>
+                            <mode>mousebutton</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+                <dpadbutton index="1">
+                    <slots>
+                        <slot>
+                            <code>4</code>
+                            <mode>mousebutton</mode>
+                        </slot>
+                    </slots>
+                </dpadbutton>
+                <dpadbutton index="8">
+                    <slots>
+                        <slot>
+                            <code>6</code>
                             <mode>mousebutton</mode>
                         </slot>
                     </slots>
@@ -115,6 +115,14 @@
                     <slot>
                         <code>2</code>
                         <mode>mousebutton</mode>
+                    </slot>
+                </slots>
+            </button>
+            <button index="7">
+                <slots>
+                    <slot>
+                        <code>0x1000000</code>
+                        <mode>keyboard</mode>
                     </slot>
                 </slots>
             </button>
