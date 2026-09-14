@@ -120,7 +120,7 @@
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
-            "image-path": "/home/diego/dotfiles-dizzi/local/.local/share/bottles/bottles/gaming/icons/PokeOne.png",
+            "image-path": "/home/diego/.config/sunshine/covers/igdb_127982.png",
             "name": "PokeOne",
             "output": "env WINEDEBUG=-all LUTRIS_SKIP_INIT=1 wine \"/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/PokeOne/Launcher.exe\"",
             "wait-all": true

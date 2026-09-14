@@ -3,11 +3,6 @@
 // STARTUP PROGRAMS (MIGRADO DESDE exec-autostart.conf)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Steam minimizado en Big Picture Mode
-spawn-sh-at-startup "pkill -x steam || true; exec steam -silent -bigpicture"
-
-// Discord nativo minimizado al tray (mantiene el socket IPC para CustomRP y Rich Presence)
-spawn-sh-at-startup "pkill -x discord || true; exec discord --start-minimized"
 
 // Sanear la cadena xdg-desktop-portal tras un swap de compositor (niri <-> Hyprland)
 spawn-at-startup "/home/diego/.local/bin/restart-portals"
@@ -95,3 +90,12 @@ spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLA
 // Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
 // Detecta el compositor activo y aplica la rotación correcta con estado persistente.
 spawn-sh-at-startup "sleep 3; sh /home/diego/scripts/toggle-monitor-rotation"
+
+// Steam minimizado en Big Picture Mode (espera 4s a que el System Tray y la red estén listos)
+spawn-sh-at-startup "sleep 4; pkill -x steam || true; sleep 1; exec steam -silent -bigpicture"
+
+// Discord nativo minimizado al tray (espera 5s para sincronizar tray y socket IPC)
+spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --start-minimized"
+
+// Antimicrox Gamepad Keyboard Mapping Tool
+spawn-at-startup "antimicrox"

@@ -1,29 +1,40 @@
 #!/usr/bin/env bash
 # //Steam Sync Shortcut
-# Re-aplica el symlink de shortcuts.vdf roto por Steam.
-# Uso: steam-sync-shortcut [--auto] [vdf-path] [repo-dir]
+# Sincroniza SIEMPRE la última versión de Steam de shortcuts.vdf al repo.
+# Dirección: Steam es la fuente de verdad → dotfiles es el espejo versionado.
+# NO recrea symlinks: Steam reescribe el archivo con rename y deja un archivo
+# real; este script lo copia al repo cuando cambia (vivo, o .backup si no hay
+# vivo). Si el vivo no existe, lo siembra desde el repo la primera vez.
+# Corrido por un systemd user timer (features/services.nix).
 
 set -euo pipefail
 
 CFG="$HOME/.local/share/Steam/userdata/1187856367/config"
-REPO_CFG="$HOME/dotfiles-dizzi/local/.local/share/Steam/userdata/1187856367/config"
-VDF="${1:-$CFG/shortcuts.vdf}"
-REPO_VDF="${REPO_CFG}/$(basename "$VDF")"
-AUTO=0
-[[ "${1:-}" == "--auto" ]] && { AUTO=1; VDF="$CFG/shortcuts.vdf"; }
+LIVE="$CFG/shortcuts.vdf"
+BACKUP="$CFG/shortcuts.vdf.backup"
+REPO="$HOME/dotfiles-dizzi/local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf"
 
-if [ -L "$VDF" ]; then
-  [ -f "$REPO_VDF" ] && echo "OK: shortcuts.vdf ya es symlink al repo"
-  exit 0
+# 1) Sembrar el vivo desde el repo si falta (primer arranque / HM lo deslinkeó)
+if [ ! -e "$LIVE" ] && [ -f "$REPO" ]; then
+  mkdir -p "$CFG"
+  cp "$REPO" "$LIVE"
+  echo "Seeded shortcuts.vdf from repo -> $LIVE"
 fi
 
-echo "Steam rompió el symlink de shortcuts.vdf — sincronizando..."
-
-if [ -f "$VDF" ]; then
-  cp "$VDF" "$REPO_VDF"
-  rm "$VDF"
+# 2) Fuente de la última versión: el vivo real de Steam; si no hay, .backup.
+SRC=""
+if [ -f "$LIVE" ] && [ ! -L "$LIVE" ]; then
+  SRC="$LIVE"
+elif [ -f "$BACKUP" ]; then
+  SRC="$BACKUP"
 fi
-ln -s "$REPO_VDF" "$VDF"
 
-echo "OK: repo actualizado y symlink restaurado -> $REPO_VDF"
-[ "$AUTO" -eq 1 ] || echo "Pendiente: git -C ~/dotfiles-dizzi add + commit de shortcuts.vdf"
+[ -z "$SRC" ] && { echo "No hay shortcuts.vdf de Steam (ni vivo ni backup). Nada que sincronizar."; exit 0; }
+
+# 3) Copiar al repo solo si cambió (nunca tocar el archivo de Steam)
+if ! cmp -s "$SRC" "$REPO"; then
+  cp "$SRC" "$REPO"
+  echo "OK: shortcuts.vdf sincronizado de Steam -> repo ($(basename "$SRC"))"
+else
+  echo "OK: shortcuts.vdf al día (repo == $SRC)"
+fi
