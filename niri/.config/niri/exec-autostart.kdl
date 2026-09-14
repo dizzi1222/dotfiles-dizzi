@@ -99,3 +99,5 @@ spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --
 
 // Antimicrox Gamepad Keyboard Mapping Tool
 spawn-at-startup "antimicrox"
+// Sunshine
+spawn-at-startup "sunshine"
