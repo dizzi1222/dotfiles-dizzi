@@ -107,20 +107,22 @@ case "$ICON" in
         echo '📦 Instalando bindfs...'
         yay -S bindfs --noconfirm
       else
-        echo '📦 bindfs no disponible en NixOS. Montando sin bindfs...'
+        echo '❌ bindfs no disponible en NixOS. Instálalo con: nix shell nixpkgs#bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       fi
     fi
 
-    echo '🔧 Preparando montaje...'
-    sudo mkdir -p /mnt/waydroid
+    echo '🔧 Preparando montajes...'
+    sudo mkdir -p /mnt/waydroid /mnt/waydroid-viewonce
+    sudo mkdir -p \$HOME/.local/share/waydroid/data/data/com.whatsapp/files/ViewOnce
     sudo umount /mnt/waydroid 2>/dev/null
+    sudo umount /mnt/waydroid-viewonce 2>/dev/null
 
-    echo '🔗 Montando almacenamiento de Waydroid...'
-    if command -v bindfs &>/dev/null; then
-      sudo bindfs --mirror=\$(id -u) \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
-    else
-      sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
-    fi
+    echo '🔗 Montando almacenamiento de Waydroid (mapeo de UIDs a usuario)...'
+    # Mapea TODOS los UIDs/GIDs de Android (1023, 10141, 10154...) al usuario actual
+    sudo bindfs --map=@/\$(id -u)/\$(id -g) \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
+    sudo bindfs --map=@/\$(id -u)/\$(id -g) \$HOME/.local/share/waydroid/data/data/com.whatsapp/files/ViewOnce /mnt/waydroid-viewonce
 
     mkdir -p \$HOME/Descargas/Waydroid_Fotos
 
@@ -130,16 +132,18 @@ case "$ICON" in
     rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' /mnt/waydroid/Pictures/ \$HOME/Descargas/Waydroid_Fotos/Pictures/ 2>/dev/null
     rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' /mnt/waydroid/Download/ \$HOME/Descargas/Waydroid_Fotos/Download/ 2>/dev/null
     rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/WhatsApp/Media/WhatsApp Images/' \$HOME/Descargas/Waydroid_Fotos/WhatsApp/ 2>/dev/null
-    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/' \$HOME/Descargas/Waydroid_Fotos/Statuses/ 2>/dev/null
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --include='*.mp4' --include='*.mkv' --exclude='*' '/mnt/waydroid/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/' \$HOME/Descargas/Waydroid_Fotos/Statuses/ 2>/dev/null
     rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.bmp' --exclude='*' '/mnt/waydroid/Pictures/Screenshots/' \$HOME/Descargas/Waydroid_Fotos/Screenshots/ 2>/dev/null
+
+    echo '👁️  Sincronizando ViewOnce (vía bindfs, sin sudo)...'
+    rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.mp4' --include='*.mkv' --exclude='*' /mnt/waydroid-viewonce/ \$HOME/Descargas/Waydroid_Fotos/ViewOnce/ 2>/dev/null
 
     echo '🧹 Limpiando bindfs...'
     sudo umount /mnt/waydroid
+    sudo umount /mnt/waydroid-viewonce
 
-    echo '📂 Sincronizando ViewOnce (datos privados, requiere sudo)...'
-    sudo mkdir -p \$HOME/Descargas/Waydroid_Fotos/ViewOnce
-    sudo rsync -av --include='*/' --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --exclude='*' \$HOME/.local/share/waydroid/data/data/com.whatsapp/files/ViewOnce/ \$HOME/Descargas/Waydroid_Fotos/ViewOnce/ 2>/dev/null
-    sudo chown -R \$USER:\$USER \$HOME/Descargas/Waydroid_Fotos/ViewOnce/ 2>/dev/null
+    echo '🔑 Asegurando permisos (sin candados en file explorer)...'
+    chmod -R u+rwX \$HOME/Descargas/Waydroid_Fotos/ 2>/dev/null
 
     echo ''
     echo '✅ Imágenes sincronizadas en ~/Descargas/Waydroid_Fotos/'
