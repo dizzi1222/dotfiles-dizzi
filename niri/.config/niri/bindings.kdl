@@ -313,7 +313,7 @@ Mod+T {
     
     Mod+K { spawn-sh "pkill eww"; }
     Shift+Alt+W { spawn-sh "pkill waybar"; }
-    Ctrl+Shift+W { spawn-sh "waybar &"; }
+    Ctrl+Shift+W { spawn-sh "waybar -c ~/.config/waybar/config-niri.json &"; }
 
     
     // ═══════════════════════════════════════════════════════════════════════
