@@ -34,7 +34,6 @@ window-rule {
     open-floating true
     default-column-width { fixed 600; }
     default-window-height { fixed 338; }
-    opacity 1.0
 }
 
 // Nemo desktop — SOLO la ventana flotante (title="^nemo-desktop$"),
