@@ -98,6 +98,6 @@ spawn-sh-at-startup "sleep 4; pkill -x steam || true; sleep 1; exec steam -silen
 spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --start-minimized"
 
 // Antimicrox Gamepad Keyboard Mapping Tool
-spawn-at-startup "antimicrox"
+spawn-at-startup "antimicrox --show %f"
 // Sunshine
 spawn-at-startup "sunshine"
