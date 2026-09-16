@@ -330,4 +330,5 @@
   // "window.autoDetectColorScheme": false
   // "terminal.integrated.gpuAcceleration": "off" // ~ esto relantiza, recordatorio: elminalo cunado actives vribancy
   // -------------------- VIBRANCY SETTINGS -----------------
+  "jetski.cloudCodeUrl": "http://127.0.0.1:18999"
 }

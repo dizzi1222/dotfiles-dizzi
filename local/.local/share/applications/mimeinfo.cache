@@ -1,0 +1,8 @@
+[MIME Cache]
+application/x-cd-image=iso-mount.desktop;
+application/x-iso9660-image=iso-mount.desktop;
+application/x-raw-disk-image=iso-mount.desktop;
+text/plain=[APPS]+scripts-notepad.desktop;
+x-scheme-handler/discord-45571216979578063=discord-455712169795780630.desktop;
+x-scheme-handler/steam=wine-protocol-steam.desktop;
+x-scheme-handler/steamlink=wine-protocol-steamlink.desktop;
