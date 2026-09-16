@@ -1,4 +1,4 @@
 game:
   args: ''
-  exe: /usr/bin/lutris
-  working_dir: /usr/bin/
+  exe: lutris
+  working_dir: ''

@@ -1,0 +1,26 @@
+#!/bin/sh
+# docker: lanza Docker Desktop / Podman Desktop desde cualquier fuente instalada.
+#   - flatpak Docker Desktop: com.docker.Desktop
+#   - flatpak Podman Desktop: io.podman_desktop.PodmanDesktop
+#   - nativos posibles: docker-desktop / podman-desktop
+# Prioriza la fuente instalada (cualquiera) y cae a la otra si falta.
+set -euo pipefail
+
+for cmd in \
+  "com.docker.Desktop" \
+  "io.podman_desktop.PodmanDesktop" \
+  "docker-desktop" \
+  "podman-desktop"; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    exec "$cmd" "$@"
+  fi
+done
+
+if flatpak info com.docker.Desktop >/dev/null 2>&1; then
+  exec flatpak run com.docker.Desktop "$@"
+elif flatpak info io.podman_desktop.PodmanDesktop >/dev/null 2>&1; then
+  exec flatpak run io.podman_desktop.PodmanDesktop "$@"
+fi
+
+echo "docker: Docker Desktop / Podman Desktop no encontrado" >&2
+exit 1

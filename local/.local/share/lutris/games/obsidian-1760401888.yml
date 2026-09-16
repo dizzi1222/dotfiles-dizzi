@@ -1,3 +1,3 @@
 game:
-  exe: /usr/bin/obsidian
-  working_dir: /usr/bin/
+  exe: obsidian
+  working_dir: ''

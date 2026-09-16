@@ -4,3 +4,6 @@ game:
 system:
   env:
     WINEDEBUG: -all
+wine:
+  custom_wine_path: /home/diego/.nix-profile/bin/wine
+  version: custom
