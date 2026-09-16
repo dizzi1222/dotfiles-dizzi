@@ -1,4 +1,4 @@
 game:
   args: ''
-  exe: /usr/bin/nvim
-  working_dir: /usr/bin/
+  exe: nvim
+  working_dir: ''

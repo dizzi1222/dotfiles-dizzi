@@ -1,3 +1,4 @@
 game:
-  exe: discord --start-minimized
-  working_dir: /usr/bin/
+  args: --start-minimized
+  exe: discord
+  working_dir: ''

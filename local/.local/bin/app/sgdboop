@@ -1,0 +1,19 @@
+#!/bin/sh
+# sgdboop: lanza SteamGridDB Boop desde cualquier fuente instalada.
+#   - flatpak (export bin en PATH): com.steamgriddb.SGDBoop
+#   - nativo posible: SGDBoop / sgdboop
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v com.steamgriddb.SGDBoop >/dev/null 2>&1; then
+  exec com.steamgriddb.SGDBoop "$@"
+elif command -v SGDBoop >/dev/null 2>&1; then
+  exec SGDBoop "$@"
+elif command -v sgdboop >/dev/null 2>&1; then
+  exec sgdboop "$@"
+elif flatpak info com.steamgriddb.SGDBoop >/dev/null 2>&1; then
+  exec flatpak run com.steamgriddb.SGDBoop "$@"
+fi
+
+echo "sgdboop: SteamGridDB Boop no encontrado (ni flatpak ni nativo)" >&2
+exit 1

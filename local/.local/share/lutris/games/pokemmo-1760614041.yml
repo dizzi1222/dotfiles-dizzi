@@ -1,6 +1,6 @@
 game:
   args: ''
-  exe: pokemmo-launcher
+  exe: /home/diego/.local/bin/app/pokemmo
   working_dir: ''
 system:
   env:

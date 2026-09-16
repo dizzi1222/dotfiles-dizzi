@@ -1,3 +1,3 @@
 game:
-  exe: /usr/bin/JDownloader
-  working_dir: /usr/bin/
+  exe: /home/diego/.local/bin/app/jdownloader
+  working_dir: ''
