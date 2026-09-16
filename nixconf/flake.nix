@@ -55,6 +55,19 @@
         # Uso en Steam → Launch Options por juego:
         #   winediscordipcbridge-steam.sh %command%
         wine-discord-ipc-bridge = prev.callPackage ./packages/wine-discord-ipc-bridge.nix { };
+        # Soundbound (AppImage x64, sucesor de SpotiFlyer) — descargador de
+        # música. spotiflyer.nix se mantiene disponible pero DESACTIVADO en
+        # media.nix (proyecto discontinuado 2023; no funciona con Spotify).
+        soundbound = prev.callPackage ./packages/soundbound.nix { };
+        spotiflyer = prev.callPackage ./packages/spotiflyer.nix { };
+        # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
+        # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
+        # El patch pasa `request` como primer argumento (nueva firma).
+        spotdl = prev.spotdl.overrideAttrs (old: {
+          patches = (old.patches or []) ++ [
+            ./patches/spotdl-web-templateresponse.patch
+          ];
+        });
       })
     ];
 
