@@ -3,8 +3,10 @@
 {
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
+    # cursor-cli
     # Editors
-    code-cursor # neocursor.nvim requiere la APP
+    # code-cursor # neocursor.nvim requiere la APP
+    cursor-cli
     # antigravity-ide
 
     # Languages
@@ -67,6 +69,7 @@
     uv
     postman
     llama-cpp
+    appimage-run
 
     # AI tools & Agents
     ollama
@@ -84,7 +87,6 @@
     pi-coding-agent
     ctx7
     openspec
-    cursor-cli
     python3Packages.huggingface-hub # huggingface-cli
 
     # Agentes no empaquetados en nixpkgs oficial (se pueden ejecutar via npx/npm/pip):
