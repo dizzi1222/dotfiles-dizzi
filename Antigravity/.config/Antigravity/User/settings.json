@@ -24,8 +24,8 @@
       "timeoutlen": "300", // Buen balance
       "ttimeoutlen": "0", // Instantáneo para teclas especiales
       "updatetime": "100", // Más rápido para autocompletado
-      "clipboard": "unnamedplus", // Compartir portapapeles
-    },
+      "clipboard": "unnamedplus" // Compartir portapapeles
+    }
   },
 
   // Otras opciones útiles para Neovim:
@@ -48,8 +48,8 @@
     "titleBarStyle": "hiddenInset",
     "trafficLightPosition": {
       "x": 20,
-      "y": 16,
-    },
+      "y": 16
+    }
   },
   "custom-ui-style.stylesheet": {
     ".notification-toast": "box-shadow: none !important",
@@ -79,7 +79,7 @@
     ".monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container": "justify-content: center !important;",
     ".title .monaco-icon-label.file-icon": "margin: 0 auto !important;",
     // ".title .monaco-icon-label.file-icon": "margin: 0 60px",// en conflicto con arriba
-    ".monaco-editor .cursors-layer .cursor": "background-image: linear-gradient(135deg, #ffaffc 10%, #DA70D6 100%)",
+    ".monaco-editor .cursors-layer .cursor": "background-image: linear-gradient(135deg, #ffaffc 10%, #DA70D6 100%)"
   },
   // "custom-ui-style.font.sansSerif": "Dank Mono",
   "custom-ui-style.font.sansSerif": "Fira Code, monospace",
@@ -103,8 +103,8 @@
     // "editorOverviewRuler.border": "#0000",
     "[Aura Dracula Spirit (Soft)]": {
       "editorSuggestWidget.selectedBackground": "#3A334B",
-      "sideBar.background": "#191521",
-    },
+      "sideBar.background": "#191521"
+    }
   },
   "editor.fontSize": 14,
   "editor.lineHeight": 2.5,
@@ -113,10 +113,10 @@
       {
         "scope": "comment",
         "settings": {
-          "fontStyle": "italic",
-        },
-      },
-    ],
+          "fontStyle": "italic"
+        }
+      }
+    ]
   },
   "editor.stickyScroll.enabled": false,
   // esto activa los colores en linea en CSS, HTML, JS, etc
@@ -153,7 +153,7 @@
   "editor.hideCursorInOverviewRuler": false,
   "editor.overviewRuler.enable": true,
   "editor.quickSuggestions": {
-    "other": "on",
+    "other": "on"
   },
   "editor.suggestOnTriggerCharacters": true,
   "editor.tabCompletion": "on",
@@ -174,14 +174,14 @@
   "vs-kubernetes": {
     "vscode-kubernetes.kubectl-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
     "vscode-kubernetes.minikube-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe",
-    "vscode-kubernetes.helm-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe",
+    "vscode-kubernetes.helm-path-windows": "C:\\Users\\Diego.DESKTOP-0CQHRL5\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe"
   },
   "workbench.editor.empty.hint": "hidden",
   "git.autofetch": true,
   "yaml.schemas": {
     "c:\\Users\\Diego.DESKTOP-0CQHRL5\\.vscode\\extensions\\continue.continue-1.0.20-win32-x64\\config-yaml-schema.json": [
-      ".continue/**/*.yaml",
-    ],
+      ".continue/**/*.yaml"
+    ]
   },
   "doki.statusbar.name": "2B^ Kaine",
   "files.autoSave": "onFocusChange",
@@ -205,7 +205,7 @@
     "rgba(255,127,255,0.3)",
     "rgba(68, 230, 122, 0.3)",
     "rgba(221, 200, 131, 0.5)",
-    "rgba(255, 255, 255, 0.3)",
+    "rgba(255, 255, 255, 0.3)"
   ],
   "indentRainbow.indicatorStyle": "light",
   "indentRainbow.lightIndicatorStyleLineWidth": 1,
@@ -216,7 +216,7 @@
   "editor.guides.bracketPairs": "active",
   "security.allowedUNCHosts": ["wsl.localhost"],
   "extensions.experimental.affinity": {
-    "asvetliakov.vscode-neovim": 1,
+    "asvetliakov.vscode-neovim": 1
   },
   "vscode-neovim.neovimExecutablePaths.windows": "C:\\Program Files\\Neovim\\bin\\nvim.exe",
   // Si usas WSL o Linux en un futuro:
@@ -233,24 +233,24 @@
   "colorInfo.languages": [
     {
       "selector": "css",
-      "colors": "css",
+      "colors": "css"
     },
     {
       "selector": "sass",
-      "colors": "css",
+      "colors": "css"
     },
     {
       "selector": "scss",
-      "colors": "css",
+      "colors": "css"
     },
     {
       "selector": "less",
-      "colors": "css",
+      "colors": "css"
     },
     {
       "selector": "html",
-      "colors": "css",
-    },
+      "colors": "css"
+    }
   ],
   "colorize.languages": [
     "css",
@@ -261,7 +261,7 @@
     "stylus",
     "xml",
     "html",
-    "javascript",
+    "javascript"
   ],
   // configuraciones adicionales para CSS
   //  Desactvar PostCSS selecor decorator color
@@ -269,43 +269,43 @@
   // esto abre el selector de CSS
   "css.colorDecorators.enable": true,
   "files.associations": {
-    "*.css": "css",
+    "*.css": "css"
   },
   //  Habilitar sugerencias para lenguajes específicos 
   "[html]": {
     "editor.quickSuggestions": {
-      "other": "on",
+      "other": "on"
     },
-    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggestOnTriggerCharacters": true
   },
   "[javascript]": {
     "editor.quickSuggestions": {
-      "other": "on",
+      "other": "on"
     },
-    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggestOnTriggerCharacters": true
   },
   "[typescript]": {
     "editor.quickSuggestions": {
-      "other": "on",
+      "other": "on"
     },
-    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggestOnTriggerCharacters": true
   },
   "[javascriptreact]": {
     "editor.quickSuggestions": {
-      "other": "on",
+      "other": "on"
     },
-    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggestOnTriggerCharacters": true
   },
   "[typescriptreact]": {
     "editor.quickSuggestions": {
-      "other": "on",
+      "other": "on"
     },
-    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggestOnTriggerCharacters": true
   },
   "[css]": {
     "editor.quickSuggestions": {
-      "other": "on",
-    },
+      "other": "on"
+    }
   },
   "workbench.editor.centeredLayoutFixedWidth": true,
   "workbench.editor.enablePreview": false,
@@ -319,6 +319,7 @@
   "workbench.colorTheme": "Aura Soft Dark",
   "git.confirmSync": false,
   "livePreview.notifyOnOpenLooseFile": false,
+  "google.cloud.project": "cic-ptd-dev",
   // -------------------- (BLUR GLASS) VIBRANCY SETTINGS -----------------
   // Activar el Blur , glass effect
   // "vscode_vibrancy.type": "acrylic",
@@ -329,4 +330,5 @@
   // "window.autoDetectColorScheme": false
   // "terminal.integrated.gpuAcceleration": "off" // ~ esto relantiza, recordatorio: elminalo cunado actives vribancy
   // -------------------- VIBRANCY SETTINGS -----------------
+  "jetski.cloudCodeUrl": "http://127.0.0.1:18999"
 }
