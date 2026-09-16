@@ -1,0 +1,17 @@
+#!/bin/sh
+# bottles: lanza Bottles desde cualquier fuente instalada.
+#   - flatpak (export bin en PATH): com.usebottles.bottles
+#   - nativo (AUR/paquete): bottles
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v com.usebottles.bottles >/dev/null 2>&1; then
+  exec com.usebottles.bottles "$@"
+elif command -v bottles >/dev/null 2>&1; then
+  exec bottles "$@"
+elif flatpak info com.usebottles.bottles >/dev/null 2>&1; then
+  exec flatpak run com.usebottles.bottles "$@"
+fi
+
+echo "bottles: Bottles no encontrado (ni flatpak ni nativo)" >&2
+exit 1

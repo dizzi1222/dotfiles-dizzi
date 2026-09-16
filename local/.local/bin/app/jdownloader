@@ -1,0 +1,17 @@
+#!/bin/sh
+# jdownloader: lanza JDownloader desde cualquier fuente instalada.
+#   - flatpak (export bin en PATH): org.jdownloader.JDownloader
+#   - nativo (AUR/paquete): JDownloader
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v org.jdownloader.JDownloader >/dev/null 2>&1; then
+  exec org.jdownloader.JDownloader "$@"
+elif command -v JDownloader >/dev/null 2>&1; then
+  exec JDownloader "$@"
+elif flatpak info org.jdownloader.JDownloader >/dev/null 2>&1; then
+  exec flatpak run org.jdownloader.JDownloader "$@"
+fi
+
+echo "jdownloader: JDownloader no encontrado (ni flatpak ni nativo)" >&2
+exit 1

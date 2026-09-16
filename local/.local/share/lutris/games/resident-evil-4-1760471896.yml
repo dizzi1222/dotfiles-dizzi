@@ -3,3 +3,6 @@ game:
     Evil 4 2023/re4.exe
   working_dir: /home/diego/.wine/drive_c/Games/Resident
     Evil 4 2023/
+wine:
+  custom_wine_path: /home/diego/.nix-profile/bin/wine
+  version: custom
