@@ -3,7 +3,10 @@
 
 # === Configuración ===
 # === Token de Gyazo ===
-API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+# NOTA: el token NO expira por tiempo; un 401 con "The access token was
+# revoked" en WWW-Authenticate = revocado → regenerar en
+# https://gyazo.com/oauth/applications → clic en app (DIZZI) → Regenerate.
+API_TOKEN="8tpTwzUTedImGHZCFAcatRcjGIzzdBTY-3UZ6Ur_yPM"
 IMG_PATH="/tmp/gyazo_$(date +%s).png"
 
 # === Asegura entorno Wayland ===
@@ -33,19 +36,52 @@ if ! ping -c 1 -W 1 gyazo.com &>/dev/null; then
   exit 0
 fi
 
-# === Subida a Gyazo ===
-response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
-  -F "access_token=$API_TOKEN" \
-  -F "imagedata=@$IMG_PATH")
+# === Subida a Gyazo (retry: HTTP 000 = fallo de conexión transitorio) ===
+attempts=0
+http_code="000"
+curl_exit=""
+while [ "$http_code" = "000" ] && [ "$attempts" -lt 3 ]; do
+  attempts=$((attempts + 1))
+  response=$(curl -s -m 30 -w "\n%{http_code}" -X POST https://upload.gyazo.com/api/upload \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -F "imagedata=@$IMG_PATH" 2>/tmp/gyazo_curl_err.txt)
+  curl_exit=$?
+  http_code=$(echo "$response" | tail -n1)
+  [ "$http_code" = "000" ] && [ "$attempts" -lt 3 ] && sleep 2
+done
+body=$(echo "$response" | sed '$d')
 
 # === Extraer link del JSON ===
-link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+link=$(echo "$body" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
 
 # === Acciones finales ===
 if [ -n "$link" ]; then
   echo -n "$link" | wl-copy --primary # copia también el link como texto por si acaso
   xdg-open "$link" &
-  notify-send "Screnshoot Saved" "$link" --icon="$IMG_PATH"
+  notify-send "Screenshot Saved" "$link" --icon="$IMG_PATH"
+elif [ "$http_code" = "401" ]; then
+  notify-send -i dialog-error "❌ Token Gyazo revocado" "Regenerate en gyazo.com/oauth/applications"
+elif [ "$http_code" = "000" ]; then
+  # Fallo de conexión: la respuesta no volvió, PERO el servidor pudo haber
+  # subido la imagen (link confirmado por Gyazo). Reconciliar vía /api/images.
+  recent=$(curl -s -m 10 "https://api.gyazo.com/api/images?per_page=5" \
+    -H "Authorization: Bearer $API_TOKEN" 2>/dev/null)
+  confirmed=$(echo "$recent" | jq -r '
+    [.[] | select(((now - (.created_at | sub("\\+0000"; "Z") | fromdateiso8601)) < 180))] |
+    .[0].permalink_url // empty' 2>/dev/null)
+  if [ -n "$confirmed" ]; then
+    echo -n "$confirmed" | wl-copy --primary
+    xdg-open "$confirmed" &
+  else
+    case "$curl_exit" in
+      6)  reason="No se pudo resolver upload.gyazo.com (DNS)" ;;
+      7)  reason="Conexión rechazada por Gyazo" ;;
+      28) reason="Timeout (30s)" ;;
+      *)  reason="Fallo de red (curl exit $curl_exit: $(tr -d '\n' </tmp/gyazo_curl_err.txt 2>/dev/null))" ;;
+    esac
+    notify-send -i dialog-error "❌ Sin conexión con Gyazo" "$reason — La captura quedó en el portapapeles"
+  fi
 else
-  notify-send "❌ Error al subir a Gyazo"
+  msg=$(echo "$body" | grep -o '"message":"[^"]*' | cut -d'"' -f4)
+  notify-send -i dialog-error "❌ Error al subir a Gyazo" "${msg:-HTTP $http_code / Respuesta vacía (tras $attempts intentos)}"
 fi

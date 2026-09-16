@@ -1,0 +1,3 @@
+game:
+  exe: /home/diego/.local/bin/app/minecraft-bedrock
+  working_dir: ''

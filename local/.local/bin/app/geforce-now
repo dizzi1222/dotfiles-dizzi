@@ -1,0 +1,19 @@
+#!/bin/sh
+# geforce-now: lanza GeForce NOW desde cualquier fuente instalada.
+#   - flatpak (export bin en PATH): com.nvidia.geforcenow
+#   - nativos posibles: geforceNow / geforce-now
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v com.nvidia.geforcenow >/dev/null 2>&1; then
+  exec com.nvidia.geforcenow "$@"
+elif command -v geforceNow >/dev/null 2>&1; then
+  exec geforceNow "$@"
+elif command -v geforce-now >/dev/null 2>&1; then
+  exec geforce-now "$@"
+elif flatpak info com.nvidia.geforcenow >/dev/null 2>&1; then
+  exec flatpak run com.nvidia.geforcenow "$@"
+fi
+
+echo "geforce-now: GeForce NOW no encontrado (ni flatpak ni nativo)" >&2
+exit 1
