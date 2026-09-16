@@ -1,0 +1,6 @@
+game:
+  exe: /home/diego/.wine/drive_c/users/diego/AppData/Roaming/CustomRP/CustomRP.exe
+  working_dir: /home/diego/.wine/drive_c/users/diego/AppData/Roaming/CustomRP/
+wine:
+  custom_wine_path: /home/diego/.nix-profile/bin/wine
+  version: custom
