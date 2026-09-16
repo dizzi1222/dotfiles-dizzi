@@ -1,4 +1,4 @@
-{ config, pkgs, stateVersion, username, homeDirectory, inputs, ... }:
+{ config, pkgs, lib, stateVersion, username, homeDirectory, inputs, ... }:
 
 {
   home = {
@@ -197,8 +197,10 @@
       # el symlink. Steam es dueño del vivo; steam-sync-shortcut (timer en
       # features/services.nix) copia la última versión al repo. El repo es
       # semilla inicial y espejo versionado.
-      ".local/share/Steam/userdata/1187856367/config/shortcuts.vdf".source =
-        link "local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf";
+      ".local/share/Steam/userdata/1187856367/config/shortcuts.vdf" = {
+        source = link "local/.local/share/Steam/userdata/1187856367/config/shortcuts.vdf";
+        force = true;
+      };
 
       # Omarchy (Arch/CachyOS scripts — available on NixOS as helper stubs)
       "omarchy-arch-bin".source = link "home/omarchy-arch-bin";
@@ -341,7 +343,12 @@
   # parchea resources/app/out en runtime y muere con EROFS. Copiamos el
   # runtime a ~/.cursor/runtime (writable) y repuntamos el wrapper. El shim
   # ~/.local/bin/cursor (local/.local/bin/cursor) escribe al runtime.
-  home.activation.cursorWritable = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+  # Solo se activa si `code-cursor` está en home.packages (work.nix):
+  # comentar el paquete → la activación deja de existir y nixgc libera el store.
+  home.activation.cursorWritable = lib.mkIf
+    (builtins.hasAttr "code-cursor" pkgs
+    && builtins.elem pkgs.code-cursor config.home.packages)
+    (config.lib.dag.entryAfter [ "writeBoundary" ] ''
     CURSOR_SOURCE="${pkgs.code-cursor}"
     RUNTIME="$HOME/.cursor/runtime"
     MARKER="$RUNTIME/.store-path"
@@ -361,14 +368,19 @@
       echo "$CURSOR_SOURCE" > "$MARKER"
       echo "  cursor: runtime writable listo en $RUNTIME"
     fi
-  '';
+  '');
 
   # ── Antigravity: runtime writable (extensions need write access) ──
   # antigravity en el store Nix es read-only; las extensiones y configuraciones
   # requieren escritura en runtime. Copiamos el runtime a ~/.antigravity/runtime
   # (writable) y repuntamos el wrapper. El shim
   # ~/.local/bin/antigravity (local/.local/bin/antigravity) escribe al runtime.
-  home.activation.antigravityWritable = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+  # Solo se activa si `antigravity-ide` está en home.packages (work.nix):
+  # comentar el paquete → la activación deja de existir y nixgc libera el store.
+  home.activation.antigravityWritable = lib.mkIf
+    (builtins.hasAttr "antigravity-ide" pkgs
+    && builtins.elem pkgs.antigravity-ide config.home.packages)
+    (config.lib.dag.entryAfter [ "writeBoundary" ] ''
     ANTIGRAVITY_SOURCE="${pkgs.antigravity-ide}"
     RUNTIME="$HOME/.antigravity/runtime"
     MARKER="$RUNTIME/.store-path"
@@ -388,7 +400,7 @@
       echo "$ANTIGRAVITY_SOURCE" > "$MARKER"
       echo "  antigravity: runtime writable listo en $RUNTIME"
     fi
-  '';
+  '');
 
   # ── oklch-color-picker (Neovim picker binary) ─────────────
   # El plugin de nvim (oklch-color-picker.nvim) auto-descarga un binario
