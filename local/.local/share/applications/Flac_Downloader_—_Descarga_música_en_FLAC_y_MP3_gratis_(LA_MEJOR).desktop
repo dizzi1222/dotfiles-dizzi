@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Flac Downloader — Descarga música en FLAC y MP3 gratis (LA MEJOR)
+Comment=Open Flac Downloader — Descarga música en FLAC y MP3 gratis (LA MEJOR)
+Exec=zen-browser --new-window --kiosk https://flacdownloader.com/
+Terminal=false
+Type=Application
+# Icon=web-browser
+Icon=/home/diego/.local/share/icons/flacdownloader.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Flac_Downloader_—_Descarga_música_en_FLAC_y_MP3_gratis_(LA_MEJOR)
