@@ -1,0 +1,19 @@
+#!/bin/sh
+# minecraft-bedrock: lanza Minecraft Bedrock Launcher desde cualquier fuente.
+#   - flatpak (export bin en PATH): io.mrarm.mcpelauncher
+#   - nativos posibles: mcpelauncher / minecraft-bedrock
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v io.mrarm.mcpelauncher >/dev/null 2>&1; then
+  exec io.mrarm.mcpelauncher "$@"
+elif command -v mcpelauncher >/dev/null 2>&1; then
+  exec mcpelauncher "$@"
+elif command -v minecraft-bedrock >/dev/null 2>&1; then
+  exec minecraft-bedrock "$@"
+elif flatpak info io.mrarm.mcpelauncher >/dev/null 2>&1; then
+  exec flatpak run io.mrarm.mcpelauncher "$@"
+fi
+
+echo "minecraft-bedrock: Minecraft Bedrock Launcher no encontrado" >&2
+exit 1

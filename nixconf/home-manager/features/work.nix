@@ -4,8 +4,8 @@
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
     # Editors
-    code-cursor
-    antigravity-ide
+    code-cursor # neocursor.nvim requiere la APP
+    # antigravity-ide
 
     # Languages
     # python3 env con debugpy (para nvim-dap: `python3 -m debugpy.adapter`).

@@ -6,5 +6,5 @@ wine:
   Desktop: true
   ShowCrashDialog: true
   autoconf_joypad: true
-  custom_wine_path: /home/diego/.local/share/lutris/runners/wine/GE-Proton10-20/version
-  version: Proton 9.0 (Beta)
+  custom_wine_path: /home/diego/.nix-profile/bin/wine
+  version: custom
