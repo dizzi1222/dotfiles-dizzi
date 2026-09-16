@@ -1,0 +1,19 @@
+#!/bin/sh
+# pokemmo: lanza PokeMMO desde cualquier fuente instalada.
+#   - nativos posibles: pokemmo-launcher / pokemmo
+#   - flatpak (export bin en PATH): com.pokemmo.PokeMMO
+# Fallback a flatpak run si el export no está en PATH.
+set -euo pipefail
+
+if command -v pokemmo-launcher >/dev/null 2>&1; then
+  exec pokemmo-launcher "$@"
+elif command -v pokemmo >/dev/null 2>&1; then
+  exec pokemmo "$@"
+elif command -v com.pokemmo.PokeMMO >/dev/null 2>&1; then
+  exec com.pokemmo.PokeMMO "$@"
+elif flatpak info com.pokemmo.PokeMMO >/dev/null 2>&1; then
+  exec flatpak run com.pokemmo.PokeMMO "$@"
+fi
+
+echo "pokemmo: PokeMMO no encontrado (ni nativo ni flatpak)" >&2
+exit 1

@@ -2,8 +2,12 @@ game:
   args: ''
   exe: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
     Knight/hollow_knight.exe
+  prefix: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/
   working_dir: /home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/Games/Hollow
     Knight/
 system:
   env:
     WINEDEBUG: -all
+wine:
+  custom_wine_path: /home/diego/.nix-profile/bin/wine
+  version: custom
