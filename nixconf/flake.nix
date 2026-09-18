@@ -60,6 +60,17 @@
         # media.nix (proyecto discontinuado 2023; no funciona con Spotify).
         soundbound = prev.callPackage ./packages/soundbound.nix { };
         spotiflyer = prev.callPackage ./packages/spotiflyer.nix { };
+        # CurseForge App (gestor de mods: Minecraft, WoW, etc.) — AppImage
+        # Linux oficial de Overwolf. No está en nixpkgs ni Flathub.
+        curseforge = prev.callPackage ./packages/curseforge.nix { };
+        # Amethyst Mod Manager — gestor de mods nativo Linux (MO2-style).
+        # AppImage oficial v2.5.2. No está en nixpkgs ni Flathub.
+        amethyst = prev.callPackage ./packages/amethyst.nix { };
+        # Vortex alias (busqueda/arranque): wrapper sobre nexusmods-app-unfree
+        # con binario `vortex` + .desktop keywords "Vortex;Nexus Mods;mods".
+        vortex = prev.callPackage ./packages/vortex.nix {
+          nexusmods-app-unfree = prev.nexusmods-app-unfree;
+        };
         # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
         # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
         # El patch pasa `request` como primer argumento (nueva firma).

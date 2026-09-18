@@ -42,6 +42,8 @@ binds {
     Mod+Space hotkey-overlay-title="rofi" { spawn-sh "vicinae open"; }
     Mod+Shift+Space hotkey-overlay-title="rofi combi" { spawn-sh "rofi -show combi"; }
     Mod+Ctrl+Space hotkey-overlay-title="fuzzel" { spawn-sh "fuzzel --prompt='App:'"; }
+    // Menú de sistema Eww (grid icon→texto estilo Omarchy)
+    Mod+Super+Space hotkey-overlay-title="system menu" { spawn-sh "kitty --class=floating --title='System Control' -e sh ~/scripts/system_control.sh"; }
     
     // ═══════════════════════════════════════════════════════════════════════
     // NOTIFICATIONS
@@ -70,7 +72,7 @@ binds {
     Mod+Shift+C hotkey-overlay-title="color picker" { spawn-sh "~/.config/niri/scripts/niri-colorpicker.sh"; }
     Ctrl+Shift+Escape hotkey-overlay-title="monitor" { spawn-sh "kitty -e btop"; }
     Super+Ctrl+Escape hotkey-overlay-title="btop" { spawn "gnome-system-monitor"; }
-    Super+Z hotkey-overlay-title="system control" { spawn-sh "sh ~/scripts/system_control.sh"; }
+    Super+Z hotkey-overlay-title="system control" { spawn-sh "kitty --class=floating --title='System Control' -e sh ~/scripts/system_control.sh"; }
     
     // ═══════════════════════════════════════════════════════════════════════
     // WINDOW MANAGEMENT
@@ -83,8 +85,9 @@ binds {
     F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
     Mod+F11 hotkey-overlay-title="fullscreen" { fullscreen-window; }
     Mod+Tab hotkey-overlay-title="maximize" { maximize-column; }
-    // [Alt+Tab] Cycle Tab - alterna al último window enfocado
-    Ctrl+Tab { focus-window-previous; }
+    // [Alt+Tab] Cycle Tab - igual a hyprland cyclenext: TODAS las ventanas del workspace (incl. flotantes)
+    Ctrl+Tab { spawn-sh "~/.config/niri/scripts/niri-cycle-window.sh next"; }
+    Ctrl+Shift+Tab { spawn-sh "~/.config/niri/scripts/niri-cycle-window.sh prev"; }
     Mod+Ctrl+F hotkey-overlay-title="fill space" { expand-column-to-available-width; }
     Mod+F hotkey-overlay-title="toggle float" { toggle-window-floating; }
     // # Clipboard Wofi
@@ -153,13 +156,20 @@ binds {
     Mod+Ctrl+Right { set-column-width "+10%"; }
     Mod+Ctrl+Down { set-window-height "+10%"; }
     Mod+Ctrl+Up { set-window-height "-10%"; }
-    Mod+Minus { set-column-width "-10%"; }
-    Mod+Equal { set-column-width "+10%"; }
-    Mod+Shift+Minus { set-window-height "-10%"; }
-    Mod+Shift+Equal { set-window-height "+10%"; }
+    Mod+Shift+Minus { set-column-width "-10%"; }
+    Mod+Shift+Equal { set-column-width "+10%"; }
+    Mod+Ctrl+Minus { set-window-height "-10%"; }
+    Mod+Ctrl+Equal { set-window-height "+10%"; }
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R hotkey-overlay-title="launch bar" { spawn-sh "sh ~/scripts/launch-bar.sh"; }
     Mod+Ctrl+R { reset-window-height; }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ZOOM
+    // ═══════════════════════════════════════════════════════════════════════
+
+    Super+Equal hotkey-overlay-title="zoom menu" { spawn-sh "~/scripts/zoom_menu.sh"; }
+    Super+Minus hotkey-overlay-title="reset zoom" { spawn-sh "niri msg output eDP-1 scale 1.0"; }
     
     // ═══════════════════════════════════════════════════════════════════════
     // COLUMNS

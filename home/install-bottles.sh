@@ -116,6 +116,74 @@ function fix_stale_icu_dll() {
 }
 
 # ═══════════════════════════════════════════════════════════
+# FUNCIÓN: FIX SYMLINKS ROTOS DEL PREFIX A GE-PROTON STEAM
+# ═══════════════════════════════════════════════════════════
+# Uso: fix_broken_wine_symlinks <prefix> <etiqueta>
+# Corrige el crash "wine: could not load kernel32.dll, status c0000135".
+# Causa: si Steam se reinstala o se mueve, se pierde
+#   ~/.local/share/Steam/compatibilitytools.d/GE-Proton*/files/
+# y TODOS los symlinks del drive_c/windows que apuntaban ahí quedan rotos
+# (verificado: 1304 de 1413). Fix: re-mapear los symlinks rotos al wine
+# del sistema (wine-wow64 del nix = ~/.nix-profile/bin/wine).
+function fix_broken_wine_symlinks() {
+  local prefix="$1"
+  local label="$2"
+
+  WINEPREFIX="$prefix" wineserver -k 2>/dev/null
+  sleep 1
+
+  # Resolver el wine del sistema (NixOS: ~/.nix-profile/bin/wine → wine-wow64)
+  local wine_path wine_base
+  wine_path="$(command -v wine 2>/dev/null)"
+  [[ -z "$wine_path" && -x "$HOME/.nix-profile/bin/wine" ]] && wine_path="$HOME/.nix-profile/bin/wine"
+  [[ -z "$wine_path" ]] && { print_warning "$label: wine no encontrado en PATH — no se puede re-mapear symlinks"; return 1; }
+  wine_path="$(readlink -f "$wine_path")"
+  wine_base="${wine_path%/bin/wine*}"
+
+  local old_base_new="/nix/store"  # targets absolutos al store nix
+
+  # Buscar la base GE-Proton que quebró (puede ser la de Steam o la de umu)
+  local ge_base ge_candidates=( "$HOME/.local/share/Steam/compatibilitytools.d" "$HOME/.local/share/umu/compatibilitytools.d" )
+  for d in "${ge_candidates[@]}"; do
+    [[ -d "$d" ]] && ge_base="$d" && break
+  done
+
+  local fixed=0 skipped=0
+  while IFS= read -r -d '' link; do
+    # Solo symlinks rotos (target inexistente)
+    [[ -L "$link" ]] || continue
+    [[ -e "$link" ]] && continue
+    local target
+    target="$(readlink "$link")"
+    case "$target" in
+      *"/GE-Proton"*"files/"*)
+        local new_target="$wine_base${target#*files}"
+        if [[ -e "$new_target" ]]; then
+          ln -sfn "$new_target" "$link"
+          fixed=$((fixed+1))
+        else
+          skipped=$((skipped+1))
+        fi
+        ;;
+      *) skipped=$((skipped+1)) ;;
+    esac
+  done < <(find "$prefix/drive_c/windows" -type l -print0 2>/dev/null)
+
+  if [[ "$fixed" -gt 0 ]]; then
+    print_success "$label: $fixed symlinks del prefix re-mapeados a $wine_base"
+    if [[ "$skipped" -gt 0 ]]; then
+      print_warning "$label: $skipped symlinks no mapeables (targets que no existen en wine del sistema) — no suelen ser críticos (DLLs de GE-Proton: steam/libicu-proton/...) e ignorados por Wine."
+    fi
+  else
+    if [[ "$skipped" -gt 0 ]]; then
+      print_info "$label: sin symlinks re-mapeables a GE-Proton (solo $skipped rotos no-GE, OK)"
+    else
+      print_info "$label: sin symlinks rotos (OK)"
+    fi
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════
 # FUNCIÓN: INSTALAR SHIMS CLR .NET 4.8 NATIVOS EN UN PREFIX
 # ═══════════════════════════════════════════════════════════
 # Uso: install_ms_shims_dotnet48 <prefix> <etiqueta>
@@ -562,6 +630,32 @@ fi
 # Mismo fix para el prefix ~/.wine (Wine directo: CustomRP y otras apps WPF/.NET 4.8)
 if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
   install_ms_shims_dotnet48 "$HOME/.wine" "Wine (~/.wine)"
+fi
+
+# ═══════════════════════════════════════════════════════════
+# PASO 1.9: FIX SYMLINKS ROTOS A GE-PROTON (kernel32.dll c0000135)
+# ═══════════════════════════════════════════════════════════
+# Sintoma: "wine: could not load kernel32.dll, status c0000135" en cualquier
+# exe de un prefix. Causa raiz (sep 2026, NixOS): Steam se reinstaló y se
+# regeneró ~/.steam, desapareciendo compatibilitytools.d/GE-Proton*/*; los
+# symlinks del drive_c/windows quedaron rotos apuntando a esas rutas
+# (1304 de 1413). Fix permanent: re-mapear los symlinks al wine del sistema
+# (wine-wow64 del nix). Corre sobre botellas y ~/.wine.
+print_header "PASO 1.9: Fix symlinks rotos del prefix (kernel32.dll c0000135)"
+
+if [[ "$IS_ARCH" == true ]]; then
+  print_warning "Arch/CachyOS: los runners GE-Proton de Steam viven en AUR (se mantienen), el re-mapeo no debería ser necesario. Igual se ejecuta por seguridad:"
+fi
+
+if [[ -d "$BOTTLES_BASE/bottles" ]]; then
+  for prefix in "$BOTTLES_BASE"/bottles/*/; do
+    [[ -d "$prefix/drive_c/windows" ]] || continue
+    fix_broken_wine_symlinks "${prefix%/}" "Botella $(basename "$prefix")"
+  done
+fi
+
+if [[ -d "$HOME/.wine/drive_c/windows" ]]; then
+  fix_broken_wine_symlinks "$HOME/.wine" "Wine (~/.wine)"
 fi
 
 # ═══════════════════════════════════════════════════════════

@@ -5,44 +5,65 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/platform.sh"
 
+# ── Pre-shutdown: desmontar FUSE colgados (rclone) ──────────
+# Antes (con --force --force) saltábamos los servicios de shutdown (nixos);
+# ahora el apagado es normal (timeouts 4s) y los units shutdown-kill-rclone
+# corren solos. pre_power_fuse queda como backstop si el FUSE está muerto.
+# Es el mismo bug que el hook 90-rclone.sh arregla solo para sleep.
+pre_power_fuse() {
+  pkill -KILL -f "rclone mount" 2>/dev/null || true
+  pkill -KILL -f "vicinae-file-indexer" 2>/dev/null || true
+  sleep 1
+  for m in "$HOME/mi_gdmusica" "$HOME/mi_gdrive" "$HOME/mi_gdlibros"; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+  for m in /run/media/$USER/*; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+}
+
 CHOICE=$(printf "\n\n\n\n\n󰒲" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
 
 case "$CHOICE" in
 "")
-  cd /$HOME
-  # shutdown now
+  cd "$HOME" || exit 1
   sync                                                                                                   # Fuerza escritura a disco
-  wm_spawn "500 200" kitty --title "PowerOff" -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
-  # poweroff
+  pre_power_fuse
+  # Shutdown NORMAL (sin --force): systemd ejecuta shutdown-kill-rclone (sistema),
+  # shutdown-kill-rclone-user (usuario) y alternar-a-windows ANTES del corte ACPI.
+  # El compositor/browser (niri) salen limpios → liberan DRM/KMS → sin frame
+  # congelado. DefaultTimeoutStopSec=4s garantiza SIGKILL a los rebeldes.
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true # Backstop (ya corre por wantedBy)
+  wm_spawn "500 200" kitty --title "PowerOff" -- sudo systemctl poweroff
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   sync # Fuerza escritura a disco
   sleep 1
-  wm_spawn "500 200" kitty --title "Reboot" -- sudo systemctl reboot --force --force # Doble --force = bypass todo
-  # reboot
+  pre_power_fuse
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true # Backstop (ya corre por wantedBy)
+  wm_spawn "500 200" kitty --title "Reboot" -- sudo systemctl reboot
   ;;
 "")
-  hyprlock # funciona en Niri too
+  swaylock -f # niri usa swaylock (layer-shell); hyprlock es solo de Hyprland
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   sync # Fuerza escritura a disco
   sleep 1
-  wm_spawn "500 200" kitty --title "Suspend" -- sudo systemctl suspend --force --force # o usa sleep
+  wm_spawn "500 200" kitty --title "Suspend" -- sudo systemctl suspend # suspend normal (inhibitors en manos de logind)
   ;;
 "󰒲")
   # hibernar
   # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
   systemctl hibernate
-  # kitty -- sudo systemctl hibernate --force --force
-  # Verificar si la hibernación está correctamente configurada
+  # verificar si la hibernación está correctamente configurada
   if ! grep -q "resume=" /proc/cmdline || ! swapon --show | grep -q "/"; then
     notify-send "⚠️ NO PUEDES HIBERNAR!" "Falta configuración de SWAP o parámetros de resume en GRUB " -i dialog-warning -t 5000
   fi
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   case "$(wm_detect)" in
   niri)
     niri msg action quit
