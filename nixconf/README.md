@@ -14,7 +14,7 @@ El instalador gráfico de NixOS maneja particionado, formateo, instalación y GR
 
 #### Step 1: Boot from NixOS ISO USB
 
-Selecciona "Install" en el menú de arranque.
+Selecciona "Install" en el menú de arranque
 
 #### Step 2: Partitioning
 
@@ -249,6 +249,96 @@ El theme actual es `sddm-astronaut` (package custom en `nixos/pkgs/sddm-astronau
 3. Reconstruí: `sudo nixos-rebuild switch --flake .#thinkpad-x1e2`
 
 **Crear theme custom:** agregá un derivation en `nixos/pkgs/` (ej: `sddm-astronaut-theme/default.nix`) e importalo via `pkgs.callPackage`.
+
+---
+
+## Remote Work & Dual-Boot
+
+Setup pensado para trabajar remoto desde otras laptops (Moonlight/Tailscale) y
+alternar cómodamente entre **NixOS** y **Windows**. Todo el flujo vive en
+`nixos/features/remote-control.nix` + la `extraConfig` de GRUB en
+`nixos/base-configuration.nix`.
+
+### Autologin SDDM + WM por defecto
+
+**Hoy (activo):** el sistema arranca NixOS, autologinea a `diego` y abre **niri**
+automáticamente. Así un reboot remoto nunca queda atrapado en el greeter.
+
+```nix
+# nixos/features/remote-control.nix — T1
+services.displayManager.autoLogin = {
+  enable = true;
+  user = "diego";
+};
+services.displayManager.defaultSession = "niri";
+```
+
+- **Desactivar autologin** (volver a pedir usuario/contraseña en SDDM):
+  comenta el bloque `autoLogin` (`enable = true` → `false`).
+- **Cambiar WM por defecto:** cambiá `defaultSession` a `"hyprland"` o `"plasma"`
+  (el módulo sddm por defecto usa kwin/plasma; `niri` es el actual).
+
+### GRUB: guardar última elección (saved_entry) vs ping-pong
+
+Hay **dos modos** controlados por `remote-control.nix`:
+
+**A. 💾 Recordar la última elección (saved_entry) — el "revertible"**
+Con `boot.loader.grub.default = "saved"` (base-configuration.nix), GRUB recuerda
+la última entrada elegida: si booteaste Windows una vez, sigue en Windows hasta
+que elijas otra. Si en el menú elegís NixOS, vuelve a NixOS para siempre.
+
+**B. 🔁 Boost automático NixOS → Windows → NixOS (ping-pong, activo hoy)**
+El servicio `alternar-a-windows` (T3) corre en cada shutdown/reboot de NixOS y
+escribe `next_entry` con el **título exacto** de Windows (`grub-reboot "Windows Boot Manager (on /dev/nvme0n1p1)"`). La `extraConfig` de GRUB lo usa **una sola vez** (`boot_once`) y lo borra → el siguiente boot desde Windows vuelve a NixOS.
+
+**Cómo cambiar de modo:**
+
+```bash
+# Forzar Windows UNA vez (funciona en ambos modos)
+sudo systemctl start alternar-a-windows && sudo reboot
+
+# Volver a "recordar última" (desactivar ping-pong automático):
+#   1) Comentar el servicio T3 en remote-control.nix
+#   2) Quitar el `sudo systemctl start alternar-a-windows` de power_management.sh
+#   3) Rebuild + listo (GRUB queda con default="saved")
+```
+
+**Reset manual del env de GRUB si algo queda "pegado":**
+
+```bash
+sudo grub-editenv /boot/grub/grubenv set saved_entry=NixOS
+sudo grub-editenv /boot/grub/grubenv unset next_entry
+```
+
+### Hypridle: desactivar poweroff (para no apagar en remoto)
+
+El `hypridle.conf` tiene el listener de **apagado comentado** (NUNCA apaga sola
+la PC — ideal si la dejás encendida para Moonlight):
+
+```
+# ~/.config/hypr/hypridle.conf — líneas 52-55
+listener {
+    # timeout = 1300 # 20 minutos
+    # on-timeout = systemctl poweroff # Apagar la PC completamente
+}
+```
+
+**Si querés reactivar el auto-apagado:** descomentá el `listener`.
+
+### Flujo remoto completo
+
+1. `sudo reboot` (o power menu) → GRUB usa `next_entry` (si es ping-pong) →
+   **Windows** (o NixOS si desactivaste T3).
+2. Desde Windows → reboot → GRUB sin `next_entry` → vuelve a **NixOS**.
+3. NixOS arranca → autologin → **niri** → **Sunshine** (servicio `services.sunshine`,
+   no autostart manual) → lista para **Moonlight** desde otra laptop.
+4. Acceso por red: **Tailscale** (descomentar `services.tailscale.enable` en
+   remote-control.nix si querés tailnet).
+
+> ⚠️ **Una sola vía por app:** Sunshine se lanza por systemd (`services.sunshine`);
+> Eww por el autostart del WM (niri → `launch_widgets.sh`, hypr → `eww daemon`);
+> Vicinae por `vicinae.service`. **No combinar autostart + systemd** para la misma
+> app (evita dobles daemons).
 
 ---
 
@@ -765,6 +855,90 @@ Si `/boot` se llena (300MB con dual boot Windows), usar GParted Live USB para ex
 > Estos se resuelven editando los dotfiles para que sean compatibles con ambos sistemas, o creando overrides en nixconf.
 
 ---
+
+## Keyring en blanco tras autologin (headless)
+
+**Síntoma:** con `autoLogin` de SDDM, PAM no recibe la contraseña del usuario → el llavero
+`login` de gnome-keyring queda bloqueado y ~3 min después una app (NM/agente, etc.) pide la
+contraseña del keyring.
+
+**Por qué:** `security.pam.services.sddm.enableGnomeKeyring = true` solo desbloquea con la
+authtok de PAM; con autologin esa authtok es vacía → la llave del llavero debe ser **vacía**
+para que haga match.
+
+> ⚠️ En gnome-keyring moderno (40+/50.x) se eliminó `libgnome-keyring`. **NO existe
+> `gnome-keyring-daemon --change`** (devuelve `Unknown option --change`), así que el
+> "cambio de contraseña" por CLI puro no está disponible. Procedimiento realista abajo.
+
+### Método A — GUI (recomendado, preserva los secretos guardados)
+
+```bash
+nix-shell -p seahorse --run seahorse
+```
+
+En "Passwords and Keys": llavero **Login** → derecho → **Cambiar contraseña** →
+contraseña actual → **nueva contraseña vacía** → Confirmar.
+
+### Método B — CLI (solo si está OK perder los secretos guardados)
+
+1. Verifica que el PSK de wifi no dependa del keyring (box remota = crítico):
+
+   ```bash
+   nmcli con modify <CONEXION_WIFI> 802-11-wireless-security.psk <PSK> 802-11-wireless-security.psk-flags 0
+   ```
+
+2. Backup + eliminar keyrings (se recrean vacíos en el próximo login):
+
+   ```bash
+   mkdir -p ~/.local/share/keyrings.bak
+   cp -a ~/.local/share/keyrings/. ~/.local/share/keyrings.bak/
+   # ⚠️ NO usar `pkill -x gnome-keyring-daemon`: el nombre del binario > 15 chars
+   # hace que -x falle en matchearlo → el daemon QUEDA VIVO con el keyring EN
+   # MEMORIA y los prompts viejos siguen dando "Incorrect" con cualquier password.
+   # Matar por PID (o -f con un patrón que NO aparezca en tu propia cmdline):
+   kill -9 "$(pgrep -f 'gnome-keyring-daemon --')" 2>/dev/null || true
+   rm -f ~/.local/share/keyrings/login.keyring ~/.local/share/keyrings/user.keystore
+   ```
+
+   > El daemon se **auto-reactiva** por D-Bus (`org.freedesktop.secrets`) apenas una
+   > app pide secretos. No pelees prompts de sesiones viejas: mata por PID, borra
+   > los archivos y **reinicia sesión/reboot** para que PAM cree el llavero limpio.
+
+3. Re-login/reboot → PAM recrea el llavero `login` con password vacía → sin prompt nunca.
+
+### ⚠️ OJO: borrar el keyring rompe GitHub (gh/git push)
+
+El credential helper de git es `!gh auth git-credential`, y **gh guarda los tokens
+OAuth en el keyring** (secrets service / libsecret), NO en `~/.config/gh/hosts.yml`
+(ese archivo solo tiene `user:`). Si se borra el keyring (Método B) los tokens de
+**todas** las cuentas (`dizzi1222`, `dhardi007`) quedan inválidos y el push falla:
+
+```
+remote: No anonymous write access.
+fatal: Authentication failed for 'https://github.com/dizzi1222/dotfiles-dizzi.git/'
+```
+
+Diagnóstico: `gh auth status` → "The token is invalid".
+
+Recuperación (tokens frescos, opcional la vía backup):
+- Re-autenticar con device flow (genera token nuevo; se guarda sin prompt en
+  keyring vacío/en blanco):
+  ```bash
+  gh auth login -h github.com -p https   # browser + código; elegir cuenta
+  gh auth switch -u dizzi1222            # según remote
+  ```
+- **Recuperar el token viejo del backup** (si el backup conserva el llavero viejo y
+  conoces su password): restaurar `keyrings.bak-*/login.keyring`, desbloquear con la
+  pass vieja, y `gh auth refresh` — solo si el token no expiró.
+
+> Consejo: si prevés borrar el keyring, exporta antes los tokens: `gh auth token`.
+
+### Nota para la LLM / autoproceso
+
+Para no romper secretos, la LLM debe **preguntar al dueño de la PC la contraseña ACTUAL
+del keyring** y usarla solo como inline (nunca escribirla en el repo, ni en README, ni en
+archivos versionados). Con la contraseña actual se puede autenticar seahorse; la vía de
+dejar en blanco es la A o la B según tolerancia a perder secretos.
 
 ## What's Included
 

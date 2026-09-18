@@ -166,6 +166,18 @@ window-rule {
     default-window-height { fixed 600; }
 }
 
+// System Control (grid eww): el kitty host del script toma el foco del
+// teclado (para capturar ESC) mientras el grid eww se muestra encima.
+// Casi invisible: 1px flotante, opacity mínima, sin interferir visualmente.
+window-rule {
+    match title=r#"^System Control$"#
+    open-floating true
+    default-column-width { fixed 1; }
+    default-window-height { fixed 1; }
+    opacity 0.01
+    clip-to-geometry true
+}
+
 window-rule {
     match title=r#"^(NixRebuild)$"#
     open-floating true

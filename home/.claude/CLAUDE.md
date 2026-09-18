@@ -288,6 +288,15 @@ Flujo: `feat/m3-cat-ui-global` → merge a → `feat/m3-cat-hub` → PR a `dev` 
 
 ## NixOS Config (thinkpad-x1e2)
 
+> ⚠️ **WORKFLOW ACTUAL: NO es GNU Stow ni GNU Stow dotfiles.** Toda la config de
+> apps (opencode, hypr, nvim, ghostty, starship, etc.) vive en
+> `~/dotfiles-dizzi/<app>/` y se **home-manager** la enlaza vía symlinks
+> (out-of-store) a las rutas XDG esperadas. El mapeo está en
+> `~/dotfiles-dizzi/nixconf/home-manager/home.nix` (sección `home.file`).
+> **NO revisar/verificar si la config está "stoweada"** — ya no hay Stow; las
+> ediciones se hacen SIEMPRE sobre la fuente en `~/dotfiles-dizzi/` y se aplican
+> con `home-manager switch` (o `~/.local/bin/nixconf-rebuild`).
+
 ### Flake structure
 ```
 dotfiles-dizzi/nixconf/
@@ -497,6 +506,36 @@ git branch --set-upstream-to="origin/<rama>" <rama>
 git branch -vv | grep "<rama>"
 # Debe mostrar: [origin/<rama>] NO [dizzi1222/<rama>]
 ```
+
+## DataImpulse MCP (di-proxy en OpenCode)
+
+Proxy residencial para scraping desde OpenCode sin proxear todo el sistema
+(MCP crea un `ProxyAgent` por request). Repo: `~/workspace/dataimpulse-mcp`.
+Config en `opencode.json` (`mcp.di-proxy`) con `DI_USER`/`DI_PASS` vía
+`{env:...}` — las variables viven en `~/.api-keys.sh` / `~/.api-keys.ps1`.
+
+### Modelo de pago: pay-to-win
+
+**DataImpulse NUNCA da credenciales gratis.** La cuenta gratis solo da el
+panel; `DI_USER`/`DI_PASS` existen tras pagar. Su "trial" es el plan Intro de
+**$5 / 5GB** (nunca expira, sin KYC, sin auto-cargo), residencial desde $1/GB.
+Es la **opción favorita** de Diego: sin suscripción, tráfico no expira, 90M+ IPs.
+
+**Acción futura:** si Diego se "pone intenso" con OpenCode y paga DataImpulse →
+descomentar las vars en `~/.api-keys.sh` y listo. Reconsiderar las 3 opciones
+gratis solo si no quiere pagar.
+
+### Alternativas gratuitas (reconsiderar vs DataImpulse)
+
+| Proveedor | Trial gratis | Limitación |
+| --- | --- | --- |
+| **Webshare** | Plan free (~10 proxies) | Datacenter/rotating limitado, NO residential |
+| **Decodo** | 3 días / 100MB | Verificación de tarjeta, cuota mínima |
+| **SOAX** | ~$1.99 trial (400MB) | No es gratis real, ventana corta |
+
+> Ninguna alternativa gratis es compatible 1:1 con el MCP (host
+> `gw.dataimpulse.com:823` hardcodeado en `index.js`), pero sirven para
+> evaluar el mismo flujo de scraping si no se quiere pagar.
 
 ## Engram - Memoria Persistente para Agentes IA
 

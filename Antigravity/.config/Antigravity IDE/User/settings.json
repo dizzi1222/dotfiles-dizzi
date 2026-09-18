@@ -1,5 +1,5 @@
 {
-  /* Para refrescar la config usa:
+  /* Para refrescar la config usa:F
   Ctrl Shift P  >  Developer: Reload Window
   Ctrl Shift P  >  Custom UI: Reload/
   */
@@ -330,5 +330,4 @@
   // "window.autoDetectColorScheme": false
   // "terminal.integrated.gpuAcceleration": "off" // ~ esto relantiza, recordatorio: elminalo cunado actives vribancy
   // -------------------- VIBRANCY SETTINGS -----------------
-  "jetski.cloudCodeUrl": "http://127.0.0.1:18999"
 }
