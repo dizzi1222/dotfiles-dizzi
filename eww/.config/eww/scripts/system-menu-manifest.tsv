@@ -1,0 +1,59 @@
+Apps		TV/Nix
+Apps	󰺐	Scrcpy
+Apps	󰜫	Webapp
+Apps	󰗃	Soundbound
+Apps	󱄲󰖳	Bottles
+Apps	󱦥	Sunshine
+Trigger	󰳾	AutoClick
+Trigger	󰌌 󱊮	AutoPress
+Trigger	󰩫	Shot Clip
+Trigger		Shot Menu
+Trigger	☠	Save Point
+Trigger		Fix Ydo
+Style		Night
+Style		Hypridle
+Style	󱓞	Power Mode
+Style		Game Mode
+Style		GTK Fix
+Style	󰐫	Design
+Setup		Drive
+Setup	󱛟	Disco
+Setup	 	Waydroid
+Setup		Portal
+Setup	󱛍	WiFi Docs
+Setup		Zoom
+System		Rebuild Nix
+System	󰮮	Clean Boot
+System	󰊭	Nix GC
+System		Nix Cleanup
+System		Git Clean
+System		Docker
+System		Red/Net
+System		Bluetooth
+System	󰂜	DND
+System		Power
+Audio		Audio
+Audio		Mic
+Audio		Mute
+About	🦙	Ollama
+About		AI Conf
+Herramientas	󰋚	Historial
+Herramientas		Widgets eww
+Herramientas		Git Help
+Herramientas	󰊢	Gitflow
+Herramientas		Cache
+Herramientas		Nix GC
+Trigger	󰋋	Fix BT KZ
+Trigger		Kill Gamescope
+Android	 	Waydroid
+Android		Fotos Way
+Multimedia	󰝛	MP3 128k
+Multimedia	󰋌	Libros
+Multimedia		Suwayomi
+Instalar	󰣇	AUR
+Instalar		Inst. pkg
+Instalar	󰬺	Hypr fase1
+Instalar	󰬻	Hypr fase2
+Instalar	󰋊󰬼	CachyOS
+Instalar	󰟝	Inst. juego
+Sistema	 󱕴	Gnome keyring

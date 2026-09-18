@@ -5,13 +5,16 @@
     inherit username stateVersion;
     homeDirectory = homeDirectory;
     # pointerCursor.enable = true;
-  sessionVariables = {
-    EDITOR = "nvim";
-    TERMINAL = "kitty";
-    BROWSER = "zen";
-    SHELL = "zsh";
-    VSCODE_EXTENSIONS = "$HOME/.antigravity/runtime/lib/antigravity-ide:$VSCODE_EXTENSIONS";
-  };
+    sessionVariables = {
+      EDITOR = "nvim";
+      TERMINAL = "kitty";
+      BROWSER = "zen";
+      SHELL = "zsh";
+      ANTIGRAVITY_HOME = "$HOME/.antigravity/runtime";
+      # ydotoold (módulo programs.ydotool) crea el socket en /run/ydotoold/socket
+      # con permiso 0660 grupo ydotool. Sin esto ydotool busca /tmp/.ydotool_socket.
+      YDOTOOL_SOCKET = "/run/ydotoold/socket";
+    };
   };
 
   nixpkgs.config = {

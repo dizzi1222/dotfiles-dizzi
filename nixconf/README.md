@@ -14,7 +14,7 @@ El instalador gráfico de NixOS maneja particionado, formateo, instalación y GR
 
 #### Step 1: Boot from NixOS ISO USB
 
-Selecciona "Install" en el menú de arranque.
+Selecciona "Install" en el menú de arranque
 
 #### Step 2: Partitioning
 
@@ -249,6 +249,96 @@ El theme actual es `sddm-astronaut` (package custom en `nixos/pkgs/sddm-astronau
 3. Reconstruí: `sudo nixos-rebuild switch --flake .#thinkpad-x1e2`
 
 **Crear theme custom:** agregá un derivation en `nixos/pkgs/` (ej: `sddm-astronaut-theme/default.nix`) e importalo via `pkgs.callPackage`.
+
+---
+
+## Remote Work & Dual-Boot
+
+Setup pensado para trabajar remoto desde otras laptops (Moonlight/Tailscale) y
+alternar cómodamente entre **NixOS** y **Windows**. Todo el flujo vive en
+`nixos/features/remote-control.nix` + la `extraConfig` de GRUB en
+`nixos/base-configuration.nix`.
+
+### Autologin SDDM + WM por defecto
+
+**Hoy (activo):** el sistema arranca NixOS, autologinea a `diego` y abre **niri**
+automáticamente. Así un reboot remoto nunca queda atrapado en el greeter.
+
+```nix
+# nixos/features/remote-control.nix — T1
+services.displayManager.autoLogin = {
+  enable = true;
+  user = "diego";
+};
+services.displayManager.defaultSession = "niri";
+```
+
+- **Desactivar autologin** (volver a pedir usuario/contraseña en SDDM):
+  comenta el bloque `autoLogin` (`enable = true` → `false`).
+- **Cambiar WM por defecto:** cambiá `defaultSession` a `"hyprland"` o `"plasma"`
+  (el módulo sddm por defecto usa kwin/plasma; `niri` es el actual).
+
+### GRUB: guardar última elección (saved_entry) vs ping-pong
+
+Hay **dos modos** controlados por `remote-control.nix`:
+
+**A. 💾 Recordar la última elección (saved_entry) — el "revertible"**
+Con `boot.loader.grub.default = "saved"` (base-configuration.nix), GRUB recuerda
+la última entrada elegida: si booteaste Windows una vez, sigue en Windows hasta
+que elijas otra. Si en el menú elegís NixOS, vuelve a NixOS para siempre.
+
+**B. 🔁 Boost automático NixOS → Windows → NixOS (ping-pong, activo hoy)**
+El servicio `alternar-a-windows` (T3) corre en cada shutdown/reboot de NixOS y
+escribe `next_entry` con el **título exacto** de Windows (`grub-reboot "Windows Boot Manager (on /dev/nvme0n1p1)"`). La `extraConfig` de GRUB lo usa **una sola vez** (`boot_once`) y lo borra → el siguiente boot desde Windows vuelve a NixOS.
+
+**Cómo cambiar de modo:**
+
+```bash
+# Forzar Windows UNA vez (funciona en ambos modos)
+sudo systemctl start alternar-a-windows && sudo reboot
+
+# Volver a "recordar última" (desactivar ping-pong automático):
+#   1) Comentar el servicio T3 en remote-control.nix
+#   2) Quitar el `sudo systemctl start alternar-a-windows` de power_management.sh
+#   3) Rebuild + listo (GRUB queda con default="saved")
+```
+
+**Reset manual del env de GRUB si algo queda "pegado":**
+
+```bash
+sudo grub-editenv /boot/grub/grubenv set saved_entry=NixOS
+sudo grub-editenv /boot/grub/grubenv unset next_entry
+```
+
+### Hypridle: desactivar poweroff (para no apagar en remoto)
+
+El `hypridle.conf` tiene el listener de **apagado comentado** (NUNCA apaga sola
+la PC — ideal si la dejás encendida para Moonlight):
+
+```
+# ~/.config/hypr/hypridle.conf — líneas 52-55
+listener {
+    # timeout = 1300 # 20 minutos
+    # on-timeout = systemctl poweroff # Apagar la PC completamente
+}
+```
+
+**Si querés reactivar el auto-apagado:** descomentá el `listener`.
+
+### Flujo remoto completo
+
+1. `sudo reboot` (o power menu) → GRUB usa `next_entry` (si es ping-pong) →
+   **Windows** (o NixOS si desactivaste T3).
+2. Desde Windows → reboot → GRUB sin `next_entry` → vuelve a **NixOS**.
+3. NixOS arranca → autologin → **niri** → **Sunshine** (servicio `services.sunshine`,
+   no autostart manual) → lista para **Moonlight** desde otra laptop.
+4. Acceso por red: **Tailscale** (descomentar `services.tailscale.enable` en
+   remote-control.nix si querés tailnet).
+
+> ⚠️ **Una sola vía por app:** Sunshine se lanza por systemd (`services.sunshine`);
+> Eww por el autostart del WM (niri → `launch_widgets.sh`, hypr → `eww daemon`);
+> Vicinae por `vicinae.service`. **No combinar autostart + systemd** para la misma
+> app (evita dobles daemons).
 
 ---
 
