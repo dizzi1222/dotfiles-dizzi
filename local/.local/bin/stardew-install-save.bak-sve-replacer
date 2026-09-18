@@ -1,0 +1,628 @@
+#!/bin/bash
+
+PHONE_DOWNLOAD="/sdcard/Download/Diego_339177434"
+PHONE_MODS="/sdcard/Download/DIZZI WORLD APES-1.6.15/overrides/mods"
+ANDROID_SAVE_SMPI="/sdcard/Android/data/abc.smapi.gameloader/files/Saves"
+ANDROID_SAVE_VANILLA="/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves"
+ANDROID_MODS="/sdcard/Android/data/abc.smapi.gameloader/files/mods"
+WINE_SAVE="$HOME/.wine/drive_c/users/diego/AppData/Roaming/StardewValley/Saves"
+WINE_MODS="$HOME/.wine/drive_c/Games/Stardew Valley/Mods"
+BACKUP_DIR="$WINE_SAVE/backups"
+LOG_FILE="$HOME/.local/share/stardew-sync.log"
+MODPACK_DRIVE="https://drive.google.com/drive/u/0/folders/1hjuhPKr_mV_gZpubSxdz-CMkCbL46wVC"
+
+CYAN='\033[96m'
+GREEN='\033[92m'
+YELLOW='\033[93m'
+RED='\033[91m'
+DIM='\033[2m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+log() {
+  echo -e "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG_FILE" 2>/dev/null
+}
+
+backup_save() {
+  if [ -d "$WINE_SAVE/Diego_339177434" ]; then
+    mkdir -p "$BACKUP_DIR"
+    rm -rf "$BACKUP_DIR/Diego_339177434"
+    mv "$WINE_SAVE/Diego_339177434" "$BACKUP_DIR/Diego_339177434"
+    echo -e "${DIM}🗂 Save anterior respaldado en: $BACKUP_DIR/${RESET}"
+    log "BACKUP -> $BACKUP_DIR/Diego_339177434"
+  fi
+}
+
+restore_save() {
+  if [ -d "$BACKUP_DIR/Diego_339177434" ]; then
+    rm -rf "$WINE_SAVE/Diego_339177434"
+    mv "$BACKUP_DIR/Diego_339177434" "$WINE_SAVE/Diego_339177434"
+    echo -e "${YELLOW}♻️ Backup restaurado: ${RESET}$WINE_SAVE/Diego_339177434"
+    log "RESTORE <- $BACKUP_DIR/Diego_339177434"
+  fi
+}
+
+# ── Modpacks (andamiaje generico) ──────────────────────────────
+# Staging: descargar/extraer cada pack en ~/stardew-modpacks/<pack>/...
+MODPACK_STAGING="$HOME/stardew-modpacks"
+
+check_uid() {
+  # $1 = UniqueID MATCH -> 0 si un mod instalado lo declara como SU propio UniqueID
+  for m in "$WINE_MODS"/*/manifest.json; do
+    [ -f "$m" ] || continue
+    local uid; uid="$(jq -r '.UniqueID // empty' "$m" 2>/dev/null)"
+    [ "$uid" = "$1" ] && return 0
+  done
+  return 1
+}
+
+check_nexus() {
+  # $1 = numero Nexus (sin "Nexus:") -> 0 si un mod instalado lo declara en UpdateKeys
+  for m in "$WINE_MODS"/*/manifest.json; do
+    [ -f "$m" ] || continue
+    local hit; hit="$(jq -r --arg n "$1" '.UpdateKeys? // [] | index("Nexus:" + $n)' "$m" 2>/dev/null)"
+    [ -n "$hit" ] && [ "$hit" != "null" ] && return 0
+  done
+  return 1
+}
+
+
+asset_drop_apply() {
+  # Aplica assets que NO son mods con manifest: PNG overlay y XNB a Content.
+  # $1 = tipo: "felicia-png" | "660315-xnb"
+  local type="$1"
+  case "$type" in
+    felicia-png)
+      echo -e "${CYAN}🎨 asset-drop Felicia1L → SVE Characters (4 NPCs)${RESET}"
+      local SVE="$WINE_MODS/External-by dizzi~ [CP] Stardew Valley Expanded"
+      [ -d "$SVE" ] || { echo -e "${YELLOW}⚠ SVE no instalado — salto Felicia1L drop${RESET}"; return 1; }
+      for z in "$MODPACK_STAGING"/fase2-seasonal-anime/Felicia1L*.zip; do
+        [ -f "$z" ] || continue
+        local base; base="$(basename "$z")"
+        case "$base" in
+          *Claire*|*Olivia*|*Sophia*|*Victor*)
+            if unzip -l "$z" 2>/dev/null | grep -q "Stardew Valley Expanded/assets/CharacterFiles"; then
+              echo -e "${GREEN}✅ Felicia1L drop ← $base${RESET}"
+              unzip -o -q "$z" -d "$SVE"
+            fi
+            ;;
+        esac
+      done
+      ;;
+    660315-xnb)
+      echo -e "${CYAN}🎨 asset-drop 660315 → Content/Portraits (XNB)${RESET}"
+      local CONTENT="$HOME/.wine/drive_c/Games/Stardew Valley/Content/Portraits"
+      local src="$MODPACK_STAGING/fase3-660315/Portraits"
+      mkdir -p "$CONTENT"
+      local c=0
+      for f in "$src"/*.xnb; do
+        [ -f "$f" ] || continue
+        cp -f "$f" "$CONTENT/"
+        c=$((c+1))
+      done
+      echo -e "${GREEN}✅ $c XNB aplicados a Content/Portraits${RESET}"
+      ;;
+  esac
+}
+
+asset_drop_report() {
+  echo -e "${CYAN}🎨 asset-drops:${RESET}"
+  local F2="$MODPACK_STAGING/fase2-seasonal-anime"
+  echo -e "  · Felicia1L PNG → SVE: $(ls "$F2"/Felicia1L*.zip 2>/dev/null | wc -l) zips"
+  echo -e "  · 660315 XNB → Content/Portraits: $(ls "$MODPACK_STAGING/fase3-660315/Portraits"/*.xnb 2>/dev/null | wc -l) archivos"
+}
+
+
+modpack_sync() {
+  # Copia TODAS las carpetas/archivos del staging al WINE_MODS (rm -rf previo) y valida los mods.
+  # $1 = nombre display del pack, $2 = subcarpeta staging, $3+ = pares "Nexus:<id>|UniqueID" esperados
+  local name="$1" staging="$MODPACK_STAGING/$2"; shift 2
+  local expected=("$@") ok=0 missing=0 n=0
+  if [ ! -d "$staging" ]; then
+    echo -e "${RED}❌ [$name] staging no existe: ${DIM}$staging${RESET}"
+    log "FAIL modpack $name: staging missing"
+    return 1
+  fi
+  # staging vacio -> no hay nada que copiar, solo reportar
+  local items=("$staging"/*)
+  if [ -e "${items[0]:-$staging/__none__}" ] && [ "${items[0]}" = "$staging/*" ]; then
+    echo -e "${YELLOW}⬜ [$name] staging vacio - nada que instalar${RESET}"
+    return "$((${#expected[@]} > 0 ? 1 : 0))"
+  fi
+  mkdir -p "$WINE_MODS"
+  for item in "${items[@]}"; do
+    [ -e "$item" ] || continue
+    # solo copiar mods con manifest.json valido (evita assets sueltos o CPs sin manifest)
+    if [ -f "$item/manifest.json" ]; then
+      : # ok, es un mod
+    elif find "$item" -maxdepth 2 -name manifest.json 2>/dev/null | grep -q .; then
+      : # manifest anidado (pack con submods) -> ok
+    else
+      echo -e "${YELLOW}⏭  [$name] SINTA evitar: $item (sin manifest.json)${RESET}"
+      continue
+    fi
+    n=$((n + 1))
+    local base; base="$(basename "$item")"
+    chmod -Rf u+rwx "$WINE_MODS/$base" 2>/dev/null
+    rm -rf "$WINE_MODS/$base"
+    if cp -r "$item" "$WINE_MODS/$base"; then
+      chmod -Rf u+rwx "$WINE_MODS/$base" 2>/dev/null
+      echo -e "${GREEN}✅ [$name] wine Mods ← $base${RESET}"
+    else
+      echo -e "${RED}❌ [$name] FALLO copia: $base${RESET}"
+      ok=1
+    fi
+  done
+  for key in "${expected[@]}"; do
+    if [[ "$key" == Nexus:* ]]; then
+      local nid="${key#Nexus:}"
+      if check_nexus "$nid"; then
+        echo -e "${GREEN}✓ [$name] Nexus:$nid presente${RESET}"
+      else
+        echo -e "${YELLOW}⚠️  [$name] Nexus:$nid NO verificado${RESET}"
+        missing=1
+      fi
+    elif check_uid "$key"; then
+      echo -e "${GREEN}✓ [$name] UniqueID presente: $key${RESET}"
+    else
+      echo -e "${YELLOW}⚠️  [$name] UniqueID NO verificado: $key${RESET}"
+      missing=1
+    fi
+  done
+  [ "$ok" -eq 0 ] && [ "$missing" -eq 0 ] \
+    && log "OK modpack $name -> wine" || log "WARN modpack $name -> wine (faltan $missing ids, $ok copias rotas)"
+  return "$((missing + ok))"
+}
+
+modpack_push_phone() {
+  # Pushea al Android SMAPI cada carpeta del pack ya sincronizada en WINE_MODS.
+  # $1 = nombre display, $2 = subcarpeta staging (misma convencion que modpack_sync)
+  local name="$1" staging="$MODPACK_STAGING/$2"
+  local fail=0 pushed=0 has=0
+  for item in "$staging"/*; do [ -e "$item" ] && has=1 && break; done
+  [ "$has" -eq 1 ] || { echo -e "${YELLOW}⬜ [$name] staging vacio - nada que push${RESET}"; return 0; }
+  adb shell "mkdir -p '$ANDROID_MODS'" || return 1
+  for item in "$staging"/*; do
+    [ -e "$item" ] || continue
+    local base; base="$(basename "$item")"
+    [ -d "$WINE_MODS/$base" ] || continue
+    adb shell "rm -rf '$ANDROID_MODS/$base'"
+    if adb push -a "$WINE_MODS/$base" "$ANDROID_MODS/"; then
+      pushed=$((pushed + 1))
+    else
+      echo -e "${RED}❌ [$name] FALLO push Android: $base${RESET}"
+      fail=1
+    fi
+  done
+  [ "$fail" -eq 0 ] && echo -e "${GREEN}✅ [$name] Android SMAPI ← $pushed carpeta(s)${RESET}" \
+                   || echo -e "${RED}❌ [$name] hubo errores al pushear a Android${RESET}"
+  log "OK modpack $name -> android ($pushed folders)"
+  return "$fail"
+}
+
+android_exclude() {
+  # Quita de Android SMAPI los mods que el fork móvil (SMAPI-Android 4.3.2.5) no
+  # soporta o que crashean: dependientes de SpaceCore/MEEP y PolySweet Rooms.
+  # Uso: android_exclude <carpeta1> <carpeta2> ...
+  local removed=0
+  for d in "$@"; do
+    if adb shell "ls -d '$ANDROID_MODS/$d' 2>/dev/null" | grep -q .; then
+      adb shell "rm -rf '$ANDROID_MODS/$d'" && { echo -e "${DIM}  (android-exclude) quitado: $d${RESET}"; removed=$((removed + 1)); }
+    fi
+  done
+  log "ANDROID_EXCLUDE: $removed carpeta(s) removidas"
+}
+
+modpack_report() {
+  # Indica qué mods del pack ya están instalados y cuáles faltan (con link de descarga).
+  # $1 = nombre display, $2 = subcarpeta staging, $3+ = pares "clave|Nexus:NNN|https://nexus..."
+  local name="$1" staging_sub="$2"; shift 2
+  local n_missing=0
+  echo -e "${BOLD}Estado modpack: ${CYAN}$name${RESET}"
+  while [ $# -gt 0 ]; do
+    local key="$1" id="$2" url="$3"; shift 3
+    local ok=0
+    if [[ "$key" == Nexus:* ]]; then
+      local nid="${key#Nexus:}"
+      check_nexus "$nid" && ok=1
+    elif [[ "$key" == uid:* ]]; then
+      check_uid "${key#uid:}" && ok=1
+    fi
+    if [ "$ok" -eq 1 ]; then
+      echo -e "  ${GREEN}✓ instalado${RESET}  $id"
+    else
+      echo -e "  ${YELLOW}⬇ manual${RESET}    $id  →  ${CYAN}$url${RESET}  →  ${DIM}$MODPACK_STAGING/$staging_sub/${RESET}"
+      n_missing=$((n_missing + 1))
+    fi
+  done
+  echo ""
+  return "$n_missing"
+}
+
+clear
+echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}${BOLD}║     Stardew Valley Sync PC ↔ Android        ║${RESET}"
+echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════╝${RESET}\n"
+
+echo -e "${BOLD}PREREQUISITOS:${RESET}\n"
+echo -e "  1. Ten el save en ${BOLD}Downloads${RESET} del telefono"
+echo -e "     (carpeta Diego_339177434)\n"
+echo -e "  2. Mods a Android SMAPI: desde ${BOLD}Downloads${RESET} del telefono"
+echo -e "     (opcion 'Mods Phone') o desde tu ${BOLD}PC${RESET}:"
+echo -e "     ${CYAN}${DIM}$WINE_MODS${RESET}\n"
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
+
+if ! adb devices | grep -q "device$"; then
+    echo -e "${RED}❌ No hay celular conectado${RESET}"
+    exit 1
+fi
+
+echo -e "${GREEN}Celular detectado${RESET}\n"
+
+# ── Buscar save en el telefono ────────────────────────────────
+PHONE_SOURCE=""
+if adb shell "ls -d '$ANDROID_SAVE_SMPI/Diego_339177434'" &>/dev/null; then
+    PHONE_SOURCE="$ANDROID_SAVE_SMPI/Diego_339177434"
+    echo -e "${GREEN}📁 Save encontrado en: Android SMAPI${RESET}\n"
+elif adb shell "ls -d '$ANDROID_SAVE_VANILLA/Diego_339177434'" &>/dev/null; then
+    PHONE_SOURCE="$ANDROID_SAVE_VANILLA/Diego_339177434"
+    echo -e "${GREEN}📁 Save encontrado en: Android Vanilla${RESET}\n"
+elif adb shell "ls -d '$PHONE_DOWNLOAD'" &>/dev/null; then
+    PHONE_SOURCE="$PHONE_DOWNLOAD"
+    echo -e "${GREEN}📁 Save encontrado en: Downloads${RESET}\n"
+else
+    echo -e "${RED}❌ No se encontro el save en ninguna ubicacion del telefono${RESET}\n"
+    exit 1
+fi
+log "SOURCE=$PHONE_SOURCE"
+
+# ── Phone → Windows ───────────────────────────────────────────
+echo -e "${DIM}── Phone → Windows ──────────────────────────${RESET}\n"
+
+if gum confirm "¿Copiar saves del telefono a Windows? (reemplaza lo actual)"; then
+    mkdir -p "$WINE_SAVE"
+    backup_save
+    if adb pull -a "$PHONE_SOURCE" "$WINE_SAVE/"; then
+        echo -e "${GREEN}✅ Phone → Windows${RESET}\n"
+        log "OK Windows <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO Phone → Windows. Restaurando backup...${RESET}\n"
+        log "FAIL Windows <- $PHONE_SOURCE"
+        restore_save
+    fi
+fi
+
+# ── Windows → Android SMAPI/Vanilla ───────────────────────────
+echo -e "${DIM}── Windows → Android SMAPI/Vanilla ────────────${RESET}\n"
+
+if gum confirm "¿Copiar saves de Windows a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_SMPI'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/abc.smapi.gameloader/files/Saves/"; then
+        echo -e "${GREEN}✅ Windows → Android SMAPI${RESET}\n"
+        log "OK Android SMAPI <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Android SMAPI${RESET}\n"
+        log "FAIL Android SMAPI <- Windows"
+    fi
+fi
+
+if gum confirm "¿Copiar saves de Windows a Android Vanilla?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_VANILLA'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves/"; then
+        echo -e "${GREEN}✅ Windows → Android Vanilla${RESET}\n"
+        log "OK Android Vanilla <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Android Vanilla${RESET}\n"
+        log "FAIL Android Vanilla <- Windows"
+    fi
+fi
+
+# ── Windows → Phone Downloads ─────────────────────────────────
+echo -e "${DIM}── Windows → Phone Downloads ──────────────────${RESET}\n"
+
+if gum confirm "¿Copiar saves de Windows a Downloads del telefono? (reemplaza lo actual)"; then
+    if adb shell "rm -rf '$PHONE_DOWNLOAD'" && adb shell "mkdir -p '/sdcard/Download'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Download/"; then
+        echo -e "${GREEN}✅ Windows → Phone Downloads${RESET}\n"
+        log "OK Phone Downloads <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Phone Downloads${RESET}\n"
+        log "FAIL Phone Downloads <- Windows"
+    fi
+fi
+
+# ── Abrir carpeta Windows ─────────────────────────────────────
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
+
+if gum confirm "¿Abrir carpeta de saves de Windows?"; then
+    mkdir -p "$WINE_SAVE"
+    setsid nemo "$WINE_SAVE" &>/dev/null &
+fi
+
+
+# ── Phone → Android SMAPI/Vanilla ─────────────────────────────
+echo -e "${DIM}── Phone → Android SMAPI ──────────────────────${RESET}\n"
+
+if gum confirm "¿Copiar saves a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_SMPI' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_SMPI/'"; then
+        echo -e "${GREEN}✅ Saves → Android SMAPI${RESET}\n"
+        log "OK Android SMAPI <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO al copiar a Android SMAPI${RESET}\n"
+        log "FAIL Android SMAPI <- $PHONE_SOURCE"
+    fi
+fi
+
+if gum confirm "¿Copiar saves a Android Vanilla?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_VANILLA' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_VANILLA/'"; then
+        echo -e "${GREEN}✅ Saves → Android Vanilla${RESET}\n"
+        log "OK Android Vanilla <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO al copiar a Android Vanilla${RESET}\n"
+        log "FAIL Android Vanilla <- $PHONE_SOURCE"
+    fi
+fi
+
+if gum confirm "¿Copiar mods del telefono a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_MODS' && cp -r '$PHONE_MODS'/* '$ANDROID_MODS/'"; then
+        echo -e "${GREEN}✅ Mods Phone → Android SMAPI${RESET}\n"
+        log "OK Mods Android <- $PHONE_MODS"
+    else
+        echo -e "${RED}❌ FALLO al copiar mods Phone → Android SMAPI${RESET}\n"
+        log "FAIL Mods Android <- $PHONE_MODS"
+    fi
+fi
+
+if gum confirm "¿Copiar mods de Windows (PC) a Android SMAPI?"; then
+    if [ -d "$WINE_MODS" ]; then
+        if adb shell "mkdir -p '$ANDROID_MODS'" && adb push -a "$WINE_MODS/." "$ANDROID_MODS/"; then
+            echo -e "${GREEN}✅ Mods PC → Android SMAPI${RESET}\n"
+            log "OK Mods Android <- $WINE_MODS"
+            # Excepciones Android: el fork SMAPI-Android no soporta/crashea estos mods.
+            # Aplicar SIEMPRE tras cada push global (el push los vuelve a copiar).
+            android_exclude \
+                "PolyamorySweetBed" "PolyamorySweetKiss" "PolyamorySweetLove" "PolyamorySweetRooms" \
+                "PolyamorySweetWedding" "[CP] Polyamory Sweet" "MEEP" "SpaceCore" "JsonAssets" \
+                "[CP] RRRR" "[FS] Magnus Earrings" "[CP] Romanceable Rasmodia - RRRR Patch" \
+                "East Scarp: Locations" "East Scarp: NPCs" "East Scarp: C#" "East Scarp: Core" \
+                "East Scarp FTM" "ESBarberShop" "ConsoleCommands" "MobilePhone" "SaveBackup" \
+                "External-by dizzi~ [CP]Xtardew Portraits&Sprites" "Portraiture" \
+                "SpritesInDetail" "FashionSense"
+            echo -e "${DIM}  exclusiones Android aplicadas.${RESET}\n"
+        else
+            echo -e "${RED}❌ FALLO al copiar mods PC → Android SMAPI${RESET}\n"
+            log "FAIL Mods Android <- $WINE_MODS"
+        fi
+    else
+        echo -e "${RED}❌ No existe carpeta de mods en PC: $WINE_MODS${RESET}\n"
+    fi
+fi
+
+# ── Modpacks (Fase 0: base frameworks) ─────────────────────────
+echo -e "${DIM}── Modpacks (Fase 0: base) ────────────────────${RESET}\n"
+echo -e "${DIM}  Staging: descarga/extrae MODS MANUALES en ${RESET}${CYAN}$MODPACK_STAGING/fase0-base/${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase0-base" ]; then
+  modpack_report "Fase0-base" "fase0-base" \
+    "uid:Esca.FarmTypeManager"                             "Farm Type Manager (FTM)"                                        "https://www.nexusmods.com/stardewvalley/mods/1826" \
+    "uid:Parrot.RomRas"                                    "Rasmodia - Female Wizard"                                     "https://www.nexusmods.com/stardewvalley/mods/8265" \
+    "uid:Nom0ri.RomRas"                                    "Rasmodia (RRRR patch)"                                        "https://www.nexusmods.com/stardewvalley/mods/18144" \
+    "Nexus:28284"                                          "Cross-Mod Compatibility Tokens (CMCT)"                        "https://www.nexusmods.com/stardewvalley/mods/28284" \
+    "uid:Mangupix.DialogueDisplayFrameworkContinued"       "Dialogue Display Framework Continued"                         "https://www.nexusmods.com/stardewvalley/mods/22678" \
+    "Nexus:44971"                                          "DDFC Scaler"                                                  "https://www.nexusmods.com/stardewvalley/mods/44971" \
+    "uid:BleakCodex.SpritesInDetail"                       "Sprites in Detail"                                            "https://www.nexusmods.com/stardewvalley/mods/14487" \
+    "Nexus:20599"                                          "PolyamorySweet"                                               "https://www.nexusmods.com/stardewvalley/mods/20599"
+fi
+
+if gum confirm "¿Instalar frameworks base y sincronizar? (los ⬇ manual van a $MODPACK_STAGING/fase0-base/)"; then
+    modpack_sync "Fase0-base" "fase0-base" \
+        "Esca.FarmTypeManager"  "Parrot.RomRas"  "Nom0ri.RomRas" \
+        "Nexus:28284"       "Mangupix.DialogueDisplayFrameworkContinued"  "Nexus:44971" \
+        "BleakCodex.SpritesInDetail"  "Nexus:20599"
+    if [ -d "$MODPACK_STAGING/fase0-base" ]; then
+        modpack_push_phone "Fase0-base" "fase0-base"
+    fi
+fi
+
+# ── Modpacks (Fase 1: SVE / Expanded + Xtardew) ────────────────
+echo -e "${DIM}── Modpacks (Fase 1: SVE + Xtardew) ────────────${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase1-sve-xtardew" ]; then
+  modpack_report "Fase1-SVE-Xtardew" "fase1-sve-xtardew" \
+    "uid:FlashShifter.StardewValleyExpandedCP"  "SVE (Expanded) [CP]"            "https://www.nexusmods.com/stardewvalley/mods/3753" \
+    "Nexus:30982"                                "Red Panda Bazaar"               "https://www.nexusmods.com/stardewvalley/mods/30982" \
+    "Nexus:5787"                                 "East Scarp"                     "https://www.nexusmods.com/stardewvalley/mods/5787" \
+    "uid:Pseudodiego.XtardewValley"              "Xtardew Valley (padre)"         "https://www.nexusmods.com/stardewvalley/mods/1839" \
+    "Nexus:11867"                                "Xtardew Anime Portrait"         "https://www.nexusmods.com/stardewvalley/mods/11867" \
+    "Nexus:7404"                                 "Xtardew Anime Replacers"        "https://www.nexusmods.com/stardewvalley/mods/7404"
+fi
+
+if gum confirm "¿Instalar Fase 1 (SVE+Xtardew) y sincronizar?"; then
+    modpack_sync "Fase1-SVE-Xtardew" "fase1-sve-xtardew" \
+        "uid:FlashShifter.StardewValleyExpandedCP"  "Nexus:30982"  "Nexus:5787" \
+        "uid:Pseudodiego.XtardewValley"  "Nexus:11867"  "Nexus:7404"
+    if [ -d "$MODPACK_STAGING/fase1-sve-xtardew" ]; then
+        modpack_push_phone "Fase1-SVE-Xtardew" "fase1-sve-xtardew"
+    fi
+fi
+
+# ── Modpacks (Fase 2: Seasonal / Anime base) ────────────────────
+echo -e "${DIM}── Modpacks (Fase 2: Seasonal/Anime) ───────────${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase2-seasonal-anime" ]; then
+  modpack_report "Fase2-Seasonal-Anime" "fase2-seasonal-anime" \
+    "Nexus:43012"  "Drawberry's Seasonal Cuter for ESR"         "https://www.nexusmods.com/stardewvalley/mods/43012" \
+    "Nexus:16045"  "Seasonal Cute for East Scarp"               "https://www.nexusmods.com/stardewvalley/mods/16045" \
+    "Nexus:14158"  "Sydney - Custom NPC"                        "https://www.nexusmods.com/stardewvalley/mods/14158" \
+    "Nexus:32228"  "Dacar Rasmodia anime portraits"             "https://www.nexusmods.com/stardewvalley/mods/32228" \
+    "Nexus:5969"   "Seasonal Cuter for SVE"                     "https://www.nexusmods.com/stardewvalley/mods/5969" \
+    "Nexus:37247"  "FadeHelm East Scarp seasonal portrait"      "https://www.nexusmods.com/stardewvalley/mods/37247" \
+    "Nexus:42895"  "FadeHelm Rosa (East Scarp)"                 "https://www.nexusmods.com/stardewvalley/mods/42895" \
+    "Nexus:38101"  "FadeHelm Rasmodia portrait"                 "https://www.nexusmods.com/stardewvalley/mods/38101" \
+    "Nexus:39518"  "FadeHelm Lavril portrait"                   "https://www.nexusmods.com/stardewvalley/mods/39518" \
+    "Nexus:11282"  "Lavril - Spanish"                           "https://www.nexusmods.com/stardewvalley/mods/11282" \
+    "Nexus:46956"  "Felicia1L Wizard"                           "https://www.nexusmods.com/stardewvalley/mods/46956" \
+    "Nexus:46901"  "Felicia1L Claire"                           "https://www.nexusmods.com/stardewvalley/mods/46901" \
+    "Nexus:47618"  "Felicia1L Olivia"                           "https://www.nexusmods.com/stardewvalley/mods/47618" \
+    "Nexus:50052"  "Felicia1L Victor"                           "https://www.nexusmods.com/stardewvalley/mods/50052" \
+    "Nexus:48156"  "Felicia1L Sophia"                           "https://www.nexusmods.com/stardewvalley/mods/48156" \
+    "Nexus:9522"   "SVE High-Res Anime Olivia"                  "https://www.nexusmods.com/stardewvalley/mods/9522" \
+    "Nexus:19589"  "Igor's Anime Portraits SDV"                 "https://www.nexusmods.com/stardewvalley/mods/19589" \
+    "Nexus:19476"  "Older Jas (Igor)"                           "https://www.nexusmods.com/stardewvalley/mods/19476" \
+    "Nexus:19320"  "Igor's female Willy"                        "https://www.nexusmods.com/stardewvalley/mods/19320" \
+    "Nexus:19148"  "Igor's Pam"                                 "https://www.nexusmods.com/stardewvalley/mods/19148"
+fi
+
+if gum confirm "¿Instalar Fase 2 (Seasonal/Anime) y sincronizar?"; then
+    modpack_sync "Fase2-Seasonal-Anime" "fase2-seasonal-anime" \
+        "Nexus:43012" "Nexus:16045" "Nexus:14158" "Nexus:32228" "Nexus:5969" \
+        "Nexus:37247" "Nexus:42895" "Nexus:38101" "Nexus:39518" "Nexus:11282" \
+        "Nexus:46956" "Nexus:46901" "Nexus:47618" "Nexus:50052" "Nexus:48156" "Nexus:9522" \
+        "Nexus:19589" "Nexus:19476" "Nexus:19320" "Nexus:19148"
+    if [ -d "$MODPACK_STAGING/fase2-seasonal-anime" ]; then
+        modpack_push_phone "Fase2-Seasonal-Anime" "fase2-seasonal-anime"
+    fi
+    # asset-drop: Felicia1L PNG overlay a SVE Characters (4 NPCs)
+    asset_drop_apply "felicia-png"
+fi
+echo -e "${DIM}── Seasonal Cute + Anime Portraits ────────────${RESET}\n"
+
+SEASONAL_CUTE="$WINE_MODS/External-by dizzi~ [CP] Seasonal Cute Characters"
+SEASONAL_ANIME="$WINE_MODS/External-by dizzi~ [CP] Seasonal Anime Characters III"
+
+if gum confirm "¿Configurar Seasonal (Cute+Anime) y copiar a Android SMAPI? (Portraits Animes sobre Cute)"; then
+    if [ -d "$SEASONAL_CUTE" ] && [ -d "$SEASONAL_ANIME" ]; then
+        # Windows/wine: fusionar Portraits del Anime DENTRO del Cute (sobreescribir en orden)
+        if cp -r "$SEASONAL_ANIME/assets/Portraits/." "$SEASONAL_CUTE/assets/Portraits/"; then
+            echo -e "${GREEN}✅ Windows: Portraits Anime → Cute (sobrescritos)${RESET}\n"
+            log "Seasonal Windows: Portraits Anime -> Cute"
+        else
+            echo -e "${RED}❌ FALLO al fusionar Portraits en Windows${RESET}\n"
+            log "FAIL Seasonal Windows: Portraits fusion"
+        fi
+        # Android SMAPI: push Cute fusionado + push Anime completo, en ese orden
+        if adb shell "mkdir -p '$ANDROID_MODS'" \
+           && adb push -a "$SEASONAL_CUTE/" "$ANDROID_MODS/External-by dizzi~ [CP] Seasonal Cute Characters/" \
+           && adb push -a "$SEASONAL_ANIME/" "$ANDROID_MODS/External-by dizzi~ [CP] Seasonal Anime Characters III/"; then
+            echo -e "${GREEN}✅ Seasonal → Android SMAPI (Cute antes, Anime despues)${RESET}\n"
+            log "OK Seasonal Android <- Cute+Anime"
+        else
+            echo -e "${RED}❌ FALLO al copiar Seasonal → Android SMAPI${RESET}\n"
+            log "FAIL Seasonal Android <- Cute+Anime"
+        fi
+    else
+        echo -e "${RED}❌ No se encontraron los mods Seasonal en PC${RESET}\n"
+    fi
+fi
+
+# ── Modpacks (Fase 3: Packs de Portraits, UNO A LA VEZ) ────────
+echo -e "${DIM}── Modpacks (Fase 3: Portraits) ────────────────${RESET}\n"
+echo -e "${YELLOW}⚠️  Los packs de Portraits se pisan entre si. Instala UNO a la vez.${RESET}\n"
+
+pack_group() {
+  # Fase 3: activa UN pack a la vez. Al activar un pack, desactiva el anterior
+  # (borra sus carpetas de Mods y Android) antes de copiar el nuevo.
+  # $1 = display, $2 = staging subcarpeta, $3+ = triplas "Nexus:id|nombre|url"
+  local name="$1" sub="$2"; shift 2
+  [ -d "$MODPACK_STAGING/$sub" ] || return 0
+  modpack_report "$name" "$sub" "$@"
+  if gum confirm "¿ACTIVAR $name (aisla el resto de packs de Portraits) y sincronizar?"; then
+    # 1) desactivar pack de Fase 3 activo anterior (si hay otro)
+    local prev=""
+    [ -f "$MODPACK_STAGING/.fase3-activo" ] && prev="$(cat "$MODPACK_STAGING/.fase3-activo")"
+    if [ -n "$prev" ] && [ "$prev" != "$sub" ] && [ -d "$MODPACK_STAGING/$prev" ]; then
+      echo -e "${YELLOW}⏏️  Desactivando pack previo: $prev${RESET}"
+      for item in "$MODPACK_STAGING/$prev"/*; do
+        [ -e "$item" ] || continue
+        local b; b="$(basename "$item")"
+        chmod -Rf u+rwx "$WINE_MODS/$b" 2>/dev/null
+        rm -rf "$WINE_MODS/$b"
+        adb shell "rm -rf '$ANDROID_MODS/$b'" 2>/dev/null
+      done
+    fi
+    # 2) instalar el pack elegido (wine + android)
+    local keys=()
+    while [ $# -gt 0 ]; do
+      keys+=("$1"); shift 3
+    done
+    modpack_sync "$name" "$sub" "${keys[@]}"
+    modpack_push_phone "$name" "$sub"
+    # 3) asset-drops especiales según pack
+    if [ "$sub" = "fase3-660315" ]; then
+      asset_drop_apply "660315-xnb"
+    fi
+    # 4) marcar activo
+    echo "$sub" > "$MODPACK_STAGING/.fase3-activo"
+    log "ACTIVO packs portraits: $sub"
+  fi
+  echo ""
+}
+
+pack_group "Valley Girls" "fase3-valleygirls" \
+  "Nexus:4399" "Valley Girls (padre)"     "https://www.nexusmods.com/stardewvalley/mods/4399" \
+  "Nexus:12106" "Valley Girls Anime Portrait" "https://www.nexusmods.com/stardewvalley/mods/12106" \
+  "Nexus:14738" "Valley Girls (extra 1)"    "https://www.nexusmods.com/stardewvalley/mods/14738" \
+  "Nexus:35492" "Valley Girls (extra 2)"    "https://www.nexusmods.com/stardewvalley/mods/35492"
+
+pack_group "Bountiful Beauties (Mud)" "fase3-bountiful" \
+  "Nexus:37316" "BB Vol.1 Less Skimpy"    "https://www.nexusmods.com/stardewvalley/mods/37316" \
+  "Nexus:29979" "BB Vol.1 Super Skimpy"   "https://www.nexusmods.com/stardewvalley/mods/29979" \
+  "Nexus:37227" "BB Vol.2 Super Skimpy"   "https://www.nexusmods.com/stardewvalley/mods/37227" \
+  "Nexus:30712" "BB Vol.1 ES VN-Style"    "https://www.nexusmods.com/stardewvalley/mods/30712" \
+  "Nexus:37333" "BB Vol.2 ES Skimpy"      "https://www.nexusmods.com/stardewvalley/mods/37333"
+
+pack_group "OO's Anime Skimpy" "fase3-oos" \
+  "Nexus:32397" "OO's Anime Skimpy"        "https://www.nexusmods.com/stardewvalley/mods/32397" \
+  "Nexus:37312" "OO's for SVE"             "https://www.nexusmods.com/stardewvalley/mods/37312" \
+  "Nexus:38738" "OO's remove tattoo SVE"   "https://www.nexusmods.com/stardewvalley/mods/38738" \
+  "Nexus:35970" "Robin no tattoo"          "https://www.nexusmods.com/stardewvalley/mods/35970" \
+  "Nexus:14487" "Sprites in Detail (req)"  "https://www.nexusmods.com/stardewvalley/mods/14487"
+
+pack_group "Igor's Anime" "fase3-igors" \
+  "Nexus:19589" "Igor's SDV NPC"   "https://www.nexusmods.com/stardewvalley/mods/19589" \
+  "Nexus:19476" "Older Jas"        "https://www.nexusmods.com/stardewvalley/mods/19476" \
+  "Nexus:19320" "female Willy"     "https://www.nexusmods.com/stardewvalley/mods/19320" \
+  "Nexus:19148" "Pam"              "https://www.nexusmods.com/stardewvalley/mods/19148"
+
+pack_group "Pretty Anime (Shop)" "fase3-pretty" \
+  "Nexus:44894" "Shop Portrait Overhaul"    "https://www.nexusmods.com/stardewvalley/mods/44894" \
+  "Nexus:45136" "Pretty Anime Misc Shops"   "https://www.nexusmods.com/stardewvalley/mods/45136" \
+  "Nexus:38134" "Pretty Anime Portraits"    "https://www.nexusmods.com/stardewvalley/mods/38134" \
+  "Nexus:39535" "Beach Bikinis (req)"       "https://www.nexusmods.com/stardewvalley/mods/39535" \
+  "Nexus:28532" "Improved Swimsuits (req)"  "https://www.nexusmods.com/stardewvalley/mods/28532" \
+  "Nexus:10505" "GMCM Options (req)"        "https://www.nexusmods.com/stardewvalley/mods/10505"
+
+pack_group "SVE Anime Replacer" "fase3-sve-replacer" \
+  "Nexus:17516" "(SVE) Anime Portraits Replacer" "https://www.nexusmods.com/stardewvalley/mods/17516"
+
+pack_group "660315's Anime" "fase3-660315" \
+  "Nexus:18610" "Xtardew Anime Retexture"  "https://www.nexusmods.com/stardewvalley/mods/18610" \
+  "Nexus:11654" "ALL NPC anime portraits"  "https://www.nexusmods.com/stardewvalley/mods/11654" \
+  "Nexus:11760" "Anime Expanded portraits" "https://www.nexusmods.com/stardewvalley/mods/11760" \
+  "Nexus:8922"  "Anime Ridgeside"          "https://www.nexusmods.com/stardewvalley/mods/8922" \
+  "Nexus:18608" "Rasmodia Anime Retexture" "https://www.nexusmods.com/stardewvalley/mods/18608"
+
+# ── Verificar ─────────────────────────────────────────────────
+echo -e "${DIM}──────────────────────────────────────────────${RESET}"
+echo -e "${BOLD}Verificación:${RESET}\n"
+
+# asset-drops registrados (Felicia1L PNG → SVE, 660315 XNB → Content)
+asset_drop_report
+echo ""
+
+echo -e "${CYAN}Phone Downloads:${RESET}"
+adb shell "ls '$PHONE_DOWNLOAD'" 2>/dev/null | head -5 || echo -e "  ${RED}No existe${RESET}"
+echo ""
+
+echo -e "${CYAN}Android SMAPI:${RESET}"
+adb shell "ls '$ANDROID_SAVE_SMPI/Diego_339177434/'" 2>/dev/null | head -5
+echo ""
+
+echo -e "${CYAN}Android Vanilla:${RESET}"
+adb shell "ls '$ANDROID_SAVE_VANILLA/Diego_339177434/'" 2>/dev/null | head -5
+echo ""
+
+echo -e "${CYAN}Windows:${RESET}"
+if [ -d "$WINE_SAVE/Diego_339177434" ]; then
+    ls "$WINE_SAVE/Diego_339177434/" 2>/dev/null | head -5
+else
+    echo -e "  ${RED}No existe${RESET}"
+fi
+echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
