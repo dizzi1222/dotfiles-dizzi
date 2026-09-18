@@ -1,11 +1,60 @@
 #!/bin/bash
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 🧩 TIPOS DE MODS EN STARDEW VALLEY (y cómo identificarlos)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# 1) 🟦 CP / Content Patcher (el más común)
+#    · Identificar: carpeta con manifest.json + content.json
+#    · Qué es: mod de parcheo — dice al juego qué cambiar (imágenes, diálogos,
+#      datos) SIN tocar los archivos originales.
+#    · Instalar: copiar la carpeta ENTERA a Mods/ del juego.
+#    · Ejemplo: [CP] Felicia1L- Anime Portraits for Wizard, Pretty Anime Portraits.
+#
+# 2) 🟨 Asset-Drop / PNG sueltos
+#    · Identificar: NO trae manifest.json — son .png/.PNG sueltos en una carpeta
+#      (ej: Susan/Susan_Beach.PNG, Portraits/Andy/Andy.PNG).
+#    · Qué es: archivos de imagen que reemplazan PNG DENTRO de otro mod ya
+#      instalado (aquí: dentro de Stardew Valley Expanded).
+#    · Instalar: NO van a Mods/. Se extraen y se copian dentro de la carpeta del
+#      mod destino, ej:
+#        Susan/Susan*.PNG → Mods/External-by dizzi~ [CP] Stardew Valley Expanded/
+#                           assets/CharacterFiles/Portraits/Susan/
+#    · ⚠️ Regla crítica: se aplican EN ORDEN — el último que pisa, gana.
+#    · ⚠️ Case: SVE referencia *.png (minúscula) → los drops se normalizan
+#      (.PNG → .png) para que el juego los cargue.
+#
+# 3) 🟪 XNB (los más viejos)
+#    · Identificar: archivos .xnb (compilados, ilegibles).
+#    · Qué es: reemplazan directamente los archivos comprimidos del juego vanilla
+#      (carpeta Content/).
+#    · Instalar: NO van a Mods/ ni a la carpeta del mod; van a Content/ del juego
+#      (fuera de Mods). Ej: el pack 660315 (101 XNB).
+#
+# 4) 🟩 SMAPI C# / frameworks
+#    · Identificar: archivo .dll + manifest.json.
+#    · Instalar: como el CP — carpeta entera a Mods/.
+#    · Ejemplo: DDFC, ShopPortraitOverhaul, ContentPatcher.
+#
+# 🔍 Clasificación de los mods de portraits de SVE en Descargas:
+#    Susan's_Portraits (24511)      → 🟨 PNG sueltos → Portraits/Susan/
+#    Scarlett's_Potraits (24329)    → 🟨 PNG sueltos → Portraits/Scarlett/
+#    Claire's_Portraits (24510)     → 🟨 PNG sueltos → Portraits/Claire/
+#    SVEAnimePortraits (17516)      → 🟨 PNG sueltos (con Joja/) → varios NPCs
+#    Felicia1L × 5                  → 🟨 drops (Claire/Olivia/Sophia/Victor)
+#                                      + 🟦 CP (Wizard)
+#    Ninguno es XNB ni requiere dict DDFC → ninguno causa mosaico/cuadro.
+# ═══════════════════════════════════════════════════════════════════════════
+
 PHONE_DOWNLOAD="/sdcard/Download/Diego_339177434"
 PHONE_MODS="/sdcard/Download/DIZZI WORLD APES-1.6.15/overrides/mods"
 ANDROID_SAVE_SMPI="/sdcard/Android/data/abc.smapi.gameloader/files/Saves"
 ANDROID_SAVE_VANILLA="/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves"
 ANDROID_MODS="/sdcard/Android/data/abc.smapi.gameloader/files/mods"
 WINE_SAVE="$HOME/.wine/drive_c/users/diego/AppData/Roaming/StardewValley/Saves"
+WINE_MODS="$HOME/.wine/drive_c/Games/Stardew Valley/Mods"
+BACKUP_DIR="$WINE_SAVE/backups"
+LOG_FILE="$HOME/.local/share/stardew-sync.log"
 MODPACK_DRIVE="https://drive.google.com/drive/u/0/folders/1hjuhPKr_mV_gZpubSxdz-CMkCbL46wVC"
 
 CYAN='\033[96m'
@@ -16,93 +65,817 @@ DIM='\033[2m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
+log() {
+  echo -e "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG_FILE" 2>/dev/null
+}
+
+backup_save() {
+  if [ -d "$WINE_SAVE/Diego_339177434" ]; then
+    mkdir -p "$BACKUP_DIR"
+    rm -rf "$BACKUP_DIR/Diego_339177434"
+    mv "$WINE_SAVE/Diego_339177434" "$BACKUP_DIR/Diego_339177434"
+    echo -e "${DIM}🗂 Save anterior respaldado en: $BACKUP_DIR/${RESET}"
+    log "BACKUP -> $BACKUP_DIR/Diego_339177434"
+  fi
+}
+
+restore_save() {
+  if [ -d "$BACKUP_DIR/Diego_339177434" ]; then
+    rm -rf "$WINE_SAVE/Diego_339177434"
+    mv "$BACKUP_DIR/Diego_339177434" "$WINE_SAVE/Diego_339177434"
+    echo -e "${YELLOW}♻️ Backup restaurado: ${RESET}$WINE_SAVE/Diego_339177434"
+    log "RESTORE <- $BACKUP_DIR/Diego_339177434"
+  fi
+}
+
+# ── Modpacks (andamiaje generico) ──────────────────────────────
+# Staging: descargar/extraer cada pack en ~/stardew-modpacks/<pack>/...
+MODPACK_STAGING="$HOME/stardew-modpacks"
+
+check_uid() {
+  # $1 = UniqueID MATCH -> 0 si un mod instalado lo declara como SU propio UniqueID
+  for m in "$WINE_MODS"/*/manifest.json; do
+    [ -f "$m" ] || continue
+    local uid; uid="$(jq -r '.UniqueID // empty' "$m" 2>/dev/null)"
+    [ "$uid" = "$1" ] && return 0
+  done
+  return 1
+}
+
+check_nexus() {
+  # $1 = numero Nexus (sin "Nexus:") -> 0 si un mod instalado lo declara en UpdateKeys
+  for m in "$WINE_MODS"/*/manifest.json; do
+    [ -f "$m" ] || continue
+    local hit; hit="$(jq -r --arg n "$1" '.UpdateKeys? // [] | index("Nexus:" + $n)' "$m" 2>/dev/null)"
+    [ -n "$hit" ] && [ "$hit" != "null" ] && return 0
+  done
+  return 1
+}
+
+
+asset_drop_apply() {
+  # Aplica assets que NO son mods con manifest: PNG overlay y XNB a Content.
+  # $1 = tipo: "felicia-png" | "sve-npc-portraits" | "sve-portraits-replacer" | "660315-xnb"
+  local type="$1"
+  case "$type" in
+    felicia-png)
+      echo -e "${CYAN}🎨 asset-drop Felicia1L → SVE Characters (4 NPCs)${RESET}"
+      local SVE="$WINE_MODS/External-by dizzi~ [CP] Stardew Valley Expanded"
+      [ -d "$SVE" ] || { echo -e "${YELLOW}⚠ SVE no instalado — salto Felicia1L drop${RESET}"; return 1; }
+      local TMP; TMP="$(mktemp -d)"
+      for z in "$MODPACK_STAGING"/fase2-seasonal-anime/Felicia1L*.zip; do
+        [ -f "$z" ] || continue
+        local base; base="$(basename "$z")"
+        case "$base" in
+          *Claire*|*Olivia*|*Sophia*|*Victor*)
+            if unzip -l "$z" 2>/dev/null | grep -q "Stardew Valley Expanded/assets/CharacterFiles"; then
+              rm -rf "$TMP"/* ; unzip -o -q "$z" -d "$TMP"
+              # APLANAR: el zip trae prefijo '[CP] Stardew Valley Expanded/...' — copiar su contenido a la raíz de SVE
+              # (evita crear la subcapa anidada SVE/[CP] Stardew Valley Expanded)
+              local nest="$TMP/[CP] Stardew Valley Expanded"
+              if [ -d "$nest" ]; then
+                cp -r "$nest/." "$SVE/"
+                echo -e "${GREEN}✅ Felicia1L drop (aplanado) ← $base${RESET}"
+              else
+                echo -e "${YELLOW}⚠ $base sin estructura [CP] — salto${RESET}"
+              fi
+            fi
+            ;;
+        esac
+      done
+      rm -rf "$TMP"
+      ;;
+    sve-npc-portraits)
+      # Susan (24511) / Scarlett (24329) / Claire (24510): PNG sueltos `<npc>/*.PNG`
+      # → SVE assets/CharacterFiles/Portraits/<npc>/
+      echo -e "${CYAN}🎨 asset-drop SVE NPC Portraits (Susan/Scarlett/Claire)${RESET}"
+      local SVE2="$WINE_MODS/External-by dizzi~ [CP] Stardew Valley Expanded"
+      [ -d "$SVE2" ] || { echo -e "${YELLOW}⚠ SVE no instalado${RESET}"; return 1; }
+      local TMP2; TMP2="$(mktemp -d)"
+      for z in \
+        "$MODPACK_STAGING"/fase2-seasonal-anime/Susan*.zip \
+        "$MODPACK_STAGING"/fase2-seasonal-anime/Scarlett*.zip \
+        "$MODPACK_STAGING"/fase2-seasonal-anime/Claire*.zip; do
+        [ -f "$z" ] || continue
+        local base; base="$(basename "$z")"
+        if [ -d "$MODPACK_STAGING/fase2-seasonal-anime" ] && [ -f "$z" ]; then
+          rm -rf "$TMP2"/* ; unzip -o -q "$z" -d "$TMP2"
+          # copiar cada carpeta <npc>/ a su Portraits/<npc>/
+          for npcdir in "$TMP2"/*/; do
+            [ -d "$npcdir" ] || continue
+            local npc; npc="$(basename "$npcdir")"
+            [ "$npc" = "__MACOSX" ] && continue
+            mkdir -p "$SVE2/assets/CharacterFiles/Portraits/$npc"
+            cp -r "$npcdir". "$SVE2/assets/CharacterFiles/Portraits/$npc/"
+            # normalizar mayúsculas: SVE referencia *.png (lower); si el zip trae .PNG re-copiar a .png
+            ( cd "$SVE2/assets/CharacterFiles/Portraits/$npc" && for f in *.PNG; do [ -f "$f" ] || continue; cp -f "$f" "${f%.PNG}.png"; done ) 2>/dev/null || true
+            echo -e "${GREEN}✅ SVE portraits ← $npc (${base%%-*})${RESET}"
+          done
+        fi
+      done
+      rm -rf "$TMP2"
+      ;;
+    sve-portraits-replacer)
+      # (SVE) Anime Portraits Replacer 17516 + portraits separados (Alesia/Isaac/Jadu, Morgan, Suki, Susan 24511).
+      # Procesa TODOS los *.zip del staging; acepta dos estructuras:
+      #   - Portraits/<npc>/...   (estilo 17516 base)
+      #   - <NPC>.PNG plano a la raíz (estilo separados: Alesia.PNG, Morgan.png, Suki.PNG, Isaac.PNG...)
+      # Skip configurables (no se copian aunque vengan en un zip): Alesia (excluida), Claire base
+      # (Felicia ya gana vía override), Lance (se usa Lannah - Female Lance 11085).
+      echo -e "${CYAN}🎨 asset-drop SVE Anime Portraits Replacer (17516 + separados)${RESET}"
+      local SVE3="$WINE_MODS/External-by dizzi~ [CP] Stardew Valley Expanded"
+      [ -d "$SVE3" ] || { echo -e "${YELLOW}⚠ SVE no instalado${RESET}"; return 1; }
+      local RSR="$MODPACK_STAGING/fase3-sve-replacer"
+      local SKIP=("Alesia" "Claire" "Lance")
+      local applied=0 tmpz; tmpz="$(mktemp -d)"
+      for z in "$RSR"/*.zip "$HOME/Descargas"/SVEAnimePortraits-17516*.zip; do
+        [ -f "$z" ] || continue
+        # normalizar el zip como único: extraer a subcarpeta
+        local sub; sub="$tmpz/$(basename "$z")"
+        mkdir -p "$sub"; unzip -o -q "$z" -d "$sub" 2>/dev/null || continue
+        local npc
+        # 1) estructura Portraits/<npc>/
+        for pd in "$sub"/Portraits/*/; do [ -d "$pd" ] || continue
+          npc="$(basename "$pd")"
+          [[ " ${SKIP[*]} " == *" $npc "* ]] && { echo -e "${YELLOW}⏭  skip $npc (replacer)${RESET}"; continue; }
+          mkdir -p "$SVE3/assets/CharacterFiles/Portraits/$npc"
+          cp -r "$pd". "$SVE3/assets/CharacterFiles/Portraits/$npc/"
+          ( cd "$SVE3/assets/CharacterFiles/Portraits/$npc" && for f in *.PNG; do [ -f "$f" ] || continue; cp -f "$f" "${f%.PNG}.png"; done ) 2>/dev/null || true
+          echo -e "${GREEN}✅ replacer portrait ← $npc${RESET}"; applied=$((applied+1))
+        done
+        # 2) PNG planos a la raíz → <npc>/<npc>.png (ej. Alesia.PNG, Morgan.png, Suki.PNG, Isaac.PNG, Jadu.PNG)
+        local pf
+        for pf in "$sub"/*.{png,PNG}; do [ -f "$pf" ] || continue
+          npc="$(basename "$pf")"; npc="${npc%.PNG}"; npc="${npc%.png}"
+          [[ " ${SKIP[*]} " == *" $npc "* ]] && { echo -e "${YELLOW}⏭  skip $npc (replacer)${RESET}"; continue; }
+          mkdir -p "$SVE3/assets/CharacterFiles/Portraits/$npc"
+          cp -f "$pf" "$SVE3/assets/CharacterFiles/Portraits/$npc/$npc.PNG"
+          cp -f "$pf" "$SVE3/assets/CharacterFiles/Portraits/$npc/$npc.png"
+          echo -e "${GREEN}✅ replacer portrait ← $npc (plano)${RESET}"; applied=$((applied+1))
+        done
+        # 2b) PNG planos dentro de Portraits/ (ej. zip 'Alesia Isaac Jadu': Portraits/Alesia.PNG, Portraits/Isaac.PNG, Portraits/Jadu.PNG)
+        for pf in "$sub"/Portraits/*.{png,PNG}; do [ -f "$pf" ] || continue
+          npc="$(basename "$pf")"; npc="${npc%.PNG}"; npc="${npc%.png}"
+          [[ " ${SKIP[*]} " == *" $npc "* ]] && { echo -e "${YELLOW}⏭  skip $npc (replacer)${RESET}"; continue; }
+          mkdir -p "$SVE3/assets/CharacterFiles/Portraits/$npc"
+          cp -f "$pf" "$SVE3/assets/CharacterFiles/Portraits/$npc/$npc.PNG"
+          cp -f "$pf" "$SVE3/assets/CharacterFiles/Portraits/$npc/$npc.png"
+          echo -e "${GREEN}✅ replacer portrait ← $npc (Portraits plano)${RESET}"; applied=$((applied+1))
+        done
+        # 3) subcarpeta <npc>/ (ej. Susan/Susan_*.PNG del 24511)
+        for npcd in "$sub"/*/; do [ -d "$npcd" ] || continue
+          npc="$(basename "$npcd")"
+          [ "$npc" = "__MACOSX" ] && continue
+          [[ " ${SKIP[*]} " == *" $npc "* ]] && { echo -e "${YELLOW}⏭  skip $npc (replacer)${RESET}"; continue; }
+          if find "$npcd" -maxdepth 1 -iname "*.png" -o -maxdepth 1 -iname "*.PNG" 2>/dev/null | grep -q .; then
+            mkdir -p "$SVE3/assets/CharacterFiles/Portraits/$npc"
+            cp -r "$npcd". "$SVE3/assets/CharacterFiles/Portraits/$npc/"
+            ( cd "$SVE3/assets/CharacterFiles/Portraits/$npc" && for f in *.PNG; do [ -f "$f" ] || continue; cp -f "$f" "${f%.PNG}.png"; done ) 2>/dev/null || true
+            echo -e "${GREEN}✅ replacer portrait ← $npc (folder)${RESET}"; applied=$((applied+1))
+          fi
+        done
+        # 4) Joja/ (vendor de tienda) solo del 17516 base
+        if [ -d "$sub/Joja" ]; then
+          mkdir -p "$SVE3/assets/CharacterFiles/Shops/Joja"
+          cp -r "$sub/Joja/." "$SVE3/assets/CharacterFiles/Shops/Joja/"
+          echo -e "${GREEN}✅ replacer vendor ← Joja/ (Shops/Joja)${RESET}"
+        fi
+      done
+      rm -rf "$tmpz"
+      echo -e "${GREEN}✅ replacer: $applied NPCs aplicados (skip: Alesia/Claire/Lance)${RESET}"
+      ;;
+    660315-xnb)
+      echo -e "${CYAN}🎨 asset-drop 660315 → Content/Portraits (XNB)${RESET}"
+      local CONTENT="$HOME/.wine/drive_c/Games/Stardew Valley/Content/Portraits"
+      local src="$MODPACK_STAGING/fase3-660315/Portraits"
+      mkdir -p "$CONTENT"
+      local c=0
+      for f in "$src"/*.xnb; do
+        [ -f "$f" ] || continue
+        cp -f "$f" "$CONTENT/"
+        c=$((c+1))
+      done
+      echo -e "${GREEN}✅ $c XNB aplicados a Content/Portraits${RESET}"
+      ;;
+    sydney-portraits)
+      # "New anime-style portraits for Sydney" (38486): single PNG overlay -> [CP] Sydney - A Custom NPC Portraits
+      echo -e "${CYAN}🎨 asset-drop Sydney portraits → [CP] Sydney${RESET}"
+      local SYD="$WINE_MODS/[CP] Sydney - A Custom NPC"
+      [ -d "$SYD" ] || { echo -e "${YELLOW}⚠ [CP] Sydney no instalado${RESET}"; return 1; }
+      local ZSYD="$MODPACK_STAGING/fase3-sydney/Sydney portraits-38486-1-0-0-1760283704.zip"
+      [ -f "$ZSYD" ] || ZSYD="$HOME/Descargas/Sydney portraits-38486-1-0-0-1760283704.zip"
+      [ -f "$ZSYD" ] || { echo -e "${YELLOW}⚠ zip Sydney portraits no encontrado${RESET}"; return 1; }
+      local TMP4; TMP4="$(mktemp -d)"
+      unzip -o -q "$ZSYD" -d "$TMP4"
+      # el zip trae 'Sydney portraits/Portraits/Sydney_Portraits.png' -> copiar a Sydney/Assets/CharacterFiles/Portraits/
+      local srcpng; srcpng="$(find "$TMP4" -iname "Sydney_Portraits.png" 2>/dev/null | head -1)"
+      if [ -n "$srcpng" ]; then
+        cp -f "$srcpng" "$SYD/Assets/CharacterFiles/Portraits/Sydney_Portraits.png"
+        echo -e "${GREEN}✅ Sydney_Portraits.png → [CP] Sydney${RESET}"
+      else
+        echo -e "${YELLOW}⚠ PNG no encontrado en zip Sydney${RESET}"
+      fi
+      rm -rf "$TMP4"
+      ;;
+  esac
+}
+
+asset_drop_report() {
+  echo -e "${CYAN}🎨 asset-drops:${RESET}"
+  local F2="$MODPACK_STAGING/fase2-seasonal-anime"
+  echo -e "  · Felicia1L PNG → SVE: $(ls "$F2"/Felicia1L*.zip 2>/dev/null | wc -l) zips"
+  echo -e "  · SVE NPC Portraits (Susan/Scarlett/Claire): $(ls "$F2"/Susan*.zip "$F2"/Scarlett*.zip "$F2"/Claire*.zip 2>/dev/null | wc -l) zips"
+  local Z17516="$MODPACK_STAGING/fase3-sve-replacer/SVEAnimePortraits-17516-1-1-1689905600.zip"
+  [ -f "$Z17516" ] || Z17516="$HOME/Descargas/SVEAnimePortraits-17516-1-1-1689905600.zip"
+  echo -e "  · (SVE) Anime Portraits Replacer 17516: $([ -f "$Z17516" ] && echo 'presente' || echo 'FALTA zip')"
+  local ZSYD="$HOME/Descargas/Sydney portraits-38486-1-0-0-1760283704.zip"
+  echo -e "  · Sydney Portraits (38486, rem): $([ -f "$ZSYD" ] && echo 'presente' || echo 'no descargado')"
+  echo -e "  · 660315 XNB → Content/Portraits: $(ls "$MODPACK_STAGING/fase3-660315/Portraits"/*.xnb 2>/dev/null | wc -l) archivos"
+}
+
+packs_to_gdrive() {
+  # Sincroniza el staging LOCAL (fuente de trabajo) → packs-staging/ GDrive (respaldo persistente).
+  # GDrive = mount rclone `gd-libros` en ~/mi_gdlibros; NO se usa como fuente durante instalaciones.
+  local GV="/home/diego/mi_gdlibros/⛹️Games, Mods/Stardew Valley; MODS CurseForge/packs-staging"
+  [ -d "$GV" ] || { echo -e "${YELLOW}⚠ GDrive no montado — sincroniza manualmente${RESET}"; return 1; }
+  echo -e "${CYAN}⏫ Sincronizando staging LOCAL → packs-staging/ (GDrive)${RESET}"
+  # copiar packs de fase*/ newest files
+  local copied=0
+  for z in "$MODPACK_STAGING"/fase*/pack-*.zip "$MODPACK_STAGING"/fase*/*.zip "$MODPACK_STAGING"/fase*/*.rar; do
+    [ -f "$z" ] || continue
+    local b; b="$(basename "$z")"
+    cp -f "$z" "$GV/$b" 2>/dev/null && { copied=$((copied+1)); echo -e "  ✓ $b"; }
+  done
+  echo -e "${GREEN}✅ $copied archivos sincronizados a packs-staging/ (GDrive)${RESET}"
+}
+
+override_sve_claire_choice() {
+  # Gestión del arte de Claire (NPC SVE) en `dizzi SVE Portrait Force`.
+  # Dos opciones estables como assets del override: Claire_felicia.png (46901) y Claire_seasonal.png
+  # (Seasonal Outfits preservado). La decisión la toma el usuario aquí (gum confirm) y se aplica sobre
+  # assets/Claire.png (FromFile del Load late). Default = Felicia.
+  local OV="$WINE_MODS/[CP] dizzi SVE Portrait Force"
+  [ -d "$OV" ] || { echo -e "${YELLOW}⚠ [CP] dizzi SVE Portrait Force no instalado — salto decisión Claire${RESET}"; return 1; }
+  [ -f "$OV/assets/Claire_felicia.png" ] && [ -f "$OV/assets/Claire_seasonal.png" ] || {
+    echo -e "${RED}❌ override sin los dos assets de Claire (Claire_felicia/Claire_seasonal) — re-aplica desde staging${RESET}"
+    return 1
+  }
+  echo -e "${CYAN}🎨 Art de Claire (SVE Portrait Force):${RESET}"
+  echo -e "   · Felicia1L (46901)  = anime consistente con Sophia/Victor"
+  echo -e "   · Seasonal Outfits   = el estilo 'Seasonal Anime Outfits' que venía en SVE"
+  if gum confirm "¿Claire con art de Felicia1L? (No = Seasonal Outfits)"; then
+    cp -f "$OV/assets/Claire_felicia.png" "$OV/assets/Claire.png"
+    echo -e "${GREEN}✅ Claire = Felicia1L${RESET}"
+  else
+    cp -f "$OV/assets/Claire_seasonal.png" "$OV/assets/Claire.png"
+    echo -e "${GREEN}✅ Claire = Seasonal Anime Outfits${RESET}"
+  fi
+}
+
+override_sve_susan_choice() {
+  # Gestión del arte de Susan (NPC SVE) en `dizzi SVE Portrait Force`.
+  # Susan_felicia.png = Summer del 24511 (Seasonal Anime Outfits, DonutSteelPeas) → base del diálogo normal.
+  # Susan_vanilla.png = base antiguo de SVE (preservado). Decisión vía gum confirm. Default = 24511.
+  local OV="$WINE_MODS/[CP] dizzi SVE Portrait Force"
+  [ -d "$OV" ] || { echo -e "${YELLOW}⚠ [CP] dizzi SVE Portrait Force no instalado — salto decisión Susan${RESET}"; return 1; }
+  [ -f "$OV/assets/Susan_felicia.png" ] && [ -f "$OV/assets/Susan_vanilla.png" ] || {
+    echo -e "${RED}❌ override sin los dos assets de Susan (Susan_felicia/Susan_vanilla) — re-aplica desde staging${RESET}"
+    return 1
+  }
+  echo -e "${CYAN}🎨 Art de Susan (SVE Portrait Force):${RESET}"
+  echo -e "   · 24511 Seasonal Anime Outfits (Summer base) = el mod de DonutSteelPeas"
+  echo -e "   · Vanilla SVE                                    = el base original del juego"
+  if gum confirm "¿Susan con art de 24511 (Seasonal Anime Outfits)? (No = Vanilla SVE)"; then
+    cp -f "$OV/assets/Susan_felicia.png" "$OV/assets/Susan.png"
+    echo -e "${GREEN}✅ Susan = 24511 Seasonal Anime Outfits${RESET}"
+  else
+    cp -f "$OV/assets/Susan_vanilla.png" "$OV/assets/Susan.png"
+    echo -e "${GREEN}✅ Susan = Vanilla SVE${RESET}"
+  fi
+}
+
+wizard_rasmodia_choice() {
+  # Gestión del arte/modo del Wizard: Felicia1L (macho, 46956) vs Rasmodia (bruja, 8265).
+  # Ambos EditImage sobre Characters/Wizard + Portraits/Wizard → son el MISMO NPC. Si el usuario
+  # romancea con Looking for Love (→ Rasmodia), conviene que la bruja gane: Felicia1L Wizard se
+  # mueve a staging .CONFLICT-RASMODIA. Default = Rasmodia (recomendado).
+  local RSR="$MODPACK_STAGING"
+  local FZ="$RSR/.[CONFLICT-RASMODIA] Felicia1L Anime Portraits for Wizard"
+  local WZ="$WINE_MODS/[CP] Felicia1L- Anime Portraits for Wizard"
+  echo -e "${CYAN}🎨 Wizard art:${RESET}"
+  echo -e "   · Rasmodia (8265)  = Female Wizard/bruja (romance via Looking for Love)"
+  echo -e "   · Felicia1L (46956) = art anime del Wizard macho (pisa a Rasmodia en eventos)" 
+  if gum confirm "¿Wizard como Rasmodia (bruja)? (No = habilitar Felicia1L Wizard macho)"; then
+    [ -d "$WZ" ] && { chmod -R u+rwx "$WZ" 2>/dev/null; mv "$WZ" "$FZ"; echo -e "${GREEN}✅ Rasmodia gana — Felicia1L Wizard a staging${RESET}"; }
+    [ -d "$FZ" ] && echo -e "${GREEN}✅ Wizard = Rasmodia (bruja)${RESET}"
+  else
+    [ -d "$FZ" ] && { cp -r "$FZ" "$WZ"; echo -e "${GREEN}✅ Felicia1L Wizard habilitado (pisa Rasmodia en eventos/sprites)${RESET}"; }
+    [ -d "$WZ" ] && echo -e "${GREEN}✅ Wizard = Felicia1L (macho)${RESET}"
+  fi
+}
+
+override_sve_olivia_choice() {
+  # Gestión del arte de Olivia (NPC SVE): Felicia1L (47618, default) vs Kove High-Res Seasonal (9522).
+  # El override 'dizzi SVE Portrait Force' fuerza Portraits/Olivia desde assets/Olivia.png (Felicia).
+  # Kove 9522 es un parche estacional de Seasonal Cute SVE; para elegirlo se aplica sobre
+  # 'External-by dizzi~ [CP] Seasonal Cute Characters'. Default = Felicia (tu caso).
+  local OV="$WINE_MODS/[CP] dizzi SVE Portrait Force"
+  local SC="$WINE_MODS/External-by dizzi~ [CP] Seasonal Cute Characters"
+  local KZ="$MODPACK_STAGING/fase2-seasonal-anime/Kove - High Res Seasonal Portraits for Olivia-9522-1-0-1-1-1668086754.zip"
+  [ -f "$OV/assets/Olivia.png" ] || { echo -e "${YELLOW}⚠ override Olivia base ausente${RESET}"; return 1; }
+  echo -e "${CYAN}🎨 Art de Olivia (SVE Portrait Force):${RESET}"
+  echo -e "   · Felicia1L (47618)      = anime del override (default, tu caso)"
+  echo -e "   · Kove HR Seasonal (9522) = parche estacional high-res (requiere Seasonal Cute SVE)"
+  if gum confirm "¿Olivia con art de Felicia1L? (No = Kove High-Res Seasonal)"; then
+    [ -f "$OV/assets/Olivia_felicia.png" ] || cp "$OV/assets/Olivia.png" "$OV/assets/Olivia_felicia.png"
+    echo -e "${GREEN}✅ Olivia = Felicia1L (override activo)${RESET}"
+  else
+    [ -f "$KZ" ] || { echo -e "${RED}❌ zip Kove 9522 no está en staging — salto${RESET}"; return 1; }
+    [ -d "$SC" ] || { echo -e "${RED}❌ Seasonal Cute SVE no instalado — no se puede aplicar Kove${RESET}"; return 1; }
+    local T; T="$(mktemp -d)"; unzip -o -q "$KZ" -d "$T" 2>/dev/null
+    # aplicar Portraits/Olivia del zip sobre el pack SC-SVE (parche quita el del override? no — solo estacional)
+    local SRC="$T/[CP] Seasonal Cute Characters - SVE/assets/Portraits/Olivia"
+    if [ -d "$SRC" ]; then
+      mkdir -p "$SC/assets/Portraits/Olivia"
+      cp -r "$SRC/." "$SC/assets/Portraits/Olivia/"
+      echo -e "${GREEN}✅ Olivia = Kove High-Res Seasonal (aplicada sobre SC-SVE)${RESET}"
+    else
+      echo -e "${YELLOW}⚠ zip Kove sin Portraits/Olivia — salto${RESET}"
+    fi
+    rm -rf "$T"
+  fi
+}
+
+rasmodia_anime_choice() {
+  # Gestión del portrait anime de Rasmodia (Female Wizard): 3 opciones que NO coexisten:
+  #   660315 (18608 · '660315's Romanceable Rasmodia ANIME Portrait')
+  #   Dacar  (32228 · 'Dacar Rasmodia Portraits', ya instalado en Mods)
+  #   FadeHeim (38101 · default, instalado)
+  # Default = FadeHeim. Mueve a staging los no elegidos (solo 1 activo).
+  local M="$WINE_MODS"
+  local STG="$MODPACK_STAGING/fase2-seasonal-anime"
+  local FH="$M/[CP]FadeHeim's Rasmodia Anime Portrait"      # opción A (default)
+  local DC="$M/[CP] Dacar Rasmodia Portraits"               # opción B (ya en Mods)
+  local Z60="$STG/660315's Romanceable Rasmodia ANIME Portrait-18608-2-7-1-1696599287.zip"
+  local FHZ="$STG/FadeHeim's Rasmodia anime style portrait-38101-1-1-1-1762839867.zip"
+  echo -e "${CYAN}🎨 Rasmodia portrait anime (3 opciones, no coexisten):${RESET}"
+  echo -e "   1. FadeHeim (38101)  = default (instalado)"
+  echo -e "   2. Dacar (32228)     = instalado en Mods"
+  echo -e "   3. 660315 (18608)    = zip en staging (no instalado)"
+  if gum confirm "¿Rasmodia con art de FadeHeim? (No = Dacar instalado)"; then
+    [ -f "$FH/manifest.json" ] && echo -e "${GREEN}✅ Rasmodia = FadeHeim (activo)${RESET}" || { echo -e "${RED}❌ FadeHeim no instalado${RESET}"; return 1; }
+  else
+    [ -f "$DC/manifest.json" ] && echo -e "${GREEN}✅ Rasmodia = Dacar (activo)${RESET}" || { echo -e "${RED}❌ Dacar no está — re-instalar desde staging${RESET}"; return 1; }
+  fi
+  # los zips de staging quedan como referencia (instalación manual de la opción elegida)
+}
+
+juliet_anime_choice() {
+  # Overlay anime de Juliet (34022 'Anime Portraits for Juliet') → East Scarp NPCs.
+  # CARPETA CORRECTA: ES NPCs carga Portraits/Juliet desde assets/Portraits/Juliet/ (FromFile
+  # 'assets/{{Target}}/Juliet_base.png'). El overlay anime se copia ahí; el base ES queda en
+  # STASH (staging fase3-julietjessie/ES-Juliet-base-STASH) para poder revertir.
+  # Default = ON (anime aplicado).
+  local ES="$WINE_MODS/East Scarp NPCs"
+  local J="$ES/assets/Portraits/Juliet"                      # carpeta que ES NPCs LEE
+  local STASH="$MODPACK_STAGING/fase3-julietjessie/ES-Juliet-base-STASH"
+  local ZJ="$MODPACK_STAGING/fase3-julietjessie/Anime Portraits for Juliet-34022-0-1-1-1757203212.zip"
+  echo -e "${CYAN}🎨 Juliet overlay anime (34022):${RESET}"
+  if gum confirm "¿Juliet con overlay anime? (No = portrait base ES)"; then
+    if [ -f "$J/Juliet_base.png" ] && [ "$(md5sum "$J/Juliet_base.png" | cut -c1-8)" = "38caa6d4" ]; then
+      echo -e "${GREEN}✅ Juliet anime (overlay en assets/Portraits/Juliet/)${RESET}"
+    elif [ -f "$ZJ" ]; then
+      local T; T="$(mktemp -d)"
+      unzip -o -q "$ZJ" -d "$T" 2>/dev/null
+      mkdir -p "$J"
+      cp -f "$T"/[CP]*/assets/Portraits/Juliet/* "$J/" 2>/dev/null
+      cp -f "$T"/[CP]*/assets/Portraits/Juliet_*.png "$J/" 2>/dev/null
+      rm -rf "$T"
+      echo -e "${GREEN}✅ Juliet anime aplicado (desde zip 34022)${RESET}"
+    else
+      echo -e "${YELLOW}⚠ zip 34022 no está en staging — hay que copiar el overlay manualmente${RESET}"
+    fi
+  else
+    if [ -d "$STASH" ]; then
+      # restaurar base ES desde stash
+      rm -rf "$J"; mkdir -p "$J"
+      cp -r "$STASH/." "$J/"
+      echo -e "${GREEN}✅ Juliet base ES restaurado (desde stash)${RESET}"
+    else
+      echo -e "${YELLOW}ℹ️  Stash no existe — borra manualmente el overlay: keep 'natural' + borra Juliet_*.png de assets/Portraits/Juliet/ excepto los base de ES${RESET}"
+    fi
+  fi
+}
+
+sydney_anime_choice() {
+  # Gestión del portrait de Sydney ([CP] Sydney - A New NPC): vanilla original del mod vs
+  # overlay anime 'New anime-style portraits for Sydney' (38486). Ambos PNG preservados en
+  # staging fase3-sydney (Sydney_Portraits_VANILLA.png del móvil / zip 38486). Default = vanilla.
+  local SYD="$WINE_MODS/[CP] Sydney - A Custom NPC"
+  local STG="$MODPACK_STAGING/fase3-sydney"
+  local DST="$SYD/Assets/CharacterFiles/Portraits/Sydney_Portraits.png"
+  local VAN="$STG/Sydney_Portraits_VANILLA.png"
+  local ANZ="$STG/Sydney portraits-38486-1-0-0-1760283704.zip"
+  [ -d "$SYD" ] || { echo -e "${YELLOW}⚠ [CP] Sydney no instalado — salto decisión Sydney${RESET}"; return 1; }
+  echo -e "${CYAN}🎨 Portrait de Sydney (38486):${RESET}"
+  echo -e "   · Vanilla (original del mod) = default (restaurado)"
+  echo -e "   · Anime (38486)              = overlay 'New anime-style portraits'"
+  if gum confirm "¿Sydney con portrait vanilla? (No = overlay anime 38486)"; then
+    [ -f "$VAN" ] && { cp -f "$VAN" "$DST"; echo -e "${GREEN}✅ Sydney = vanilla (original del mod)${RESET}"; } \
+      || echo -e "${YELLOW}⚠ vanilla no está en staging — nada que restaurar${RESET}"
+  else
+    if [ -f "$ANZ" ]; then
+      local T; T="$(mktemp -d)"; unzip -o -q "$ANZ" -d "$T" 2>/dev/null
+      local P; P="$(find "$T" -ipath "*Portraits/Sydney_Portraits.png" | head -1)"
+      [ -n "$P" ] && { cp -f "$P" "$DST"; echo -e "${GREEN}✅ Sydney = anime (38486)${RESET}"; } || echo -e "${YELLOW}⚠ zip sin Sydney_Portraits.png${RESET}"
+      rm -rf "$T"
+    else
+      echo -e "${YELLOW}⚠ zip 38486 no está en staging — salto${RESET}"
+    fi
+  fi
+}
+
+clint_choice() {
+  # Gestión del portrait de Clint: OO's Anime Skimpy (default) vs Pretty Anime Portraits (macho).
+  # OO's (1200x2400, Load Early) pierde contra Pretty (Medium); se forza con CP override
+  # '[CP] dizzi Clint Choice' (Load Exclusive Portraits/Clint + dict DDFC Late con celda 1200x1200).
+  # Default = OO's. Si se desactiva, el override se mueve a staging y vuelve Pretty.
+  local OV="$WINE_MODS/[CP] dizzi Clint Choice"
+  local STG="$MODPACK_STAGING/fase3-oos"
+  local res="$STG/clint-choice/Clint_oos.png"
+  echo -e "${CYAN}🎨 Portrait de Clint:${RESET}"
+  echo -e "   · OO's Anime Skimpy = estilo femenino/anime del pack OO's (default)"
+  echo -e "   · Pretty Anime      = Clint macho del pack Pretty (vuelve si resp. No)"
+  if gum confirm "¿Clint con portrait del OO's? (No = Pretty Anime macho)"; then
+    if [ -f "$OV/manifest.json" ]; then
+      echo -e "${GREEN}✅ Clint = OO's Anime Skimpy (override activo)${RESET}"
+    else
+      [ -d "$STG/.[CONFLICT] Clint Choice" ] && cp -r "$STG/.[CONFLICT] Clint Choice" "$OV"
+      [ -f "$res" ] && { cp -f "$res" "$WINE_MODS/[CP] dizzi Clint Choice/assets/Clint_oos.png" 2>/dev/null; }
+      [ -f "$OV/manifest.json" ] && echo -e "${GREEN}✅ Clint = OO's (override restaurado)${RESET}" || echo -e "${RED}❌ override no disponible — faltan assets en staging fase3-oos/clint-choice${RESET}"
+    fi
+  else
+    [ -d "$OV" ] && { chmod -R u+rwx "$OV" 2>/dev/null; mv "$OV" "$STG/.[CONFLICT] Clint Choice"; echo -e "${GREEN}✅ Clint = Pretty Anime (override a staging)${RESET}"; }
+  fi
+}
+
+sandy_choice() {
+  # Choice de Sandy: OO's Anime Skimpy (default) vs Sandy Buxom/3779 (WangJangle).
+  # '[CP] dizzi Sandy Choice' con Load Exclusive Portraits+Characters/Sandy + dict DDFC Late (+20),
+  # ConfigSchema SandyStyle (GMCM): OOs (default) | Buxom. Estilo Buxom forzado a Nude.
+  # Si el override no está, Buxom queda como fallback nativo del mod 3779 (sin forzar).
+  local OV="$WINE_MODS/[CP] dizzi Sandy Choice"
+  local STG="$MODPACK_STAGING/fase3-pretty/sandy-buxom"
+  echo -e "${CYAN}🎨 Portrait de Sandy:${RESET}"
+  echo -e "   · OO's Anime Skimpy  = estilo OO's (default)"
+  echo -e "   · Sandy Buxom (3779) = Nude (Victy/Nadiki, forzado via Choice)"
+  if gum confirm "¿Sandy con portrait del OO's? (No = Sandy Buxom Nude)"; then
+    if [ -f "$OV/manifest.json" ]; then
+      echo -e "${GREEN}✅ Sandy = OO's Anime Skimpy (SandyStyle OOs, override activo)${RESET}"
+    else
+      [ -d "$STG/[CP] dizzi Sandy Choice" ] && cp -r "$STG/[CP] dizzi Sandy Choice" "$OV"
+      [ -f "$OV/manifest.json" ] && echo -e "${GREEN}✅ Sandy = OO's (override restaurado)${RESET}" || echo -e "${YELLOW}⚠ Sandy = Buxom nativo (override sin staging)${RESET}"
+    fi
+  else
+    # SandyStyle -> Buxom via GMCM ? escribir config de CP? default del content es OOs; si se elige Buxom, se cambia el default en content.json
+    if [ -f "$OV/content.json" ]; then
+      python3 - "$OV/content.json" << 'PY'
+import json, sys
+p=sys.argv[1]; d=json.load(open(p))
+d["ConfigSchema"]["SandyStyle"]["Default"]="Buxom"
+json.dump(d,open(p,"w"),indent=2,ensure_ascii=False)
+print("  → SandyStyle default = Buxom (GMCM)")
+PY
+      echo -e "${GREEN}✅ Sandy = Sandy Buxom Nude (SandyStyle Buxom)${RESET}"
+    else
+      echo -e "${YELLOW}⚠ Sandy = Buxom nativo (override sin content)${RESET}"
+    fi
+  fi
+}
+
+
+modpack_sync() {
+  # Copia TODAS las carpetas/archivos del staging al WINE_MODS (rm -rf previo) y valida los mods.
+  # $1 = nombre display del pack, $2 = subcarpeta staging, $3+ = pares "Nexus:<id>|UniqueID" esperados
+  local name="$1" staging="$MODPACK_STAGING/$2"; shift 2
+  local expected=("$@") ok=0 missing=0 n=0
+  if [ ! -d "$staging" ]; then
+    echo -e "${RED}❌ [$name] staging no existe: ${DIM}$staging${RESET}"
+    log "FAIL modpack $name: staging missing"
+    return 1
+  fi
+  # staging vacio -> no hay nada que copiar, solo reportar
+  local items=("$staging"/*)
+  if [ -e "${items[0]:-$staging/__none__}" ] && [ "${items[0]}" = "$staging/*" ]; then
+    echo -e "${YELLOW}⬜ [$name] staging vacio - nada que instalar${RESET}"
+    return "$((${#expected[@]} > 0 ? 1 : 0))"
+  fi
+  mkdir -p "$WINE_MODS"
+  for item in "${items[@]}"; do
+    [ -e "$item" ] || continue
+    # solo copiar mods con manifest.json valido (evita assets sueltos o CPs sin manifest)
+    if [ -f "$item/manifest.json" ]; then
+      : # ok, es un mod
+    elif find "$item" -maxdepth 2 -name manifest.json 2>/dev/null | grep -q .; then
+      : # manifest anidado (pack con submods) -> ok
+    else
+      echo -e "${YELLOW}⏭  [$name] SINTA evitar: $item (sin manifest.json)${RESET}"
+      continue
+    fi
+    n=$((n + 1))
+    local base; base="$(basename "$item")"
+    chmod -Rf u+rwx "$WINE_MODS/$base" 2>/dev/null
+    rm -rf "$WINE_MODS/$base"
+    if cp -r "$item" "$WINE_MODS/$base"; then
+      chmod -Rf u+rwx "$WINE_MODS/$base" 2>/dev/null
+      echo -e "${GREEN}✅ [$name] wine Mods ← $base${RESET}"
+    else
+      echo -e "${RED}❌ [$name] FALLO copia: $base${RESET}"
+      ok=1
+    fi
+  done
+  for key in "${expected[@]}"; do
+    if [[ "$key" == Nexus:* ]]; then
+      local nid="${key#Nexus:}"
+      if check_nexus "$nid"; then
+        echo -e "${GREEN}✓ [$name] Nexus:$nid presente${RESET}"
+      else
+        echo -e "${YELLOW}⚠️  [$name] Nexus:$nid NO verificado${RESET}"
+        missing=1
+      fi
+    elif check_uid "$key"; then
+      echo -e "${GREEN}✓ [$name] UniqueID presente: $key${RESET}"
+    else
+      echo -e "${YELLOW}⚠️  [$name] UniqueID NO verificado: $key${RESET}"
+      missing=1
+    fi
+  done
+  [ "$ok" -eq 0 ] && [ "$missing" -eq 0 ] \
+    && log "OK modpack $name -> wine" || log "WARN modpack $name -> wine (faltan $missing ids, $ok copias rotas)"
+  return "$((missing + ok))"
+}
+
+phone_push_dir() {
+  # Pushea UNA carpeta de WINE_MODS a Android resolviendo symlinks.
+  # Fallo conocido (#605): 'External-by dizzi~ [CP] Stardew Valley Expanded/Assets'
+  # es un symlink -> assets; 'adb push -a' no lo puede recrear en /sdcard
+  # ("remote symlink failed: Operation not permitted"). Solución: copiar a
+  # staging temporal con cp -rL (sigue symlinks) y empujar eso.
+  # $1 = nombre de carpeta dentro de WINE_MODS
+  local base="$1" src="$WINE_MODS/$1" rc=0
+  [ -e "$src" ] || return 1
+  local TMPPUSH; TMPPUSH="$(mktemp -d)"
+  if cp -rL "$src" "$TMPPUSH/$base" 2>/dev/null; then
+    adb shell "rm -rf '$ANDROID_MODS/$base'"
+    adb push -a "$TMPPUSH/$base/" "$ANDROID_MODS/"; rc=$?
+  else
+    adb shell "rm -rf '$ANDROID_MODS/$base'"
+    adb push -a "$src" "$ANDROID_MODS/"; rc=$?
+  fi
+  rm -rf "$TMPPUSH"
+  return "$rc"
+}
+
+modpack_push_phone() {
+  # Pushea al Android SMAPI cada carpeta del pack ya sincronizada en WINE_MODS.
+  # $1 = nombre display, $2 = subcarpeta staging (misma convencion que modpack_sync)
+  if [ "$PHONE_ON" -eq 0 ]; then
+    echo -e "${DIM}  [$1] sin celular — push Android omitido${RESET}"
+    return 0
+  fi
+  local name="$1" staging="$MODPACK_STAGING/$2"
+  local fail=0 pushed=0 has=0
+  for item in "$staging"/*; do [ -e "$item" ] && has=1 && break; done
+  [ "$has" -eq 1 ] || { echo -e "${YELLOW}⬜ [$name] staging vacio - nada que push${RESET}"; return 0; }
+  adb shell "mkdir -p '$ANDROID_MODS'" || return 1
+  for item in "$staging"/*; do
+    [ -e "$item" ] || continue
+    local base; base="$(basename "$item")"
+    [ -d "$WINE_MODS/$base" ] || continue
+    if phone_push_dir "$base"; then
+      pushed=$((pushed + 1))
+    else
+      echo -e "${RED}❌ [$name] FALLO push Android: $base${RESET}"
+      fail=1
+    fi
+  done
+  [ "$fail" -eq 0 ] && echo -e "${GREEN}✅ [$name] Android SMAPI ← $pushed carpeta(s)${RESET}" \
+                   || echo -e "${RED}❌ [$name] hubo errores al pushear a Android${RESET}"
+  log "OK modpack $name -> android ($pushed folders)"
+  return "$fail"
+}
+
+android_exclude() {
+  # Quita de Android SMAPI los mods que el fork móvil (SMAPI-Android 4.3.2.5) no
+  # soporta o que crashean: dependientes de SpaceCore/MEEP, PolySweet Rooms,
+  # HD-sheets OOM, RSV-cadena, forces Pretty pesados.
+  # Uso: android_exclude <carpeta1> <carpeta2> ...
+  if [ "$PHONE_ON" -eq 0 ]; then
+    return 0
+  fi
+  local removed=0
+  for d in "$@"; do
+    if adb shell "ls -d \"$ANDROID_MODS/$d\" 2>/dev/null" | grep -q .; then
+      adb shell "rm -rf \"$ANDROID_MODS/$d\"" && { echo -e "${DIM}  (android-exclude) quitado: $d${RESET}"; removed=$((removed + 1)); }
+    fi
+  done
+  log "ANDROID_EXCLUDE: $removed carpeta(s) removidas"
+}
+
+android_exclude_all() {
+  # Lista consolidada de exclusiones Android (fork SMAPI-móvil).
+  # Nombres verificados contra WINE_MODS real (sin ':' en East Scarp, #605).
+  # Solo se aplica si hay celular; sin celular no hace nada.
+  if [ "$PHONE_ON" -eq 0 ]; then
+    return 0
+  fi
+  # ── frameworks/colisiones (crash o dependencias no-soportadas) ──
+  android_exclude \
+    "PolyamorySweetBed" "PolyamorySweetKiss" "PolyamorySweetLove" "PolyamorySweetRooms" \
+    "PolyamorySweetWedding" "[CP] Polyamory Sweet" "MEEP" "SpaceCore" "JsonAssets" \
+    "[CP] RRRR" "[FS] Magnus Earrings" "[CP] Romanceable Rasmodia - RRRR Patch"
+  # ── cadena East Scarp (nombres REALES de carpeta) ──
+  android_exclude \
+    "East Scarp C#" "East Scarp Core" "East Scarp NPCs" "East Scarp FTM" "ESBarberShop"
+  # ── cadena RSV (Ridgeside) no corre en el fork SMAPI-móvil ──
+  android_exclude \
+    "Ridgeside Village" "CustomCompanions" "[NPC] Alecto" "[NPC] Leilani"
+  # ── RSV-dependientes (sin RSV en móvil, inútiles/pesan) ──
+  android_exclude \
+    "[CP] RSV Seasonal Outfits" "[CP] Ysabelle - Seasonal Anime Portraits"
+  # ── Xtardew completo (solo P&S estaba; Valley+Poly+Spanish faltaban) ──
+  android_exclude \
+    "External-by dizzi~ [CP]Xtardew Portraits&Sprites" \
+    "External-by dizzi~ [CP]Xtardew Valley" \
+    "External-by dizzi~ [CP]Xtardew Valley Poly Leah&Abigail" "XtardewSpanish" \
+    "Xtardew Core" "[CP]Xtardew Valley Restoration" \
+    "[CP] Xtardew Valley - Sexperimental Edition Spanish"
+  # ── dependientes RSV/Xtardew (no van al móvil) ──
+  android_exclude \
+    "MilkVillagers" "[CP]MilkVillagers" \
+    "[CP] LostUnderwear" "[FTM] LostUnderwear"
+  # ── HD / render móvil (farmer cuadrado negro, OOM) ──
+  android_exclude \
+    "External-by dizzi~ [CP] Seasonal Cute Characters" "Portraiture" \
+    "SpritesInDetail" "FashionSense" "StardewCGEvents"
+  # ── forces dizzi PRETTY pesados (HD OOM en móvil; OO's y Skimpy PENNY/MARU SÍ van) ──
+  android_exclude \
+    "[CP] dizzi Pretty Anime Characters Force" \
+    "[CP] dizzi Skimpy Penny Maru Characters Force" \
+    "[CP] dizzi Abigail Pretty Sprites Force" \
+    "[CP] dizzi Genderbend Force" \
+    "[CP] dizzi MainDates Pretty Force" \
+    "[CP] dizzi SVE Portrait Force" \
+    "[CP] dizzi Bountiful Bach Portraits Force"
+  # ── misc no-soportados / no necesarios en móvil ──
+  android_exclude \
+    "ConsoleCommands" "MobilePhone" "SaveBackup"
+  # ── culpables cuadrado negro del personaje en móvil (2026-09-25) ──
+  # El bug del farmer/character negro se fue al quitar ESTAS 4 juntas.
+  # · Portraiture: su carpeta ".disabled" NO empieza con punto → SMAPI la cargaba igual.
+  # · TDIT - Portraits for Extras (PortraitsForAll): nadie lo requiere; duplica UID con Dacar Mermaids.
+  # · ScaleUpUnofficial + PlatonymousScaleUpCompatibilityLayer: escalan sprites hi-res del jugador
+  #   (probable causa del cuadrado; SID que excluíamos era req-perdido de este).
+  android_exclude \
+    "Portraiture.disabled" \
+    "TDIT - Portraits for Extras" \
+    "ScaleUpUnofficial" \
+    "PlatonymousScaleUpCompatibilityLayer"
+}
+
+modpack_report() {
+  # Indica qué mods del pack ya están instalados y cuáles faltan (con link de descarga).
+  # $1 = nombre display, $2 = subcarpeta staging, $3+ = pares "clave|Nexus:NNN|https://nexus..."
+  local name="$1" staging_sub="$2"; shift 2
+  local n_missing=0
+  echo -e "${BOLD}Estado modpack: ${CYAN}$name${RESET}"
+  while [ $# -gt 0 ]; do
+    local key="$1" id="$2" url="$3"; shift 3
+    local ok=0
+    if [[ "$key" == Nexus:* ]]; then
+      local nid="${key#Nexus:}"
+      check_nexus "$nid" && ok=1
+    elif [[ "$key" == uid:* ]]; then
+      check_uid "${key#uid:}" && ok=1
+    fi
+    if [ "$ok" -eq 1 ]; then
+      echo -e "  ${GREEN}✓ instalado${RESET}  $id"
+    else
+      echo -e "  ${YELLOW}⬇ manual${RESET}    $id  →  ${CYAN}$url${RESET}  →  ${DIM}$MODPACK_STAGING/$staging_sub/${RESET}"
+      n_missing=$((n_missing + 1))
+    fi
+  done
+  echo ""
+  return "$n_missing"
+}
+
 clear
 echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════╗${RESET}"
 echo -e "${CYAN}${BOLD}║     Stardew Valley Sync PC ↔ Android        ║${RESET}"
 echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════╝${RESET}\n"
 
 echo -e "${BOLD}PREREQUISITOS:${RESET}\n"
-echo -e "  1. Descarga ${BOLD}DIZZI WORLD APES-1.6.15${RESET} en Drive:"
-echo -e "     ${CYAN}$MODPACK_DRIVE${RESET}"
-echo -e "     Cópialo a ${BOLD}Downloads${RESET} del telefono\n"
-echo -e "  2. Pon tu save en ${BOLD}Downloads${RESET} del telefono"
+echo -e "  1. Ten el save en ${BOLD}Downloads${RESET} del telefono"
 echo -e "     (carpeta Diego_339177434)\n"
+echo -e "  2. Mods a Android SMAPI: desde ${BOLD}Downloads${RESET} del telefono"
+echo -e "     (opcion 'Mods Phone') o desde tu ${BOLD}PC${RESET}:"
+echo -e "     ${CYAN}${DIM}$WINE_MODS${RESET}\n"
 echo -e "${DIM}──────────────────────────────────────────────${RESET}\n"
 
-if ! adb devices | grep -q "device$"; then
-    echo -e "${RED}❌ No hay celular conectado${RESET}"
-    exit 1
+# ── Deteccion de celular (NO bloqueante) ──────────────────────
+# El script instala mods en PC (wine) SIEMPRE; el sync de saves y el push
+# Android solo si hay celular conectado.
+PHONE_ON=0
+if adb devices | grep -q "device$"; then
+    PHONE_ON=1
+    echo -e "${GREEN}Celular detectado${RESET}\n"
+else
+    echo -e "${YELLOW}⚠ Sin celular conectado — solo instalación de mods en PC (sync de saves omitido)${RESET}\n"
 fi
 
-echo -e "${GREEN}Celular detectado${RESET}\n"
-
-# ── Buscar save en el telefono ────────────────────────────────
+# ── Buscar save en el telefono (solo con celular) ─────────────
 PHONE_SOURCE=""
-if adb shell "ls -d '$PHONE_DOWNLOAD'" &>/dev/null; then
-    PHONE_SOURCE="$PHONE_DOWNLOAD"
-    echo -e "${GREEN}📁 Save encontrado en: Downloads${RESET}\n"
-elif adb shell "ls -d '$ANDROID_SAVE_SMPI/Diego_339177434'" &>/dev/null; then
+if [ "$PHONE_ON" -eq 1 ]; then
+  if adb shell "ls -d '$ANDROID_SAVE_SMPI/Diego_339177434'" &>/dev/null; then
     PHONE_SOURCE="$ANDROID_SAVE_SMPI/Diego_339177434"
     echo -e "${GREEN}📁 Save encontrado en: Android SMAPI${RESET}\n"
-elif adb shell "ls -d '$ANDROID_SAVE_VANILLA/Diego_339177434'" &>/dev/null; then
+  elif adb shell "ls -d '$ANDROID_SAVE_VANILLA/Diego_339177434'" &>/dev/null; then
     PHONE_SOURCE="$ANDROID_SAVE_VANILLA/Diego_339177434"
     echo -e "${GREEN}📁 Save encontrado en: Android Vanilla${RESET}\n"
-else
+  elif adb shell "ls -d '$PHONE_DOWNLOAD'" &>/dev/null; then
+    PHONE_SOURCE="$PHONE_DOWNLOAD"
+    echo -e "${GREEN}📁 Save encontrado en: Downloads${RESET}\n"
+  else
     echo -e "${RED}❌ No se encontro el save en ninguna ubicacion del telefono${RESET}\n"
     exit 1
-fi
-
-# ── Phone → Android SMAPI/Vanilla ─────────────────────────────
-echo -e "${DIM}── Phone → Android SMAPI ──────────────────────${RESET}\n"
-
-if gum confirm "¿Copiar saves a Android SMAPI?"; then
-    adb shell "mkdir -p '$ANDROID_SAVE_SMPI' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_SMPI/'"
-    echo -e "${GREEN}✅ Saves → Android SMAPI${RESET}\n"
-fi
-
-if gum confirm "¿Copiar saves a Android Vanilla?"; then
-    adb shell "mkdir -p '$ANDROID_SAVE_VANILLA' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_VANILLA/'"
-    echo -e "${GREEN}✅ Saves → Android Vanilla${RESET}\n"
-fi
-
-if gum confirm "¿Copiar mods a Android SMAPI?"; then
-    adb shell "mkdir -p '$ANDROID_MODS' && cp -r '$PHONE_MODS'/* '$ANDROID_MODS/'"
-    echo -e "${GREEN}✅ Mods → Android SMAPI${RESET}\n"
+  fi
+  log "SOURCE=$PHONE_SOURCE"
+else
+  echo -e "${DIM}  (sin celular) búsqueda de save omitida${RESET}\n"
 fi
 
 # ── Phone → Windows ───────────────────────────────────────────
 echo -e "${DIM}── Phone → Windows ──────────────────────────${RESET}\n"
 
-if gum confirm "¿Copiar saves del telefono a Windows? (reemplaza lo actual)"; then
+if [ "$PHONE_ON" -eq 1 ]; then
+  if gum confirm "¿Copiar saves del telefono a Windows? (reemplaza lo actual)"; then
     mkdir -p "$WINE_SAVE"
-    rm -rf "$WINE_SAVE/Diego_339177434"
-    adb pull "$PHONE_SOURCE" "$WINE_SAVE/" 2>/dev/null
-    echo -e "${GREEN}✅ Phone → Windows${RESET}\n"
+    backup_save
+    if adb pull -a "$PHONE_SOURCE" "$WINE_SAVE/"; then
+        echo -e "${GREEN}✅ Phone → Windows${RESET}\n"
+        log "OK Windows <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO Phone → Windows. Restaurando backup...${RESET}\n"
+        log "FAIL Windows <- $PHONE_SOURCE"
+        restore_save
+    fi
+  fi
+else
+  echo -e "${DIM}  (sin celular) opción omitida${RESET}\n"
 fi
 
 # ── Windows → Android SMAPI/Vanilla ───────────────────────────
 echo -e "${DIM}── Windows → Android SMAPI/Vanilla ────────────${RESET}\n"
 
-if gum confirm "¿Copiar saves de Windows a Android SMAPI?"; then
-    adb shell "mkdir -p '$ANDROID_SAVE_SMPI'"
-    adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/abc.smapi.gameloader/files/Saves/" 2>/dev/null
-    echo -e "${GREEN}✅ Windows → Android SMAPI${RESET}\n"
-fi
+if [ "$PHONE_ON" -eq 1 ]; then
+  if gum confirm "¿Copiar saves de Windows a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_SMPI'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/abc.smapi.gameloader/files/Saves/"; then
+        echo -e "${GREEN}✅ Windows → Android SMAPI${RESET}\n"
+        log "OK Android SMAPI <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Android SMAPI${RESET}\n"
+        log "FAIL Android SMAPI <- Windows"
+    fi
+  fi
 
-if gum confirm "¿Copiar saves de Windows a Android Vanilla?"; then
-    adb shell "mkdir -p '$ANDROID_SAVE_VANILLA'"
-    adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves/" 2>/dev/null
-    echo -e "${GREEN}✅ Windows → Android Vanilla${RESET}\n"
+  if gum confirm "¿Copiar saves de Windows a Android Vanilla?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_VANILLA'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Android/data/com.chucklefish.stardewvalley/files/Saves/"; then
+        echo -e "${GREEN}✅ Windows → Android Vanilla${RESET}\n"
+        log "OK Android Vanilla <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Android Vanilla${RESET}\n"
+        log "FAIL Android Vanilla <- Windows"
+    fi
+  fi
+else
+  echo -e "${DIM}  (sin celular) opciones omitidas${RESET}\n"
 fi
 
 # ── Windows → Phone Downloads ─────────────────────────────────
 echo -e "${DIM}── Windows → Phone Downloads ──────────────────${RESET}\n"
 
-if gum confirm "¿Copiar saves de Windows a Downloads del telefono? (reemplaza lo actual)"; then
-    adb shell "rm -rf '$PHONE_DOWNLOAD'"
-    adb shell "mkdir -p '/sdcard/Download'"
-    adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Download/" 2>/dev/null
-    echo -e "${GREEN}✅ Windows → Phone Downloads${RESET}\n"
+if [ "$PHONE_ON" -eq 1 ]; then
+  if gum confirm "¿Copiar saves de Windows a Downloads del telefono? (reemplaza lo actual)"; then
+    if adb shell "rm -rf '$PHONE_DOWNLOAD'" && adb shell "mkdir -p '/sdcard/Download'" && adb push "$WINE_SAVE/Diego_339177434" "/sdcard/Download/"; then
+        echo -e "${GREEN}✅ Windows → Phone Downloads${RESET}\n"
+        log "OK Phone Downloads <- Windows"
+    else
+        echo -e "${RED}❌ FALLO Windows → Phone Downloads${RESET}\n"
+        log "FAIL Phone Downloads <- Windows"
+    fi
+  fi
+else
+  echo -e "${DIM}  (sin celular) opción omitida${RESET}\n"
 fi
 
 # ── Abrir carpeta Windows ─────────────────────────────────────
@@ -113,21 +886,542 @@ if gum confirm "¿Abrir carpeta de saves de Windows?"; then
     setsid nemo "$WINE_SAVE" &>/dev/null &
 fi
 
+
+# ── Phone → Android SMAPI/Vanilla ─────────────────────────────
+echo -e "${DIM}── Phone → Android SMAPI ──────────────────────${RESET}\n"
+
+if [ "$PHONE_ON" -eq 1 ]; then
+  if gum confirm "¿Copiar saves a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_SMPI' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_SMPI/'"; then
+        echo -e "${GREEN}✅ Saves → Android SMAPI${RESET}\n"
+        log "OK Android SMAPI <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO al copiar a Android SMAPI${RESET}\n"
+        log "FAIL Android SMAPI <- $PHONE_SOURCE"
+    fi
+  fi
+
+  if gum confirm "¿Copiar saves a Android Vanilla?"; then
+    if adb shell "mkdir -p '$ANDROID_SAVE_VANILLA' && cp -r '$PHONE_SOURCE' '$ANDROID_SAVE_VANILLA/'"; then
+        echo -e "${GREEN}✅ Saves → Android Vanilla${RESET}\n"
+        log "OK Android Vanilla <- $PHONE_SOURCE"
+    else
+        echo -e "${RED}❌ FALLO al copiar a Android Vanilla${RESET}\n"
+        log "FAIL Android Vanilla <- $PHONE_SOURCE"
+    fi
+  fi
+
+  if gum confirm "¿Copiar mods del telefono a Android SMAPI?"; then
+    if adb shell "mkdir -p '$ANDROID_MODS' && cp -r '$PHONE_MODS'/* '$ANDROID_MODS/'"; then
+        echo -e "${GREEN}✅ Mods Phone → Android SMAPI${RESET}\n"
+        log "OK Mods Android <- $PHONE_MODS"
+    else
+        echo -e "${RED}❌ FALLO al copiar mods Phone → Android SMAPI${RESET}\n"
+        log "FAIL Mods Android <- $PHONE_MODS"
+    fi
+  fi
+else
+  echo -e "${DIM}  (sin celular) opciones omitidas${RESET}\n"
+fi
+
+if [ "$PHONE_ON" -eq 1 ]; then
+  if gum confirm "¿Copiar mods de Windows (PC) a Android SMAPI?"; then
+    if [ -d "$WINE_MODS" ]; then
+        # Push por-carpeta con phone_push_dir (resuelve el symlink Assets de SVE, #605).
+        adb shell "mkdir -p '$ANDROID_MODS'" || { echo -e "${RED}❌ mkdir Android falló${RESET}"; log "FAIL Mods Android <- $WINE_MODS"; }
+        _pfail=0 _ppushed=0
+        # shellcheck disable=SC2034
+        for _m in "$WINE_MODS"/*; do
+          [ -e "$_m" ] || continue
+          _pb="$(basename "$_m")"
+          if phone_push_dir "$_pb"; then
+            _ppushed=$((_ppushed + 1))
+          else
+            echo -e "${RED}❌ FALLO push Android: $_pb${RESET}"
+            _pfail=1
+          fi
+        done
+        if [ "$_pfail" -eq 0 ]; then
+            echo -e "${GREEN}✅ Mods PC → Android SMAPI ($_ppushed carpetas)${RESET}\n"
+            log "OK Mods Android <- $WINE_MODS"
+            # Excepciones Android: el fork SMAPI-Android no soporta/crashea estos mods.
+            # Aplicar SIEMPRE tras cada push global (el push los vuelve a copiar).
+            android_exclude_all
+            echo -e "${DIM}  exclusiones Android aplicadas.${RESET}\n"
+        else
+            echo -e "${RED}❌ FALLO al copiar mods PC → Android SMAPI (hubo errores)${RESET}\n"
+            log "FAIL Mods Android <- $WINE_MODS"
+        fi
+    else
+        echo -e "${RED}❌ No existe carpeta de mods en PC: $WINE_MODS${RESET}\n"
+    fi
+  fi
+else
+  echo -e "${DIM}  (sin celular) push de mods a Android omitido — mods instalados solo en PC${RESET}\n"
+fi
+
+# ── Modpacks (Fase 0: base frameworks) ─────────────────────────
+echo -e "${DIM}── Modpacks (Fase 0: base) ────────────────────${RESET}\n"
+echo -e "${DIM}  Staging: descarga/extrae MODS MANUALES en ${RESET}${CYAN}$MODPACK_STAGING/fase0-base/${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase0-base" ]; then
+  modpack_report "Fase0-base" "fase0-base" \
+    "uid:Esca.FarmTypeManager"                             "Farm Type Manager (FTM)"                                        "https://www.nexusmods.com/stardewvalley/mods/1826" \
+    "uid:Parrot.RomRas"                                    "Rasmodia - Female Wizard"                                     "https://www.nexusmods.com/stardewvalley/mods/8265" \
+    "uid:Nom0ri.RomRas"                                    "Rasmodia (RRRR patch)"                                        "https://www.nexusmods.com/stardewvalley/mods/18144" \
+    "Nexus:28284"                                          "Cross-Mod Compatibility Tokens (CMCT)"                        "https://www.nexusmods.com/stardewvalley/mods/28284" \
+    "uid:Mangupix.DialogueDisplayFrameworkContinued"       "Dialogue Display Framework Continued"                         "https://www.nexusmods.com/stardewvalley/mods/22678" \
+    "Nexus:44971"                                          "DDFC Scaler"                                                  "https://www.nexusmods.com/stardewvalley/mods/44971" \
+    "uid:BleakCodex.SpritesInDetail"                       "Sprites in Detail"                                            "https://www.nexusmods.com/stardewvalley/mods/14487" \
+    "Nexus:20599"                                          "PolyamorySweet"                                               "https://www.nexusmods.com/stardewvalley/mods/20599"
+fi
+
+if gum confirm "¿Instalar frameworks base y sincronizar? (los ⬇ manual van a $MODPACK_STAGING/fase0-base/)"; then
+    modpack_sync "Fase0-base" "fase0-base" \
+        "Esca.FarmTypeManager"  "Parrot.RomRas"  "Nom0ri.RomRas" \
+        "Nexus:28284"       "Mangupix.DialogueDisplayFrameworkContinued"  "Nexus:44971" \
+        "BleakCodex.SpritesInDetail"  "Nexus:20599"
+    if [ -d "$MODPACK_STAGING/fase0-base" ]; then
+        modpack_push_phone "Fase0-base" "fase0-base"
+    fi
+fi
+
+# ── Modpacks (Fase 1: SVE / Expanded + Xtardew) ────────────────
+echo -e "${DIM}── Modpacks (Fase 1: SVE + Xtardew) ────────────${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase1-sve-xtardew" ]; then
+  modpack_report "Fase1-SVE-Xtardew" "fase1-sve-xtardew" \
+    "uid:FlashShifter.StardewValleyExpandedCP"  "SVE (Expanded) [CP]"            "https://www.nexusmods.com/stardewvalley/mods/3753" \
+    "Nexus:30982"                                "Red Panda Bazaar"               "https://www.nexusmods.com/stardewvalley/mods/30982" \
+    "Nexus:5787"                                 "East Scarp"                     "https://www.nexusmods.com/stardewvalley/mods/5787" \
+    "uid:Pseudodiego.XtardewValley"              "Xtardew Valley (padre)"         "https://www.nexusmods.com/stardewvalley/mods/1839" \
+    "Nexus:11867"                                "Xtardew Anime Portrait"         "https://www.nexusmods.com/stardewvalley/mods/11867" \
+    "Nexus:7404"                                 "Xtardew Anime Replacers"        "https://www.nexusmods.com/stardewvalley/mods/7404"
+fi
+
+if gum confirm "¿Instalar Fase 1 (SVE+Xtardew) y sincronizar?"; then
+    modpack_sync "Fase1-SVE-Xtardew" "fase1-sve-xtardew" \
+        "uid:FlashShifter.StardewValleyExpandedCP"  "Nexus:30982"  "Nexus:5787" \
+        "uid:Pseudodiego.XtardewValley"  "Nexus:11867"  "Nexus:7404"
+    if [ -d "$MODPACK_STAGING/fase1-sve-xtardew" ]; then
+        modpack_push_phone "Fase1-SVE-Xtardew" "fase1-sve-xtardew"
+    fi
+fi
+
+# ── Modpacks (Fase 2: Seasonal / Anime base) ────────────────────
+echo -e "${DIM}── Modpacks (Fase 2: Seasonal/Anime) ───────────${RESET}\n"
+
+if [ -d "$MODPACK_STAGING/fase2-seasonal-anime" ]; then
+  modpack_report "Fase2-Seasonal-Anime" "fase2-seasonal-anime" \
+    "Nexus:43012"  "Drawberry's Seasonal Cuter for ESR"         "https://www.nexusmods.com/stardewvalley/mods/43012" \
+    "Nexus:16045"  "Seasonal Cute for East Scarp"               "https://www.nexusmods.com/stardewvalley/mods/16045" \
+    "Nexus:14158"  "Sydney - Custom NPC"                        "https://www.nexusmods.com/stardewvalley/mods/14158" \
+    "Nexus:32228"  "Dacar Rasmodia anime portraits"             "https://www.nexusmods.com/stardewvalley/mods/32228" \
+    "Nexus:5969"   "Seasonal Cuter for SVE"                     "https://www.nexusmods.com/stardewvalley/mods/5969" \
+    "Nexus:37247"  "FadeHelm East Scarp seasonal portrait"      "https://www.nexusmods.com/stardewvalley/mods/37247" \
+    "Nexus:42895"  "FadeHelm Rosa (East Scarp)"                 "https://www.nexusmods.com/stardewvalley/mods/42895" \
+    "Nexus:38101"  "FadeHelm Rasmodia portrait"                 "https://www.nexusmods.com/stardewvalley/mods/38101" \
+    "Nexus:39518"  "FadeHelm Lavril portrait"                   "https://www.nexusmods.com/stardewvalley/mods/39518" \
+    "Nexus:11282"  "Lavril - Spanish"                           "https://www.nexusmods.com/stardewvalley/mods/11282" \
+    "Nexus:46956"  "Felicia1L Wizard"                           "https://www.nexusmods.com/stardewvalley/mods/46956" \
+    "Nexus:46901"  "Felicia1L Claire"                           "https://www.nexusmods.com/stardewvalley/mods/46901" \
+    "Nexus:47618"  "Felicia1L Olivia"                           "https://www.nexusmods.com/stardewvalley/mods/47618" \
+    "Nexus:50052"  "Felicia1L Victor"                           "https://www.nexusmods.com/stardewvalley/mods/50052" \
+    "Nexus:48156"  "Felicia1L Sophia"                           "https://www.nexusmods.com/stardewvalley/mods/48156" \
+    "Nexus:9522"   "SVE High-Res Anime Olivia"                  "https://www.nexusmods.com/stardewvalley/mods/9522" \
+    "Nexus:19589"  "Igor's Anime Portraits SDV"                 "https://www.nexusmods.com/stardewvalley/mods/19589" \
+    "Nexus:19476"  "Older Jas (Igor)"                           "https://www.nexusmods.com/stardewvalley/mods/19476" \
+    "Nexus:19320"  "Igor's female Willy"                        "https://www.nexusmods.com/stardewvalley/mods/19320" \
+    "Nexus:19148"  "Igor's Pam"                                 "https://www.nexusmods.com/stardewvalley/mods/19148"
+fi
+
+if gum confirm "¿Instalar Fase 2 (Seasonal/Anime) y sincronizar?"; then
+    modpack_sync "Fase2-Seasonal-Anime" "fase2-seasonal-anime" \
+        "Nexus:43012" "Nexus:16045" "Nexus:14158" "Nexus:32228" "Nexus:5969" \
+        "Nexus:37247" "Nexus:42895" "Nexus:38101" "Nexus:39518" "Nexus:11282" \
+        "Nexus:46956" "Nexus:46901" "Nexus:47618" "Nexus:50052" "Nexus:48156" "Nexus:9522" \
+        "Nexus:19589" "Nexus:19476" "Nexus:19320" "Nexus:19148"
+# ── Mods nuevos (diálogos/NPCs/framework) — descarga manual ✓ — pre-Fase3 ──
+echo -e "${CYAN}── Mods nuevos (diálogos/NPC/framework) manuales ──────${RESET}"
+modpack_report "Nuevos-Mods" "fase3-dialogos" \
+  "Nexus:39733"   "Mirren The Florist (SFW)"                  "https://www.nexusmods.com/stardewvalley/mods/39733" \
+  "Nexus:40695"   "Ahegao Dryads (req AlternativeTextures)"   "https://www.nexusmods.com/stardewvalley/mods/40695" \
+  "Nexus:9246"    "Alternative Textures (framework)"          "https://www.nexusmods.com/stardewvalley/mods/9246" \
+  "Nexus:35854"   "Penny Ever After - Marriage Dialogue"      "https://www.nexusmods.com/stardewvalley/mods/35854" \
+  "Nexus:41561"   "Penny Ever After ESP"                      "https://www.nexusmods.com/stardewvalley/mods/41561" \
+  "Nexus:28046"   "Haley Ever After - Marriage Dialogue"      "https://www.nexusmods.com/stardewvalley/mods/28046" \
+  "Nexus:40798"   "Haley Ever After ESP"                      "https://www.nexusmods.com/stardewvalley/mods/40798" \
+  "Nexus:4531"    "Sam Marriage Dialogue Expansion"           "https://www.nexusmods.com/stardewvalley/mods/4531" \
+  "Nexus:9311"    "Emily Marriage Dialogue Expansion"         "https://www.nexusmods.com/stardewvalley/mods/9311" \
+  "Nexus:1595"    "Elliott Marriage Dialogue Expansion"       "https://www.nexusmods.com/stardewvalley/mods/1595" \
+  "Nexus:3749"    "Sandy Buxom Portrait Overhaul (LfL)"       "https://www.nexusmods.com/stardewvalley/mods/3749"
+echo ""
+
+if [ -d "$MODPACK_STAGING/fase2-seasonal-anime" ]; then
+        modpack_push_phone "Fase2-Seasonal-Anime" "fase2-seasonal-anime"
+    fi
+    # asset-drop: Felicia1L PNG overlay a SVE Characters (4 NPCs)
+    asset_drop_apply "felicia-png"
+fi
+echo -e "${DIM}── Seasonal Cute + Anime Portraits ────────────${RESET}\n"
+
+SEASONAL_CUTE="$WINE_MODS/External-by dizzi~ [CP] Seasonal Cute Characters"
+SEASONAL_ANIME="$WINE_MODS/External-by dizzi~ [CP] Seasonal Anime Characters III"
+
+if gum confirm "¿Configurar Seasonal (Cute+Anime) en PC? (Portraits Animes sobre Cute)"; then
+    if [ -d "$SEASONAL_CUTE" ] && [ -d "$SEASONAL_ANIME" ]; then
+        # Windows/wine: fusionar Portraits del Anime DENTRO del Cute (sobreescribir en orden)
+        if cp -r "$SEASONAL_ANIME/assets/Portraits/." "$SEASONAL_CUTE/assets/Portraits/"; then
+            echo -e "${GREEN}✅ Windows: Portraits Anime → Cute (sobrescritos)${RESET}\n"
+            log "Seasonal Windows: Portraits Anime -> Cute"
+        else
+            echo -e "${RED}❌ FALLO al fusionar Portraits en Windows${RESET}\n"
+            log "FAIL Seasonal Windows: Portraits fusion"
+        fi
+        # Android SMAPI: SOLO el Anime (el Cute va excluido en móvil — farmer HD = cuadrado negro, #607)
+        if [ "$PHONE_ON" -eq 1 ]; then
+            if adb shell "mkdir -p '$ANDROID_MODS'" \
+               && adb push -a "$SEASONAL_ANIME/" "$ANDROID_MODS/External-by dizzi~ [CP] Seasonal Anime Characters III/"; then
+                echo -e "${GREEN}✅ Seasonal → Android SMAPI (solo Anime; Cute excluido en móvil)${RESET}\n"
+                log "OK Seasonal Android <- Anime (Cute excluido)"
+            else
+                echo -e "${RED}❌ FALLO al copiar Anime → Android SMAPI${RESET}\n"
+                log "FAIL Seasonal Android <- Anime"
+            fi
+        else
+            echo -e "${DIM}  (sin celular) push Anime → Android omitido — fusion solo en PC${RESET}\n"
+        fi
+    else
+        echo -e "${RED}❌ No se encontraron los mods Seasonal en PC${RESET}\n"
+    fi
+fi
+
+# ── Modpacks (Fase 3: Packs de Portraits, UNO A LA VEZ) ────────
+echo -e "${DIM}── Modpacks (Fase 3: Portraits) ────────────────${RESET}\n"
+echo -e "${YELLOW}⚠️  Los packs de Portraits se pisan entre si. Instala UNO a la vez.${RESET}\n"
+
+pack_group() {
+  # Fase 3: activa UN pack a la vez. Al activar un pack, desactiva el anterior
+  # (borra sus carpetas de Mods y Android) antes de copiar el nuevo.
+  # $1 = display, $2 = staging subcarpeta, $3+ = triplas "Nexus:id|nombre|url"
+  local name="$1" sub="$2"; shift 2
+  [ -d "$MODPACK_STAGING/$sub" ] || return 0
+  modpack_report "$name" "$sub" "$@"
+  if gum confirm "¿ACTIVAR $name (aisla el resto de packs de Portraits) y sincronizar?"; then
+    # 1) desactivar pack de Fase 3 activo anterior (si hay otro)
+    local prev=""
+    [ -f "$MODPACK_STAGING/.fase3-activo" ] && prev="$(cat "$MODPACK_STAGING/.fase3-activo")"
+    if [ -n "$prev" ] && [ "$prev" != "$sub" ] && [ -d "$MODPACK_STAGING/$prev" ]; then
+      echo -e "${YELLOW}⏏️  Desactivando pack previo: $prev${RESET}"
+      for item in "$MODPACK_STAGING/$prev"/*; do
+        [ -e "$item" ] || continue
+        local b; b="$(basename "$item")"
+        chmod -Rf u+rwx "$WINE_MODS/$b" 2>/dev/null
+        rm -rf "$WINE_MODS/$b"
+        [ "$PHONE_ON" -eq 1 ] && adb shell "rm -rf '$ANDROID_MODS/$b'" 2>/dev/null
+      done
+    fi
+    # 2) instalar el pack elegido (wine + android)
+    local keys=()
+    while [ $# -gt 0 ]; do
+      keys+=("$1"); shift 3
+    done
+    modpack_sync "$name" "$sub" "${keys[@]}"
+    modpack_push_phone "$name" "$sub"
+    # 3) asset-drops especiales según pack
+    if [ "$sub" = "fase3-660315" ]; then
+      asset_drop_apply "660315-xnb"
+    fi
+    if [ "$sub" = "fase3-sve-replacer" ]; then
+      asset_drop_apply "sve-portraits-replacer"
+    fi
+    # 4) marcar activo
+    echo "$sub" > "$MODPACK_STAGING/.fase3-activo"
+    log "ACTIVO packs portraits: $sub"
+  fi
+  echo ""
+}
+
+pack_group "Valley Girls" "fase3-valleygirls" \
+  "Nexus:4399" "Valley Girls (padre)"     "https://www.nexusmods.com/stardewvalley/mods/4399" \
+  "Nexus:12106" "Valley Girls Anime Portrait" "https://www.nexusmods.com/stardewvalley/mods/12106" \
+  "Nexus:14738" "Valley Girls (extra 1)"    "https://www.nexusmods.com/stardewvalley/mods/14738" \
+  "Nexus:35492" "Valley Girls (extra 2)"    "https://www.nexusmods.com/stardewvalley/mods/35492"
+
+pack_group "Bountiful Beauties (Mud)" "fase3-bountiful" \
+  "Nexus:37316" "BB Vol.1 Less Skimpy"    "https://www.nexusmods.com/stardewvalley/mods/37316" \
+  "Nexus:29979" "BB Vol.1 Super Skimpy"   "https://www.nexusmods.com/stardewvalley/mods/29979" \
+  "Nexus:37227" "BB Vol.2 Super Skimpy"   "https://www.nexusmods.com/stardewvalley/mods/37227" \
+  "Nexus:30712" "BB Vol.1 ES VN-Style"    "https://www.nexusmods.com/stardewvalley/mods/30712" \
+  "Nexus:37333" "BB Vol.2 ES Skimpy"      "https://www.nexusmods.com/stardewvalley/mods/37333"
+
+pack_group "OO's Anime Skimpy" "fase3-oos" \
+  "Nexus:32397" "OO's Anime Skimpy"        "https://www.nexusmods.com/stardewvalley/mods/32397" \
+  "Nexus:37312" "OO's for SVE"             "https://www.nexusmods.com/stardewvalley/mods/37312" \
+  "Nexus:38738" "OO's remove tattoo SVE"   "https://www.nexusmods.com/stardewvalley/mods/38738" \
+  "Nexus:35970" "Robin no tattoo"          "https://www.nexusmods.com/stardewvalley/mods/35970" \
+  "Nexus:14487" "Sprites in Detail (req)"  "https://www.nexusmods.com/stardewvalley/mods/14487"
+
+pack_group "Igor's Anime" "fase3-igors" \
+  "Nexus:19589" "Igor's SDV NPC"   "https://www.nexusmods.com/stardewvalley/mods/19589" \
+  "Nexus:19476" "Older Jas"        "https://www.nexusmods.com/stardewvalley/mods/19476" \
+  "Nexus:19320" "female Willy"     "https://www.nexusmods.com/stardewvalley/mods/19320" \
+  "Nexus:19148" "Pam"              "https://www.nexusmods.com/stardewvalley/mods/19148"
+
+pack_group "Pretty Anime (Shop)" "fase3-pretty" \
+  "Nexus:44894" "Shop Portrait Overhaul"    "https://www.nexusmods.com/stardewvalley/mods/44894" \
+  "Nexus:45136" "Pretty Anime Misc Shops"   "https://www.nexusmods.com/stardewvalley/mods/45136" \
+  "Nexus:38134" "Pretty Anime Portraits"    "https://www.nexusmods.com/stardewvalley/mods/38134" \
+  "Nexus:39535" "Beach Bikinis (req)"       "https://www.nexusmods.com/stardewvalley/mods/39535" \
+  "Nexus:28532" "Improved Swimsuits (req)"  "https://www.nexusmods.com/stardewvalley/mods/28532" \
+  "Nexus:10505" "GMCM Options (req)"        "https://www.nexusmods.com/stardewvalley/mods/10505"
+
+pack_group "SVE Anime Replacer" "fase3-sve-replacer" \
+  "Nexus:17516" "(SVE) Anime Portraits Replacer" "https://www.nexusmods.com/stardewvalley/mods/17516"
+
+pack_group "660315's Anime" "fase3-660315" \
+  "Nexus:18610" "Xtardew Anime Retexture"  "https://www.nexusmods.com/stardewvalley/mods/18610" \
+  "Nexus:11654" "ALL NPC anime portraits"  "https://www.nexusmods.com/stardewvalley/mods/11654" \
+  "Nexus:11760" "Anime Expanded portraits" "https://www.nexusmods.com/stardewvalley/mods/11760" \
+  "Nexus:8922"  "Anime Ridgeside"          "https://www.nexusmods.com/stardewvalley/mods/8922" \
+  "Nexus:18608" "Rasmodia Anime Retexture" "https://www.nexusmods.com/stardewvalley/mods/18608"
+
+# ── Modpack opcional rem (POST Fase 3): Sydney Portraits ────────────────
+if [ -d "$MODPACK_STAGING/fase3-sydney" ] || [ -f "$HOME/Descargas/Sydney portraits-38486-1-0-0-1760283704.zip" ]; then
+  local_sydney_zip="$HOME/Descargas/Sydney portraits-38486-1-0-0-1760283704.zip"
+  echo -e "${DIM}── Modpack rem: Sydney Portraits (38486) ─────────${RESET}\n"
+  echo -e "  · zip: $([ -f "$local_sydney_zip" ] && echo 'presente (Descargas)' || echo 'requiere descarga manual')"
+  if gum confirm "¿Instalar Sydney portraits (38486) y aplicar?"; then
+    # registrar en staging opcional
+    mkdir -p "$MODPACK_STAGING/fase3-sydney"
+    [ -f "$local_sydney_zip" ] && cp -n "$local_sydney_zip" "$MODPACK_STAGING/fase3-sydney/"
+    asset_drop_apply "sydney-portraits"
+    echo -e "${GREEN}✅ Sydney Portraits instalado (pack rem, opcional)${RESET}"
+  fi
+  echo ""
+fi
+
+# ── Modpack rem (POST Fase 3): Juliet & Jessie (Joja Clerks) + Date mods ──
+if [ -d "$MODPACK_STAGING/fase3-julietjessie" ] || [ -d "$MODPACK_STAGING/fase3-date" ]; then
+  echo -e "${DIM}── Modpack rem: Juliet & Jessie + Date mods ───────${RESET}\n"
+  # Juliet & Jessie (Joja Clerks) — Opción A recomendada (sin pisar FadeHeim)
+  if gum confirm "¿Instalar Juliet & Jessie (NPC) con portraits anime SOLO base (Opción A, no pisa FadeHeim)?"; then
+    echo -e "${CYAN}ℹ️  NOTA (marriables reales): Juliet, Jessie, Caroline, Robin, Jodi, Qingfeng, Nora, Lannah, Lantana y Rasmodia (Wizard→Rasmodia) son marriables. Requieren HEARTS + EVENTO DE CORTEJO (8-10 corazones) para aparecer en el social. NO marriables: Rosa, Edith, Susan, Josephine, Beatrice, Evelyn y la mayoría de 'viejas' (sin mod de date hoy).${RESET}"
+    TMPJJ="$(mktemp -d)"
+    # NPC base 6398
+    if unzip -o -q "$MODPACK_STAGING/fase3-julietjessie/Juliet and Jessie-6398-1-5-6-1728982422.zip" -d "$TMPJJ/" 2>/dev/null; then
+      for d in "$TMPJJ"/*/; do
+        [ -d "$d" ] && { b="$(basename "$d")"; rm -rf "$WINE_MODS/$b"; cp -r "$d" "$WINE_MODS/$b"; echo -e "${GREEN}✅ Juliet&Jessie base ← $b${RESET}"; }
+      done
+    fi
+    # req DaisyNiko Tilesheets 4736
+    if unzip -o -q "$MODPACK_STAGING/fase3-julietjessie/DaisyNiko's Tilesheets-4736-1-12-1771473826.zip" -d "$TMPJJ/" 2>/dev/null; then
+      for d in "$TMPJJ"/*/; do
+        [ -d "$d" ] && { b="$(basename "$d")"; rm -rf "$WINE_MODS/$b"; cp -r "$d" "$WINE_MODS/$b"; echo -e "${GREEN}✅ DaisyNiko req ← $b${RESET}"; }
+      done
+    fi
+    # overlay Anime Portraits for Juliet 34022 (opción A: dentro del base)
+    if unzip -o -q "$MODPACK_STAGING/fase3-julietjessie/Anime Portraits for Juliet-34022-0-1-1-1757203212.zip" -d "$TMPJJ/" 2>/dev/null; then
+      JJSRC="$(find "$TMPJJ" -type d -name "Portraits" | head -1)"
+      if [ -n "$JJSRC" ]; then
+        cp -r "$JJSRC/." "$WINE_MODS/[CP] Juliet & Jessie (1.6)/assets/Portraits/"
+        echo -e "${GREEN}✅ Anime portraits Juliet overlay (Opción A)${RESET}"
+      fi
+    fi
+    rm -rf "$TMPJJ"
+    # Opción B (opcional): si el usuario quiere el asset East Scarp 15802 (pisa FadeHeim)
+    if gum confirm "¿Aplicar TAMBIÉN el asset East Scarp 15802 (pisará a FadeHeim en Juliet/Jessie)?"; then
+      TMPJJ2="$(mktemp -d)"
+      unzip -o -q "$MODPACK_STAGING/fase3-julietjessie/Juliet and Jessie portraits mod East Scarp-15802-1-5-1678476957.zip" -d "$TMPJJ2/" 2>/dev/null
+      ES_JONES="$(find "$WINE_MODS/East Scarp NPCs" -type d -name "Juliet" 2>/dev/null | head -1)"
+      # el asset usa 'Juliet/1/...' — copiar a East Scarp NPCs según su layout si existe destino
+      dst_es="$(dirname "$WINE_MODS/East Scarp NPCs/assets/CharacterFiles/Portraits")"
+      [ -d "$dst_es" ] && { cp -r "$TMPJJ2"/* "$dst_es/" 2>/dev/null; echo -e "${YELLOW}⚠ 15802 copiado a East Scarp (puede requerir layout: Juliet/1/ = events)${RESET}"; }
+      rm -rf "$TMPJJ2"
+      echo -e "${RED}⚠ 15802 instalado — pisa a FadeHeim para Juliet/Jessie${RESET}"
+    else
+      echo -e "${GREEN}→ Opción A confirmada: 15802 NO instalado (FadeHeim intacto)${RESET}"
+    fi
+  fi
+  echo ""
+  # Date mods (Rasmodia gana sobre Wizard)
+  if gum confirm "¿Instalar Date mods (Looking for Love + reqs + Dateable Caroline/Jodi)? Rasmodia seguirá ganando el Wizard."; then
+    TMPDT="$(mktemp -d)"
+    # ResponseCore 8284 + HugsKisses 21019 + Looking for Love 21370
+    for z in "$MODPACK_STAGING/fase3-date/MissCoriel's Unique Courtship Response CORE 8284"*.zip \
+             "$MODPACK_STAGING/fase3-date/Hugs And Kisses Continued-21019"*.zip \
+             "$MODPACK_STAGING/fase3-date/looking for love redux-21370"*.zip; do
+      [ -f "$z" ] || continue
+      unzip -o -q "$z" -d "$TMPDT/" 2>/dev/null
+    done
+    # Dateable Caroline (rar) con unrar si disponible
+    unrar_bin="$(command -v unrar-free || true)"
+    if [ -n "$unrar_bin" ]; then
+      "$unrar_bin" x -o+ "$MODPACK_STAGING/fase3-date/Dateable Caroline for 1.6.0-15532-1-2-1-1712601878.rar" "$TMPDT/" >/dev/null 2>&1
+    else
+      z78="$(find /nix/store -maxdepth 4 -name unrar-free -type f 2>/dev/null | head -1)"
+      [ -n "$z78" ] && "$z78" x -o+ "$MODPACK_STAGING/fase3-date/Dateable Caroline for 1.6.0-15532-1-2-1-1712601878.rar" "$TMPDT/" >/dev/null 2>&1
+    fi
+    # Datable Jodi
+    unzip -o -q "$MODPACK_STAGING/fase3-date/Dateable Jodi 1.3-7721-1-3-1656081323.zip" -d "$TMPDT/" 2>/dev/null
+    # sanitizar JSON de Dateable Caroline (el autor dejó // en manifest + trailing commas) — evita skip por manifest inválido
+    CARRAR=5; python3 -c "import json,sys; json.load(open('$TMPDT/[CP] Dateable Caroline/manifest.json'))" 2>/dev/null || python3 - << 'PY'
+import json
+p="/tmp/opencode/caroline_manifest_patch.json"
+d={
+  "Name":"Dateable Caroline",
+  "Author":"sy_mokarin & MamaNachona",
+  "Version":"1.2.1",
+  "Description":"A mod that lets you date (and marry) Caroline.",
+  "UniqueID":"Nachona.DateableCaroline",
+  "UpdateKeys":[],
+  "ContentPackFor":{"UniqueID":"Pathoschild.ContentPatcher"}
+}
+json.dump(d,open(p,"w"),indent=2,ensure_ascii=False)
+PY
+    # si el manifest no parsea, reemplazarlo
+    if ! python3 -c "import json,sys; json.load(open('$TMPDT/[CP] Dateable Caroline/manifest.json'))" 2>/dev/null; then
+      cp /tmp/opencode/caroline_manifest_patch.json "$TMPDT/[CP] Dateable Caroline/manifest.json"
+      echo -e "${YELLOW}⚠ Manifest Dateable Caroline sanitizado (autor dejó // inválido)${RESET}"
+    fi
+    # mover todo
+    for d in "$TMPDT"/*/; do
+      [ -d "$d" ] || continue
+      b="$(basename "$d")"
+      case "$b" in
+        "[CP] Looking for Love"|"[H&K] Looking for Love"|"ResponseCore"|"HugsAndKisses"|"[CP] Dateable Caroline"|"[CP] Datable Jodi")
+          rm -rf "$WINE_MODS/$b"; cp -r "$d" "$WINE_MODS/$b"; echo -e "${GREEN}✅ Date ← $b${RESET}"
+          ;;
+      esac
+    done
+    rm -rf "$TMPDT"
+  fi
+  echo ""
+fi
+
+# ── Modpack rem (POST): Grupo A (date-night/robin/lantana/nora/qingfeng/aideen/lannah/FS) ──
+if [ -d "$MODPACK_STAGING/fase3-rem-mods" ]; then
+  echo -e "${DIM}── Modpack rem: extras (DateNight/Robin/Lantana/Nora/Qingfeng/Aideen/Lannah/FS) ──${RESET}\n"
+  if gum confirm "¿Instalar los extras de rem-mods (Date Night Redux, Dateable Robin+ES, Lantana, Nora, Qingfeng, Aideen, Lannah, Fashion Closet)?"; then
+    TMPR="$(mktemp -d)"; UNRAR_BIN="$(command -v unrar-free || find /nix/store -maxdepth 4 -name unrar-free -type f 2>/dev/null | head -1)"
+    # Date Night Redux base
+    for z in "$MODPACK_STAGING"/fase3-rem-mods/Date\ Night\ Redux\ 22714*.zip; do
+      [ -f "$z" ] && unzip -o -q "$z" -d "$TMPR/" 2>/dev/null
+    done
+    # merge DateSpanish del 14833
+    TMPR2="$(mktemp -d)"
+    for z in "$MODPACK_STAGING"/fase3-rem-mods/Date\ Night\ Redux\ \(2.3.4\)*.zip; do
+      [ -f "$z" ] && unzip -o -q "$z" -d "$TMPR2/" 2>/dev/null
+    done
+    # Dateable Robin + ES + Lantana + Nora + Qingfeng + Aideen + Lannah + FS (zip y rar)
+    for z in "$MODPACK_STAGING"/fase3-rem-mods/*.zip; do
+      [ -f "$z" ] || continue
+      case "$(basename "$z")" in
+        *22714*|*\(2.3.4\)*) ;;  # ya extraído Date Night
+        *) unzip -o -q "$z" -d "$TMPR/" 2>/dev/null ;;
+      esac
+    done
+    for rz in "$MODPACK_STAGING"/fase3-rem-mods/*.rar; do
+      [ -f "$rz" ] && [ -n "$UNRAR_BIN" ] && "$UNRAR_BIN" x -o+ "$rz" "$TMPR/" >/dev/null 2>&1
+    done
+    # mover todas las carpetas top-level a Mods
+    move_tmp_to_mods() { for d in "$1"/*/; do [ -d "$d" ] || continue; b="$(basename "$d")"; [ "$b" = __MACOSX ] && continue; rm -rf "$WINE_MODS/$b"; cp -r "$d" "$WINE_MODS/$b"; echo -e "${GREEN}  ✓ $b${RESET}"; done; }
+    move_tmp_to_mods "$TMPR"
+    # DateSpanish del 14833 → dentro de [CP] Date Night Redux
+    [ -d "$TMPR2/DateSpanish" ] && cp -r "$TMPR2/DateSpanish" "$WINE_MODS/[CP] Date Night Redux/" && echo -e "${GREEN}  ✓ DateSpanish anexado${RESET}"
+    # es.json de Nora/Qingfeng al i18n del [CP] (aplanar)
+    for n in "[NPC] Nora the Herpetologist v.2.9.2 ESR/[CP] The Herpetologist" "Qingfeng/[CP]Qingfeng"; do
+      esf="$(find "$WINE_MODS/$n" -maxdepth 1 -iname es.json 2>/dev/null | head -1)"
+      if [ -n "$esf" ]; then mkdir -p "$WINE_MODS/$n/i18n"; mv "$esf" "$WINE_MODS/$n/i18n/"; echo -e "${GREEN}  ✓ es.json → $n/i18n/${RESET}"; fi
+    done
+    rm -rf "$TMPR" "$TMPR2"
+    echo -e "${GREEN}✅ Extras rem-mods instalados${RESET}"
+  fi
+  echo ""
+fi
+
+# ── Modpack rem (POST): Grupo B SVE-opcional (Jolyne/Alesia/Camilla) default=No ──
+if [ -d "$MODPACK_STAGING/fase3-sve-optional" ]; then
+  echo -e "${DIM}── Modpack rem: SVE Portraits opcionales (Jolyne/Alesia/Camilla) ──${RESET}\n"
+  # top-level (fuera de función): NO usar `local` aquí
+  SVE6="$WINE_MODS/External-by dizzi~ [CP] Stardew Valley Expanded"
+  if [ -d "$SVE6" ] && gum confirm "¿Instalar SVE Portraits opcionales (Jolyne, Alesia, Camilla)? RECOMENDADO NO si usas Seasonal Cute SVE."; then
+    TMP6="$(mktemp -d)"
+    for z in "$MODPACK_STAGING"/fase3-sve-optional/Jolyne*.zip; do [ -f "$z" ] && { unzip -o -q "$z" -d "$TMP6/" 2>/dev/null; jolynepng="$(find "$TMP6" -iname "Jolyne.png" -path "*Portraits/Jolyne*" | head -1)"; [ -n "$jolynepng" ] && { mkdir -p "$SVE6/assets/CharacterFiles/Portraits/Jolyne"; cp -f "$jolynepng" "$SVE6/assets/CharacterFiles/Portraits/Jolyne/"; echo -e "${GREEN}  ✓ Jolyne${RESET}"; }; }; done
+    rm -rf "$TMP6"/*
+    for z in "$MODPACK_STAGING"/fase3-sve-optional/Alesia*.zip; do [ -f "$z" ] && { unzip -o -q "$z" -d "$TMP6/" 2>/dev/null; mkdir -p "$SVE6/assets/CharacterFiles/Portraits/Alesia"; for f in "$TMP6"/Alesia/*; do [ -f "$f" ] && cp -f "$f" "$SVE6/assets/CharacterFiles/Portraits/Alesia/"; done; echo -e "${GREEN}  ✓ Alesia${RESET}"; }; done
+    rm -rf "$TMP6"/*
+    for z in "$MODPACK_STAGING"/fase3-sve-optional/Camilla*.zip; do [ -f "$z" ] && { unzip -o -q "$z" -d "$TMP6/" 2>/dev/null; cpng="$(find "$TMP6" -iname "Camilla*.png" | head -1)"; [ -n "$cpng" ] && { mkdir -p "$SVE6/assets/CharacterFiles/Portraits/Camilla"; cp -f "$cpng" "$SVE6/assets/CharacterFiles/Portraits/Camilla/Camilla.png"; echo -e "${GREEN}  ✓ Camilla${RESET}"; }; }; done
+    rm -rf "$TMP6"
+  fi
+  echo ""
+fi
+
 # ── Verificar ─────────────────────────────────────────────────
 echo -e "${DIM}──────────────────────────────────────────────${RESET}"
 echo -e "${BOLD}Verificación:${RESET}\n"
 
-echo -e "${CYAN}Phone Downloads:${RESET}"
-adb shell "ls '$PHONE_DOWNLOAD'" 2>/dev/null | head -5 || echo -e "  ${RED}No existe${RESET}"
+# asset-drops registrados (Felicia1L PNG → SVE, 660315 XNB → Content)
+asset_drop_report
 echo ""
 
-echo -e "${CYAN}Android SMAPI:${RESET}"
-adb shell "ls '$ANDROID_SAVE_SMPI/Diego_339177434/'" 2>/dev/null | head -5
+# decisión del arte de Claire (override SVE Portrait Force)
+override_sve_claire_choice
 echo ""
 
-echo -e "${CYAN}Android Vanilla:${RESET}"
-adb shell "ls '$ANDROID_SAVE_VANILLA/Diego_339177434/'" 2>/dev/null | head -5
+# decisión del arte de Susan (override SVE Portrait Force)
+override_sve_susan_choice
 echo ""
+
+# decisión del arte de Olivia (override SVE Portrait Force)
+override_sve_olivia_choice
+echo ""
+
+# decisión del Wizard (Rasmodia bruja vs Felicia1L macho)
+wizard_rasmodia_choice
+echo ""
+
+# decisión del portrait anime de Rasmodia (FadeHeim default / Dacar / 660315)
+rasmodia_anime_choice
+echo ""
+
+# decisión del overlay anime de Juliet (34022)
+juliet_anime_choice
+echo ""
+
+# decisión del portrait de Sydney (vanilla vs anime 38486)
+sydney_anime_choice
+echo ""
+
+# decisión del portrait de Clint (OO's vs Pretty)
+clint_choice
+echo ""
+
+# decisión del portrait de Sandy (OO's vs Buxom 3779)
+sandy_choice
+echo ""
+
+# respaldo opcional a GDrive (packs-staging) — persistencia de staging local
+if gum confirm "¿Sincronizar staging LOCAL → packs-staging/ (GDrive)? (respaldo persistente)"; then
+   packs_to_gdrive
+fi
+echo ""
+
+if [ "$PHONE_ON" -eq 1 ]; then
+  echo -e "${CYAN}Phone Downloads:${RESET}"
+  adb shell "ls '$PHONE_DOWNLOAD'" 2>/dev/null | head -5 || echo -e "  ${RED}No existe${RESET}"
+  echo ""
+
+  echo -e "${CYAN}Android SMAPI:${RESET}"
+  adb shell "ls '$ANDROID_SAVE_SMPI/Diego_339177434/'" 2>/dev/null | head -5
+  echo ""
+
+  echo -e "${CYAN}Android Vanilla:${RESET}"
+  adb shell "ls '$ANDROID_SAVE_VANILLA/Diego_339177434/'" 2>/dev/null | head -5
+  echo ""
+else
+  echo -e "${CYAN}Phone Downloads / Android SMAPI / Android Vanilla:${RESET} ${DIM}(sin celular — n/d)${RESET}\n"
+fi
 
 echo -e "${CYAN}Windows:${RESET}"
 if [ -d "$WINE_SAVE/Diego_339177434" ]; then

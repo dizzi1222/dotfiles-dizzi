@@ -134,6 +134,8 @@
     fzf
     silver-searcher-ng
     television # TUI fuzzy-finder (álgebra de consultas tipo tv)
+    nix-search-tv # Buscar paquetes NixOS en la TUI (television)
+    sunsetr # Filtro azul noche para niri/hyprland (toggle-night-mode.sh)
 
     # JSON/YAML
     jq
@@ -154,6 +156,7 @@
     file
     unzip
     p7zip
+    ydotool
 
     # Wine (64-bit WoW64 — el `wine` default de nixpkgs es solo 32-bit
     # y tira "Bad EXE format" con instaladores PE32+ x86-64)

@@ -1,0 +1,56 @@
+@import url("/home/diego/.cache/wal/colors-waybar.css");
+
+* {
+  font-family: "JetBrainsMono Nerd Font", "Iosevka";
+  font-size: 15px;
+  color: @foreground;
+}
+
+window {
+  background-color: @background;
+  border-radius: 16px;
+  border: 2px solid @color5;
+  padding: 6px;
+}
+
+#outer-box {
+  background-color: transparent;
+}
+
+#input {
+  background-color: @color0;
+  color: @foreground;
+  border-radius: 10px;
+  margin: 10px 10px 6px 10px;
+  padding: 10px 14px;
+  font-size: 17px;
+}
+
+#inner-box,
+#list {
+  background-color: transparent;
+}
+
+#entry {
+  background-color: transparent;
+  color: @foreground;
+  border-radius: 12px;
+  padding: 16px 12px;
+  margin: 5px;
+}
+
+#entry:selected {
+  background-color: @color1;
+  color: @background;
+}
+
+#entry:hover {
+  background-color: @color4;
+  color: @background;
+}
+
+#text {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
