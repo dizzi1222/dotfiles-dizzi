@@ -61,6 +61,14 @@ in
     mpv
     imv
 
+    # Mod managers
+    curseforge        # AppImage oficial Overwolf: mods Minecraft/WoW (no en nixpkgs/Flathub)
+    vortex            # Vortex (NexusMods.App UNFREE, soporta .rar) + .desktop con keywords
+    r2modman          # Unofficial Thunderstore mod manager (AppImage→nixpkgs 3.2.18, Thunderstore)
+    #amethyst         # DESCARTADO: AppImages 2.5.1/2.5.2 dañados (offset SQUASHFS desalineado,
+    #                 #   "Can't find a valid SQUASHFS superblock" en appimageTools.extract)
+    #ModDrop          # NO existe Linux: Windows-only, sin AppImage/flatpak; comunidad desaconseja
+
     # Audio
     pavucontrol
     easyeffects

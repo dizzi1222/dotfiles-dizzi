@@ -141,7 +141,23 @@
           if [ -s ($drive1)/grub/grubenv ]; then
             load_env -f ($drive1)/grub/grubenv
           fi
-          set default="''${saved_entry}"
+          # Prioridad one-shot: si grub-reboot escribió next_entry, usalo SOLO
+          # una vez (así el ping-pong NixOS→Windows→NixOS funciona) y borralo
+          # del grubenv para que el siguiente boot vuelva a saved_entry.
+          #
+          # CRITICO (Secure Boot standalone): $prefix = memdisk read-only, por
+          # eso load_env/save_env van SIEMPRE con `-f ($drive1)/grub/grubenv`.
+          # `set default=...` debe quedar DESPUÉS de cargar el env real.
+          # `savedefault` usa boot_once para no quemar la entrada one-shot.
+          if [ -n "''${next_entry}" ]; then
+            set default="''${next_entry}"
+            unset next_entry
+            save_env -f ($drive1)/grub/grubenv next_entry
+            set boot_once="true"
+          else
+            set default="''${saved_entry}"
+            set boot_once=""
+          fi
           function savedefault {
               if [ -z "''${boot_once}" ]; then
                   saved_entry="''${chosen}"
@@ -533,7 +549,6 @@
 
     # Misc
     scrcpy
-    ydotool
     wtype
     rclone
     gedit
@@ -725,7 +740,12 @@
     KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"
   '';
 
-  # ── ThinkPad X1E2: Fn key mode (F-keys primary) ───────────
+  # ── ydotoold (ydotool daemon) ───────────────────────────────
+  # Socket en /run/ydotoold/socket (permiso 0660, grupo ydotool). El usuario
+  # diego debe estar en el grupo ydotool. Quita la necesidad de `ydotoold`
+  # manual o del unit "linked-runtime" que quedaba inactive (socket no existía).
+  programs.ydotool.enable = true;
+  users.groups.ydotool.members = [ "diego" ];
   systemd.services.thinkpad-fn-mode = {
     description = "Set ThinkPad Fn lock OFF (F1-F12 by default, media keys with Fn)";
     after = [ "sys-subsystem-platform-devices-thinkpad_acpi.device" ];
