@@ -19,7 +19,8 @@ spawn-sh-at-startup "powerprofilesctl set performance" // Usa balanced si quiere
 spawn-sh-at-startup "sh ~/.config/eww/scripts/toggle-game-mode.sh"
 
 // Desktop environment
-spawn-sh-at-startup "vicinae server"
+// vicinae: el daemon lo levanta vicinae.service (systemd user). NO usar
+// spawn-sh-at-startup "vicinae server" // descomentar si no usas systemd
 spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x-desktop"
 // ##################
 // # ARRANCAR NEMO  #
@@ -100,4 +101,7 @@ spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --
 // Antimicrox Gamepad Keyboard Mapping Tool
 spawn-at-startup "antimicrox --show %f"
 // Sunshine
-spawn-at-startup "sunshine"
+// spawn-at-startup "sunshine"
+// Sunshine: NO lanzar aquí — el servicio `sunshine.service` (módulo
+// services.sunshine.autoStart en remote-control.nix) ya lo arranca al
+// graphical-session.target. Si se lanza en ambos, duplica procesos en puerto 47989.

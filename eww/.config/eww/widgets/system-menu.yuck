@@ -1,0 +1,370 @@
+;; Eww System Menu — grid estático completo. Buscador decorativo (sin filtrado).
+;; ESTILOS INLINE (`:css` en el box raíz) — NO dependen de scss/imports/paleta externos.
+;; Navegación: Tab/Enter con :focusable. Generado desde system-menu-manifest.tsv.
+
+(defwindow system-menu
+  :monitor 0
+  :geometry (geometry :x "0px" :y "0px" :width "760px" :anchor "center")
+  :stacking "fg"
+  :focusable "ondemand"
+  :windowtype "normal"
+  :wm-ignore true
+  (system-grid))
+
+(defwidget system-grid []
+  (box :class "sys-menu" :orientation "vertical" :space-evenly "false"
+       :style "background-color: #070711; border: 1px solid #5e5ba2; border-radius: 14px; padding: 18px; margin: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);"
+       :css "  .sys-menu { background-color: #070711; border: 1px solid #5e5ba2;
+              border-radius: 14px; padding: 18px; margin: 12px;
+              box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+  .sys-search { background-color: #16162a; border-radius: 8px; padding: 8px 12px;
+                margin: 0 0 8px 0; color: #c1c1c3; font-size: 13pt;
+                font-family: \"Iosevka\"; }
+  .sys-cat { color: #a197dd; font-size: 10pt; font-weight: bold;
+             letter-spacing: 1px; margin: 6px 0 2px 4px; }
+  .sys-row { margin: 2px 0; }
+  .sys-btn { background-color: #16162a; border-radius: 10px; padding: 10px 14px; margin: 3px; }
+  .sys-btn:focus  { background-color: #5e5ba2; border: 1px solid #c1c1c3; }
+  .sys-btn:hover  { background-color: #2b2b52; }
+  .sys-btn-box    { spacing: 10px; }
+  .sys-btn-icon   { font-family: \"Iosevka Nerd Font\"; font-size: 20pt;
+                    color: #c1c1c3; min-width: 28px; margin: 0; }
+  .sys-btn-label  { font-family: \"Iosevka\"; font-size: 11pt; color: #c1c1c3; }
+  .sys-btn-chev   { font-family: \"Iosevka Nerd Font\"; font-size: 11pt;
+                    color: #5e5ba2; margin-left: auto; }"
+    (input :class "sys-search" :onchange "true" :placeholder "Buscar…")
+    (label :class "sys-cat" :text "Apps")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "TV/Nix" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰺐"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰺐")
+          (label :class "sys-btn-label" :text "Scrcpy" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰜫"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰜫")
+          (label :class "sys-btn-label" :text "Webapp" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰗃"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰗃")
+          (label :class "sys-btn-label" :text "Soundbound" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󱄲󰖳"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󱄲󰖳")
+          (label :class "sys-btn-label" :text "Bottles" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󱦥"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󱦥")
+          (label :class "sys-btn-label" :text "Sunshine" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Trigger")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰳾"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰳾")
+          (label :class "sys-btn-label" :text "AutoClick" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰌌 󱊮"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰌌 󱊮")
+          (label :class "sys-btn-label" :text "AutoPress" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰩫"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰩫")
+          (label :class "sys-btn-label" :text "Shot Clip" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Shot Menu" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh ☠"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "☠")
+          (label :class "sys-btn-label" :text "Save Point" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Fix Ydo" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Style")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Night" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Hypridle" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󱓞"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󱓞")
+          (label :class "sys-btn-label" :text "Power Mode" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Game Mode" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "GTK Fix" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰐫"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰐫")
+          (label :class "sys-btn-label" :text "Design" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Setup")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Drive" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󱛟"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󱛟")
+          (label :class "sys-btn-label" :text "Disco" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Waydroid" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Portal" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󱛍"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󱛍")
+          (label :class "sys-btn-label" :text "WiFi Docs" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Zoom" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "System")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Rebuild Nix" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰮮"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰮮")
+          (label :class "sys-btn-label" :text "Clean Boot" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰊭"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰊭")
+          (label :class "sys-btn-label" :text "Nix GC" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Nix Cleanup" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Git Clean" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Docker" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Red/Net" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Bluetooth" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰂜"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰂜")
+          (label :class "sys-btn-label" :text "DND" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Power" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Audio")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Audio" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Mic" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Mute" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "About")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 🦙"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "🦙")
+          (label :class "sys-btn-label" :text "Ollama" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "AI Conf" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Herramientas")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰋚"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰋚")
+          (label :class "sys-btn-label" :text "Historial" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Widgets eww" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Git Help" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰊢"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰊢")
+          (label :class "sys-btn-label" :text "Gitflow" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Cache" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Nix GC" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Trigger")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰋋"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰋋")
+          (label :class "sys-btn-label" :text "Fix BT KZ" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Kill Gamescope" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Android")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh  "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text " ")
+          (label :class "sys-btn-label" :text "Waydroid" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Fotos Way" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Multimedia")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰝛"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰝛")
+          (label :class "sys-btn-label" :text "MP3 128k" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰋌"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰋌")
+          (label :class "sys-btn-label" :text "Libros" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Suwayomi" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Instalar")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰣇"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰣇")
+          (label :class "sys-btn-label" :text "AUR" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh "
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "")
+          (label :class "sys-btn-label" :text "Inst. pkg" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰬺"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰬺")
+          (label :class "sys-btn-label" :text "Hypr fase1" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰬻"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰬻")
+          (label :class "sys-btn-label" :text "Hypr fase2" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰋊󰬼"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰋊󰬼")
+          (label :class "sys-btn-label" :text "CachyOS" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh 󰟝"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text "󰟝")
+          (label :class "sys-btn-label" :text "Inst. juego" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+    (label :class "sys-cat" :text "Sistema")
+    (box :class "sys-row" :orientation "horizontal" :space-evenly "true"
+      (button :class "sys-btn" :onclick "~/.config/eww/scripts/system-menu-click.sh  󱕴"
+        (box :class "sys-btn-box" :orientation "horizontal" :space-evenly "false" :spacing "10"
+          (label :class "sys-btn-icon" :text " 󱕴")
+          (label :class "sys-btn-label" :text "Gnome keyring" :hexpand "true" :halign "start")
+          (label :class "sys-btn-chev" :text "" :halign "end")))
+    )
+  ))

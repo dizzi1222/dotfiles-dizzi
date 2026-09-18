@@ -29,8 +29,8 @@
     gamescope
 
     # Cloud gaming / streaming
+    # sunshine  # ← movido a services.sunshine (remote-control.nix) con capSysAdmin
     moonlight-qt
-    sunshine
 
     # Compatibility layers
     protonup-qt
