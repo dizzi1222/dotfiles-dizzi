@@ -13,7 +13,65 @@ CHOICE=$(printf "󰋚\0meta\x1fhistorial, history, HISTORIAL, history commands, 
 # Los íconos se muestran, las descripciones son para búsqueda (invisibles con color transparente)
 
 # Extraer solo el ícono (antes del meta tag)
-ICON=$(echo "$CHOICE" | awk -F '\0meta' '{print $1}')
+# Modo dual: si se llama con un argumento (desde eww system-menu), se usa ese
+# ícono directamente; sin argumentos abre el wofi grid con categorías.
+if [ -n "$1" ]; then
+  ICON="$1"
+else
+  MANIFEST="$HOME/.config/eww/scripts/system-menu-manifest.tsv"
+  KW_FILE="$HOME/.config/eww/scripts/system-menu-kw.tsv"
+  WOFI_CONF="$HOME/.config/wofi/system-control.conf"
+  WOFI_STYLE="$HOME/.config/wofi/system-control.css"
+
+  # Keywords invisibles (búsqueda recursiva como el \0meta de rofi): el texto
+  # viaja en la línea pero se renderiza transparente vía pango markup
+  # (requiere allow_markup=true en system-control.conf).
+  kw_span() {
+    local icon="$1"
+    local kw
+    kw=$(awk -F'\t' -v i="$icon" '$1==i {print $2; exit}' "$KW_FILE" 2>/dev/null)
+    [ -n "$kw" ] && printf '<span alpha="1" font_size="1">%s</span>' "$kw"
+  }
+
+  # Iconos por categoría para el primer grid (wofi --columns 3)
+  CATEGORY_ICONS="Todos:󰁍
+Apps:󰀄
+Trigger:󰳾
+Style:󰑐
+Setup:󰒓
+System:󰣇
+Audio:󰓃
+About:󰊖
+Herramientas:󰊢
+Android:󰀲
+Multimedia:󰝚
+Instalar:󰌓
+Sistema:󰠅"
+
+  cat_icon() {
+    echo "$CATEGORY_ICONS" | awk -F: -v c="$1" '$1==c {print $2; exit}'
+  }
+
+  # Paso 1 — elegir categoría (grid 3 columnas). "Todos" = búsqueda recursiva.
+  # Cada categoría lleva chevron ' ' a la derecha (estilo Omarchy).
+  CAT_LIST=$(printf 'Todos\n'; awk -F'\t' '!seen[$1]++ {print $1}' "$MANIFEST")
+  CHOICE=$(printf '%s\n' "$CAT_LIST" | while read -r cat; do
+    [ -n "$cat" ] && printf '%s\t%s\t<span letter_spacing="40000"> </span>%s\n' "$(cat_icon "$cat")" "$cat" ""
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 3 --prompt "󱍕 󰣇 Categoría")
+  [ -z "$CHOICE" ] && exit 0
+  CATEGORY=$(echo "$CHOICE" | awk -F'\t' '{print $2}')
+
+# Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
+  # búsqueda recursiva ("nixconf cleanup" encuentra "Nix Cleanup").
+  # Cada entrada lleva el chevron ' ' a la derecha (estilo Omarchy).
+  CHOICE=$(awk -F'\t' -v c="$CATEGORY" '
+    $1==c || c=="Todos" { printf "%s\t%s\t%s\n", $2, $3, "KW" }
+  ' "$MANIFEST" | while IFS=$'\t' read -r icon label _; do
+    printf '%s\t%s %s %s\n' "$icon" "$label" "" "$(kw_span "$icon")"
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 2 --prompt "󱍕 $CATEGORY")
+  [ -z "$CHOICE" ] && exit 0
+  ICON=$(echo "$CHOICE" | awk -F'\t' '{print $1}')
+fi
 
 case "$ICON" in
 "")
