@@ -7,13 +7,68 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/platform.sh"
 
-CHOICE=$(printf "󰋚\0meta\x1fhistorial, history, HISTORIAL, history commands, zsh, bash, terminal\n󰣇\0meta\x1faur yay instalar paquetes arch\n\0meta\x1fpkg instalar paquetes pacman\n󰜫\0meta\x1fwebapp instalar aplicaciones web\n󰳾\0meta\x1fautoclick, mouse, macro, tinytask god\n\0meta\x1fpulse audio control volumen\n󰂜\0meta\x1fdnd notificaciones do not disturb\n\0meta\x1fgit clean limpiar repositorio\n\0meta\x1flimpiar cache limpieza\n󰮮\0meta\x1flimpiar boot clean-boot reconstruir\n\0meta\x1fnix os nixos nixconf rebuild build config home-manager\n󰌌 󱊮\0meta\x1fautopress de tecla, teclado, keyboard macro, auto\n\0meta\x1fred network wifi ethernet, network & internet\n\0meta\x1fbluetooth bluetuith conexion\n\n\0meta\x1fgame modo juego gaming\n󱓞\0meta\x1fpower perfomance optimizar rendimiento energia bateria\n\0meta\x1fgyazo captura screenshot menu\n󰩫\0meta\x1fgyazo captura recortar screenshot clipboard\n\0meta\x1fnight noche modo nocturno oscuro night toggle hypr sunset\n\0meta\x1fhypridle toggle stop start idle daemon\n\0meta\x1faudio mute silenciar volumen\n\0meta\x1fmicrofono mic mute toggle\n󰬺\0meta\x1fhyprland install fase1 root instalacion arch\n󰬻\0meta\x1fhyprland install fase2 user instalacion arch\n󰋊󰬼\0meta\x1fInstalar CachyOS, fase2-HyprInstall-CachyOS-Edition, cachyos, cachy os Cachy OS\n󱄲󰖳\0meta\x1fbottles wine windows instalar
-󱦥\0meta\x1fsunshine audio local loopback aurifonos headphones streaming\n\0meta\x1ffix de ydotool, para macros, autoclick, systemd\n 󱕴\0meta\x1fgnome, keyring, Gnome Keyring, llaves, reparar para GDM, SDDM [Brave] mejor que KDE\n󰺐\0meta\x1fscrcpy android telefono\n\0meta\x1fimagenes fotos pictures dcim whatsapp exportar waydroid sync\n󰗃\0meta\x1fsoundbound musica canciones sync waydroid exportar\n \0meta\x1fwaydroid scripts gapps gms magisk ROOT android 13 11\n\0meta\x1fwidgets eww lanzar\n\0meta\x1fgit ayuda help comandos\n\0meta\x1fXDG xdg Portal Fix del GDM/SDDM Desktop Env\n🦙\0meta\x1fOllama, ollama, llama, local, cloud\n\0meta\x1fgtk font fuente nerd icons iconos refresh cache fix\n󰐫\0meta\x1fdesign extract blueprint colores palette css tokens prompt ia imagen\n󱛍\0meta\x1fwifi wifi.docx lista redes\n☠\0meta\x1fsave point restore restore restore, checkpoint, dev, save, revert, rollback, recovery, undertale, cuphead, ffx, final fantasy\n󰋋\0meta\x1fkz az09 audifonos earbuds a2dp fix bluetooth audio\n\0meta\x1faicommitconfig, commits, cambiar de modelo, IA\n\0meta\x1fkill, gamescope, Gamescope, Kill, matar waydroid, stop session, container, contenedor\n󰊢\0meta\x1fgitflow, Gitflow, git, dotfiles\n\0meta\x1fDocker, docker, Desktop, desktop\n\0meta\x1fgoogle drive rclone montar mount gdrive gd-musica\n󱛟\0meta\x1fmontar wine bottles montar mount disco externo install\n󰟝\0meta\x1finstalar juego bottles iso disco externo wine\n󰋌\0meta\x1flibros waydroid sync gdlibros epub pdf Documentos\n\0meta\x1fsuwayomi backup tachidesk sync renombrar google drive\n\0meta\x1fzoom, zoom menu, nivel de zoom, escalar, scale, resolución, escala monitor\n\0meta\x1ftelevision, tv, fuzzy, buscar, channel, picker, files, git\n\0meta\x1fnix gc, nix-collect-garbage, nix-store optimise, optimizar, garbage, deduplicar, perezoso, limpiar generaciones\n\0meta\x1fnixconf-cleanup, cleanup, limpiar cache, limpieza nix, trash, basura\n󰝛\0meta\x1fconvertir tus MP3 en lote, 128kbps, .mp3, FLAC to -> 128kbps in /downloadas" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
-
 # Los íconos se muestran, las descripciones son para búsqueda (invisibles con color transparente)
 
 # Extraer solo el ícono (antes del meta tag)
-ICON=$(echo "$CHOICE" | awk -F '\0meta' '{print $1}')
+# Modo dual: si se llama con un argumento (desde eww system-menu), se usa ese
+# ícono directamente; sin argumentos abre el wofi grid con categorías.
+if [ -n "$1" ]; then
+  ICON="$1"
+else
+  MANIFEST="$HOME/.config/eww/scripts/system-menu-manifest.tsv"
+  KW_FILE="$HOME/.config/eww/scripts/system-menu-kw.tsv"
+  WOFI_CONF="$HOME/.config/wofi/system-control.conf"
+  WOFI_STYLE="$HOME/.config/wofi/system-control.css"
+
+  # Keywords invisibles (búsqueda recursiva como el \0meta de rofi): el texto
+  # viaja en la línea pero se renderiza transparente vía pango markup
+  # (requiere allow_markup=true en system-control.conf).
+  kw_span() {
+    local icon="$1"
+    local kw
+    kw=$(awk -F'\t' -v i="$icon" '$1==i {print $2; exit}' "$KW_FILE" 2>/dev/null)
+    [ -n "$kw" ] && printf '<span alpha="1" font_size="1">%s</span>' "$kw"
+  }
+
+  # Iconos por categoría para el primer grid (wofi --columns 3)
+  CATEGORY_ICONS="Todos:󰁍
+Apps:󰀄
+Trigger:󰳾
+Style:󰑐
+Setup:󰒓
+System:󰣇
+Audio:󰓃
+About:󰊖
+Herramientas:󰊢
+Android:󰀲
+Multimedia:󰝚
+Instalar:󰌓
+Sistema:󰠅"
+
+  cat_icon() {
+    echo "$CATEGORY_ICONS" | awk -F: -v c="$1" '$1==c {print $2; exit}'
+  }
+
+  # Paso 1 — elegir categoría (grid 3 columnas). "Todos" = búsqueda recursiva.
+  # Cada categoría lleva chevron ' ' a la derecha (estilo Omarchy).
+  CAT_LIST=$(printf 'Todos\n'; awk -F'\t' '!seen[$1]++ {print $1}' "$MANIFEST")
+  CHOICE=$(printf '%s\n' "$CAT_LIST" | while read -r cat; do
+    [ -n "$cat" ] && printf '%s\t%s\t<span letter_spacing="40000"> </span>%s\n' "$(cat_icon "$cat")" "$cat" ""
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 3 --prompt "󱍕 󰣇 Categoría")
+  [ -z "$CHOICE" ] && exit 0
+  CATEGORY=$(echo "$CHOICE" | awk -F'\t' '{print $2}')
+
+# Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
+  # búsqueda recursiva ("nixconf cleanup" encuentra "Nix Cleanup").
+  # Cada entrada lleva el chevron ' ' a la derecha (estilo Omarchy).
+  CHOICE=$(awk -F'\t' -v c="$CATEGORY" '
+    $1==c || c=="Todos" { printf "%s\t%s\t%s\n", $2, $3, "KW" }
+  ' "$MANIFEST" | while IFS=$'\t' read -r icon label _; do
+    printf '%s\t%s %s %s\n' "$icon" "$label" "" "$(kw_span "$icon")"
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 2 --prompt "󱍕 $CATEGORY")
+  [ -z "$CHOICE" ] && exit 0
+  ICON=$(echo "$CHOICE" | awk -F'\t' '{print $1}')
+fi
 
 case "$ICON" in
 "")
@@ -422,6 +477,9 @@ case "$ICON" in
     echo ""
     read -p "Conversión finalizada. Presiona Enter para cerrar..."
 '
+  ;;
+"󰊭")
+  kitty --hold -e bash -c '~/scripts/antigravity-wipe-nuclear.sh'
   ;;
 
 *)

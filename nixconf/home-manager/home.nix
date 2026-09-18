@@ -11,6 +11,9 @@
       BROWSER = "zen";
       SHELL = "zsh";
       ANTIGRAVITY_HOME = "$HOME/.antigravity/runtime";
+      # ydotoold (módulo programs.ydotool) crea el socket en /run/ydotoold/socket
+      # con permiso 0660 grupo ydotool. Sin esto ydotool busca /tmp/.ydotool_socket.
+      YDOTOOL_SOCKET = "/run/ydotoold/socket";
     };
   };
 

@@ -8,6 +8,7 @@
     ../../nixos/features/cinnamon-debug.nix
     ../../nixos/features/steam.nix
     ../../nixos/features/waydroid.nix
+    ../../nixos/features/remote-control.nix
     ./features/nvidia.nix
     ./hardware-configuration.nix
   ];

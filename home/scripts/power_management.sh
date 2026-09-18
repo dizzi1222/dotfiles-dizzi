@@ -5,13 +5,34 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/platform.sh"
 
+# ── Pre-shutdown: desmontar FUSE colgados (rclone) ──────────
+# `--force --force` salta el servicio shutdown-kill-rclone (nixos), así que
+# aquí de antemano matamos rclone e hacemos umount lazy de los mounts de
+# Google Drive. Sin esto systemd espera el unmount de un FUSE en D-state y
+# poweroff/reboot se cuelga permanente (mismo bug que el hook 90-rclone.sh
+# arregla solo para sleep).
+pre_power_fuse() {
+  pkill -KILL -f "rclone mount" 2>/dev/null || true
+  pkill -KILL -f "vicinae-file-indexer" 2>/dev/null || true
+  sleep 1
+  for m in "$HOME/mi_gdmusica" "$HOME/mi_gdrive" "$HOME/mi_gdlibros"; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+  for m in /run/media/$USER/*; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+}
+
 CHOICE=$(printf "\n\n\n\n\n󰒲" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
 
 case "$CHOICE" in
 "")
   cd /$HOME
-  # shutdown now
   sync                                                                                                   # Fuerza escritura a disco
+  pre_power_fuse
+  # El --force --force salta los servicios shutdown (no corre WantedBy),
+  # así que forzamos explícitamente next boot a Windows antes de apagar.
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true
   wm_spawn "500 200" kitty --title "PowerOff" -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
   # poweroff
   ;;
@@ -19,6 +40,9 @@ case "$CHOICE" in
   cd /$HOME
   sync # Fuerza escritura a disco
   sleep 1
+  pre_power_fuse
+  # Ver nota "": con --force --force el WantedBy de alternar-a-windows NO corre.
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true
   wm_spawn "500 200" kitty --title "Reboot" -- sudo systemctl reboot --force --force # Doble --force = bypass todo
   # reboot
   ;;
