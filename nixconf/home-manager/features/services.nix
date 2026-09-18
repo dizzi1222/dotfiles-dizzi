@@ -78,6 +78,38 @@ in
     target = "mi_gdlibros";
   };
 
+  # ── Kill rclone pre-shutdown (SESIÓN DE USUARIO) ────────────
+  # Los mounts rclone son units de systemd --user. En un shutdown/reinicio
+  # NORMAL (sin --force), systemd detiene user@1000.service y rclone intenta
+  # unmount del FUSE → "Device or resource busy" → cuelgue permanente (visto
+  # en journal: "Failed to unmount /home/diego/mi_gdlibros: Device or
+  # resource busy"). El servicio de SISTEMA shutdown-kill-rclone (remote-
+  # control.nix) corre en paralelo al user slice y no alcanza.
+  # Este unit (user manager, systemd ≥254 soporta shutdown.target propio)
+  # mata rclone ANTES del cierre de la sesión. Complementa:
+  #  - power_management.sh → pre_power_fuse (cubre --force --force)
+  #  - remote-control.nix → shutdown-kill-rclone (cubre shutdown de sistema)
+  systemd.user.services."shutdown-kill-rclone-user" = {
+    Unit = {
+      Description = "Matar rclone y desmontar lazy FUSE antes del cierre de sesión";
+      Before = [ "shutdown.target" ];
+    };
+    Install = {
+      WantedBy = [ "shutdown.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.writeShellScript "shutdown-kill-rclone-user" ''
+        ${pkgs.procps}/bin/pkill -KILL -f "rclone mount" 2>/dev/null || true
+        ${pkgs.coreutils}/bin/sleep 1
+        for m in "$HOME/mi_gdmusica" "$HOME/mi_gdrive" "$HOME/mi_gdlibros"; do
+          ${pkgs.util-linux}/bin/umount -l "$m" 2>/dev/null || true
+        done
+      ''}";
+    };
+  };
+
   # ── Steam shortcuts.vdf sync (Steam → repo) ─────────────
   # Steam es dueño del vivo (~/.local/share/Steam/.../shortcuts.vdf) y
   # lo reescribe con rename (rompe symlinks). Este timer copia la última
@@ -105,6 +137,9 @@ in
 
   # ── Services packages ──────────────────────────────────────
   home.packages = with pkgs; [
+    # Lockscreen (niri usa swaylock, layer-shell)
+    swaylock
+
     # Clipboard
     wl-clipboard
     cliphist
