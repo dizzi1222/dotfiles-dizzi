@@ -84,6 +84,7 @@
 
 ;; Widgets ;;
 (include "widgets/bar.yuck")
+(include "widgets/system-menu.yuck")
 (include "widgets/side-bar.yuck")
 (include "widgets/wallpaper.yuck")
 (include "widgets/resource-monitor.yuck")

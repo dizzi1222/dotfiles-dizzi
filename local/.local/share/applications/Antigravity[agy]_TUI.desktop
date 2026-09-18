@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Antigravity TUI
+Comment=Open Antigravity [agy] TUI
+Exec=kitty -e agy
+Terminal=false
+Type=Application
+Icon=antigravity
+Categories=Network;
+StartupNotify=true
+StartupWMClass=Antigravity[agy]_TUI

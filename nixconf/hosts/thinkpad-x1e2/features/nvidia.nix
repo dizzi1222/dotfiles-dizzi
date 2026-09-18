@@ -2,9 +2,21 @@
 
 {
   # ── NVIDIA Hybrid Graphics (ThinkPad X1E2 — GTX 1650) ─────
+  # ¡OJO! En nixpkgs actual el módulo hardware.nvidia está GATEADO por
+  # `services.xserver.videoDrivers` (hardware.nvidia.enabled es readOnly y
+  # se calcula de `elem "nvidia" videoDrivers`). Sin esto el driver NUNCA se
+  # aplica (corría nouveau/NVK de facto). Se setea aunque no haya X: solo
+  # activa el módulo hardware.nvidia (kernel modules, blacklist nouveau,
+  # nvidia-smi), no levanta el X server.
+  services.xserver.videoDrivers = [ "nvidia" ];
+
   hardware.nvidia = {
     modesetting.enable = true;
-    powerManagement.enable = false;
+    # powerManagement.enable=true → la dGPU entra en runtime PM y se apaga sola
+    # antes del shutdown (evita el cuelgue de device_shutdown con la dGPU
+    # encendida, síntoma del freeze con frame congelado). Antes estaba en
+    # false y además corría nouveau (no se aplicaba el driver propietario).
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
     open = false;
     nvidiaSettings = true;

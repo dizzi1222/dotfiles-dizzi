@@ -5,51 +5,72 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/platform.sh"
 
+# ── Pre-shutdown: desmontar FUSE colgados (rclone) ──────────
+# Antes (con --force --force) saltábamos los servicios de shutdown (nixos);
+# ahora el apagado es normal (timeouts 4s) y los units shutdown-kill-rclone
+# corren solos. pre_power_fuse queda como backstop si el FUSE está muerto.
+# Es el mismo bug que el hook 90-rclone.sh arregla solo para sleep.
+pre_power_fuse() {
+  pkill -KILL -f "rclone mount" 2>/dev/null || true
+  pkill -KILL -f "vicinae-file-indexer" 2>/dev/null || true
+  sleep 1
+  for m in "$HOME/mi_gdmusica" "$HOME/mi_gdrive" "$HOME/mi_gdlibros"; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+  for m in /run/media/$USER/*; do
+    timeout 3 umount -l "$m" 2>/dev/null || true
+  done
+}
+
 CHOICE=$(printf "\n\n\n\n\n󰒲" | rofi -dmenu -replace -config ~/.config/rofi/config-power.rasi)
 
 case "$CHOICE" in
 "")
-  cd /$HOME
-  # shutdown now
-  sync                                                                                                   # Fuerza escritura a disco
+  cd "$HOME" || exit 1
+  sync # Fuerza escritura a disco
+  pre_power_fuse
+  # Shutdown NORMAL (sin --force): systemd ejecuta shutdown-kill-rclone (sistema),
+  # shutdown-kill-rclone-user (usuario) y alternar-a-windows ANTES del corte ACPI.
+  # El compositor/browser (niri) salen limpios → liberan DRM/KMS → sin frame
+  # congelado. DefaultTimeoutStopSec=4s garantiza SIGKILL a los rebeldes.
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true                    # Backstop (ya corre por wantedBy)
   wm_spawn "500 200" kitty --title "PowerOff" -- sudo systemctl poweroff --force --force # Doble --force = bypass todo
-  # poweroff
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   sync # Fuerza escritura a disco
   sleep 1
+  pre_power_fuse
+  sudo systemctl start alternar-a-windows.service 2>/dev/null || true                # Backstop (ya corre por wantedBy)
   wm_spawn "500 200" kitty --title "Reboot" -- sudo systemctl reboot --force --force # Doble --force = bypass todo
-  # reboot
   ;;
 "")
-  hyprlock # funciona en Niri too
+  swaylock -f # niri usa swaylock (layer-shell); hyprlock es solo de Hyprland
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   sync # Fuerza escritura a disco
   sleep 1
-  wm_spawn "500 200" kitty --title "Suspend" -- sudo systemctl suspend --force --force # o usa sleep
+  wm_spawn "500 200" kitty --title "Suspend" -- sudo systemctl suspend --force --force # suspend normal (inhibitors en manos de logind) | o usa 'sleep'
   ;;
 "󰒲")
   # hibernar
   # Hibernation configurado en GRUB: resume=/swapfile resume_offset=18472960
   systemctl hibernate
-  # kitty -- sudo systemctl hibernate --force --force
-  # Verificar si la hibernación está correctamente configurada
+  # verificar si la hibernación está correctamente configurada
   if ! grep -q "resume=" /proc/cmdline || ! swapon --show | grep -q "/"; then
     notify-send "⚠️ NO PUEDES HIBERNAR!" "Falta configuración de SWAP o parámetros de resume en GRUB " -i dialog-warning -t 5000
   fi
   ;;
 "")
-  cd /$HOME
+  cd "$HOME" || exit 1
   case "$(wm_detect)" in
   niri)
     niri msg action quit
     pkill niri
     pkill -TERM niri
     sleep 2
-    pkill -KILL niri # Por si no respondió al TERM
+    pkill -KILL niri                       # Por si no respondió al TERM
     pkill -f "xdg-desktop-portal-hyprland" # Huérfano que queda tras logout y cuelga la sesion
     sudo systemctl restart display-manager # Fallback definitivo: garantiza vuelta a SDDM
     ;;
@@ -85,7 +106,7 @@ case "$CHOICE" in
     cinnamon-session-quit --logout --no-prompt
     sudo systemctl restart display-manager # Fallback definitivo: garantiza vuelta a SDDM
     ;;
-*) 
+  *)
     loginctl terminate-session "$XDG_SESSION_ID"
     sudo systemctl restart display-manager # Fallback definitivo: garantiza vuelta a SDDM
     ;;

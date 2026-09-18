@@ -29,6 +29,46 @@
       "headers": {
         "x-api-key": "{env:COMPOSIO_API_KEY}"
       }
+    },
+    "dataimpulse": {
+      "type": "local",
+      "command": [
+        "node",
+        "/home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+        "DI_USER": "{env:DI_USER}",
+        "DI_PASS": "{env:DI_PASS}"
+      },
+      "enabled": true
+    },
+    "webshare-uk": {
+      "type": "local",
+      "command": [
+        "node",
+        "/home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+        "DI_USER": "{env:WS_USER}",
+        "DI_PASS": "{env:WS_PASS}",
+        "DI_PROXY_HOST": "31.59.20.176",
+        "DI_PROXY_PORT": "6754"
+      },
+      "enabled": true
+    },
+    "webshare-us": {
+      "type": "local",
+      "command": [
+        "node",
+        "/home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+        "DI_USER": "{env:WS_USER}",
+        "DI_PASS": "{env:WS_PASS}",
+        "DI_PROXY_HOST": "198.23.243.226",
+        "DI_PROXY_PORT": "6361"
+      },
+      "enabled": true
     }
   },
   "plugin": [
