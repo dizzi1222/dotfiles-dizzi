@@ -4,12 +4,71 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\0meta\x1fgit ayuda help comandos\n󰣇\0meta\x1faur instalar paquetes arch\n\0meta\x1fpkg instalar paquetes pacman\n󰜫\0meta\x1fwebapp instalar aplicaciones web\n󰳾\0meta\x1fautoclick, mouse, macro, tinytask god\n\0meta\x1faudio mute silenciar volumen\0meta\x1fpulse audio control volumen\n󰂜\0meta\x1fdnd notificaciones do not disturb\n\0meta\x1fgit clean limpiar repositorio\n\0meta\x1flimpiar cache limpieza\n󰌌 󱊮\0meta\x1fautopress de tecla, teclado, keyboard macro, auto\n\0meta\x1fred network wifi ethernet, network & internet\n\0meta\x1fbluetooth bluetuith conexion\n\n\0meta\x1fgame modo juego gaming\n\0meta\x1fpower perfomance optimizar rendimiento energia bateria\n\0meta\x1fgyazo captura screenshot menu\n󰩫\0meta\x1fgyazo captura recortar screenshot clipboard\n\0meta\x1fnight noche modo nocturno oscuro night toggle hypr sunset\n\n\0meta\x1fmicrofono mic mute toggle\n 󰬺\0meta\x1fhyprland install fase1 root instalacion arch\n 󰬻\0meta\x1fhyprland install fase2 user instalacion arch\n󰋊󰬼\0meta\x1fgrub reparar repair boot particion\n󰁨\0meta\x1ffile repair-reparar limits arreglar fix ulimit fuiles (archivos)\n󱄲󰖳\0meta\x1fbottles wine windows instalar\n\0meta\x1ffix de ydotool, para macros, autoclick, systemd\n 󱕴\0meta\x1fgnome, keyring, Gnome Keyring, llaves, reparar para GDM, SDDM [Brave] mejor que KDE\n󰺐\0meta\x1fscrcpy android telefono\n \0meta\x1fwaydroid scripts gapps gms magisk ROOT android 13 11\n\0meta\x1fwidgets eww lanzar" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/platform.sh"
 
 # Los íconos se muestran, las descripciones son para búsqueda (invisibles con color transparente)
 
 # Extraer solo el ícono (antes del meta tag)
-ICON=$(echo "$CHOICE" | awk -F '\0meta' '{print $1}')
+# Modo dual: si se llama con un argumento (desde eww system-menu), se usa ese
+# ícono directamente; sin argumentos abre el wofi grid con categorías.
+if [ -n "$1" ]; then
+  ICON="$1"
+else
+  MANIFEST="$HOME/.config/eww/scripts/system-menu-manifest.tsv"
+  KW_FILE="$HOME/.config/eww/scripts/system-menu-kw.tsv"
+  WOFI_CONF="$HOME/.config/wofi/system-control.conf"
+  WOFI_STYLE="$HOME/.config/wofi/system-control.css"
+
+  # Keywords invisibles (búsqueda recursiva como el \0meta de rofi): el texto
+  # viaja en la línea pero se renderiza transparente vía pango markup
+  # (requiere allow_markup=true en system-control.conf).
+  kw_span() {
+    local icon="$1"
+    local kw
+    kw=$(awk -F'\t' -v i="$icon" '$1==i {print $2; exit}' "$KW_FILE" 2>/dev/null)
+    [ -n "$kw" ] && printf '<span alpha="1" font_size="1">%s</span>' "$kw"
+  }
+
+  # Iconos por categoría para el primer grid (wofi --columns 3)
+  CATEGORY_ICONS="Todos:󰁍
+Apps:󰀄
+Trigger:󰳾
+Style:󰑐
+Setup:󰒓
+System:󰣇
+Audio:󰓃
+About:󰊖
+Herramientas:󰊢
+Android:󰀲
+Multimedia:󰝚
+Instalar:󰌓
+Sistema:󰠅"
+
+  cat_icon() {
+    echo "$CATEGORY_ICONS" | awk -F: -v c="$1" '$1==c {print $2; exit}'
+  }
+
+  # Paso 1 — elegir categoría (grid 3 columnas). "Todos" = búsqueda recursiva.
+  # Cada categoría lleva chevron ' ' a la derecha (estilo Omarchy).
+  CAT_LIST=$(printf 'Todos\n'; awk -F'\t' '!seen[$1]++ {print $1}' "$MANIFEST")
+  CHOICE=$(printf '%s\n' "$CAT_LIST" | while read -r cat; do
+    [ -n "$cat" ] && printf '%s\t%s\t<span letter_spacing="40000"> </span>%s\n' "$(cat_icon "$cat")" "$cat" ""
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 3 --prompt "󱍕 󰣇 Categoría")
+  [ -z "$CHOICE" ] && exit 0
+  CATEGORY=$(echo "$CHOICE" | awk -F'\t' '{print $2}')
+
+# Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
+  # búsqueda recursiva ("nixconf cleanup" encuentra "Nix Cleanup").
+  # Cada entrada lleva el chevron ' ' a la derecha (estilo Omarchy).
+  CHOICE=$(awk -F'\t' -v c="$CATEGORY" '
+    $1==c || c=="Todos" { printf "%s\t%s\t%s\n", $2, $3, "KW" }
+  ' "$MANIFEST" | while IFS=$'\t' read -r icon label _; do
+    printf '%s\t%s %s %s\n' "$icon" "$label" "" "$(kw_span "$icon")"
+  done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 2 --prompt "󱍕 $CATEGORY")
+  [ -z "$CHOICE" ] && exit 0
+  ICON=$(echo "$CHOICE" | awk -F'\t' '{print $1}')
+fi
 
 case "$ICON" in
 "")
@@ -194,6 +253,12 @@ case "$ICON" in
     notify-send "system-control" "AUR (omarchy) solo disponible en Arch/CachyOS"
   fi
   ;;
+"")
+  kitty -e nvim ~/.config/wofi/README-wofi-system-control.md 2>/dev/null || zsh -c "sleep 0.5; cat ~/.config/wofi/README-wofi-system-control.md; read -p 'Presiona Enter para cerrar...'"
+  ;;
+"")
+  kitty --hold -e bash -c 'cat ~/.config/wofi/README-wofi-system-control.md 2>/dev/null | grep -A30 "Créditos"; read -p "Presiona Enter para cerrar..."'
+  ;;
 "")
   kitty -e ~/scripts/show_githelp.sh
   ;;
@@ -237,6 +302,152 @@ case "$ICON" in
 " ")
   kitty -e ~/scripts/waydroid-scripts-launcher.sh
   ;;
+"󰋚")
+  if is_arch; then
+    kitty -e nvim ~/.zsh_history
+  else
+    kitty -e nvim ~/.local/share/fish/fish_history
+  fi
+  ;;
+"")
+  if is_arch; then
+    kitty -e ~/fix-plasma-post-install.sh
+  else
+    notify-send "system-control" "XDG Portal — configurado en NixOS via flake"
+  fi
+  ;;
+"🦙")
+  if is_arch; then
+    kitty -e ~/instalar-ollamaCloud.sh
+  else
+    kitty --hold -e bash -c "echo '🤖  Ollama — Instalado via flake'; echo; ollama list 2>/dev/null || echo 'No hay modelos descargados'; echo; echo 'Usa: ollama pull <modelo>'; echo; read -p 'Presiona Enter para cerrar...'"
+  fi
+  ;;
+"")
+  sh ~/scripts/fix-gtk-fonts-icons.sh
+  ;;
+"󰐫")
+  kitty --hold -e bash ~/scripts/design-extract-gum
+  ;;
+"")
+  kitty --hold -e zsh -is -c "sleep 0.5; aicommitconfig"
+  ;;
+"")
+  kitty -e ~/scripts/kill-gamescope
+  ;;
+"󰊢")
+  if is_arch; then
+    kitty --hold -e zsh -is -c "sleep 0.5; cd ~/dotfiles-dizzi/ && gitflow"
+  elif command -v git-flow &>/dev/null; then
+    kitty --hold -e bash -c "cd ~/dotfiles-dizzi/ && git flow"
+  else
+    notify-send "system-control" "gitflow — instalar con: nix shell nixpkgs#gitflow"
+  fi
+  ;;
+"")
+  if is_arch; then
+    kitty -e ~/scripts/setup-de-docker-desktop.sh
+  else
+    (
+      if flatpak info com.docker.Desktop &>/dev/null 2>&1; then
+        flatpak run com.docker.Desktop &
+      elif command -v lazydocker &>/dev/null; then
+        kitty -e lazydocker
+      else
+        notify-send "Docker" "⚠️  ni Docker Desktop flatpak ni lazydocker disponibles"
+      fi
+    ) &>/dev/null &
+  fi
+  ;;
+"")
+  # Google Drive rclone: montar los remotes gdrive y gd-musica
+  kitty --hold -e bash -c "
+    bash ~/montar_gdrive.sh
+    bash ~/montar_gd-musica.sh
+    sleep 2
+    mount | grep -E 'mi_gdrive|mi_gdmusica' || echo '⚠️  no se montó ningún remote'
+    read -p 'Presiona Enter para cerrar...'
+  "
+  ;;
+"󱛟")
+  # Disco externo (Seagate 500GB / JMicron): montar/desmontar particiones
+  kitty -e ~/scripts/montar_disco_externo.sh
+  ;;
+"󰟝")
+  # Instalar juegos desde ISOs del disco externo en la botella de Bottles
+  kitty -e ~/scripts/instalar_juego.sh
+  ;;
+"󰋌")
+  # Sync mi_gdlibros/📖Libros → Waydroid Documents
+  kitty --hold -e bash ~/scripts/sync-libros-waydroid.sh
+  ;;
+"")
+  # Suwayomi/Tachidesk backup: detectar org.suwayomi* en Descargas/Downloads, renombrar con timestamp y MOVER a GDrive
+  kitty --hold -e bash -c '
+    set -euo pipefail
+    SRC_DIRS=("$HOME/Descargas" "$HOME/Downloads")
+    DEST_DIR="$HOME/mi_gdrive/Mi unidad/[Documentos]"
+    PREFIX="org.suwayomi"
+    NEW_BASE="eu.PC.org.suwayomi.tachidesk"
+
+    echo "🔍 Buscando archivos que empiecen por \"$PREFIX\" en Descargas/Downloads..."
+    FOUND=()
+    for dir in "${SRC_DIRS[@]}"; do
+      if [ -d "$dir" ]; then
+        while IFS= read -r -d "" file; do
+          FOUND+=("$file")
+        done < <(find "$dir" -maxdepth 1 -type f -name "${PREFIX}*" -print0 2>/dev/null)
+      fi
+    done
+
+    if [ ${#FOUND[@]} -eq 0 ]; then
+      echo "❌ No se encontraron archivos que empiecen por \"$PREFIX\""
+      read -p "Presiona Enter para cerrar..."
+      exit 0
+    fi
+
+    echo "📋 Archivos encontrados:"
+    for f in "${FOUND[@]}"; do
+      echo "  - $(basename "$f")"
+    done
+
+    if [ ! -d "$DEST_DIR" ]; then
+      echo "❌ Directorio destino no existe o no está montado: $DEST_DIR"
+      echo "   Asegúrate de haber montado Google Drive (󰋟 montar google drive rclone)"
+      read -p "Presiona Enter para cerrar..."
+      exit 1
+    fi
+
+    TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
+    for file in "${FOUND[@]}"; do
+      EXT="${file##*.}"
+      NEW_NAME="${NEW_BASE}._${TIMESTAMP}.${EXT}"
+      echo "📦 Procesando: $(basename "$file") → $NEW_NAME"
+      mv -f "$file" "$DEST_DIR/$NEW_NAME"
+      echo "✅ Movido a $DEST_DIR/$NEW_NAME"
+    done
+
+    echo ""
+    echo "🎉 Backup completado. Archivos en: $DEST_DIR"
+    read -p "Presiona Enter para cerrar..."
+  '
+  ;;
+
+"")
+  bash ~/scripts/zoom_menu.sh
+  ;;
+"󰝛")
+  wm_spawn "1000 700" kitty --title "Convertir MP3 128kbps" -- sh -c '
+    mkdir -p "$HOME/Descargas/128kbps"
+    nix-shell -p ffmpeg --run "for f in \$HOME/Descargas/*.mp3; do [ -f \"\$f\" ] || continue; ffmpeg -i \"\$f\" -b:a 128k \"\$HOME/Descargas/128kbps/\$(basename \"\$f\")\"; done"
+    echo ""
+    read -p "Conversión finalizada. Presiona Enter para cerrar..."
+'
+  ;;
+"󰊭")
+  kitty --hold -e bash -c '~/scripts/antigravity-wipe-nuclear.sh'
+  ;;
+
 *)
   exit 1
   ;;
