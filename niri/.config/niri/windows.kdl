@@ -106,6 +106,8 @@ window-rule {
 window-rule {
     match title=r#"^(Oklch Color Picker|oklch-color-picker)$"#
     open-floating true
+    default-column-width { fixed 926; }
+    default-window-height { fixed 809; }
 }
 
 // Firefox
