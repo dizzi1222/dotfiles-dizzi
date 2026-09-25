@@ -1,12 +1,30 @@
 #!/usr/bin/env bash
 # nixconf-rebuild: rebuild NixOS + home-manager (NO actualiza inputs).
 # Para actualizar inputs usar el alias `nixup` antes de este script.
+#
+# Uso: ./nixrb.sh [args extra para nix, p.ej. --option max-jobs 1]
+#
+#   NIXRB_TMP=auto|ram|disk|/ruta   dónde van los directorios temporales de build
+#     auto (default): normal; pasa a RAM solo si hay poco disco Y bastante RAM libre
+#     ram   : /dev/shm/nixrb-build (RAM; cuidado con builds grandes)
+#     disk  : no cambia nada
+#     /ruta : directorio propio (ideal: otro disco con espacio)
+#   MIN_FREE_GB=10   umbral de disco libre en /
+#   MIN_RAM_GB=10    RAM disponible mínima para permitir el modo ram
+#   HM_REF=github:nix-community/home-manager   se usa con `nix run` si falta el
+#                    binario home-manager en el PATH (primera vez / perfil roto)
 set -euo pipefail
 
 REPO="/home/diego/dotfiles-dizzi"
 FLAKE="$REPO/nixconf"
 TARGET_USER="diego"
 HOST="thinkpad-x1e2"
+
+MIN_FREE_GB="${MIN_FREE_GB:-10}"
+MIN_RAM_GB="${MIN_RAM_GB:-10}"
+NIXRB_TMP="${NIXRB_TMP:-auto}"
+RAM_DIR="/dev/shm/nixrb-build"
+HM_REF="${HM_REF:-github:nix-community/home-manager}"
 
 # home-manager debe correr como el usuario dueño del perfil; como root
 # instalaría en el perfil de root y dejaría el tuyo desincronizado.
@@ -15,9 +33,101 @@ if [ "$(id -u)" -eq 0 ] || [ "$(id -un)" != "$TARGET_USER" ]; then
   exit 1
 fi
 
+confirm() {
+  local r
+  read -r -p "   $1 [y/N] " r
+  case "$r" in y | Y) ;; *)
+    echo "Abortado."
+    exit 1
+    ;;
+  esac
+}
+
+# ── ¿Existe home-manager? ────────────────────────────────────────
+# HM_EXISTS=1 -> binario en PATH. HM_EXISTS=0 -> se arranca con `nix run $HM_REF`
+# (pasa la primera vez o si el perfil de home-manager se rompió).
+# Con --flake el CLI solo llama a tu activationPackage, así que la versión del
+# CLI de HM_REF no cambia qué módulos se aplican (eso lo fija tu flake.lock).
+detect_hm() {
+  if command -v home-manager >/dev/null 2>&1; then
+    HM_EXISTS=1
+    HM_CMD=(home-manager)
+  else
+    HM_EXISTS=0
+    HM_CMD=(nix run "$HM_REF" --)
+  fi
+}
+
+# ── Lógica de TMP ────────────────────────────────────────────────
+free_gb=$(df -BG --output=avail / | sed -n '2p' | tr -dc '0-9')
+ram_gb=$(awk '/MemAvailable/ {printf "%d", $2/1048576}' /proc/meminfo)
+free_gb="${free_gb:-0}"
+ram_gb="${ram_gb:-0}"
+
+BUILD_TMP=""
+case "$NIXRB_TMP" in
+disk) ;;
+ram) BUILD_TMP="$RAM_DIR" ;;
+auto)
+  if [ "$free_gb" -lt "$MIN_FREE_GB" ]; then
+    if [ "$ram_gb" -ge "$MIN_RAM_GB" ]; then
+      echo "⚠  Solo ${free_gb}G libres en /: usando RAM (${ram_gb}G disponibles) para builds."
+      BUILD_TMP="$RAM_DIR"
+    else
+      echo "⚠  Solo ${free_gb}G libres en / y ${ram_gb}G de RAM disponible." >&2
+      confirm "¿Continuar igual?"
+    fi
+  fi
+  ;;
+/*) BUILD_TMP="$NIXRB_TMP" ;;
+*)
+  echo "NIXRB_TMP inválido: '$NIXRB_TMP' (auto|ram|disk|/ruta)" >&2
+  exit 1
+  ;;
+esac
+
+if [ "$BUILD_TMP" = "$RAM_DIR" ] && [ "$ram_gb" -lt "$MIN_RAM_GB" ]; then
+  echo "✗ Modo ram pedido pero solo hay ${ram_gb}G de RAM disponible (mínimo ${MIN_RAM_GB}G)." >&2
+  echo "  Fuerza con MIN_RAM_GB=0 si sabes lo que haces." >&2
+  exit 1
+fi
+
+SYS_ENV=()
+NIX_OPTS=()
+if [ -n "$BUILD_TMP" ]; then
+  # build-dir NO puede ser world-writable (ni /dev/shm a secas): subdirectorio
+  # propio de root con 0755. NO se usa sandbox-build-dir: ese es el path
+  # virtual DENTRO del sandbox (/build) y cambiarlo rompe el build.
+  sudo install -d -m 0755 -o root -g root "$BUILD_TMP"
+  SYS_ENV=(TMPDIR="$BUILD_TMP")
+  NIX_OPTS=(--option build-dir "$BUILD_TMP")
+  echo "→ Temporales de build en: $BUILD_TMP"
+fi
+
+# Limpia el dir en RAM al terminar (solo ese path fijo, nunca uno del usuario)
+cleanup_ram() { sudo rm -rf /dev/shm/nixrb-build 2>/dev/null || true; }
+[ "$BUILD_TMP" = "$RAM_DIR" ] && trap cleanup_ram EXIT
+
 echo "=== NixOS + Home Manager Rebuild ==="
-echo "  sudo nixos-rebuild switch --flake $FLAKE#$HOST"
-echo "  home-manager switch -b backup --flake $FLAKE#$TARGET_USER@$HOST"
+echo "  sudo ${SYS_ENV[*]:-} nixos-rebuild switch --flake $FLAKE#$HOST ${NIX_OPTS[*]:-} $*"
+detect_hm
+echo "  ${HM_CMD[*]} switch -b backup --flake $FLAKE#$TARGET_USER@$HOST ${NIX_OPTS[*]:-} $*"
+if [ "$HM_EXISTS" -eq 0 ]; then
+  echo "  (home-manager no está en el PATH: se arranca con nix run $HM_REF)"
+fi
+echo ""
+echo "El script usa la RAM como fallback por si tienes el espacio insuficiente para compilar:"
+echo ""
+echo "TMPDIR=/dev/shm nix run --option max-jobs 1 github:nix-community/home-manager -- switch --flake .#diego@thinkpad-x1e2"
+echo ""
+echo "If: Sistema Activo sin Espacio (REPARAR DESDE ADENTRO): /mnt/nix/store corrupto"
+echo ""
+echo "# As Bajo la manga:SI TODO FALLA borra el store 'fantasma'. 'Sí, bórralo. La base de datos existe en /nix/var/nix/db/'"
+echo "ls -ld /mnt/nix"
+echo "sudo rm -rf /mnt/nix"
+echo "df -h /"
+echo ""
+echo "Eso libera entre 12-30gb de una store vieja corrompida. Usarlo en el peor de los casos."
 echo ""
 
 # safe.directory debe ser el TOPLEVEL del repo (dotfiles-dizzi), no nixconf.
@@ -25,9 +135,13 @@ echo ""
 git config --global --replace-all safe.directory "$REPO"
 
 echo "→ Rebuilding system..."
-sudo nixos-rebuild switch --flake "$FLAKE#$HOST"
+sudo env "${SYS_ENV[@]}" nixos-rebuild switch --flake "$FLAKE#$HOST" "${NIX_OPTS[@]}" "$@"
 
 echo "→ Switching home-manager..."
-home-manager switch -b backup --flake "$FLAKE#$TARGET_USER@$HOST"
+detect_hm # re-chequea: el rebuild del sistema pudo haberlo instalado
+if [ "$HM_EXISTS" -eq 0 ]; then
+  echo "  home-manager no encontrado -> bootstrap con nix run $HM_REF"
+fi
+"${HM_CMD[@]}" switch -b backup --flake "$FLAKE#$TARGET_USER@$HOST" "${NIX_OPTS[@]}" "$@"
 
 echo "✅ Rebuild completado"
