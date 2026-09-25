@@ -50,6 +50,8 @@
     phpPackages.composer
 
     # Dev tools
+    peazip
+    p7zip
     git
     lazygit
     docker-client
@@ -71,22 +73,22 @@
     appimage-run
 
     # AI tools & Agents
-    ollama
+    # ollama
     opencommit
-    aichat
+    # aichat
     # gemini-cli # Deshabilitado: Reemplazado por antigravity-cli (agy). Usar alias `gemini` -> `agy`
     antigravity-cli
-    claude-code
+    # claude-code
     opencode
-    qwen-code
-    (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
+    # qwen-code
+    # (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
     # openclaw # Omitido: requiere construir monorepo gigante de 1390 paquetes pnpm; ejecutar via npx openclaw si se necesita
     codex
     # kilo # Omitido: monorepo gigante que agota espacio en build; ejecutar via npx kilo si se necesita
-    pi-coding-agent
-    ctx7
-    openspec
-    python3Packages.huggingface-hub # huggingface-cli
+    # pi-coding-agent
+    # ctx7
+    # openspec
+    # python3Packages.huggingface-hub # huggingface-cli
 
     # Agentes no empaquetados en nixpkgs oficial (se pueden ejecutar via npx/npm/pip):
     # openclaude, qoder, cactus-needle, keelcode, kimchi, mimocode, engram, codegraph,
@@ -94,20 +96,20 @@
     # freebuff, supercode, cline, ampcode, droid-factory, cactus, walkie
 
     # DB tools
-    pgadmin4
+    # pgadmin4
     # mongodb [compila 2h 󰚌 ] (motor) NO se instala: el daemon corre via docker-compose
     # (~/workspace/mongodb, mongo:7). Estos clientes conectan por TCP.
-    mongodb-compass # GUI oficial (browser de datos y JSON)
-    mongosh # shell moderno (MongoDB 6+ no trae `mongo`)
-    mongodb-tools # mongodump / mongorestore / mongoimport
+    # mongodb-compass # GUI oficial (browser de datos y JSON)
+    # mongosh # shell moderno (MongoDB 6+ no trae `mongo`)
+    # mongodb-tools # mongodump / mongorestore / mongoimport
 
     # QA / Testing automation (binarios nativos de Nix; los frameworks npm
     # como jests/react-testing-library se instalan por proyecto con npm)
-    playwright-driver.browsers
-    cypress
-    chromedriver
-    geckodriver
-    chromium
+    # playwright-driver.browsers
+    # cypress
+    # chromedriver
+    # geckodriver
+    # chromium
     # L-11: JEST: # No se añade jest aquí: se instala con pnpm/npm en el proyecto
     #  󱞩Referencia: /home/diego/dotfiles-dizzi/nixconf/home-manager/features/work.nix
 
@@ -164,8 +166,8 @@
     winetricks
 
     # Cloud
-    google-cloud-sdk
-    google-cloud-sql-proxy
+    # google-cloud-sdk
+    # google-cloud-sql-proxy
     rclone
 
     # Misc
