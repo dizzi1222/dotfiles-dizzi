@@ -117,8 +117,19 @@
       # GTK Bookmarks (file managers GTK: Nemo/Thunar/Dolphin-GTK). settings.ini
       # y gtk.css los maneja el module gtk (stylix.nix); aquí solo bookmarks.
       ".config/gtk-3.0/bookmarks".source = link "nwg-gtk-3.0/.config/gtk-3.0/bookmarks";
-      # Input Remapper
-      ".config/input-remapper".source = link "input-remapper/.config/input-remapper";
+      # Input Remapper (OJO: input-remapper 2 lee ~/.config/input-remapper-2,
+      # no ~/.config/input-remapper. Con el path sin sufijo el symlink queda
+      # dangling y el servicio arranca sin config: "config.json does not exist")
+      ".config/input-remapper-2".source = link "input-remapper/.config/input-remapper-2";
+      # PeaZip: menu contextual en Nemo (compress/extract). Los .desktop para
+      # "Abrir con" NO van por home.file: link() genera symlink fuera de $HOME
+      # y home-manager lo rechaza con "outside $HOME". Ya estan enlazados via
+      # local/.local/share/applications (linea de abajo).
+      ".local/share/nemo".source = link "peazip/.config/local/share/nemo";
+      # ~/.config/mimeapps.list: nadie lo genera (ni home-manager, ni NixOS, ni
+      # el repo), asi que se puede versionar y enlazar tranquilamente. Contiene
+      # los default apps de todo el sistema + PeaZip para 58 formatos comprimidos.
+      ".config/mimeapps.list".source = link "mime/.config/mimeapps.list";
       # Kew
       ".config/kew".source = link "kew/.config/kew";
       # VSCode / VSCodium
@@ -243,7 +254,15 @@
     mime.enable = true;
   };
 
-  # ── Steam: ensure ~/.local/share/fonts is a real directory ─
+  # PeaZip como app por DEFAULT de formatos comprimidos (doble click).
+  # NO hace falta ninguna activacion: ~/.config/mimeapps.list esta versionado
+  # en mime/.config/mimeapps.list y enlazado arriba. Verificar que nadie lo
+  # regenera con: rg -c mimeapps ~/.local/state/nix/profiles/home-manager/activate
+  # (-> 0). Los .desktop viven en local/.local/share/applications/.
+  home.activation.peazipMimeCache = config.lib.dag.entryAfter [ "linkGeneration" ] ''
+    update-mime-database "$HOME/.local/share/mime" >/dev/null 2>&1 || true
+  '';
+
   home.activation.ensureFontDir = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "$HOME/.local/share/fonts" ]; then
       mkdir -p "$HOME/.local/share/fonts"
@@ -433,6 +452,20 @@
       flatpak remote-add --user --if-not-exists GeForceNOW \
         https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo 2>/dev/null || true
       flatpak install -y --user GeForceNOW com.nvidia.geforcenow 2>/dev/null || true
+    fi
+
+    # GeForce NOW dentro de gamescope (1920x1080, escala 1.5, cursor forzado).
+    # El flatpak REGENERA este .desktop en cada `flatpak update`, asi que sin
+    # esta re-aplicacion el Exec vuelve al flatpak pelado. Se usa % como
+    # delimitador de sed porque la linea contiene | (los || de fallback).
+    GFN_DESKTOP="$HOME/.local/share/flatpak/exports/share/applications/com.nvidia.geforcenow.desktop"
+    GFN_EXEC="Exec=gamescope -W 1920 -H 1080 -w 1920 -h 1080 --force-grab-cursor -s 1.5 -- flatpak run com.nvidia.geforcenow || geforcenow-electron || geforceNow"
+    if [ -f "$GFN_DESKTOP" ] && ! grep -q 'gamescope' "$GFN_DESKTOP" 2>/dev/null; then
+      if sed -i "s%^Exec=.*%$GFN_EXEC%" "$GFN_DESKTOP"; then
+        echo "  geforcenow: Exec con gamescope aplicado"
+      else
+        echo "  geforcenow: no se pudo parchear el Exec (revisar permisos)" >&2
+      fi
     fi
   '';
 
