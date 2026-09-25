@@ -1,5 +1,74 @@
 { config, pkgs, lib, stateVersion, username, homeDirectory, inputs, ... }:
 
+let
+  # Formatos de archivo comprimido que PeaZip debe reconocer como "Abrir con".
+  peazipMimeTypes = [
+    "application/bzip2"
+    "application/gzip"
+    "application/vnd.android.package-archive"
+    "application/vnd.ms-cab-compressed"
+    "application/vnd.debian.binary-package"
+    "application/x-7z-compressed"
+    "application/x-7z-compressed-tar"
+    "application/x-ace"
+    "application/x-alz"
+    "application/x-ar"
+    "application/x-archive"
+    "application/x-arj"
+    "application/x-brotli"
+    "application/x-bzip-brotli-tar"
+    "application/x-bzip"
+    "application/x-bzip2"
+    "application/x-bzip3"
+    "application/x-bzip-compressed-tar"
+    "application/x-bzip1"
+    "application/x-bzip1-compressed-tar"
+    "application/x-cabinet"
+    "application/x-cd-image"
+    "application/x-compress"
+    "application/x-compressed-tar"
+    "application/x-cpio"
+    "application/x-deb"
+    "application/x-ear"
+    "application/x-gtar"
+    "application/x-gzip"
+    "application/x-gzpostscript"
+    "application/x-java-archive"
+    "application/x-lha"
+    "application/x-lhz"
+    "application/x-lrzip"
+    "application/x-lrzip-compressed-tar"
+    "application/x-lz4"
+    "application/x-lzip"
+    "application/x-lzip-compressed-tar"
+    "application/x-lzma"
+    "application/x-lzma-compressed-tar"
+    "application/x-lzop"
+    "application/x-lz4-compressed-tar"
+    "application/x-ms-wim"
+    "application/x-rar"
+    "application/x-rar-compressed"
+    "application/x-rpm"
+    "application/x-source-rpm"
+    "application/x-rzip"
+    "application/x-rzip-compressed-tar"
+    "application/x-tar"
+    "application/x-tarz"
+    "application/x-tzo"
+    "application/x-stuffit"
+    "application/x-war"
+    "application/x-xar"
+    "application/x-xz"
+    "application/x-xz-compressed-tar"
+    "application/x-zip"
+    "application/x-zip-compressed"
+    "application/x-zstd-compressed-tar"
+    "application/x-zoo"
+    "application/zip"
+    "application/zstd"
+  ];
+in
+
 {
   home = {
     inherit username stateVersion;
@@ -22,7 +91,6 @@
     permittedInsecurePackages = [
       "electron-39.8.10"
       "openclaw-2026.6.33"
-      "nexusmods-app-unfree-0.21.1"
     ];
   };
 
@@ -117,8 +185,19 @@
       # GTK Bookmarks (file managers GTK: Nemo/Thunar/Dolphin-GTK). settings.ini
       # y gtk.css los maneja el module gtk (stylix.nix); aquí solo bookmarks.
       ".config/gtk-3.0/bookmarks".source = link "nwg-gtk-3.0/.config/gtk-3.0/bookmarks";
-      # Input Remapper
-      ".config/input-remapper".source = link "input-remapper/.config/input-remapper";
+      # Input Remapper (OJO: input-remapper 2 lee ~/.config/input-remapper-2,
+      # no ~/.config/input-remapper. Con el path sin sufijo el symlink queda
+      # dangling y el servicio arranca sin config: "config.json does not exist")
+      ".config/input-remapper-2".source = link "input-remapper/.config/input-remapper-2";
+      # PeaZip: menu contextual en Nemo (compress/extract). Los .desktop para
+      # "Abrir con" NO van por home.file: link() genera symlink fuera de $HOME
+      # y home-manager lo rechaza con "outside $HOME". Ya estan enlazados via
+      # local/.local/share/applications (linea de abajo).
+      ".local/share/nemo".source = link "peazip/.config/local/share/nemo";
+      # ~/.config/mimeapps.list: nadie lo genera (ni home-manager, ni NixOS, ni
+      # el repo), asi que se puede versionar y enlazar tranquilamente. Contiene
+      # los default apps de todo el sistema + PeaZip para 58 formatos comprimidos.
+      ".config/mimeapps.list".source = link "mime/.config/mimeapps.list";
       # Kew
       ".config/kew".source = link "kew/.config/kew";
       # VSCode / VSCodium
@@ -237,13 +316,28 @@
       '';
     };
 
+  # ── Sunshine: gestión en remote-control.nix (NixOS) ────────
+  # El servicio lo maneja el módulo NixOS services.sunshine + el system
+  # service `sunshine` (T4d) en remote-control.nix. El user unit que trae el
+  # paquete se deshabilita ahí mismo (app-dev.lizardbyte.app.Sunshine), así
+  # que aquí NO se define nada: `systemd.user.services.*` no tiene opción
+  # `enable` en home-manager (setear un bool rompía el build con TypeError).
+
   # ── XDG dirs ───────────────────────────────────────────────
   xdg = {
     enable = true;
     mime.enable = true;
   };
 
-  # ── Steam: ensure ~/.local/share/fonts is a real directory ─
+  # PeaZip como app por DEFAULT de formatos comprimidos (doble click).
+  # NO hace falta ninguna activacion: ~/.config/mimeapps.list esta versionado
+  # en mime/.config/mimeapps.list y enlazado arriba. Verificar que nadie lo
+  # regenera con: rg -c mimeapps ~/.local/state/nix/profiles/home-manager/activate
+  # (-> 0). Los .desktop viven en local/.local/share/applications/.
+  home.activation.peazipMimeCache = config.lib.dag.entryAfter [ "linkGeneration" ] ''
+    update-mime-database "$HOME/.local/share/mime" >/dev/null 2>&1 || true
+  '';
+
   home.activation.ensureFontDir = config.lib.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "$HOME/.local/share/fonts" ]; then
       mkdir -p "$HOME/.local/share/fonts"
@@ -445,6 +539,20 @@
       flatpak remote-add --user --if-not-exists GeForceNOW \
         https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo 2>/dev/null || true
       flatpak install -y --user GeForceNOW com.nvidia.geforcenow 2>/dev/null || true
+    fi
+
+    # GeForce NOW dentro de gamescope (1920x1080, escala 1.5, cursor forzado).
+    # El flatpak REGENERA este .desktop en cada `flatpak update`, asi que sin
+    # esta re-aplicacion el Exec vuelve al flatpak pelado. Se usa % como
+    # delimitador de sed porque la linea contiene | (los || de fallback).
+    GFN_DESKTOP="$HOME/.local/share/flatpak/exports/share/applications/com.nvidia.geforcenow.desktop"
+    GFN_EXEC="Exec=gamescope -W 1920 -H 1080 -w 1920 -h 1080 --force-grab-cursor -s 1.5 -- flatpak run com.nvidia.geforcenow || geforcenow-electron || geforceNow"
+    if [ -f "$GFN_DESKTOP" ] && ! grep -q 'gamescope' "$GFN_DESKTOP" 2>/dev/null; then
+      if sed -i "s%^Exec=.*%$GFN_EXEC%" "$GFN_DESKTOP"; then
+        echo "  geforcenow: Exec con gamescope aplicado"
+      else
+        echo "  geforcenow: no se pudo parchear el Exec (revisar permisos)" >&2
+      fi
     fi
   '';
 

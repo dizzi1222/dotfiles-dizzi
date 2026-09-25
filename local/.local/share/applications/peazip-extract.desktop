@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=PeaZip, extract archive(s)
+NoDisplay=true
+Comment=Extract archives with PeaZip
+Exec=peazip -ext2main %F
+TryExec=peazip
+Icon=peazip_extract
+Type=Application
+Terminal=false
+Categories=Utility;Archiving;Compression;
+Keywords=zip;rar;tar;extract;unpack;

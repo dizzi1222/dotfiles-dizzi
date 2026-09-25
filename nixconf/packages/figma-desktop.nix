@@ -9,7 +9,7 @@ let
   correctedSource = {
     version = "126.6.9";
     url = "https://desktop.figma.com/win/FigmaSetup.exe";
-    hash = "sha256-TRs7L8COi1XlcA9V4I70RxmsLkUmnkiHX9qHs/RqZ1A=";
+    hash = "sha256-9/I6gAfl7Sn5kQig+gOX2StAsAxB6978NUyQh+cHcuE=";
     expectedElectronMajor = 39;
   };
   electron =

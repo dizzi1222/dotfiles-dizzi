@@ -88,8 +88,16 @@
   # ];
 
   # ── Desktop Environments ───────────────────────────────────
+  # Cinnamon: el DE que se usa (X11).
   services.xserver.desktopManager.cinnamon.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  # Plasma6 DESHABILITADO: el modulo mete kate (el editor por defecto de KDE)
+  # en environment.systemPackages. El closure de kate arrastra Qt6 + KDE
+  # Frameworks entero = 3.12 GiB que no usabamos (el WM real es niri, linea
+  # 96). Se compro ~3.3 GiB con plasma-workspace incluido.
+  # Los kdePackages.* sueltos que si usas (qtmultimedia, qtvirtualkeyboard,
+  # qt6ct, qtstyleplugin-kvantum, partitionmanager) NO dependen de este modulo:
+  # son paquetes independientes, siguen funcionando comentando esta linea.
+  # services.desktopManager.plasma6.enable = true;
 
   # ── Niri (Wayland compositor) ──────────────────────────────
   # programs.niri.enable = true;  # Comentado: build broken (libdisplay-info-sys v0.3.0 vs libdisplay-info 0.4.0)
@@ -429,10 +437,13 @@
   # ── Flatpak ───────────────────────────────────────────────
   services.flatpak.enable = true;
 
-  # kbuildsycoca/plasma busca 'applications.menu' literal (ningun paquete lo trae);
-  # enlazamos al menu de plasma para silenciar el warning.
-  environment.etc."xdg/menus/applications.menu".source =
-    "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
+  # kbuildsycoca/plasma buscaba 'applications.menu' literal (ningun paquete lo
+  # trae); se enlazaba al menu de plasma para silenciar el warning. Con
+  # plasma6 deshabilitado esto ya no aplica: cinnamon no invoca kbuildsycoca,
+  # y mantener el symlink arrastraba plasma-workspace (~200 MB) al closure.
+  # Si vuelve a aparecer el warning de kbuildsycoca, descomentar.
+  # environment.etc."xdg/menus/applications.menu".source =
+  #   "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
   # ── Packages (system-level) ────────────────────────────────
   environment.systemPackages = with pkgs; [

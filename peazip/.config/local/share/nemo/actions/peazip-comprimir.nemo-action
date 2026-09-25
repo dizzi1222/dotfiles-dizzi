@@ -1,0 +1,13 @@
+[Nemo Action]
+Name=PeaZip: comprimir...
+Comment=Comprimir la selección con PeaZip (eliges formato y nivel en la GUI)
+Icon=package-x-generic
+Exec=peazip -add2archive %F
+Selection=Any
+
+[Nemo Action open]
+Name=PeaZip: abrir
+Comment=Abrir los archivos seleccionados en PeaZip
+Icon=application-x-compressed
+Exec=peazip %F
+Selection=Any

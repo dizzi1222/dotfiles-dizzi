@@ -130,7 +130,10 @@ binds {
     Mod+Shift+L { move-column-right; }
     Mod+Shift+Left { move-column-left; }
     Mod+Shift+Down { move-window-down; }
+    // WORKAROUND RK61 Plus (Arrow Key Mode via Fn+Enter): bug de firmware envia
+    // KEY_SLASH ("?") en vez de KEY_UP cuando Shift esta pulsado. Up real + alias.
     Mod+Shift+Up { move-window-up; }
+    Mod+Shift+Slash { move-window-up; }
     Mod+Shift+Right { move-column-right; }
     Mod+Ctrl+Home { move-column-to-first; }
     Mod+Ctrl+End { move-column-to-last; }

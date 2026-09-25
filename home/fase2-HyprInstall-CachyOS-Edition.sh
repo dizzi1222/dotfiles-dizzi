@@ -183,7 +183,7 @@ sudo pacman -S --needed --noconfirm \
   bluez-utils blueman bluez-plugins antimicrox evtest sc-controller # evtest para testear, antimicrox/sc-controller para bluetooth en wine/bottles, REMAPEAR TECLADO LIKE x360ce REMPLAZO # bluez en conflicto con bluez-ps3 lo quite
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  bluez bluetuith 2>/dev/null || true  # necesitas bluez-ps3  para que funcione el bluetooth en wine/bottles PS3 CONTROLLER
+  bluez bluetuith 2>/dev/null || true # necesitas bluez-ps3  para que funcione el bluetooth en wine/bottles PS3 CONTROLLER
 
 sudo systemctl enable --now bluetooth
 print_success "Bluetooth habilitado"
@@ -257,13 +257,13 @@ fi
 yay -S --needed --noconfirm zellij nix niri swaybg mpvpaper wl-color-picker wlsunset xdg-desktop-portal-wlr
 print_installing "Fix ScreenCapture niri (wlr portal UseIn=niri)"
 mkdir -p ~/.local/share/xdg-desktop-portal/portals ~/.config/xdg-desktop-portal
-cat > ~/.local/share/xdg-desktop-portal/portals/wlr-niri.portal <<'EOF'
+cat >~/.local/share/xdg-desktop-portal/portals/wlr-niri.portal <<'EOF'
 [portal]
 DBusName=org.freedesktop.impl.portal.desktop.wlr
 Interfaces=org.freedesktop.impl.portal.Screenshot;org.freedesktop.impl.portal.ScreenCast;
 UseIn=niri
 EOF
-cat > ~/.config/xdg-desktop-portal/niri-portals.conf <<'EOF'
+cat >~/.config/xdg-desktop-portal/niri-portals.conf <<'EOF'
 [preferred]
 ScreenCast=wlr
 Screenshot=wlr
@@ -272,7 +272,7 @@ default=gtk
 EOF
 print_success "OBS ScreenCapture en niri: wlr portal declarado (UseIn=niri) + niri-portals.conf"
 echo
-echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools  && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
+echo -e "${CYAN}¿Instalar Plasma (󰨡 Escritorio Tipo Windows )  Desktop  󰪫  ?  ${NC}" && read -p "[s/N]: " p && [[ "$p" =~ ^[Ss]$ ]] && print_installing "Plasma Desktop" && sudo pacman -S --needed --noconfirm plasma-desktop plasma-workspace kwin xdg-desktop-portal-kde eos-settings-plasma kde-cli-tools powerdevil systemsettings kscreen plasma-nm plasma-pa bluedevil plasma-systemmonitor qt5-tools && bash ~/fix-plasma-post-install.sh && print_success "Plasma instalado con fixes"
 print_success "Hyprland instalado"
 print_success "Niri es otro Tiling Manager igual de bueno muy RECOMANDO
 [Dependencias]: niri swaybg mpvpaper wl-color-picker wlsunset # mpv permite gifs y swaybg fondos .jpg*"
@@ -421,7 +421,10 @@ if [[ ! "$install_base" =~ ^[Nn]$ ]]; then
   print_installing "Geforce Experience"
   yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
     gfn-electron xbox-cloud-gaming sunshine moonlight-qt geforce-infinity-bin bottles curseforge minecraft-launcher vinegar # plasma-gamemode-git ICON BAR PEDORRO # VINEGAR = BLOXTRAP PARA JUGAR ROBLOX / Studio
-  pacman -Qs appimagelauncher >/dev/null && { [[ -f ~/Applications/Shadow*.AppImage ]] || { print_status "Shadow PC no encontrado => Descargando..."; mkdir -p ~/Applications && wget -q --show-progress -O ~/Applications/Shadow.AppImage https://update.shadow.tech/launcher/linux/shadow.AppImage && chmod +x ~/Applications/Shadow.AppImage && print_success "Shadow PC descargado"; }; }
+  pacman -Qs appimagelauncher >/dev/null && { [[ -f ~/Applications/Shadow*.AppImage ]] || {
+    print_status "Shadow PC no encontrado => Descargando..."
+    mkdir -p ~/Applications && wget -q --show-progress -O ~/Applications/Shadow.AppImage https://update.shadow.tech/launcher/linux/shadow.AppImage && chmod +x ~/Applications/Shadow.AppImage && print_success "Shadow PC descargado"
+  }; }
 
   print_success "Plataformas base instaladas"
   print_warning "Bottles omitido (instalar después con: yay -S bottles)"
@@ -501,7 +504,7 @@ yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   xpadneo-dkms input-remapper espanso-wayland \
   2>/dev/null || print_warning "Algunos drivers fallaron"
 
-sudo tee /etc/udev/rules.d/99-8bitdo-xinput.rules << 'EOF'
+sudo tee /etc/udev/rules.d/99-8bitdo-xinput.rules <<'EOF'
 ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 310a > /sys/bus/usb/drivers/xpad/new_id'"
 ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="310a", MODE="0666"
 EOF
@@ -611,8 +614,8 @@ sudo pacman -S --needed --noconfirm \
 
 echo "user_allow_other" | sudo tee -a /etc/fuse.conf && printf 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2717", RUN+="/usr/bin/su diego -c /usr/bin/simple-mtpfs /home/diego/cel"\n' | sudo tee /etc/udev/rules.d/99-xiaomi-mtp.rules && sudo udevadm control --reload-rules && mkdir -p ~/cel && print_success "Fix MTP Xiaomi aplicado" && print_status "Uso: conecta el cel en modo Transferencia de archivos → archivos en ~/cel"
 
-yay -S  --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-  open-fuse-iso swappy 
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  open-fuse-iso swappy
 print_success "Aplicaciones de gestión de discos instaladas [ISO]"
 
 # ═══════════════════════════════════════════════════════════
@@ -728,20 +731,20 @@ case "$editor_choice" in
 
   print_success "Cursor instalado"
   ;;
-  3)
-    print_header "Instalando Antigravity"
-    print_installing "antigravity desde yay"
-    yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
-      antigravity \
-      2>/dev/null || print_warning "Antigravity falló"
+3)
+  print_header "Instalando Antigravity"
+  print_installing "antigravity desde yay"
+  yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+    antigravity \
+    2>/dev/null || print_warning "Antigravity falló"
 
-    print_success "Antigravity instalado"
+  print_success "Antigravity instalado"
 
-    # Corregido: dentro del case y con comillas
-    bash "$HOME/dotfiles-dizzi/home/Antigravity Setup/install extensions/install-vscode-extensions.sh"
-    print_success "Extensiones de VSCode instaladas"
-    ;;
-  *)
+  # Corregido: dentro del case y con comillas
+  bash "$HOME/dotfiles-dizzi/home/Antigravity Setup/install extensions/install-vscode-extensions.sh"
+  print_success "Extensiones de VSCode instaladas"
+  ;;
+*)
   print_warning "Editor de código omitido"
   ;;
 esac
@@ -753,7 +756,7 @@ print_installing "Extras (SOLO -bin, sin compilar)"
 print_installing "Las Mejores VPN (No esta Urban)"
 sudo pacman -S proton-vpn-gtk-app --needed --noconfirm
 yay -S --needed --noconfirm \ 
-  stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
+stacer-bin bleachbit zip 7zip rar transmission-gtk windscribe-v2-bin jdownloader2 megasync \
   appimagelauncher music-presence-bin pamac-aur \
   2>/dev/null || print_warning "Algunos extras fallaron"
 
@@ -801,7 +804,7 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   print_status "Habilitando KVM..."
   sudo usermod -aG kvm $USER 2>/dev/null
   for fw_pkg in ufw firewalld; do
-    if pacman -Qs $fw_pkg > /dev/null; then
+    if pacman -Qs $fw_pkg >/dev/null; then
       sudo systemctl disable --now $fw_pkg 2>/dev/null
       # sudo pacman -Rns --noconfirm $fw_pkg 2>/dev/null
     fi
@@ -867,7 +870,7 @@ if [[ ! "$install_waydroid" =~ ^[Nn]$ ]]; then
   echo -e "  ${MAGENTA}•$NC} Sin esto: error 'App not compatible'"
   echo -e "  ${MAGENTA}•$NC} Para más detalles ver: https://github.com/waydroid/waydroid/wiki/Installing-libhoudini O consulta la imagen abajo"
   # O en heredoc
-cat <<"EOF"
+  cat <<"EOF"
 Instrucciones en: 
 https://raw.githubusercontent.com/casualsnek/waydroid_script/main/assets/img/README/image-20230430013148814.png
 EOF
@@ -1438,7 +1441,7 @@ sudo pacman -S --needed --noconfirm \
   nodejs npm python python-pip python-gobject python-pipx pyenv \
   docker rust \
   uv llama-cpp \
-  llvm clang patchelf git github-cli tgpt glow expect lazygit  # expect: Para unbuffer, glow: para los colores, lazygit: TUI git (nvim <leader>gg) 
+  llvm clang patchelf git github-cli tgpt glow expect lazygit # expect: Para unbuffer, glow: para los colores, lazygit: TUI git (nvim <leader>gg)
 
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   claude-code n8n postgresql pgadmin4 clawdbot gemini-cli-git aichat \
@@ -1530,29 +1533,29 @@ read -p "Selecciona [1=(OMITIR) CLI solamente, 2=Agregar Desktop]: " docker_choi
 
 if [[ "$docker_choice" == "2" ]]; then
   print_header "Instalando Docker Desktop (Binarios Estáticos)"
-  
+
   # Crear directorio temporal
   DOCKER_TEMP="/tmp/docker-desktop-install-$$"
   mkdir -p "$DOCKER_TEMP"
   cd "$DOCKER_TEMP"
-  
+
   # DESCARGA CORRECTA
   print_status "Descargando Docker binarios estáticos v29.1.4..."
   if wget -q --show-progress https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz 2>/dev/null; then
     wget -q --show-progress https://desktop.docker.com/linux/main/amd64/214940/docker-desktop-x86_64.pkg.tar.zst
     sudo pacman -U ./docker-desktop-x86_64.pkg.tar.zst
     print_success "GUI => Descarga completada [Pacman -U para instalaciones Locales] + Binario Estático"
-    
+
     # EXTRACCIÓN CORRECTA (sin errores de sintaxis)
     print_status "Extrayendo archivos..."
     if tar -xzf docker-29.1.4.tgz 2>/dev/null; then
       print_success "Extracción completada"
-      
+
       # INSTALACIÓN CORRECTA
       print_installing "Instalando binarios en /usr/local/bin/"
       if sudo cp -rp docker/* /usr/local/bin/ && rm -rf docker; then
         print_success "Binarios instalados"
-        
+
         # CREAR SERVICIO SYSTEMD (para docker daemon)
         print_status "Creando servicio Docker daemon..."
         sudo tee /etc/systemd/system/docker.service >/dev/null <<'DOCKERSVC'
@@ -1577,14 +1580,14 @@ DOCKERSVC
         sudo systemctl daemon-reload
         sudo systemctl enable docker docker.socket 2>/dev/null || true
         sudo systemctl restart docker 2>/dev/null || true
-        
+
         print_success "Docker daemon configurado"
-        
+
         # Verificación
         sleep 2
         if docker --version &>/dev/null; then
           print_success "✅ Docker funcional: $(docker --version)"
-          
+
           # Prueba rápida (sin descargar imagen)
           print_status "Verificando conectividad..."
           if docker ps &>/dev/null; then
@@ -1604,7 +1607,7 @@ DOCKERSVC
     print_error "❌ Error descargando Docker (sin internet o servidor caído)"
     print_status "Descarga manual: https://download.docker.com/linux/static/stable/x86_64/docker-29.1.4.tgz"
   fi
-  
+
   # Limpiar
   cd ~
   rm -rf "$DOCKER_TEMP"
@@ -1829,27 +1832,27 @@ if [[ -d ~/dotfiles-dizzi ]]; then
 
   print_status "Aplicando dotfiles con stow..."
 
-  for pkg in cinnamon niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile dolphin-files global-keyboard-shortcutsrc sunshine antimicrox; do
+  for pkg in mime cinnamon niri kdenlive-compressor-editor pipewire sattyScreenshots Antigravity networkmanager-fuzzel nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile dolphin-files global-keyboard-shortcutsrc sunshine antimicrox; do
     if [[ -d $pkg ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
     fi
   done # PROCEDO A APLICAR CONFIG DE CINNAMON.
 
-[[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ < ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
-print_status "Aplicando Submodulos [NVIM]    ."
+  [[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ <~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
+  print_status "Aplicando Submodulos [NVIM]    ."
 
-echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
-# Verificar submodules
-git submodule update --init --recursive
-rm -rf nvim
+  echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+  # Verificar submodules
+  git submodule update --init --recursive
+  rm -rf nvim
 
-# Recuperar cada submódulo
-git submodule update --init --recursive nvim
+  # Recuperar cada submódulo
+  git submodule update --init --recursive nvim
 
-echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
-cd  nvim/.config/nvim  && git checkout main
-cd  ../../../
+  echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
+  cd nvim/.config/nvim && git checkout main
+  cd ../../../
 
   print_success "Dotfiles aplicados"
 fi
@@ -1930,7 +1933,11 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
   # Para SDDM THEME
-  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && { print_package "Symlink: SDDM Theme de Jake"; sudo pacman -S sddm --needed --noconfirm; sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf; }
+  [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && {
+    print_package "Symlink: SDDM Theme de Jake"
+    sudo pacman -S sddm --needed --noconfirm
+    sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf
+  }
 
   # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
@@ -3038,7 +3045,7 @@ if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
   else
     # Fallback: Docker
     print_warning "Compilación AUR falló, usando Docker..."
-    
+
     if ! command -v docker &>/dev/null; then
       print_status "Instalando Docker..."
       sudo pacman -S --needed --noconfirm docker
@@ -3050,15 +3057,15 @@ if [[ ! "$install_webui" =~ ^[Nn]$ ]]; then
     fi
 
     print_installing "Open-WebUI via Docker"
-    # EXTRAIDO DE: 
-    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/ 
+    # EXTRAIDO DE:
+    # https://www.jeremymorgan.com/blog/generative-ai/how-to-install-ollama-web-ui-arch-linux/
 
     # I’m going to choose the option to install Open WebUI with Bundled Ollama Support and select the container that utilizes a GPU:
     # if [[ -f /etc/arch-release ]]; then # esto esta MAL, usa:
-      if command -v nvidia-smi &> /dev/null; then
+    if command -v nvidia-smi &>/dev/null; then
       print_status "Detectado Arch Linux"
       print_installing "Open-WebUI via Docker (GPU)"
-      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama  2>/dev/null
+      docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama 2>/dev/null
     else
       print_status "Detectado Debian/Ubuntu"
       print_installing "Open-WebUI via Docker (CPU)"
@@ -3552,11 +3559,11 @@ function configure_swap() {
   # Calcular swap recomendado
   local RECOMMENDED_SWAP
   if [[ $TOTAL_RAM_GB -le 8 ]]; then
-    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2))  # 2x RAM si ≤8GB
+    RECOMMENDED_SWAP=$((TOTAL_RAM_GB * 2)) # 2x RAM si ≤8GB
   elif [[ $TOTAL_RAM_GB -le 16 ]]; then
-    RECOMMENDED_SWAP=$TOTAL_RAM_GB          # 1x RAM si ≤16GB
+    RECOMMENDED_SWAP=$TOTAL_RAM_GB # 1x RAM si ≤16GB
   else
-    RECOMMENDED_SWAP=16                     # Máximo 16GB si >16GB RAM
+    RECOMMENDED_SWAP=16 # Máximo 16GB si >16GB RAM
   fi
 
   echo -e "  ${MAGENTA}•${NC} Swap recomendado: ${BOLD}${RECOMMENDED_SWAP}GB${NC}"
@@ -3577,7 +3584,7 @@ function configure_swap() {
   fi
 
   # Verificar espacio suficiente
-  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2))  # +2GB de margen
+  local REQUIRED_SPACE=$((RECOMMENDED_SWAP + 2)) # +2GB de margen
   if [[ $FREE_SPACE_GB -lt $REQUIRED_SPACE ]]; then
     echo
     echo -e "${RED}⚠️  Espacio insuficiente:${NC}"
@@ -3593,17 +3600,17 @@ function configure_swap() {
     fi
   fi
 
-echo
-echo -e "${CYAN}Opciones de swap:${NC}"
-echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
-echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
-echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
-echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
-echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
-echo
-read -p "Seleccionar opción [1-5]: " swap_choice
+  echo
+  echo -e "${CYAN}Opciones de swap:${NC}"
+  echo -e "  ${MAGENTA}1.${NC} Swapfile (${RECOMMENDED_SWAP}GB) - ${GREEN}Recomendado${NC}"
+  echo -e "  ${MAGENTA}2.${NC} Zswap (compresión en RAM) - ${YELLOW}Experimental${NC}"
+  echo -e "  ${MAGENTA}3.${NC} Ambos (Swapfile + Zswap) - ${CYAN}Máximo rendimiento${NC}"
+  echo -e "  ${MAGENTA}4.${NC} Eliminar swap completamente - ${RED}Desactiva hibernation${NC}"
+  echo -e "  ${MAGENTA}5.${NC} Omitir configuración"
+  echo
+  read -p "Seleccionar opción [1-5]: " swap_choice
 
-case "$swap_choice" in
+  case "$swap_choice" in
   4)
     print_header "Eliminando Swap Completamente"
     echo
@@ -3654,7 +3661,7 @@ case "$swap_choice" in
       print_warning "Eliminación cancelada"
     fi
     ;;
-  1|3)
+  1 | 3)
     print_header "Configurando Swapfile de ${RECOMMENDED_SWAP}GB"
     # Verificar si ya existe swapfile
     if [[ -f /swapfile ]]; then
@@ -3676,21 +3683,21 @@ case "$swap_choice" in
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
-    
+
     # Agregar a /etc/fstab si no existe
     if ! grep -q "/swapfile" /etc/fstab; then
       echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
       print_success "Swapfile agregado a /etc/fstab"
     fi
-    
+
     print_success "Swapfile de ${RECOMMENDED_SWAP}GB configurado"
     ;;
-esac
+  esac
 
-case "$swap_choice" in
-  2|3)
+  case "$swap_choice" in
+  2 | 3)
     print_header "Configurando Zswap (Compresión en RAM)"
-    
+
     # Verificar soporte del kernel
     if [[ ! -f /sys/module/zswap/parameters/enabled ]]; then
       print_warning "Zswap no soportado por el kernel actual"
@@ -3698,14 +3705,14 @@ case "$swap_choice" in
       # Habilitar zswap
       print_installing "Habilitando zswap"
       echo 1 | sudo tee /sys/module/zswap/parameters/enabled
-      
+
       # Configurar algoritmo de compresión (lz4 es más rápido)
       echo lz4 | sudo tee /sys/module/zswap/parameters/compressor 2>/dev/null || true
       echo zbud | sudo tee /sys/module/zswap/parameters/zpool 2>/dev/null || true
-      
+
       # Configurar porcentaje de RAM para zswap (20% por defecto)
       echo 20 | sudo tee /sys/module/zswap/parameters/max_pool_percent
-      
+
       # Hacer permanente agregando a kernel parameters
       if [[ -f /etc/default/grub ]]; then
         if ! grep -q "zswap.enabled=1" /etc/default/grub; then
@@ -3714,54 +3721,54 @@ case "$swap_choice" in
           print_warning "Ejecuta 'sudo grub-mkconfig -o /boot/grub/grub.cfg' después del reinicio"
         fi
       fi
-      
+
       print_success "Zswap configurado (20% RAM, compresión lz4)"
     fi
     ;;
-esac
+  esac
 
-if [[ "$swap_choice" == "5" ]]; then
-  print_warning "Configuración de swap omitida"
-else
-  # Configurar swappiness (agresividad del swap)
-  print_status "Configurando swappiness..."
-  
-  # Swappiness recomendado según RAM
-  if [[ $TOTAL_RAM_GB -ge 16 ]]; then
-    SWAPPINESS=10  # Menos agresivo con mucha RAM
-  elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
-    SWAPPINESS=20  # Moderado con RAM media
+  if [[ "$swap_choice" == "5" ]]; then
+    print_warning "Configuración de swap omitida"
   else
-    SWAPPINESS=60  # Más agresivo con poca RAM
-  fi
-  
-  echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
-  sudo sysctl vm.swappiness=$SWAPPINESS
-  
-  print_success "Swappiness configurado a $SWAPPINESS"
-  
-  # Mostrar estado final
-  echo
-  echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
-  echo
-  NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
-  NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
-  echo -e "${CYAN}Estado actual:${NC}"
-  echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
-  echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
-  echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
-  
-  if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
-    ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
-    echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
-  fi
-  
-  echo
-  echo -e "${YELLOW}Comandos útiles:${NC}"
-  echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
-  echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
-  echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
-  echo
+    # Configurar swappiness (agresividad del swap)
+    print_status "Configurando swappiness..."
+
+    # Swappiness recomendado según RAM
+    if [[ $TOTAL_RAM_GB -ge 16 ]]; then
+      SWAPPINESS=10 # Menos agresivo con mucha RAM
+    elif [[ $TOTAL_RAM_GB -ge 8 ]]; then
+      SWAPPINESS=20 # Moderado con RAM media
+    else
+      SWAPPINESS=60 # Más agresivo con poca RAM
+    fi
+
+    echo "vm.swappiness=$SWAPPINESS" | sudo tee /etc/sysctl.d/99-swappiness.conf
+    sudo sysctl vm.swappiness=$SWAPPINESS
+
+    print_success "Swappiness configurado a $SWAPPINESS"
+
+    # Mostrar estado final
+    echo
+    echo -e "${GREEN}${BOLD}✨ CONFIGURACIÓN DE SWAP COMPLETADA ✨${NC}"
+    echo
+    NEW_SWAP_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+    NEW_SWAP_GB=$((NEW_SWAP_KB / 1024 / 1024))
+    echo -e "${CYAN}Estado actual:${NC}"
+    echo -e "  ${MAGENTA}•${NC} RAM: ${BOLD}${TOTAL_RAM_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swap total: ${BOLD}${NEW_SWAP_GB}GB${NC}"
+    echo -e "  ${MAGENTA}•${NC} Swappiness: ${BOLD}$SWAPPINESS${NC}"
+
+    if [[ "$swap_choice" == "2" || "$swap_choice" == "3" ]]; then
+      ZSWAP_STATUS=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "N")
+      echo -e "  ${MAGENTA}•${NC} Zswap: ${BOLD}$([[ "$ZSWAP_STATUS" == "Y" ]] && echo "Habilitado" || echo "Deshabilitado")${NC}"
+    fi
+
+    echo
+    echo -e "${YELLOW}Comandos útiles:${NC}"
+    echo -e "  ${CYAN}•${NC} Ver uso de swap: ${YELLOW}swapon --show${NC}"
+    echo -e "  ${CYAN}•${NC} Ver memoria: ${YELLOW}free -h${NC}"
+    echo -e "  ${CYAN}•${NC} Estado zswap: ${YELLOW}grep -r . /sys/module/zswap/parameters/${NC}"
+    echo
   fi
 }
 
@@ -4098,7 +4105,7 @@ elif [[ "$dm_choice" == "3" ]]; then
   fi
   WEBKIT_CONF="/etc/lightdm/lightdm-webkit2-greeter.conf"
   if [[ ! -f "$WEBKIT_CONF" ]]; then
-    sudo tee "$WEBKIT_CONF" > /dev/null <<EOF
+    sudo tee "$WEBKIT_CONF" >/dev/null <<EOF
 [greeter]
 debug_mode          = false
 detect_theme_errors = true
@@ -4168,12 +4175,12 @@ fi
 # PASO 34.7: QTSCRCPY (SCRCPY CON UI QT)
 # ═══════════════════════════════════════════════════════════
 print_step "34.7: QtScrcpy"
-if command -v qtscrcpy &> /dev/null || [ -d "/opt/QtScrcpy" ] || [ -d "$HOME/QtScrcpy" ]; then
+if command -v qtscrcpy &>/dev/null || [ -d "/opt/QtScrcpy" ] || [ -d "$HOME/QtScrcpy" ]; then
   print_success "QtScrcpy ya instalado"
 else
   if [ "${INSTALL_QTSCRCPY:-true}" = true ]; then
     print_status "Instalando QtScrcpy..."
-    if command -v yay &> /dev/null; then
+    if command -v yay &>/dev/null; then
       yay -S --noconfirm qtscrcpy 2>/dev/null && print_success "QtScrcpy instalado via yay" || {
         print_warning "qtscrcpy no disponible en AUR, compilando desde fuente..."
         sudo pacman -S --noconfirm --needed qt5-base qt5-multimedia qt5-svg qt5-quickcontrols2 android-tools git base-devel 2>/dev/null
@@ -4200,12 +4207,12 @@ fi
 # PASO 34.8: SYNCTHING-BIN (SYNC DE ARCHIVOS P2P)
 # ═══════════════════════════════════════════════════════════
 print_step "34.8: Syncthing"
-if command -v syncthing &> /dev/null; then
+if command -v syncthing &>/dev/null; then
   print_success "Syncthing ya instalado"
 else
   if [ "${INSTALL_SYNCTHING:-true}" = true ]; then
     print_status "Instalando Syncthing..."
-    if command -v yay &> /dev/null; then
+    if command -v yay &>/dev/null; then
       yay -S --noconfirm syncthing-bin 2>/dev/null && print_success "Syncthing instalado" || print_error "Error instalando Syncthing"
     else
       sudo pacman -S --noconfirm syncthing 2>/dev/null && print_success "Syncthing instalado via pacman" || print_error "Error instalando Syncthing"
@@ -4224,12 +4231,12 @@ fi
 # PASO 34.9: RQUICKSHARE (COMPARTIR ARCHIVOS ANDROID<->LINUX)
 # ═══════════════════════════════════════════════════════════
 print_step "34.9: RQuickShare"
-if command -v rquickshare &> /dev/null || [ -d "$HOME/.local/share/rquickshare" ]; then
+if command -v rquickshare &>/dev/null || [ -d "$HOME/.local/share/rquickshare" ]; then
   print_success "RQuickShare ya instalado"
 else
   if [ "${INSTALL_RQUICKSHARE:-true}" = true ]; then
     print_status "Instalando RQuickShare..."
-    if command -v yay &> /dev/null; then
+    if command -v yay &>/dev/null; then
       yay -S --noconfirm rquickshare-x-bin 2>/dev/null && print_success "RQuickShare instalado" || {
         print_warning "rquickshare-x-bin no disponible, intentando r-quick-share-bin..."
         yay -S --noconfirm r-quick-share-bin 2>/dev/null && print_success "RQuickShare instalado" || print_error "Error instalando RQuickShare"
