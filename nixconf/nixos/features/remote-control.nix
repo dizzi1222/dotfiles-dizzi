@@ -9,7 +9,7 @@
   # ── T1: Autologin SDDM ─────────────────────────────────────
   # Evita quedarse atrapado en el greeter tras un reboot remoto.
   services.displayManager.autoLogin = {
-    enable = true;
+    enable = false;
     user = "diego";
   };
   # El WM real es niri (no Plasma, que es el default del módulo sddm con kwin).
@@ -113,3 +113,4 @@
     };
   };
 }
+
