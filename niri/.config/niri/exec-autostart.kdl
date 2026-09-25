@@ -102,6 +102,7 @@ spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --
 spawn-at-startup "antimicrox --show %f"
 // Sunshine
 // spawn-at-startup "sunshine"
-// Sunshine: NO lanzar aquí — el servicio `sunshine.service` (módulo
-// services.sunshine.autoStart en remote-control.nix) ya lo arranca al
-// graphical-session.target. Si se lanza en ambos, duplica procesos en puerto 47989.
+// Sunshine: NO lanzar aquí — el service `sunshine.service` (system, bloque T4d
+// en remote-control.nix) lo arranca en graphical.target con captura KMS root.
+// Arranca siempre, sin importar el compositor (niri o Hyprland). Se deja
+// comentado en ambos autostarts para no duplicar procesos en el puerto 47989.

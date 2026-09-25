@@ -50,6 +50,8 @@
     phpPackages.composer
 
     # Dev tools
+    peazip
+    p7zip
     git
     lazygit
     docker-client
@@ -71,22 +73,22 @@
     appimage-run
 
     # AI tools & Agents
-    ollama
+    # ollama
     opencommit
-    aichat
+    # aichat
     # gemini-cli # Deshabilitado: Reemplazado por antigravity-cli (agy). Usar alias `gemini` -> `agy`
     antigravity-cli
-    claude-code
+    # claude-code
     opencode
-    qwen-code
-    (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
+    # qwen-code
+    # (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
     # openclaw # Omitido: requiere construir monorepo gigante de 1390 paquetes pnpm; ejecutar via npx openclaw si se necesita
     codex
     # kilo # Omitido: monorepo gigante que agota espacio en build; ejecutar via npx kilo si se necesita
-    pi-coding-agent
-    ctx7
-    openspec
-    python3Packages.huggingface-hub # huggingface-cli
+    # pi-coding-agent
+    # ctx7
+    # openspec
+    # python3Packages.huggingface-hub # huggingface-cli
 
     # Agentes no empaquetados en nixpkgs oficial (se pueden ejecutar via npx/npm/pip):
     # openclaude, qoder, cactus-needle, keelcode, kimchi, mimocode, engram, codegraph,
@@ -103,11 +105,11 @@
 
     # QA / Testing automation (binarios nativos de Nix; los frameworks npm
     # como jests/react-testing-library se instalan por proyecto con npm)
-    playwright-driver.browsers
-    cypress
-    chromedriver
-    geckodriver
     chromium
+    # playwright-driver.browsers
+    # cypress
+    # chromedriver
+    # geckodriver
     # L-11: JEST: # No se añade jest aquí: se instala con pnpm/npm en el proyecto
     #  󱞩Referencia: /home/diego/dotfiles-dizzi/nixconf/home-manager/features/work.nix
 
@@ -192,13 +194,19 @@
   ];
 
   # ── QA env: forzar binarios de Nix, no downloads de npm ────
+  # OJO: estas sessionVariables COMENTADAS maintain vivos a cypress y a
+  # playwright-driver.browsers en el closure de home-manager-path (~1.6 GiB),
+  # aunque esten comentados en home.packages mas arriba. Un ${pkgs.X} en
+  # CUALQUIER parte de la config (sessionVariables, shellAliases, stringsToFile,
+  # ExecStart...) mete el paquete y sus deps al store, para siempre.
+  # Para reincorporarlos: descomentar TODO (esta sesion + la lista de arriba).
   home.sessionVariables = {
     # Playwright: usar navegadores empaquetados por nixpkgs
-    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+    # PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+    # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
     # Cypress: usar el binario parchado de Nix
-    CYPRESS_INSTALL_BINARY = "0";
-    CYPRESS_RUN_BINARY = "${pkgs.cypress}/bin/Cypress";
+    # CYPRESS_INSTALL_BINARY = "0";
+    # CYPRESS_RUN_BINARY = "${pkgs.cypress}/bin/Cypress";
   };
 
   # ── Terminal Configs ───────────────────────────────────────

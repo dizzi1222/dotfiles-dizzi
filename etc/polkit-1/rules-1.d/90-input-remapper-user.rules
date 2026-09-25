@@ -1,6 +1,8 @@
 polkit.addRule(function(action, subject) {
-    if (action.id == "org.freedesktop.policykit.exec" && 
-        action.lookup("program") == "/usr/bin/input-remapper-control" &&
+    // En NixOS el binario vive en el /nix/store, no en /usr/bin, asi que
+    // matcheamos por nombre de programa en vez de por ruta absoluta.
+    if (action.id == "org.freedesktop.policykit.exec" &&
+        action.lookup("program").split("/").pop() == "input-remapper-control" &&
         subject.is_in_group("input")) {
         return polkit.Result.YES;
     }

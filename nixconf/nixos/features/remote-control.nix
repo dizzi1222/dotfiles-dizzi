@@ -9,7 +9,7 @@
   # ── T1: Autologin SDDM ─────────────────────────────────────
   # Evita quedarse atrapado en el greeter tras un reboot remoto.
   services.displayManager.autoLogin = {
-    enable = true;
+    enable = false;
     user = "diego";
   };
   # El WM real es niri (no Plasma, que es el default del módulo sddm con kwin).
@@ -79,6 +79,40 @@
   # doble instancia → lo deshabilitamos (envía su unit a /dev/null).
   systemd.user.services."app-dev.lizardbyte.app.Sunshine".enable = false;
 
+  # ── T4d: Sunshine como SYSTEM service (root) para captura KMS ────
+  # En niri el backend por defecto (wlgrab) no puede importar los dmabuf
+  # (niri usa Smithay, NO es wlroots) -> "Frame capture failed" en mas del
+  # 70% de los frames -> lineas horizontales en Moonlight
+  # (LizardByte/Sunshine#5258). Con `capture = kms` lee el framebuffer del
+  # DRM directo, pero exige CAP_SYS_ADMIN.
+  #
+  # Por que system service y no user service:
+  #  - setcap falla dentro del sandbox de build de nix ("unable to set
+  #    CAP_SETFCAP effective capability") y el store es read-only.
+  #  - AmbientCapabilities en user units no concede caps a procesos sin
+  #    privilegio (systemd: "bad unit file setting").
+  #  - Es la via que documenta la guia oficial de niri (#680) para
+  #    Sunshine/Moonlight con captura KMS.
+  # Root pierde el audio de PipeWire del usuario -> se reinyectan las vars.
+  systemd.services.sunshine = {
+    description = "Sunshine game stream host (root, captura KMS para niri)";
+    wantedBy = [ "graphical.target" ];
+    after = [ "display-manager.service" "nix-ld-setup.service" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${lib.getExe pkgs.sunshine}";
+      Restart = "on-failure";
+      RestartSec = 5;
+      Environment = [
+        "HOME=/home/diego"
+        "XDG_RUNTIME_DIR=/run/user/1000"
+        "XDG_CONFIG_HOME=/home/diego/.config"
+        "PULSE_SERVER=unix:/run/user/1000/pulse/native"
+        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
+      ];
+    };
+  };
+
   # ── Tailscale (red remota) ─────────────────────────────────
   # Parte del flujo "inmune a la distancia" (el objetivo de T1 lo cita).
   # Descomenta si quieres acceso remoto vía Tailnet.
@@ -113,3 +147,4 @@
     };
   };
 }
+

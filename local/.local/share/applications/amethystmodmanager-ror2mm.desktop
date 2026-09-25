@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Amethyst Mod Manager (Thunderstore)
+Comment=Handle Thunderstore ror2mm:// one-click install links
+Exec=/nix/store/icc4b0xbg7i1c6ng7ml7ijbxbbmyzgbi-amethyst-appimage-2.5.1/libexec/amethyst/bin/python3 /nix/store/icc4b0xbg7i1c6ng7ml7ijbxbbmyzgbi-amethyst-appimage-2.5.1/libexec/amethyst/share/amethyst-mod-manager/run_qt.py --ror2mm %u
+Icon=amethystmodmanager
+Terminal=false
+NoDisplay=true
+MimeType=x-scheme-handler/ror2mm;
+Categories=Game;
