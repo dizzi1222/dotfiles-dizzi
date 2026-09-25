@@ -1,0 +1,7 @@
+[Nemo Action]
+Name=PeaZip: extraer en carpeta nueva
+Comment=Extraer los archivos seleccionados dentro de una carpeta nueva
+Icon=folder-new
+Exec=peazip -ext2folder %F
+Selection=Any
+Extensions=zip;7z;rar;rar5;r00;tar;gz;gzip;tgz;bz2;bz;bzip2;tbz;tbz2;xz;txz;zst;zstd;lz;lzma;lzo;lz4;br;cab;arj;lha;lzh;zoo;z;rpm;deb;cpio;iso;img;msi;exe;dmg;war;ear;apk;xapk;tar.gz;tar.bz2;tar.xz;tar.zst;tar.lz4;tar.br;

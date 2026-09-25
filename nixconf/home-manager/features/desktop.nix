@@ -62,11 +62,13 @@ in
     imv
 
     # Mod managers
-    curseforge        # AppImage oficial Overwolf: mods Minecraft/WoW (no en nixpkgs/Flathub)
-    vortex            # Vortex (NexusMods.App UNFREE, soporta .rar) + .desktop con keywords
-    r2modman          # Unofficial Thunderstore mod manager (AppImage→nixpkgs 3.2.18, Thunderstore)
-    #amethyst         # DESCARTADO: AppImages 2.5.1/2.5.2 dañados (offset SQUASHFS desalineado,
-    #                 #   "Can't find a valid SQUASHFS superblock" en appimageTools.extract)
+    curseforge # AppImage oficial Overwolf: mods Minecraft/WoW (no en nixpkgs/Flathub)
+    vortex # Vortex (NexusMods.App AppImage oficial) + .desktop con keywords "Vortex"
+    r2modman # Unofficial Thunderstore mod manager (AppImage→nixpkgs 3.2.18, Thunderstore)
+    amethyst # MO2-style nativo Linux (fork de Mod Organizer 2) para Skyrim SE y F4.
+              # AppImage v2.5.1 extraído con su propia runtime: appimageTools lee
+              # mal el offset del payload y unsquashfs no soporta su zstd.
+              # Detalle completo en packages/amethyst.nix
     #ModDrop          # NO existe Linux: Windows-only, sin AppImage/flatpak; comunidad desaconseja
 
     # Audio
@@ -120,7 +122,8 @@ in
     neovim
 
     # Office
-    libreoffice-fresh
+    # libreoffice-fresh  # DESACTIVADO: no se usa (~1.42 GiB en el closure).
+                       # Para reincorporarlo: descomentar y `nixconf-rebuild`.
     kdePackages.okular
 
     # Utilities
@@ -215,7 +218,7 @@ in
           mkdir -p $out
           cp ${pkgs.fetchurl {
             url = "https://raw.githubusercontent.com/rxri/spicetify-extensions/main/adblock/adblock.js";
-            hash = "sha256-tgckOgKnmbuo5AKJ/x5di2MriF3f7pUaqvHD1zPoABs=";
+            hash = "sha256-Mp+LGLcAJ8RWOZ7kxoCb+SRHNfJkCIiEXklx6YPoifg=";
           }} $out/adblock.js
         '';
         name = "adblock.js";
