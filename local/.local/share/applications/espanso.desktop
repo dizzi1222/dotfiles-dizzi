@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Espanso
+GenericName=Text Expander
+Comment=Espanso — expansor de texto (reinicia el daemon)
+Exec=espanso-restart
+TryExec=espanso-restart
+Icon=espanso
+Terminal=false
+Categories=Utility;Accessibility;
+Keywords=espanso;text;expander;expansion;snippet;replace;reiniciar;restart;

@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# espanso-restart — levanta / reinicia el daemon de espanso (text expander).
+#
+# POR QUÉ NO `systemctl restart espanso`:
+# el módulo NixOS deja espanso.service atado a graphical-session.target, que
+# nunca se activa en esta sesión (SDDM + niri). El daemon lo arranca el
+# compositor, no systemd:
+#   niri → spawn-at-startup "espanso"    (~/.config/niri/exec-autostart.kdl:51)
+#   hypr → exec-once = espanso daemon    (hypr/.config/hypr/exec-autostart.conf:47)
+# Por eso esto mata el proceso vivo y lo relanza a mano.
+#
+# Idempotente: si no había nada corriendo, lo arranca; si lo había, lo reinicia.
+# Es lo que dispara el .desktop del menú y el ítem "Restart Espanso" del
+# system-control de wofi, para recuperarlo cuando el worker se cuelga.
+set -uo pipefail
+
+notify() {
+  command -v notify-send >/dev/null 2>&1 && notify-send "espanso" "$1" 2>/dev/null
+  return 0
+}
+
+ESPANSO_BIN="$(command -v espanso 2>/dev/null || true)"
+
+if [ -z "$ESPANSO_BIN" ] || [ ! -x "$ESPANSO_BIN" ]; then
+  notify "❌ espanso no está en el PATH"
+  exit 127
+fi
+
+# Sin compositor el daemon aborta con "NoCompositor" (exit 101).
+if [ -z "${WAYLAND_DISPLAY:-}" ]; then
+  notify "❌ sin WAYLAND_DISPLAY — el daemon abortaría con NoCompositor"
+  exit 1
+fi
+
+# El patrón NO es la ruta de `command -v` (que en NixOS es el wrapper
+# /run/wrappers/bin/espanso) sino el path que aparece en el cmdline real
+# (/nix/store/…-espanso-*/bin/espanso). Además el ejecutable real se llama
+# .espanso-wrapped y su comm queda truncado a 15 chars (.espanso-wrappe),
+# así que `pgrep -x espanso` NO lo encuentra. El lookahead de espacio evita
+# matchear este mismo script (~/.local/bin/espanso-restart).
+PATTERN='bin/espanso( |$)'
+
+# PIDs de espanso VIVOS. Los zombies .espanso-wrappe (buen Wrapper::to_owned
+# sin reaper) aparecen en pgrep pero no se pueden matar: ya están muertos.
+espanso_pids() {
+  local p st
+  for p in $(pgrep -f "$PATTERN" 2>/dev/null); do
+    st="$(sed -n 's/^.*) \([A-Z]\).*$/\1/p' "/proc/$p/stat" 2>/dev/null)"
+    [ "$st" = "Z" ] && continue
+    printf '%s ' "$p"
+  done
+}
+
+was_running=0
+[ -n "$(espanso_pids)" ] && was_running=1
+
+# TERM primero; KILL solo si no cede. El segundo pause le da a espanso
+# tiempo a cerrar el socket del worker antes del SIGKILL.
+for sig in TERM KILL; do
+  pids="$(espanso_pids)"
+  [ -n "$pids" ] || break
+  # shellcheck disable=SC2086
+  kill -"$sig" $pids 2>/dev/null
+  for _ in 1 2 3 4 5 6; do
+    [ -n "$(espanso_pids)" ] || break
+    sleep 0.5
+  done
+  sleep 0.5
+done
+
+# setsid: desacopla del shell del lanzador para que el daemon sobreviva al
+# cierre de la app que lo lanzó.
+setsid "$ESPANSO_BIN" daemon >/dev/null 2>&1 &
+
+# El worker aparece ~1s después del daemon.
+sleep 2
+if [ -n "$(espanso_pids)" ]; then
+  if [ "$was_running" -eq 1 ]; then
+    notify "✅ daemon reiniciado"
+  else
+    notify "✅ daemon arrancado"
+  fi
+  exit 0
+fi
+
+notify "❌ el daemon no levantó — prueba manual: espanso daemon"
+exit 1
