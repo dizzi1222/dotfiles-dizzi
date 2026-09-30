@@ -51,14 +51,17 @@ Sistema:󰠅"
 
   # Paso 1 — elegir categoría (grid 3 columnas). "Todos" = búsqueda recursiva.
   # Cada categoría lleva chevron ' ' a la derecha (estilo Omarchy).
-  CAT_LIST=$(printf 'Todos\n'; awk -F'\t' '!seen[$1]++ {print $1}' "$MANIFEST")
+  CAT_LIST=$(
+    printf 'Todos\n'
+    awk -F'\t' '!seen[$1]++ {print $1}' "$MANIFEST"
+  )
   CHOICE=$(printf '%s\n' "$CAT_LIST" | while read -r cat; do
     [ -n "$cat" ] && printf '%s\t%s\t<span letter_spacing="40000"> </span>%s\n' "$(cat_icon "$cat")" "$cat" ""
   done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 3 --prompt "󱍕 󰣇 Categoría")
   [ -z "$CHOICE" ] && exit 0
   CATEGORY=$(echo "$CHOICE" | awk -F'\t' '{print $2}')
 
-# Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
+  # Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
   # búsqueda recursiva ("nixconf cleanup" encuentra "Nix Cleanup").
   # Cada entrada lleva el chevron ' ' a la derecha (estilo Omarchy).
   CHOICE=$(awk -F'\t' -v c="$CATEGORY" '
@@ -312,6 +315,12 @@ case "$ICON" in
   ;;
 "󱦥")
   sh ~/scripts/sunshine-local-audio.sh on
+  ;;
+
+"")
+  # Espanso lo arranca el compositor (niri exec-autostart.kdl:51 / hypr exec-autostart.conf:47),
+  # no systemd: por eso el script mata el proceso vivo y lo relanza.
+  espanso-restart
   ;;
 "󰳾")
   kitty -e ~/wrapper/autoclicker-menu
