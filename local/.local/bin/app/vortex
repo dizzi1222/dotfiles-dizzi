@@ -1,0 +1,24 @@
+#!/bin/bash
+# vortex: lanza Vortex 1.16.9 (Nexus Mods) bajo Wine con pty (fix EBADF).
+# --disable-gpu: render por software de Chromium (Skia) evita el freeze del
+#                gpu-process swiftshader al 92% CPU que dejaba el mouse muerto.
+export WINEPREFIX="${WINEPREFIX:-/home/diego/.wine-vortex116}"
+export WINEDEBUG="-all"
+VORTEX_EXE="C:\\Program Files\\Black Tree Gaming Ltd\\Vortex\\Vortex.exe"
+VORTEX_LOCK="$WINEPREFIX/drive_c/users/diego/AppData/Roaming/Vortex/lockfile"
+
+# 1) Matar instancias previas de Vortex + su wineserver (evita singleton Chromium)
+for pid in $(ps -ef | grep "Vortex.exe" | grep -v grep | awk '{print $2}'); do
+  kill -9 "$pid" 2>/dev/null
+done
+WINEPREFIX="$WINEPREFIX" wineserver -k 2>/dev/null
+sleep 1
+
+# 2) Limpiar lockfile residual de Chromium (error "Lock file can not be created")
+rm -f "$VORTEX_LOCK" 2>/dev/null
+
+# 3) El pty (script -q) es OBLIGATORIO: sin él Node/Electron muere con
+#    "open EBADF" en createWritableStdioStream (getStdout).
+setsid script -q -c "wine '$VORTEX_EXE' --no-sandbox --disable-gpu --enable-unsafe-swiftshader" /dev/null </dev/null >/dev/null 2>&1 &
+disown
+echo "Vortex 1.16.9 lanzado (sesión desacoplada)"
