@@ -300,6 +300,14 @@ window-rule {
     open-on-workspace "music"
 }
 
+// Vortex (wine) — no repinta al estirar el tile (render por software)
+// Si queda sola, niri expande la columna a todo el monitor y el exceso
+// se ve blanco; limitar el ancho de columna evita el estiramiento.
+window-rule {
+    match app-id=r#"^(vortex\.exe|Vortex\.exe)$"#
+    default-column-width { fixed 1260; }
+}
+
 // Rounded corners para todas las ventanas
 window-rule {
     geometry-corner-radius 2
