@@ -782,7 +782,7 @@ gitflow() {
       ;;
     13)
       echo "💾 Savepoint: aplastando al commit raíz..."
-      git reset --soft 9387b749 # newbie NixOS savepoitn commit
+      git reset --soft bdcf5754 # newbie NixOS savepoitn commit
       git add -A
       git commit --amend --no-edit
       echo "✅ Savepoint creado: $(git rev-parse --short HEAD) ($(git rev-list --count HEAD) commits)"
