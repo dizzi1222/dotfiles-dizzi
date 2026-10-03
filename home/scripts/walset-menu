@@ -85,8 +85,16 @@ if [ -n "$SELECTED_WALL" ]; then
     # Generar paleta de colores con Pywal (silencioso)
     wal -q -i "$WALL_DIR/$SELECTED_WALL"
 
-    # Recargar Waybar
-    pkill -9 waybar 2>/dev/null; waybar -c ~/.config/waybar/config &
+    # Recargar Waybar (niri usa su propia config; Hyprland/Cinnamon/Plasma la default)
+    pkill -9 waybar 2>/dev/null
+    case "$compositor" in
+    "niri")
+      waybar -c ~/.config/waybar/config-niri.json &
+      ;;
+    *)
+      waybar -c ~/.config/waybar/config &
+      ;;
+    esac
 
     # Recargar Eww solo si está corriendo
     if pgrep -x eww >/dev/null; then
