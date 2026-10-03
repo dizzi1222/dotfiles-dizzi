@@ -28,6 +28,14 @@
     vicinae = {
       url = "github:vicinaehq/vicinae";
     };
+    # Codex Desktop (GUI oficial de OpenAI para Linux). Reempaqueta el .deb
+    # firmado que OpenAI publica en persistent.oaistatic.com. Trae su propio
+    # modulo de Home Manager (homeManagerModules.default), por eso NO hace
+    # falta un packages/codex-desktop.nix local como con figma-desktop.
+    codex-desktop = {
+      url = "github:ilysenko/codex-desktop-linux";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, stylix, zen-browser, swww, spicetify-nix, vicinae, niri-flake, ... }@inputs:
@@ -71,6 +79,10 @@
         # Antes usaba nixpkgs `nexusmods-app-unfree` (build from source de
         # ~20 GB, no está en cache.nixos.org). Ver nota en packages/vortex.nix.
         vortex = prev.callPackage ./packages/vortex.nix { };
+        # Vortex Mod Manager (clásico) bajo Wine: wrapper que verifica que la
+        # instalación exista en ~/.wine-vortex116 antes de lanzar (wine + pty
+        # + --disable-gpu). El binario es `vortex-wine`, el .desktop "Vortex (Wine)".
+        vortex-wine = prev.callPackage ./packages/vortex-wine.nix { };
         # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
         # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
         # El patch pasa `request` como primer argumento (nueva firma).
