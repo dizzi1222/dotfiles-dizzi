@@ -1,0 +1,249 @@
+#!/usr/bin/env bash
+#
+# oc-open — lleva la vista de Neovim a la línea exacta que se acaba de modificar.
+#
+# Mismo mecanismo que el "open file" de lazygit (`nvim --server $NVIM
+# --remote-send q --remote-tab`), con 3 diferencias pensadas para el uso
+# agente→humano (Diego sigue la implementación en vivo):
+#   1. Acepta `ruta:línea[:columna]`.
+#   2. Si el archivo YA está abierto en ese nvim, NO crea otra tab: reutiliza la
+#      ventana existente y sólo mueve el cursor (cero ruido de tabs).
+#   3. Centra la línea y la selecciona en visual, para que el cambio se vea.
+#
+# Uso:
+#   oc-open src/app.ts:42            # abre (o reutiliza) y salta a la línea 42
+#   oc-open src/app.ts:42:8          # ...y a la línea 42, columna 8
+#   oc-open a.ts:10 b.ts:200         # varios objetivos, en orden
+#   oc-open -                        # lee "ruta:línea" desde stdin (uno por línea)
+#   oc-open -n src/app.ts:42         # fuerza tab nueva (comportamiento lazygit)
+#   oc-open -b                       # vuelve a la ventana previa (escape hatch)
+#   oc-open --socket                 # imprime el socket que usaría
+#
+# ⚠ Efecto secundario conocido: al saltar al archivo, OpenCode (que corre en un
+# terminal buffer de ESE mismo nvim) queda atrás. Es el comportamiento deseado —
+# Diego analiza el código y luego vuelve con `-b`, `Ctrl-^` o `<leader>ao`.
+#
+# NO existe modo split (ni dentro de nvim ni en otra ventana de terminal): ambos
+# se probaron y se descartaron. Ver CLAUDE.md → "Seguimiento Visual".
+#
+# Selección de instancia: $OC_NVIM_SOCKET > $NVIM > socket más reciente que
+# responda.
+#
+# Fallback: si no hay ningún nvim escuchando, intenta abrir ventana en el
+# emulador de terminal detectado; si no hay ninguno, imprime el comando.
+
+set -uo pipefail
+
+readonly SOCKETS_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+readonly STATE_DIR="${OC_NVIM_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/oc-open}"
+readonly STATE_FILE="$STATE_DIR/last-win"
+# Tab de código reutilizada: handle de tabpage, escrito por el propio Lua del jump.
+readonly CODE_TAB_FILE="$STATE_DIR/code-tab"
+
+# Todo `nvim --server` va con timeout: si el nvim de Diego está busy (insert con
+# mapping pendiente, prompt, modal), `--remote-expr` se queda colgado esperando y
+# sin esto el script cuelga al agente que lo invoca.
+readonly NVIM_TIMEOUT="${OC_NVIM_TIMEOUT:-3}"
+
+# Globales (goto_target los lee).
+new_tab=0
+
+usage() {
+  sed -n '3,32p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+die() {
+  printf 'oc-open: %s\n' "$1" >&2
+  exit "${2:-1}"
+}
+
+# nq SOCK EXPR — `--remote-expr` con timeout. Devuelve 124 si el server no responde.
+#
+# `-s KILL` y `</dev/null` son obligatorios: el cliente `nvim --server` SIN tty se
+# queda esperando stdin, y al recibir SIGTERM intenta restaurar la terminal y
+# tampoco muere (se accumulate como clientes zombis y cuelga el shell del agente).
+nq() {
+  timeout -s KILL "$NVIM_TIMEOUT" nvim --server "$1" --remote-expr "$2" \
+    </dev/null 2>/dev/null
+}
+
+# Imprime el socketPath del nvim al que hay que conectarse.
+find_socket() {
+  local candidates=() sock
+
+  if [[ -n "${OC_NVIM_SOCKET:-}" ]]; then
+    printf '%s\n' "$OC_NVIM_SOCKET"
+    return 0
+  fi
+
+  # $NVIM lo exporta el propio nvim a sus procesos hijos (así lo usa lazygit).
+  [[ -n "${NVIM:-}" ]] && candidates+=("$NVIM")
+
+  while IFS= read -r sock; do
+    candidates+=("$sock")
+  done < <(find "$SOCKETS_DIR" -maxdepth 1 -name 'nvim.*' -type s -printf '%T@ %p\n' 2>/dev/null \
+    | sort -rn | cut -d' ' -f2-)
+
+  for sock in "${candidates[@]}"; do
+    [[ -S "$sock" ]] || continue
+    nq "$sock" '1' >/dev/null && {
+      printf '%s\n' "$sock"
+      return 0
+    }
+  done
+
+  return 1
+}
+
+# remote SOCK EXPR — evalúa una expresión Vimscript y descarta la salida.
+remote() {
+  nq "$1" "$2" >/dev/null
+}
+
+open_in_terminal() {
+  local file="$1" line="$2" term
+  for term in "${TERMINAL:-}" ghostty kitty alacritty foot wezterm; do
+    [[ -n "$term" ]] || continue
+    command -v "$term" >/dev/null 2>&1 || continue
+    setsid "$term" -e nvim -- "$file" "+${line}" >/dev/null 2>&1 &
+    return 0
+  done
+  return 1
+}
+
+
+# Recuerda la ventana activa para poder volver con `-b`.
+remember_window() {
+  local id
+  id="$(nq "$1" 'string(win_getid())')"
+  [[ "$id" =~ ^[0-9]+$ ]] || return 0
+  mkdir -p "$(dirname "$STATE_FILE")"
+  printf '%s' "$id" >"$STATE_FILE"
+}
+
+# Vuelve a la ventana guardada.
+go_back() {
+  local id
+  [[ -r "$STATE_FILE" ]] || die "no hay ventana previa guardada (usá oc-open ARCHIVO:N al menos una vez)" 2
+  id="$(cat "$STATE_FILE")"
+  remote "$1" "execute(\"silent! call win_gotoid(${id})\")" \
+    || die "no se pudo volver a la ventana $id" 2
+  rm -f "$STATE_FILE"
+  printf 'oc-open: de vuelta a la ventana %s\n' "$id" >&2
+}
+
+# Mueve (o abre) el target y salta a la línea.
+#
+# Todo el trabajo se hace en UNA sola llamada `nvim_exec_lua`: si el server está
+# busy el timeout la aborta, en vez de dejar 6 requests colgados.
+goto_target() {
+  local target="$1" sock="$2"
+  local file line col esc
+  local head last lua force
+
+  # `ruta:línea[:columna]` — se parte desde la DERECHA para no confundir una
+  # ruta con `:` o dígitos dentro del nombre.
+  col=""
+  last="${target##*:}"
+  if [[ "$last" =~ ^[0-9]+$ ]]; then
+    head="${target%:*}"
+    if [[ "${head##*:}" =~ ^[0-9]+$ ]]; then
+      col="$last"
+      file="${head%:*}"
+      line="${head##*:}"
+    else
+      file="$head"
+      line="$last"
+    fi
+  else
+    file="$target"
+    line=1
+  fi
+
+  if [[ ! -e "$file" ]]; then
+    die "no existe: $file" 2
+  fi
+
+  file="$(readlink -f -- "$file")"
+  force="false"
+  [[ "$new_tab" -eq 1 ]] && force="true"
+
+  remember_window "$sock"
+
+  # Una sola línea de Lua (todo el trabajo en 1 request). Política de ventanas:
+  #   1) el buffer ya está en una ventana  -> `win_gotoid` (reutiliza, 0 tabs)
+  #   2) la ventana actual NO es opencode -> `edit` in situ (0 tabs)
+  #   3) estoy mirando opencode, o -n     -> una ÚNICA tab de código, reutilizada
+  # Nunca `tabedit` por cada salto: eso llenaba la bufferline de tabs numeradas.
+  lua="local t=[==[${file}]==] local l=${line} local c=${col:-0} local f=${force} "
+  lua+="local S=[==[${CODE_TAB_FILE}]==] "
+  lua+="local b=vim.fn.bufnr(t) local w=b>0 and vim.fn.win_findbuf(b)[1] or nil "
+  lua+="local cur=vim.api.nvim_win_get_buf(vim.api.nvim_get_current_win()) "
+  lua+="local viewing_oc = vim.bo[cur].buftype == [[terminal]] and vim.api.nvim_buf_get_name(cur):match([[opencode]]) ~= nil "
+  lua+="if not f and w then pcall(vim.api.nvim_set_current_win,w) "
+  lua+="elseif not f and not viewing_oc then vim.cmd([[silent! keepalt edit ]]..vim.fn.fnameescape(t)) "
+  lua+="else local h=0 local f2=io.open(S) if f2 then h=tonumber(f2:read([[*a]])) or 0 f2:close() end "
+  lua+="if h > 0 and vim.api.nvim_tabpage_is_valid(h) and h ~= vim.api.nvim_get_current_tabpage() then "
+  lua+="pcall(vim.api.nvim_set_current_tabpage, h) vim.cmd([[silent! keepalt edit ]]..vim.fn.fnameescape(t)) "
+  lua+="else vim.cmd([[silent! keepalt tabnew ]]..vim.fn.fnameescape(t)) "
+  lua+="local o=io.open(S, [[w]]) if o then o:write(tostring(vim.api.nvim_get_current_tabpage())) o:close() end end end "
+  lua+="vim.cmd([[silent! normal! ]]..l..[[G]]) vim.cmd([[silent! normal! zvzz]]) "
+  lua+="if c>0 then vim.cmd([[silent! normal! ]]..c..[[|]]) end "
+  lua+="vim.cmd([[silent! normal! V]])"
+
+  if ! nq "$sock" "execute(\"lua ${lua}\")" >/dev/null; then
+    die "el nvim no respondió en ${NVIM_TIMEOUT}s (¿estás en un prompt o modal?)" 5
+  fi
+
+  printf 'oc-open: %s → %s:%s\n' "${sock##*/}" "$file" "$line" >&2
+  return 0
+}
+
+main() {
+  local socket_only=0 back=0
+  local sock target
+  local targets=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -n|--new-tab) new_tab=1; shift ;;
+      -b|--back)    back=1; shift ;;
+      -s|--socket)  socket_only=1; shift ;;
+      -h|--help)    usage; exit 0 ;;
+      -)
+        while IFS= read -r target; do
+          [[ -n "$target" ]] && targets+=("$target")
+        done
+        shift
+        ;;
+      -*) die "opción desconocida: $1 (ver --help)" 2 ;;
+      *)  targets+=("$1"); shift ;;
+    esac
+  done
+
+  if ! sock="$(find_socket)"; then
+    # Sin nvim escuchando: se intenta una ventana nueva con el primer target.
+    if [[ ${#targets[@]} -gt 0 ]] && open_in_terminal "${targets[0]%%:*}" 1; then
+      printf 'oc-open: no había nvim corriendo — se abrió %s en una ventana nueva\n' "${targets[0]}" >&2
+      exit 0
+    fi
+    die "no hay instancia de nvim escuchando en $SOCKETS_DIR/nvim.*" 3
+  fi
+
+  if [[ "$back" -eq 1 ]]; then
+    [[ ${#targets[@]} -eq 0 ]] || die "-b no se combina con targets" 2
+    go_back "$sock"
+    exit 0
+  fi
+
+  if [[ "$socket_only" -eq 1 || ${#targets[@]} -eq 0 ]]; then
+    printf '%s\n' "$sock"
+    exit 0
+  fi
+
+  for target in "${targets[@]}"; do
+    goto_target "$target" "$sock"
+  done
+}
+
+main "$@"
