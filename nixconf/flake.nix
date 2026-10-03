@@ -28,6 +28,14 @@
     vicinae = {
       url = "github:vicinaehq/vicinae";
     };
+    # Codex Desktop (GUI oficial de OpenAI para Linux). Reempaqueta el .deb
+    # firmado que OpenAI publica en persistent.oaistatic.com. Trae su propio
+    # modulo de Home Manager (homeManagerModules.default), por eso NO hace
+    # falta un packages/codex-desktop.nix local como con figma-desktop.
+    codex-desktop = {
+      url = "github:ilysenko/codex-desktop-linux";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, stylix, zen-browser, swww, spicetify-nix, vicinae, niri-flake, ... }@inputs:
