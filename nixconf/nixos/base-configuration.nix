@@ -395,13 +395,18 @@
     };
   };
 
-  # ── Espanso autostart fix ──────────────────────────────────
-  # espanso-wayland panics with "NoCompositor" (exit 101) if started before
-  # Hyprland is up, so it must NOT be started by systemd at boot. It is
-  # launched via `exec-once = espanso daemon` in Hyprland (exec-autostart.conf),
-  # guaranteeing the Wayland compositor exists first. The home-manager/NixOS
-  # module's service (graphical-session.target) never activates on this
-  # SDDM+Hyprland session, so it stays dormant.
+  # ── Espanso autostart & idempotency fix ────────────────────
+  # El modulo de NixOS lo ata a graphical-session.target (que SDDM+Niri no
+  # activa por defecto) provocando que quede inactivo. Modificamos el target
+  # a default.target y forzamos Restart=always. De este modo recobra su
+  # idempotencia (24/7) y sobrevive a crasheos (ej. carrera vs udev en autoLogin).
+  systemd.user.services.espanso = {
+    wantedBy = lib.mkForce [ "default.target" ];
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = lib.mkForce "3s";
+    };
+  };
 
   # ── Firewall ──────────────────────────────────────────────
   networking.firewall = {

@@ -233,6 +233,12 @@ in
         source = link "Antigravity/.gemini/antigravity-cli/keybindings.json";
         force = true;
       };
+      # Antigravity CLI (agy) — instrucciones globales del agente.
+      # Espejo esencial de ~/.claude/CLAUDE.md: estilo de código, oc-open,
+      # reglas de git, nomenclatura de ramas, seguridad de nvim y PR/QA.
+      ".gemini/GEMINI.md" = {
+        source = link "home/.gemini/GEMINI.md";
+      };
       # Antimicrox (gamepad mapper)
       ".config/antimicrox".source = link "antimicrox/.config/antimicrox";
       # Cursor/Editor (VS Code-based editor settings)

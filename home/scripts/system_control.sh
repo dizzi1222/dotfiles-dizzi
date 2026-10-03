@@ -496,6 +496,11 @@ case "$ICON" in
 "󰊭")
   kitty --hold -e bash -c '~/scripts/antigravity-wipe-nuclear.sh'
   ;;
+"")
+  # Instalar extensiones en Antigravity/Cursor/VSCode/VSCodium
+  # Detecta el editor disponible y usa extensions.txt del mismo dir del script
+  kitty --hold -e bash -c '"$HOME/dotfiles-dizzi/home/Antigravity Setup/install extensions/install-vscode-extensions.sh"'
+  ;;
 
 *)
   exit 1

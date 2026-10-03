@@ -9,6 +9,103 @@
 - Asegúrate de que todas las funciones y clases nuevas tengan comentarios JSDoc.
 - Prefiere paradigmas de programación funcional cuando sea apropiado.
 
+## Seguimiento Visual — `oc-open` (obligatorio tras cada edición)
+
+**Regla:** después de cada tanda de `edit`/`write`, llama a `oc-open` con `ruta:línea`
+de **cada archivo modificado**, para que Diego vea el cambio en su Neovim mientras lo
+implemento. Es el equivalente agente→humano del "open file" de lazygit.
+
+```bash
+oc-open src/app.ts:42                  # salta a la línea 42 (reutiliza el buffer)
+oc-open src/app.ts:42:8                # ...y a la columna 8
+oc-open a.ts:10 b.ts:200               # varios archivos, en orden
+git diff --name-only | oc-open -       # todos los archivos del diff (sin línea)
+oc-open -b                             # vuelve a la ventana previa (escape hatch)
+```
+
+- Fuente: `~/dotfiles-dizzi/local/.local/bin/oc-open` → `~/.local/bin/oc-open`
+- Default: si el archivo ya está abierto, mueve el cursor en la ventana existente; si no,
+  abre una tab nueva. Nunca spamea tabs. `-n` fuerza tab nueva (comportamiento lazygit).
+- Facts técnicos: OpenCode corre dentro de un terminal buffer de Neovim, así que `$NVIM`
+  ya viene exportado → `oc-open` se conecta **a la misma instancia** desde la que Diego
+  me lanzó. Fallback: `$OC_NVIM_SOCKET` > `$NVIM` > socket más reciente que responda.
+- Ejecuté `normal! V` para señalar la línea: si la siguiente tecla es accidental, puede
+  reemplazar la línea. Alternativa pasiva: `matchadd`. Pendiente de decisión de Diego.
+
+### ⚠ Efecto secundario conocido (anotado 2026-10-03, NO es bug)
+
+**Al saltar al archivo, OpenCode "desaparece" de la vista.** No se cerró: el TUI vive en
+un *terminal buffer* del mismo Neovim, y `win_gotoid`/`tabedit` mueven el foco de esa
+ventana al código. Decisión de Diego: es el comportamiento deseado (analiza el código y
+luego vuelve). No intentar "arreglarlo" con hacks de focus-preserving.
+
+**Ojo con el "doble press"**: el toggle clásico (`term:toggle()`) necesita **2
+pulsaciones** cuando la ventana de opencode quedó en otra tab — la 1ª oculta / no cambia
+nada visible, la 2ª muestra. Se resolvió con un toggle **inteligente** que razona sobre
+visibilidad real, así que **siempre es 1 pulsación**:
+
+| Tecla           | Función             | Efecto                                                        |
+| --------------- | ------------------- | ------------------------------------------------------------- |
+| `<leader>ao`    | `toggle_opencode()` | Si opencode está visible en esta tab → oculta; si no → **muestra y enfoca** |
+| `<leader>af`    | `focus_opencode()`  | Siempre muestra + enfoca (idempotente)                        |
+| `oc-open -b`    | —                   | Vuelve a la ventana previa que guardó el script                |
+| `Ctrl-^`        | —                   | Alterna con la ventana anterior de Neovim                     |
+
+Ambas funciones ya **no dependen de `snacks.terminal`**: localizan el buffer por
+`buftype == "terminal"` + nombre con `opencode` + `channel > 0` (`find_opencode_buf()`),
+que es lo que fallaba cuando snacks pierde el registro. Definidas en
+`nvim/.config/nvim/lua/plugins/opencode-chat.lua`. Lógica verificada 9/9 en nvim headless
+(`/tmp/opencode/toggle_test.lua`).
+
+### Variantes
+
+| Flag           | Efecto                                                               |
+| -------------- | -------------------------------------------------------------------- |
+| (default)      | Reutiliza la ventana si el archivo ya está abierto; si no, tab nueva |
+| `-n/--new-tab` | Fuerza tab nueva siempre (comportamiento lazygit)                    |
+| `-b/--back`    | Vuelve a la ventana previa                                            |
+
+### ⛔ NO existe modo split, ni dentro de nvim ni en otra ventana
+
+Se probaron **dos** variantes para que opencode siguiera visible mientras se ve el
+código, y **ambas se descartaron**:
+
+1. `-w/--split` (mismo nvim, panel de código estable junto al terminal). Rompió el
+   layout: `opencode-chat.lua` tiene autocmds (`User OpencodeEvent:*`) que hacen
+   `nvim_api_set_current_win` + `startinsert` sobre la ventana del opencode, así que
+   cualquier secuencia `win_gotoid` + `normal!` aterriza en el terminal en vez de en el
+   código. Resultado: ventana de opencode duplicada + 4 splits.
+2. `-k/--os-window` (2do nvim en su propia ventana de terminal, socket
+   `$XDG_RUNTIME_DIR/oc-open-code.sock`). Funcionaba técnicamente y dejaba el nvim de
+   Diego intacto, pero **Diego lo rechazó**: abrir otra ventana de terminal es más
+   intrusivo que perder de vista el TUI.
+
+Decisión final: sólo el comportamiento default. OpenCode sale de la vista mientras se
+analiza el código y se vuelve con `oc-open -b`, `Ctrl-^` o `<leader>ao`. Si alguna vez
+se revisa, hay que aislar el bucle de eventos de opencode del salto de cursor.
+
+### Origen: el workflow de lazygit
+
+Lazygit ejecuta el editor vía `$SHELL -c`, y en esta máquina `$SHELL` es
+`~/.local/bin/lazygit-shell` (wrapper que descarta el `-c`, recompone el cmd y lo
+reejecuta con `zsh -ic` para cargar el `~/.zshrc` completo):
+
+```bash
+/home/diego/.local/bin/lazygit-shell -c '[ -z "$NVIM" ] && (nvim -- "FILE") || (nvim --server "$NVIM" --remote-send "q" && nvim --server "$NVIM" --remote-tab "FILE")'
+```
+
+| Parte                        | Significado                                                                                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[ -z "$NVIM" ]`             | ¿Hay un Neovim **ya corriendo**? `$NVIM` lo exporta el propio nvim a sus hijos (`v:servername`); lazygit hereda el valor porque nació dentro de nvim.              |
+| `nvim -- "FILE"`             | No hay instancia previa → abrir una nueva.                                                                                                                       |
+| `--remote-send "q"`          | Sí la hay → **cerrar el buffer actual** (`:q`) para no acumular ventanas.                                                                                        |
+| `--remote-tab "FILE"`        | Abrir el archivo en una **tab nueva** de esa instancia.                                                                                                           |
+
+`oc-open` conserva el mecanismo (`--server` + `execute()` de Vimscript vía `--remote-expr`)
+pero cambia la política para el uso agente→humano: **no cierra tu buffer ni crea tabs
+nuevas si el archivo ya está abierto**; sólo mueve el cursor, centra la línea y la
+selecciona en visual (`V`) para que veas exactamente dónde escribí.
+
 ## Estilo de Codificaciónkkk
 
 - Usa 2 espacios para la indentación.
