@@ -84,7 +84,9 @@
       vi = "nvim";
       rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
       hm = "home-manager switch --flake ~/dotfiles-dizzi/nixconf#diego@thinkpad-x1e2";
-      nixrb = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
+      # nixrb = rebuild sistema + home-manager con la lógica RAM (nixconf-rebuild):
+      # detecta poco disco y vuelca los builds a /dev/shm (MIN_RAM_GB=8).
+      nixrb = "~/.local/bin/nixconf-rebuild";
       cd = "z";
       geforceNow = "flatpak run com.nvidia.geforcenow";
     };

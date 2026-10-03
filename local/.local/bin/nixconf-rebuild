@@ -11,8 +11,9 @@
 #     /ruta : directorio propio (ideal: otro disco con espacio)
 #   MIN_FREE_GB=10   umbral de disco libre en /
 #   MIN_RAM_GB=8     RAM disponible mínima para permitir el modo ram
-#                    (con ~10G de MemAvailable reales, 10G truncaba a 9 → pedía
-#                    confirm en vez de usar /dev/shm; 8G activa el modo ram)
+#                    (con ~10G de MemAvailable reales, 10G truncaba a 9 → no
+#                    activaba /dev/shm; 8G lo activa. La RAM justa ya no pide
+#                    confirmación: avisa y sigue en disco).
 #   HM_REF=github:nix-community/home-manager   se usa con `nix run` si falta el
 #                    binario home-manager en el PATH (primera vez / perfil roto)
 set -euo pipefail
@@ -43,16 +44,6 @@ if [ "$(id -u)" -eq 0 ] || [ "$(id -un)" != "$TARGET_USER" ]; then
   echo "Ejecutá este script como '$TARGET_USER' (no root)." >&2
   exit 1
 fi
-
-confirm() {
-  local r
-  read -r -p "   $1 [y/N] " r
-  case "$r" in y | Y) ;; *)
-    echo "Abortado."
-    exit 1
-    ;;
-  esac
-}
 
 # ── ¿Existe home-manager? ────────────────────────────────────────
 # HM_EXISTS=1 -> binario en PATH. HM_EXISTS=0 -> se arranca con `nix run $HM_REF`
@@ -86,8 +77,7 @@ auto)
       echo "${C_DIM}   Hay ${ram_gb}G de RAM → los builds irán a /dev/shm${C_RST}"
       BUILD_TMP="$RAM_DIR"
     else
-      echo "${C_YEL}⚠  Poco espacio en /: ${free_gb}G libres, y RAM justa (${ram_gb}G)${C_RST}"
-      confirm "¿Continuar igual?"
+      echo "${C_DIM}   RAM justa (${ram_gb}G) → builds van al disco igual (sin RAM).${C_RST}"
     fi
   fi
   ;;
