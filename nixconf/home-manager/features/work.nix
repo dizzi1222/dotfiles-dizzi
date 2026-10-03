@@ -193,6 +193,16 @@
     # rebar3
   ];
 
+  # ── Codex Desktop (GUI) ─────────────────────────────────────
+  # Version grafica de `codex` (arriba). Electron reempaquetado del .deb
+  # oficial de OpenAI. OJO: ocupa ~3.5 GB en el store (deb 474 MiB + app
+  # desempaquetada ~1.4 GB + 241 deps de nixpkgs 1.6 GiB). Sin esto el `codex`
+  # CLI de la lista sigue funcionando igual.
+  #
+  # Comentar esta linea = NO instalar la GUI.
+  # El cableado (modulo HM + cliPackage) vive en features/codex-desktop.nix.
+  programs.codexDesktopLinux.enable = false;
+
   # ── QA env: forzar binarios de Nix, no downloads de npm ────
   home.sessionVariables = {
     # Playwright: usar navegadores empaquetados por nixpkgs
