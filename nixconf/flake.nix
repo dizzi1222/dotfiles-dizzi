@@ -66,11 +66,15 @@
         # Amethyst Mod Manager — gestor de mods nativo Linux (MO2-style).
         # AppImage oficial v2.5.2. No está en nixpkgs ni Flathub.
         amethyst = prev.callPackage ./packages/amethyst.nix { };
-        # Vortex alias (busqueda/arranque): wrapper sobre nexusmods-app-unfree
-        # con binario `vortex` + .desktop keywords "Vortex;Nexus Mods;mods".
-        vortex = prev.callPackage ./packages/vortex.nix {
-          nexusmods-app-unfree = prev.nexusmods-app-unfree;
-        };
+        # Vortex (NexusMods.App): AppImage oficial de GitHub + wrapper `vortex`
+        # + .desktop keywords "Vortex;Nexus Mods;mods".
+        # Antes usaba nixpkgs `nexusmods-app-unfree` (build from source de
+        # ~20 GB, no está en cache.nixos.org). Ver nota en packages/vortex.nix.
+        vortex = prev.callPackage ./packages/vortex.nix { };
+        # Vortex Mod Manager (clásico) bajo Wine: wrapper que verifica que la
+        # instalación exista en ~/.wine-vortex116 antes de lanzar (wine + pty
+        # + --disable-gpu). El binario es `vortex-wine`, el .desktop "Vortex (Wine)".
+        vortex-wine = prev.callPackage ./packages/vortex-wine.nix { };
         # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
         # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
         # El patch pasa `request` como primer argumento (nueva firma).
