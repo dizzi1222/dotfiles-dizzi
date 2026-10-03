@@ -5,8 +5,8 @@
   home.packages = with pkgs; [
     # cursor-cli
     # Editors
-    code-cursor # neocursor.nvim requiere la APP
-    # antigravity-ide
+    # code-cursor # neocursor.nvim requiere la APP
+    antigravity-ide
 
     # Languages
     # python3 env con debugpy (para nvim-dap: `python3 -m debugpy.adapter`).
@@ -193,6 +193,16 @@
     # rebar3
   ];
 
+  # ── Codex Desktop (GUI) ─────────────────────────────────────
+  # Version grafica de `codex` (arriba). Electron reempaquetado del .deb
+  # oficial de OpenAI. OJO: ocupa ~3.5 GB en el store (deb 474 MiB + app
+  # desempaquetada ~1.4 GB + 241 deps de nixpkgs 1.6 GiB). Sin esto el `codex`
+  # CLI de la lista sigue funcionando igual.
+  #
+  # Comentar esta linea = NO instalar la GUI.
+  # El cableado (modulo HM + cliPackage) vive en features/codex-desktop.nix.
+  programs.codexDesktopLinux.enable = false;
+
   # ── QA env: forzar binarios de Nix, no downloads de npm ────
   # OJO: estas sessionVariables COMENTADAS maintain vivos a cypress y a
   # playwright-driver.browsers en el closure de home-manager-path (~1.6 GiB),
@@ -220,7 +230,7 @@
   home.shellAliases = {
     ns = "nix search nixpkgs";
     nixup = "nix flake update --flake ~/dotfiles-dizzi/nixconf";
-    nixrb = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
+    nixrb = "~/.local/bin/nixconf-rebuild";  # rebuild sistema+HM con lógica RAM en /dev/shm
     nixgc = "sudo nix-collect-garbage -d";
     nixos = "nix-shell -p";
 
