@@ -5,8 +5,8 @@
   home.packages = with pkgs; [
     # cursor-cli
     # Editors
-    code-cursor # neocursor.nvim requiere la APP
-    # antigravity-ide
+    # code-cursor # neocursor.nvim requiere la APP
+    antigravity-ide
 
     # Languages
     # python3 env con debugpy (para nvim-dap: `python3 -m debugpy.adapter`).
@@ -220,7 +220,7 @@
   home.shellAliases = {
     ns = "nix search nixpkgs";
     nixup = "nix flake update --flake ~/dotfiles-dizzi/nixconf";
-    nixrb = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
+    nixrb = "~/.local/bin/nixconf-rebuild";  # rebuild sistema+HM con lógica RAM en /dev/shm
     nixgc = "sudo nix-collect-garbage -d";
     nixos = "nix-shell -p";
 

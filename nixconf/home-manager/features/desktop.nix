@@ -64,6 +64,8 @@ in
     # Mod managers
     curseforge # AppImage oficial Overwolf: mods Minecraft/WoW (no en nixpkgs/Flathub)
     vortex # Vortex (NexusMods.App AppImage oficial) + .desktop con keywords "Vortex"
+    vortex-wine # Vortex Mod Manager clásico bajo Wine (1.16.9, prefix ~/.wine-vortex116).
+                # Wrapper que verifica la instalación antes de lanzar; .desktop "Vortex (Wine)".
     r2modman # Unofficial Thunderstore mod manager (AppImage→nixpkgs 3.2.18, Thunderstore)
     amethyst # MO2-style nativo Linux (fork de Mod Organizer 2) para Skyrim SE y F4.
               # AppImage v2.5.1 extraído con su propia runtime: appimageTools lee
@@ -239,6 +241,23 @@ in
   # ── Zen Browser ────────────────────────────────────────────
   programs.zen-browser = {
     enable = true;
+  };
+
+  # ── Google AI Studio (experiencia Gemini Live oficial) ─────
+  # Abre aistudio.google.com como "app" propia de zen (ventana dedicada,
+  # micrófono + pantalla vía portales Wayland). Es el sustituto del Snap
+  # gemini-desktop que no existe nativo en NixOS.
+  xdg.desktopEntries."google-ai-studio" = {
+    name = "Google AI Studio";
+    genericName = "Gemini Live / Voice & Screen";
+    comment = "Gemini Live: voz + compartir pantalla (Google AI Studio)";
+    # Mismo patrón que Google_AI_Search.desktop (--new-window --kiosk URL).
+    # u/1/live?model=gemini-3.8-live abre la vista Live (voz+pantalla) con el
+    # modelo multimodal correcto.
+    exec = "zen-browser --new-window --kiosk \"https://aistudio.google.com/u/1/live?model=gemini-3.8-live\"";
+    icon = "/home/diego/.local/share/icons/google-ai-studio.png";
+    categories = [ "Network" "WebBrowser" ];
+    startupNotify = true;
   };
 
 }
