@@ -214,7 +214,7 @@
   home.shellAliases = {
     ns = "nix search nixpkgs";
     nixup = "nix flake update --flake ~/dotfiles-dizzi/nixconf";
-    nixrb = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
+    nixrb = "~/.local/bin/nixconf-rebuild";  # rebuild sistema+HM con lógica RAM en /dev/shm
     nixgc = "sudo nix-collect-garbage -d";
     nixos = "nix-shell -p";
 
