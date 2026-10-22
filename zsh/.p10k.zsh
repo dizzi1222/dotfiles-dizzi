@@ -34,6 +34,11 @@
   # Unset all configuration options.
   unset -m '(POWERLEVEL9K_*|DEFAULT_USER)~POWERLEVEL9K_GITSTATUS_DIR'
 
+  # gitstatusd no es compatible con el runtime de Termux; usar git nativo.
+  if [[ -n "${TERMUX_VERSION:-}" || -d /data/data/com.termux ]]; then
+    typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
+  fi
+
   # Zsh >= 5.1 is required.
   [[ $ZSH_VERSION == (5.<1->*|<6->.*) ]] || return
 

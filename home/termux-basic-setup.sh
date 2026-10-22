@@ -79,11 +79,7 @@ plugins=(git zsh-syntax-highlighting zsh-autosuggestions zsh-completions zsh-his
 export PATH="$HOME/.local/bin:$HOME/go/bin:$HOME/.opencode/bin:$PATH"
 [[ -f ~/.termux_aliases ]] && source ~/.termux_aliases
 
-[[ -f ~/.config/starship/starship.toml ]] && export STARSHIP_CONFIG=~/.config/starship/starship.toml
-command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
-# Oh-My-Posh: sin --config real, Termux imprime "CONFIG NOT FOUND" (no hay tema integrado).
-# Bajar el tema que usa main y apuntarlo con --config.
-command -v oh-my-posh >/dev/null 2>&1 && { mkdir -p ~/.config/oh-my-posh; [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] || curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json" >/dev/null 2>&1; eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"; }
+# El prompt se configura en el PASO 9 para que solo quede activo un renderer.
 
 command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }
 ZSH
@@ -253,43 +249,113 @@ fi
 # ═══════════════════════════════════════════════════════════
 print_step "9/23: Prompts"
 echo "Elige tu prompt:"
-echo "  1) Starship (recomendado - ligero)"
-echo "  2) Oh-My-Posh (más features)"
-echo "  3) Ninguno"
-read -p "Opción [1-3]: " prompt_choice
+echo "  1) Powerlevel10k (tema de dotfiles, recomendado)"
+echo "  2) Starship (ligero)"
+echo "  3) Oh-My-Posh (más features)"
+echo "  4) Ninguno"
+read -p "Opción [1-4, Enter=1]: " prompt_choice
+prompt_choice="${prompt_choice:-1}"
+
+remove_prompt_initializers() {
+  [[ -f ~/.zshrc ]] || touch ~/.zshrc
+  sed -i \
+    -e '/starship init zsh/d' \
+    -e '/oh-my-posh init zsh/d' \
+    -e '/# Termux Powerlevel10k prompt/d' \
+    -e '/powerlevel10k.zsh-theme/d' \
+    -e '/source .*p10k.zsh/d' \
+    -e '/POWERLEVEL9K_DISABLE_GITSTATUS=true/d' \
+    -e '/POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true/d' \
+    -e '/POWERLEVEL9K_INSTANT_PROMPT=off/d' \
+    ~/.zshrc
+}
+
+disable_omz_theme() {
+  sed -i 's/^[[:space:]]*ZSH_THEME=.*/ZSH_THEME=""/' ~/.zshrc
+}
 
 case "$prompt_choice" in
 1)
-  pkg install -y starship >/dev/null 2>&1
-  mkdir -p ~/.config
-  # NO generar preset si ya hay config propia (stow usa ~/.config/starship/starship.toml)
-  if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
-    starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null
+  mkdir -p ~/.zsh-plugins
+  if [[ ! -f ~/.zsh-plugins/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+      ~/.zsh-plugins/powerlevel10k >/dev/null 2>&1 ||
+      print_warning "Powerlevel10k no pudo clonarse"
   fi
-  # Activar starship en .zshrc (si no está ya)
-  grep -q "starship init" ~/.zshrc 2>/dev/null ||
-    echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >>~/.zshrc
-  # Usar la config del repo (stow) si existe
-  if [[ -f ~/.config/starship/starship.toml ]] && ! grep -q "STARSHIP_CONFIG" ~/.zshrc 2>/dev/null; then
-    echo 'export STARSHIP_CONFIG=~/.config/starship/starship.toml' >>~/.zshrc
+  for p10k_config in "$HOME/dotfiles-dizzi/zsh/.p10k.zsh" \
+    "$HOME/dotfiles-termux/zsh/.p10k.zsh" "$HOME/dotfiles/zsh/.p10k.zsh"; do
+    if [[ -f "$p10k_config" ]]; then
+      ln -sfn "$p10k_config" "$HOME/.p10k.zsh"
+      break
+    fi
+  done
+  if [[ -f ~/.zsh-plugins/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+    remove_prompt_initializers
+    disable_omz_theme
+    cat >>~/.zshrc <<'P10K'
+# Termux Powerlevel10k prompt
+typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
+[[ -r "$HOME/.zsh-plugins/powerlevel10k/powerlevel10k.zsh-theme" ]] && source "$HOME/.zsh-plugins/powerlevel10k/powerlevel10k.zsh-theme"
+[[ -r "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+# Set after sourcing .p10k.zsh because the dotfiles config unsets POWERLEVEL9K_* options.
+typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
+typeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
+P10K
+    print_success "Powerlevel10k instalado y configurado"
+  else
+    print_warning "Powerlevel10k no está disponible; revisa la conexión e instala: core install shell"
   fi
-  print_success "Starship instalado"
   ;;
 2)
-  pkg install -y oh-my-posh >/dev/null 2>&1
-  # Tema local obligatorio: sin --config real, oh-my-posh de Termux imprime
-  # "CONFIG NOT FOUND" (el "tema integrado" no existe). Bajar el tema que usa main.
-  mkdir -p ~/.config/oh-my-posh
-  [[ -f ~/.config/oh-my-posh/1_shell.omp.json ]] ||
-    curl -fsSL -o ~/.config/oh-my-posh/1_shell.omp.json \
-      "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json"
-  # Reemplazar CUALQUIER línea oh-my-posh vieja (sin --config o con URL remota)
-  sed -i '/oh-my-posh init/d' ~/.zshrc
-  echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/1_shell.omp.json)"' >>~/.zshrc
-  print_success "Oh-My-Posh instalado"
+  pkg install -y starship >/dev/null 2>&1
+  mkdir -p ~/.config
+  if [[ ! -f ~/.config/starship/starship.toml && ! -f ~/.config/starship.toml ]]; then
+    starship preset nerd-font-symbols -o ~/.config/starship.toml 2>/dev/null || true
+  fi
+  remove_prompt_initializers
+  disable_omz_theme
+  if [[ -f ~/.config/starship/starship.toml ]]; then
+    echo 'export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"' >>~/.zshrc
+  fi
+  echo 'command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"' >>~/.zshrc
+  print_success "Starship instalado"
+  ;;
+3)
+  OMP_CONFIG="$HOME/.config/oh-my-posh/1_shell.omp.json"
+  if ! command -v oh-my-posh >/dev/null 2>&1; then
+    pkg install -y oh-my-posh >/dev/null 2>&1 || true
+  fi
+  if ! command -v oh-my-posh >/dev/null 2>&1; then
+    print_warning "Oh-My-Posh no se instaló; no cambié el prompt actual"
+  else
+    mkdir -p "$(dirname "$OMP_CONFIG")"
+    if [[ ! -s "$OMP_CONFIG" ]] || ! jq -e 'type == "object" and (.blocks | type == "array")' "$OMP_CONFIG" >/dev/null 2>&1; then
+      if curl -fsSL --retry 3 -o "$OMP_CONFIG.tmp" \
+        "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json" &&
+        jq -e 'type == "object" and (.blocks | type == "array")' "$OMP_CONFIG.tmp" >/dev/null 2>&1; then
+        mv -f "$OMP_CONFIG.tmp" "$OMP_CONFIG"
+      else
+        rm -f "$OMP_CONFIG.tmp"
+        print_warning "No se pudo descargar un tema válido de Oh-My-Posh; no cambié el prompt actual"
+      fi
+    fi
+    if jq -e 'type == "object" and (.blocks | type == "array")' "$OMP_CONFIG" >/dev/null 2>&1; then
+      remove_prompt_initializers
+      disable_omz_theme
+      echo 'command -v oh-my-posh >/dev/null 2>&1 && eval "$(oh-my-posh init zsh --config "$HOME/.config/oh-my-posh/1_shell.omp.json")"' >>~/.zshrc
+      print_success "Oh-My-Posh configurado con tema local y sin prompts en conflicto"
+    else
+      print_warning "El tema local de Oh-My-Posh no es válido; no cambié el prompt actual"
+    fi
+  fi
+  ;;
+4)
+  remove_prompt_initializers
+  print_success "Prompts externos desactivados"
   ;;
 *)
-  print_warning "Prompts omitidos"
+  print_warning "Opción inválida; no se modificó el prompt"
   ;;
 esac
 
@@ -573,24 +639,28 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     git checkout termux 2>/dev/null || true
     # CRÍTICO: sincronizar submodules (nvim) — fix "submodule initialized but empty"
     git submodule update --init --recursive
-    # Stow desde la raíz: cada paquete del repo tiene estructura .config/
-    # NOTA: "zsh" NO se stow — su .zshrc es el del LAPTOP (oh-my-posh con URL remota,
-    # powerlevel10k, swww) y rompe el prompt de Termux. En Termux se genera desde
-    # ~/.zshrc propio (ver PASO 8 / PASO 19).
-    for pkg in nvim nixconf assets home bun-termux Antigravity starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+    # El checkout estándar de submodule queda detached; usar la rama Termux real.
+    NVIM_SUBMODULE="$DOTFILES/nvim/.config/nvim"
+    if [[ -e "$NVIM_SUBMODULE/.git" ]]; then
+      if git -C "$NVIM_SUBMODULE" fetch origin +refs/heads/termux:refs/remotes/origin/termux; then
+        if git -C "$NVIM_SUBMODULE" checkout -B termux origin/termux; then
+          git -C "$NVIM_SUBMODULE" branch --set-upstream-to=origin/termux termux >/dev/null
+          print_success "Neovim quedó en la rama termux"
+        else
+          print_warning "No se pudo cambiar Neovim a termux; se conservaron los cambios locales"
+        fi
+      else
+        print_warning "No se pudo actualizar origin/termux para Neovim"
+      fi
+    fi
+    # Compartir la configuración Powerlevel10k del repo con el entorno Termux.
+    [[ -f "$DOTFILES/zsh/.p10k.zsh" ]] && ln -sfn "$DOTFILES/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
+    # Stow desde la raíz: cada paquete del repo tiene estructura .config/.
+    # No enlazar zsh/.zshrc: Termux mantiene su propio archivo y el PASO 9
+    # selecciona un solo prompt; solo se comparte la configuración .p10k.zsh.
+    for pkg in nvim nixconf assets home Antigravity starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
-    # zsh: el .zshrc del repo en rama termux ES el funcional (p10k de ~/.zsh-plugins
-    # + ~/.termux_aliases + git-flow). Se enlaza directo; se aplica de forma
-    # idempotente el fix de p10k (gitstatusd no corre en aarch64 → git nativo,
-    # sin wizard) y el link de ~/.p10k.zsh. En ramas NO-termux el .zshrc es del
-    # laptop y rompe Termux → ahí NO enlazar (queda el generado por ensure_zshrc).
-    if [[ -f "zsh/.zshrc" ]] && ! grep -qE "oh-my-posh init zsh --config 'http|ARCH LINUX" "zsh/.zshrc"; then
-      ln -sfn "$DOTFILES/zsh/.zshrc" ~/.zshrc
-      [[ -f "zsh/.p10k.zsh" ]] && ln -sfn "$DOTFILES/zsh/.p10k.zsh" ~/.p10k.zsh
-      grep -q "POWERLEVEL9K_DISABLE_GITSTATUS" ~/.zshrc 2>/dev/null ||
-        printf '\n# p10k en Termux: gitstatusd no disponible (aarch64) → git nativo\ntypeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true\ntypeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\n' >>~/.zshrc
-    fi
     [[ -f "zsh/.zshenv" ]] && ln -sfn "$DOTFILES/zsh/.zshenv" ~/.zshenv
     cd ~
     print_success "Dotfiles ($DOTFILES)"
