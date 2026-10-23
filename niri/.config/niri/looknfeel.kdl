@@ -44,3 +44,8 @@ animations {
 // Comenta la siguiente línea si prefieres ocultar las decoraciones del lado del cliente (botones de cerrar, minimizar, etc.)
 // prefer-no-csd
 
+
+cursor {
+    xcursor-theme "Kafka"
+    xcursor-size 35
+}

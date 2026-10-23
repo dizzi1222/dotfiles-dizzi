@@ -20,7 +20,7 @@ spawn-sh-at-startup "sh ~/.config/eww/scripts/toggle-game-mode.sh"
 
 // Desktop environment
 // vicinae: el daemon lo levanta vicinae.service (systemd user). NO usar
-// spawn-sh-at-startup "vicinae server" // descomentar si no usas systemd
+spawn-sh-at-startup "vicinae server" // descomentar si no usas systemd
 spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x-desktop"
 // ##################
 // # ARRANCAR NEMO  #
@@ -68,7 +68,7 @@ spawn-sh-at-startup "/home/diego/montar_gd-musica.sh"
 spawn-sh-at-startup "/home/diego/montar_gd-libros.sh"
 
 // Cursor theme
-spawn-sh-at-startup "hyprctl setcursor Kafka 24 || true"
+// El cursor de Niri se configura en looknfeel.kdl.
 
 // GTK settings
 spawn-sh-at-startup "gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:'"
