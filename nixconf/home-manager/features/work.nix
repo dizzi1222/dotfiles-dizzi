@@ -50,10 +50,12 @@
     phpPackages.composer
 
     # Dev tools
+    kdePackages.filelight
     peazip
     p7zip
     git
     lazygit
+    lazysql
     docker-client
     docker-compose
     # docker-desktop — no disponible en nixpkgs actual; instalar via flatpak si se necesita
@@ -83,7 +85,7 @@
     # qwen-code
     # (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
     # openclaw # Omitido: requiere construir monorepo gigante de 1390 paquetes pnpm; ejecutar via npx openclaw si se necesita
-    codex
+    codex # Codex desktop en @codexDesktopLinux-L197
     # kilo # Omitido: monorepo gigante que agota espacio en build; ejecutar via npx kilo si se necesita
     # pi-coding-agent
     # ctx7
@@ -201,7 +203,7 @@
   #
   # Comentar esta linea = NO instalar la GUI.
   # El cableado (modulo HM + cliPackage) vive en features/codex-desktop.nix.
-  programs.codexDesktopLinux.enable = false;
+  programs.codexDesktopLinux.enable = true;
 
   # ── QA env: forzar binarios de Nix, no downloads de npm ────
   # OJO: estas sessionVariables COMENTADAS maintain vivos a cypress y a
@@ -230,7 +232,7 @@
   home.shellAliases = {
     ns = "nix search nixpkgs";
     nixup = "nix flake update --flake ~/dotfiles-dizzi/nixconf";
-    nixrb = "~/.local/bin/nixconf-rebuild";  # rebuild sistema+HM con lógica RAM en /dev/shm
+    nixrb = "~/.local/bin/nixconf-rebuild"; # rebuild sistema+HM con tmpfs privado en RAM
     nixgc = "sudo nix-collect-garbage -d";
     nixos = "nix-shell -p";
 
