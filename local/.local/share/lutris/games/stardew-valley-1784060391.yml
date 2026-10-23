@@ -1,5 +1,6 @@
 game:
-  exe: /home/diego/.local/bin/juegos/stardew.sh
+  args: steam://rungameid/413150
+  exe: steam://rungameid/413150
 system:
   env:
     WINEDEBUG: -all
