@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=Genshin Impact - Official Top-Up Center
+Exec=brave --profile-directory=Default --app-id=pegpplnboafbgpaklddhfijogokkfgbf
+Icon=brave-pegpplnboafbgpaklddhfijogokkfgbf-Default
+StartupWMClass=crx_pegpplnboafbgpaklddhfijogokkfgbf
