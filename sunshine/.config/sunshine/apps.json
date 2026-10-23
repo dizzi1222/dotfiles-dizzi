@@ -2,13 +2,13 @@
     "apps": [
         {
             "auto-detach": true,
-            "cmd": "steam steam://rungameid/9813346792119468032",
+            "cmd": "steam://rungameid/413150",
             "elevated": false,
             "exclude-global-prep-cmd": false,
             "exit-timeout": 5,
             "image-path": "/home/diego/.config/sunshine/covers/stardew-valley.png",
             "name": " Stardew Valley",
-            "output": "env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132",
+            "output": "steam://rungameid/413150",
             "wait-all": true
         },
         {
