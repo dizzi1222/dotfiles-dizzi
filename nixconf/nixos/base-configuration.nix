@@ -54,12 +54,14 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    # GC automático cuando el disco libre baja de 10 GiB (limitation-10).
-    # min-free: umbral (MiB) → el daemon corre nix-collect-garbage
+    # Permite que Home Manager dirija los temporales de build a /dev/shm.
+    trusted-users = [ "diego" ];
+    # GC automático cuando el disco libre baja de 2 GiB.
+    # min-free: umbral en bytes → el daemon corre nix-collect-garbage
     #           hasta recuperar max-free. Mantiene controlado el uso
     #           del disco en máquinas con NVMe pequeño como el X1E2.
-    min-free = 10 * 1024;
-    max-free = 20 * 1024;
+    min-free = 2 * 1024 * 1024 * 1024;
+    max-free = 4 * 1024 * 1024 * 1024;
   };
 
   # ── Garbage Collector automático ────────────────────────────
