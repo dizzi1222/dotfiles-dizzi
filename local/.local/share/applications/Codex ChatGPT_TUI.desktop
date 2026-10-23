@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Codex TUI
+Comment=Open ChatGPT Codex TUI in a terminal
+Exec=kitty -e codex
+Terminal=false
+Type=Application
+Icon=/home/diego/.local/share/icons/codex-black-icon.png
+Categories=Network;
+StartupNotify=true
+StartupWMClass=codex
