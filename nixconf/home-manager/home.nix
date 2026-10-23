@@ -303,6 +303,8 @@ in
       ".engram/config.json".source = link "home/.engram/config.json";
       # Claude config (~/.claude/CLAUDE.md) — fuente única versionada en el repo
       ".claude/CLAUDE.md".source = link "home/.claude/CLAUDE.md";
+      # Codex: mismas instrucciones que Claude, sin duplicar el contenido.
+      ".codex/AGENTS.md".source = link "codex/.codex/AGENTS.md";
 
       # Starship config
       #".config/starship.toml".source = link "starship/.config/starship/starship.toml";
