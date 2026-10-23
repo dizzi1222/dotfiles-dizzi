@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Abre el explorador de Wine (explorer.exe) sobre la instalacion de Daggerfall
+# usando el prefix Proton que Steam creo para el juego (appid 1812390).
+set -euo pipefail
+
+STEAM_ROOT="$HOME/.local/share/Steam/steamapps"
+COMPAT="$STEAM_ROOT/compatdata/1812390"
+GAME="$STEAM_ROOT/common/The Elder Scrolls Daggerfall"
+PROTON_WINE="$STEAM_ROOT/common/Proton - Experimental/files/bin/wine"
+
+if [ ! -x "$PROTON_WINE" ]; then
+  echo "No se encontro el wine de Proton: $PROTON_WINE" >&2
+  exit 1
+fi
+
+if [ ! -f "$COMPAT/pfx/drive_c/windows/system32/explorer.exe" ]; then
+  echo "No existe el prefix Proton de Daggerfall: $COMPAT/pfx" >&2
+  exit 1
+fi
+
+export WINEPREFIX="$COMPAT/pfx"
+export STEAM_COMPAT_DATA_PATH="$COMPAT"
+export STEAM_COMPAT_CLIENT_INSTALL_PATH="$GAME"
+export WINEDEBUG="${WINEDEBUG:--all}"
+
+# Dentro del prefix, Z: esta montado en /
+GAME_WIN='Z:\home\diego\.local\share\Steam\steamapps\common\The Elder Scrolls Daggerfall'
+
+exec "$PROTON_WINE" explorer.exe "$GAME_WIN"

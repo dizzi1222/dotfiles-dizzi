@@ -1448,6 +1448,27 @@ yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   postman-bin
 print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
 
+# ChatGPT/Codex Desktop oficial: evita el codex-desktop-bin obsoleto de AUR.
+read -r -p "¿Instalar ChatGPT/Codex Desktop oficial (chatgpt-bin)? [s/N]: " install_codex_desktop
+if [[ "$install_codex_desktop" =~ ^[Ss]$ ]]; then
+  if ! pacman-conf --repo-list | grep -qx 'openai-chatgpt'; then
+    codex_installer=$(mktemp)
+    if curl --proto '=https' --tlsv1.2 -fL --retry 5 --retry-all-errors \
+      -o "$codex_installer" https://persistent.oaistatic.com/codex-app-prod/linux/install-arch.sh \
+      && bash -n "$codex_installer" && sudo bash "$codex_installer"; then
+      print_success "Repositorio oficial OpenAI configurado"
+    else
+      rm -f -- "$codex_installer"
+      print_error "Fallo el instalador oficial; revisar la descarga o las firmas antes de continuar"
+      exit 1
+    fi
+    rm -f -- "$codex_installer"
+  fi
+  # Sincroniza tambien la base online tras el bootstrap, sin actualizacion parcial.
+  sudo pacman -Syu --needed chatgpt-bin
+  print_success "ChatGPT/Codex Desktop instalado. Ejecutar: chatgpt"
+fi
+
 print_installing "Python LSP + Neovim support"
 python -m pip install --user --break-system-packages pynvim 'python-lsp-server[all]' 2>/dev/null || true
 
@@ -1838,6 +1859,11 @@ if [[ -d ~/dotfiles-dizzi ]]; then
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
     fi
   done # PROCEDO A APLICAR CONFIG DE CINNAMON.
+
+  # Solo instrucciones: ~/.codex debe seguir siendo un directorio de datos real.
+  if [[ -d codex ]]; then
+    stow --no-folding codex || print_warning "Stow codex fallo; revisar conflictos en ~/.codex/AGENTS.md"
+  fi
 
   [[ -f ~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf ]] && dconf load /org/cinnamon/ <~/dotfiles-dizzi/cinnamon/.config/cinnamon/settings.dconf && print_success "Cinnamon settings cargados"
   print_status "Aplicando Submodulos [NVIM]    ."
