@@ -133,3 +133,4 @@ application/x-bzip3=peazip.desktop
 x-scheme-handler/nxm=com.nexusmods.app.desktop
 x-scheme-handler/curseforge=curseforge.desktop
 x-scheme-handler/cfauth=curseforge.desktop
+x-scheme-handler/codex=chatgpt.desktop

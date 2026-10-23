@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Daggerfall (Wine Explorer)
+Name[es_ES]=Daggerfall (Wine Explorer)
+Comment=Explorador de Wine sobre la instalacion de Daggerfall (prefix Proton de Steam)
+Comment[es_ES]=Explorador de Wine sobre la instalacion de Daggerfall (prefix Proton de Steam)
+Exec=/home/diego/.local/bin/daggerfall-wine-explorer
+Icon=/home/diego/.local/share/Steam/appcache/librarycache/1812390/logo.png
+Terminal=false
+StartupNotify=true
+Categories=Game;FileTools;
+Keywords=daggerfall;wine;explorer;steam;proton;

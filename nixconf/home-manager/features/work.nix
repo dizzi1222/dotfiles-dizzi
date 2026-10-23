@@ -49,10 +49,12 @@
     phpPackages.composer
 
     # Dev tools
+    kdePackages.filelight
     peazip
     p7zip
     git
     lazygit
+    lazysql
     docker-client
     docker-compose
     # docker-desktop — no disponible en nixpkgs actual; instalar via flatpak si se necesita
@@ -82,7 +84,7 @@
     # qwen-code
     # (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
     # openclaw # Omitido: requiere construir monorepo gigante de 1390 paquetes pnpm; ejecutar via npx openclaw si se necesita
-    codex
+    codex # Codex desktop en @codexDesktopLinux-L197
     # kilo # Omitido: monorepo gigante que agota espacio en build; ejecutar via npx kilo si se necesita
     # pi-coding-agent
     # ctx7
@@ -175,6 +177,16 @@
     # n8n
   ];
 
+  # ── Codex Desktop (GUI) ─────────────────────────────────────
+  # Version grafica de `codex` (arriba). Electron reempaquetado del .deb
+  # oficial de OpenAI. OJO: ocupa ~3.5 GB en el store (deb 474 MiB + app
+  # desempaquetada ~1.4 GB + 241 deps de nixpkgs 1.6 GiB). Sin esto el `codex`
+  # CLI de la lista sigue funcionando igual.
+  #
+  # Comentar esta linea = NO instalar la GUI.
+  # El cableado (modulo HM + cliPackage) vive en features/codex-desktop.nix.
+  programs.codexDesktopLinux.enable = true;
+
   # ── QA env: forzar binarios de Nix, no downloads de npm ────
   home.sessionVariables = {
     # Playwright: usar navegadores empaquetados por nixpkgs
@@ -196,7 +208,7 @@
   home.shellAliases = {
     ns = "nix search nixpkgs";
     nixup = "nix flake update --flake ~/dotfiles-dizzi/nixconf";
-    nixrb = "sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2";
+    nixrb = "~/.local/bin/nixconf-rebuild"; # rebuild sistema+HM con tmpfs privado en RAM
     nixgc = "sudo nix-collect-garbage -d";
     nixos = "nix-shell -p";
 
