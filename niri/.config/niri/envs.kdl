@@ -5,7 +5,8 @@ environment {
     EDITOR          "nvim"
     GTK_ICON_THEME  "Gruvbox-Plus-Dark"
     XCURSOR_THEME   "Kafka"
-    XCURSOR_SIZE    "24"
+    XCURSOR_SIZE    "35"
+    QT_CURSOR_SIZE  "35"
     // DISPLAY: NO hardcodear. niri spawnea xwayland-satellite y gestiona
     // DISPLAY para sus procesos. Hardcodear :0 chocaba con el Xorg de SDDM-X11
     // (que ocupa :0 con -noreset y auth) mientras el satellite real iba a :1.

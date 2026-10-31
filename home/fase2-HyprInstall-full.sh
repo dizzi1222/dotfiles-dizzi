@@ -1974,10 +1974,12 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
 
-  # Para solucionar gnome Keyring en SDDM y GNOME
+  # Para solucionar gnome Keyring y permitir login con Enter en SDDM
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
-    print_package "Symlink: SDDM pam.d para Gnome Keyring"
+    print_package "Symlink: SDDM pam.d para Gnome Keyring y acceso sin password"
     sudo pacman -S gnome-keyring python-dbus --needed --noconfirm
+    sudo groupadd -f nopasswdlogin
+    sudo usermod -aG nopasswdlogin "$USER" 2>/dev/null || true
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
     # Clave de host para cifrar la credencial del llavero (solo la crea si falta).
     sudo systemd-creds setup >/dev/null 2>&1 || true

@@ -1,7 +1,7 @@
 #%PAM-1.0
-# Login normal con contraseña: pam_gnome_keyring necesita el authtok para
-# desbloquear el llavero. No usar nopasswdlogin aquí o el llavero pedirá
-# la contraseña en cada sesión.
+# Permitir ingresar sin contraseña presionando Enter (AllowEmptyPassword="true")
+auth        sufficient  pam_succeed_if.so user = diego
+auth        sufficient  pam_succeed_if.so user ingroup nopasswdlogin
 auth        include     system-login
 -auth       optional    pam_gnome_keyring.so
 # -auth       optional    pam_kwallet5.so
