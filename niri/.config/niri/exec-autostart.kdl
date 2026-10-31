@@ -86,7 +86,7 @@ spawn-sh-at-startup "input-remapper-control --command start --device 'Compx 2.4G
 spawn-sh-at-startup "input-remapper-control --command start --device 'AT Translated Set 2 keyboard' --preset 'teclado-classmate'"
 
 // DBus
-spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP"
 
 // Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
 // Detecta el compositor activo y aplica la rotación correcta con estado persistente.

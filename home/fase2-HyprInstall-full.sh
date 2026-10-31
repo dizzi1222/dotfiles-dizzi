@@ -1903,12 +1903,28 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/udev/rules.d/99-dualsense-controllers.rules /etc/udev/rules.d/
   fi
 
+  # Sudoers NOPASSWD global para wheel (equivale a NixOS wheelNeedsPassword=false)
+  # Debe ser 99- para tener mayor prioridad que 10-installer
+  if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/99-wheel-nopasswd ]]; then
+    print_package "Sudoers: NOPASSWD para wheel"
+    sudo cp ~/dotfiles-dizzi/etc/sudoers.d/99-wheel-nopasswd /etc/sudoers.d/99-wheel-nopasswd
+    sudo chmod 440 /etc/sudoers.d/99-wheel-nopasswd
+    sudo visudo -cf /etc/sudoers.d/99-wheel-nopasswd
+  fi
+
   # Config de Sudoers POWER para systemctl reboot --force --force
   if [[ -f ~/dotfiles-dizzi/etc/sudoers.d/power ]]; then
-    print_package "Symlink: Sudoers POWER"
-    # sudo ln -sf ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/
-    # como root ejecuta: su - # &
-    # sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power && sudo chmod 440 etc/sudoers.d/power && sudo visudo -c
+    print_package "Sudoers: power commands"
+    sudo cp ~/dotfiles-dizzi/etc/sudoers.d/power /etc/sudoers.d/power
+    sudo chmod 440 /etc/sudoers.d/power
+    sudo visudo -cf /etc/sudoers.d/power
+  fi
+
+  # Polkit NOPASSWD para wheel (elimina diálogos gráficos de contraseña)
+  if [[ -f ~/dotfiles-dizzi/etc/polkit-1/rules.d/49-nopasswd-wheel.rules ]]; then
+    print_package "Polkit: NOPASSWD para wheel"
+    sudo mkdir -p /etc/polkit-1/rules.d
+    sudo cp ~/dotfiles-dizzi/etc/polkit-1/rules.d/49-nopasswd-wheel.rules /etc/polkit-1/rules.d/
   fi
 
   # TIMESHIFT Snapshots config
@@ -1961,8 +1977,17 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
-    sudo pacman -S gnome-keyring --needed --noconfirm
+    sudo pacman -S gnome-keyring python-dbus --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
+    # Clave de host para cifrar la credencial del llavero (solo la crea si falta).
+    sudo systemd-creds setup >/dev/null 2>&1 || true
+  fi
+
+  # Guardar una sola vez la contraseña del llavero y desbloquearlo en cada login.
+  if [[ -f ~/dotfiles-dizzi/home/scripts/keyring-save-password.sh ]]; then
+    print_package "Llavero: desbloqueo automático con contraseña guardada"
+    bash ~/dotfiles-dizzi/home/scripts/keyring-save-password.sh || \
+      print_warning "Llavero: ejecuta luego: bash ~/dotfiles-dizzi/home/scripts/keyring-save-password.sh"
   fi
   # Para SDDM THEME
   [[ -f ~/dotfiles-dizzi/etc/sddm.conf ]] && {
@@ -1970,6 +1995,11 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo pacman -S sddm --needed --noconfirm
     sudo ln -sf ~/dotfiles-dizzi/etc/sddm.conf /etc/sddm.conf
   }
+
+  # El greeter necesita una copia legible fuera de HOME (permisos 700).
+  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Themes ]]; then
+    bash ~/dotfiles-dizzi/home/scripts/sddm-sync-jake.sh
+  fi
 
   # Para reparar problemas con WIFI
   if [[ -f ~/dotfiles-dizzi/etc/modprobe.d/iwlwifi.conf ]]; then
@@ -4044,7 +4074,7 @@ if [[ "$dm_choice" == "1" ]]; then
   print_success "GDM habilitado"
 elif [[ "$dm_choice" == "2" ]]; then
   print_header "Instalando SDDM + Astronaut Theme"
-  sudo pacman -Sy --needed --noconfirm sddm qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
+  sudo pacman -Sy --needed --noconfirm sddm xorg-server xorg-xsetroot qt6-svg qt6-virtualkeyboard qt6-multimedia qt6-multimedia-ffmpeg
   sudo systemctl set-default graphical.target
   sudo systemctl disable gdm lightdm 2>/dev/null || true
   print_success "SDDM instalado"
@@ -4060,11 +4090,17 @@ elif [[ "$dm_choice" == "2" ]]; then
   echo -e "${CYAN}Elige uno de los 10 temas disponibles...${NC}"
   bash setup.sh
   sudo chown -R root:root /usr/share/sddm/themes/sddm-astronaut-theme/
+  # El greeter necesita una copia legible fuera de HOME (permisos 700).
+  if [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Themes ]]; then
+    bash ~/dotfiles-dizzi/home/scripts/sddm-sync-jake.sh
+  fi
   cd ~
   sudo tee /etc/sddm.conf >/dev/null <<EOF
 [Theme]
 Current=sddm-astronaut-theme
 [General]
+DisplayServer=x11-user
+GreeterEnvironment=
 InputMethod=qtvirtualkeyboard
 EOF
   sudo mkdir -p /etc/sddm.conf.d
@@ -4073,6 +4109,10 @@ EOF
 InputMethod=qtvirtualkeyboard
 EOF
   [[ -d /usr/share/sddm/themes/sddm-astronaut-theme/Fonts ]] && sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/ 2>/dev/null && fc-cache -fv >/dev/null
+  # Se mantiene el login normal con contraseña: es lo que permite que PAM
+  # desbloquee gnome-keyring con el authtok. El acceso sin contraseña
+  # (nopasswdlogin) rompe ese desbloqueo y provoca el diálogo del llavero.
+
   sudo systemctl enable sddm
   sudo ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
   cd ~
