@@ -1,0 +1,2 @@
+## Equivalente a NixOS: security.sudo.wheelNeedsPassword = false
+%wheel ALL=(ALL:ALL) NOPASSWD: ALL

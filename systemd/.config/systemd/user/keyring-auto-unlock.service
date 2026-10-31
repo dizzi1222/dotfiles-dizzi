@@ -1,0 +1,14 @@
+[Unit]
+Description=Desbloquear el llavero Login con la contraseña guardada
+After=gnome-keyring-daemon.socket
+Wants=gnome-keyring-daemon.socket
+ConditionPathExists=%h/.config/credstore.encrypted/keyring-password
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+LoadCredentialEncrypted=keyring-password:%h/.config/credstore.encrypted/keyring-password
+ExecStart=/bin/sh -c 'exec /usr/bin/python3 %h/dotfiles-dizzi/home/scripts/keyring-auto-unlock.py < "$CREDENTIALS_DIRECTORY/keyring-password"'
+
+[Install]
+WantedBy=default.target

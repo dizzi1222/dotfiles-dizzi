@@ -1,0 +1,10 @@
+/* Permite a miembros del grupo wheel ejecutar cualquier acción
+ * sin autenticación, equivalente a "sudo NOPASSWD:" pero para
+ * diálogos gráficos (pkexec, etc).
+ * Referencia: security.sudo.wheelNeedsPassword = false (NixOS)
+ * Post: reddit.com/r/cachyos/comments/1s8ih0o */
+polkit.addRule(function(action, subject) {
+  if (subject.isInGroup("wheel")) {
+    return polkit.Result.YES;
+  }
+});
