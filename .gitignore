@@ -30,8 +30,26 @@ Antigravity/.config/Antigravity IDE/User/*
 !Antigravity/.config/Antigravity IDE/User/settings.json
 !Antigravity/.config/Antigravity IDE/User/keybindings.json
 
+# ═══════════════════════════════════════════════════════════
+# GEMINI / ANTIGRAVITY CLI - Datos efímeros, runtime y sesiones
+# ═══════════════════════════════════════════════════════════
+home/.gemini/*
+!home/.gemini/GEMINI.md
+!home/.gemini/settings.json
+home/.gemini/antigravity/
+home/.gemini/antigravity-*/
+home/.gemini/config/
+home/.gemini/history/
+home/.gemini/google_accounts.json
+home/.gemini/projects.json
+home/.gemini/state.json
+home/.gemini/trustedFolders.json
+home/.gemini/installation_id
+*.db-shm
+*.db-wal
+*.db-journal
+
 # MCP específico
-./home/.opencommit
 .mcp-global.json.local
 mcp-config.local.json
 *.mcp-local
@@ -169,6 +187,14 @@ firefox/.mozilla/firefox/*/crashes/
 **/cursor/.config/Cursor/User/globalStorage/
 **/cursor/.config/Cursor/User/workspaceStorage/
 
+# Cursor: conservar solo la configuración de usuario; ignorar cachés,
+# sesiones, historial y datos locales en cursor/.config/Cursor/.
+/cursor/.config/Cursor/*
+!/cursor/.config/Cursor/User/
+/cursor/.config/Cursor/User/*
+!/cursor/.config/Cursor/User/settings.json
+!/cursor/.config/Cursor/User/keybindings.json
+
 # ═══════════════════════════════════════════════════════════
 # CACHES Y TEMPORALES
 # ═══════════════════════════════════════════════════════════
@@ -269,16 +295,16 @@ Session.vim
 # Copilot chat history
 copilot-chat-history/
 home/.opencommit
-*api-keys*
-*.env
 
-# Archivos sensibles
-home/.opencommit
-.opencommit
-**/.opencommit
-*api-keys*
-*.env
-.env.*
+# ═══════════════════════════════════════════════════════════
+# WINE - ASSETS GENERADOS AUTOMÁTICAMENTE
+# Los .desktop de wine-extension y wine/Programs los genera wine
+# al configurar el prefix (rutas absolutas a ~/.wine, no portables).
+# mimeinfo.cache es caché regenerable.
+# ═══════════════════════════════════════════════════════════
+local/.local/share/applications/wine-extension-*.desktop
+local/.local/share/applications/wine/
+local/.local/share/applications/mimeinfo.cache
 
 # Replit (app .desktop + icono descargados)
 # local/.local/share/applications/Replit*
