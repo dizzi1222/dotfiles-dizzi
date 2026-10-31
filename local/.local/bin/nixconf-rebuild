@@ -10,6 +10,8 @@
 #     disk  : no cambia nada
 #     /ruta : directorio propio (ideal: otro disco con espacio)
 #   MIN_FREE_GB=10   umbral de disco libre en /
+#   MIN_OUTPUT_FREE_GB=6  piso absoluto: por debajo se aborta porque los
+#                    outputs finales siempre se escriben en /nix aunque TMP sea RAM
 #   MIN_RAM_GB=8     RAM disponible mínima para permitir el modo ram
 #                    (con ~10G de MemAvailable reales, 10G truncaba a 9 → no
 #                    activaba el tmpfs; 8G lo activa. La RAM justa ya no pide
@@ -33,6 +35,7 @@ TARGET_USER="diego"
 HOST="thinkpad-x1e2"
 
 MIN_FREE_GB="${MIN_FREE_GB:-10}"
+MIN_OUTPUT_FREE_GB="${MIN_OUTPUT_FREE_GB:-6}"
 MIN_RAM_GB="${MIN_RAM_GB:-8}"
 NIXRB_TMP="${NIXRB_TMP:-auto}"
 RAM_DIR="/mnt/nixrb-build"
@@ -62,9 +65,18 @@ detect_hm() {
 
 # ── Lógica de TMP ────────────────────────────────────────────────
 free_gb=$(df -BG --output=avail / | sed -n '2p' | tr -dc '0-9')
+free_bytes=$(df -B1 --output=avail / | sed -n '2p' | tr -dc '0-9')
 ram_gb=$(awk '/MemAvailable/ {printf "%d", $2/1048576}' /proc/meminfo)
 free_gb="${free_gb:-0}"
+free_bytes="${free_bytes:-0}"
 ram_gb="${ram_gb:-0}"
+
+min_output_bytes=$(( MIN_OUTPUT_FREE_GB * 1024 * 1024 * 1024 ))
+if [ "$free_bytes" -lt "$min_output_bytes" ]; then
+  echo "${C_RED}✗ Solo hay ${free_gb}G libres en /; el piso para reconstruir es ${MIN_OUTPUT_FREE_GB} GiB.${C_RST}" >&2
+  echo "  Ejecutá nixconf-cleanup o liberá espacio antes del rebuild." >&2
+  exit 1
+fi
 
 BUILD_TMP=""
 case "$NIXRB_TMP" in

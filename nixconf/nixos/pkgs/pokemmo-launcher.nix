@@ -23,15 +23,11 @@ let
     ];
 
     runScript = writeShellScript "pokemmo-run" ''
-      # Asegurar DISPLAY: bajo niri/Hypr el Xwayland puede estar caído y java
-      # muere con HeadlessException. Lo levantamos si no hay X activo.
+      # DISPLAY lo provee el compositor: niri lo setea al display real de su
+      # xwayland-satellite (p.ej. :1) y Hyprland gestiona el suyo. NO hardcodear
+      # :0 (choca con el Xorg de SDDM-X11, que exige auth). Fallback: :1.
       if [ -z "''${DISPLAY:-}" ]; then
-        [ -S /tmp/.X11-unix/X0 ] || systemctl --user start xwayland-satellite.service 2>/dev/null || true
-        for _ in $(seq 1 20); do
-          [ -S /tmp/.X11-unix/X0 ] && break
-          sleep 0.5
-        done
-        export DISPLAY=:0
+        export DISPLAY=:1
       fi
 
       POKEMMO_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/pokemmo"
