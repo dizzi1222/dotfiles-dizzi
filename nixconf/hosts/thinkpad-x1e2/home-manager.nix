@@ -28,10 +28,9 @@
     enable = true;
     # Parcheado: fix del bug "Uninstall Extension" en el store para no-instaladas.
     package = vicinaePatchedPkg;
-    systemd = {
-      enable = true;
-      autoStart = true;
-    };
+    # Cada compositor lo inicia una sola vez con su entorno gráfico real.
+    # Evita competir contra un servicio atado a graphical-session.target.
+    systemd.enable = false;
     # Exportado desde ~/.config/vicinae/settings.json (imperativo → declarativo).
     settings = {
       theme = {
@@ -59,7 +58,27 @@
         "applications:waydroid-start-sd"
         "applications:Stremio_Web"
       ];
+      fallbacks = [ "files:search" ];
       providers = {
+        files = {
+          preferences = {
+            autoIndexing = true;
+            indexingPaths = map (path: "${homeDirectory}/${path}") [
+              "Documentos"
+              "Documents"
+              "Descargas"
+              "Escritorio"
+              "Imágenes"
+              "Pictures"
+              "Música"
+              "Vídeos"
+              "workspace"
+              "Proyectos"
+              "dotfiles-dizzi"
+            ];
+            excludedIndexingPaths = [ ];
+          };
+        };
         "@meshal/store.raycast.antigravity" = {
           entrypoints = {
             open-with-antigravity = {

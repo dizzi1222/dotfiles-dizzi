@@ -15,7 +15,8 @@
     MOZ_ENABLE_WAYLAND = "1";
     _JAVA_AWT_WM_NONREPARENTING = "1";
     CLUTTER_BACKEND = "wayland";
-    SDL_VIDEODRIVER = "wayland";
+    # Steam/SDL recomienda permitir X11 como fallback bajo Xwayland.
+    SDL_VIDEODRIVER = "wayland,x11";
     ECORE_EVAS_ENGINE = "wayland";
   };
 
