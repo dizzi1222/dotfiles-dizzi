@@ -842,8 +842,57 @@
                   cleanup_dir "Antigravity-IDE Code Cache" "$HOME/.antigravity-ide/Code Cache"
                   cleanup_dir "Antigravity-IDE logs" "$HOME/.antigravity-ide/logs"
 
-                  # Vicinae (índice retenido ~1.4GB borrado-abierto + store cache)
-                  cleanup_dir "Vicinae cache" "$HOME/.cache/vicinae"
+                  # Vicinae (protección del índice: solo resetear si supera 1 GiB)
+                  # Detiene Vicinae antes de borrar, limpia SOLO file-indexer,
+                  # nunca toca extensiones, configuración ni portapapeles.
+                  cleanup_vicinae_index() {
+                    local index_dir="$HOME/.cache/vicinae/file-indexer"
+                    local vicinae_pid
+
+                    [ -d "$index_dir" ] || return
+
+                    local index_bytes
+                    index_bytes=$(du -sb "$index_dir" 2>/dev/null | cut -f1)
+                    [ -z "$index_bytes" ] && index_bytes=0
+
+                    # Solo actúa si el índice supera 1 GiB (1073741824 bytes)
+                    if [ "$index_bytes" -lt 1073741824 ] 2>/dev/null; then
+                      echo -e "   Vicinae index: $(human "$index_bytes") (bajo 1 GiB — omitido)"
+                      return
+                    fi
+
+                    local index_size
+                    index_size=$(human "$index_bytes")
+                    echo -ne "Cleaning Vicinae index... found ''${RED}$index_size''${NC}"
+
+                    # Detener Vicinae
+                    vicinae_pid=$(pgrep -x vicinae-server 2>/dev/null || true)
+                    if [ -n "$vicinae_pid" ]; then
+                      systemctl --user stop vicinae.service 2>/dev/null || true
+                      kill -TERM "$vicinae_pid" 2>/dev/null || true
+                      for _ in $(seq 1 20); do
+                        kill -0 "$vicinae_pid" 2>/dev/null || break
+                        sleep 0.25
+                      done
+                    fi
+
+                    # Borrar SOLO el índice (file-indexer), no extensiones/config
+                    find "$index_dir" -mindepth 1 -type f -delete 2>/dev/null
+                    find "$index_dir" -mindepth 1 -depth -type d -empty -delete 2>/dev/null
+
+                    # Restaurar Vicinae
+                    if [ -n "$vicinae_pid" ]; then
+                      systemctl --user start vicinae.service 2>/dev/null || true
+                      # Si systemd no lo gestiona (enable=false), arrancar directo
+                      if ! systemctl --user is-active --quiet vicinae.service 2>/dev/null; then
+                        nohup vicinae server >/dev/null 2>&1 &
+                      fi
+                    fi
+
+                    echo -e " ''${GREEN}✓''${NC} (extensiones y config intactas)"
+                  }
+
+                  cleanup_vicinae_index
 
                   sec_end "Editores (Cursor/Antigravity) + Vicinae"
 

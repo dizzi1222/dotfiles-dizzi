@@ -56,12 +56,15 @@
     auto-optimise-store = true;
     # Permite que Home Manager dirija los temporales de build a /dev/shm.
     trusted-users = [ "diego" ];
-    # GC automático cuando el disco libre baja de 2 GiB.
+    # GC automático antes de que las aplicaciones de usuario alcancen ENOSPC.
     # min-free: umbral en bytes → el daemon corre nix-collect-garbage
-    #           hasta recuperar max-free. Mantiene controlado el uso
-    #           del disco en máquinas con NVMe pequeño como el X1E2.
-    min-free = 2 * 1024 * 1024 * 1024;
-    max-free = 4 * 1024 * 1024 * 1024;
+    #           hasta recuperar max-free. Debe ser un valor REALISTA: con el
+    #           disco al ~95% (Bottles+Steam+/nix), un umbral de 10 GiB nunca
+    #           se satisface y el auto-GC entra en bucle hasta crashear
+    #           (SIGSEGV en collectGarbage). 4 GiB sí es alcanzable; la
+    #           limpieza agresiva real la hace `nixconf-cleanup`.
+    min-free = 4 * 1024 * 1024 * 1024;
+    max-free = 8 * 1024 * 1024 * 1024;
   };
 
   # ── Garbage Collector automático ────────────────────────────
@@ -90,6 +93,8 @@
   # ];
 
   # ── Desktop Environments ───────────────────────────────────
+  services.xserver.enable = true;
+
   # Cinnamon: el DE que se usa (X11).
   services.xserver.desktopManager.cinnamon.enable = true;
   # Plasma6 DESHABILITADO: el modulo mete kate (el editor por defecto de KDE)
@@ -336,7 +341,7 @@
   # ── Display Manager (SDDM with Astronaut "Jake the Dog" theme) ──
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = true;
+    wayland.enable = false;
     theme = "sddm-astronaut-theme";
     extraPackages = with pkgs; [
       kdePackages.qtmultimedia
@@ -718,7 +723,7 @@
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      START_CHARGE_THRESH_BAT0 = 40;
+      START_CHARGE_THRESH_BAT0 = 50;
       STOP_CHARGE_THRESH_BAT0 = 80;
       USB_AUTOSUSPEND = 0;
     };

@@ -19,8 +19,8 @@ spawn-sh-at-startup "powerprofilesctl set performance" // Usa balanced si quiere
 spawn-sh-at-startup "sh ~/.config/eww/scripts/toggle-game-mode.sh"
 
 // Desktop environment
-// vicinae: el daemon lo levanta vicinae.service (systemd user). NO usar
-// spawn-sh-at-startup "vicinae server" // descomentar si no usas systemd
+// Instancia única; Home Manager no la duplica con systemd.
+spawn-at-startup "vicinae" "server"
 spawn-sh-at-startup "xdg-mime default nemo.desktop inode/directory application/x-desktop"
 // ##################
 // # ARRANCAR NEMO  #
@@ -86,7 +86,7 @@ spawn-sh-at-startup "input-remapper-control --command start --device 'Compx 2.4G
 spawn-sh-at-startup "input-remapper-control --command start --device 'AT Translated Set 2 keyboard' --preset 'teclado-classmate'"
 
 // DBus
-spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP"
 
 // Configs DIZZI - Toggle Monitor Rotation (vertical ↔ horizontal)
 // Detecta el compositor activo y aplica la rotación correcta con estado persistente.
@@ -99,7 +99,7 @@ spawn-sh-at-startup "sleep 4; pkill -x steam || true; sleep 1; exec steam -silen
 spawn-sh-at-startup "sleep 5; pkill -x discord || true; sleep 1; exec discord --start-minimized"
 
 // Antimicrox Gamepad Keyboard Mapping Tool
-spawn-at-startup "antimicrox --show %f"
+// spawn-at-startup "antimicrox" "--tray"
 // Sunshine
 // spawn-at-startup "sunshine"
 // Sunshine: NO lanzar aquí — el service `sunshine.service` (system, bloque T4d
