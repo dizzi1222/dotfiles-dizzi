@@ -61,6 +61,13 @@ in
   systemd.user.services.flameshot.Unit.ConditionEnvironment =
     "XDG_CURRENT_DESKTOP=Hyprland";
 
+  # ── Vortex crash dumps ───────────────────────────────────────
+  # Los dumps de Vortex no son saves ni mods. systemd-tmpfiles elimina a diario
+  # solo reportes de crash con más de siete días dentro de la bottle.
+  systemd.user.tmpfiles.rules = [
+    "e %h/.var/app/com.usebottles.bottles/data/bottles/bottles/vortex/drive_c/users/diego/AppData/Roaming/Vortex/temp/dumps/reports - - - 7d -"
+  ];
+
   # ── Rclone mounts (sistema) ───────────────────────────────
   # Re-montan ~/mi_gdrive, ~/mi_gdmusica y ~/mi_gdlibros sin depender del hook
   # post-sleep de systemd-sleep (que muere con KillMode=control-group). Los

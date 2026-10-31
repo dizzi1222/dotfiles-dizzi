@@ -1,0 +1,8 @@
+
+[Desktop Entry]
+Type=Application
+Name=Stardew Valley
+Icon=lutris_stardew-valley
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132
+Categories=Game
+TryExec=lutris
