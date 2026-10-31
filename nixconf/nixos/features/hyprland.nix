@@ -1,5 +1,8 @@
 { config, pkgs, inputs, ... }:
 
+let
+  antimicroxX11 = pkgs.callPackage ../pkgs/antimicrox-x11.nix { };
+in
 {
   # ── Hyprland (System Level) ────────────────────────────────
   programs.hyprland = {
@@ -108,7 +111,7 @@
     bluetui
 
     # Input devices / controllers
-    antimicrox
+    antimicroxX11
     evtest
     sc-controller
 
