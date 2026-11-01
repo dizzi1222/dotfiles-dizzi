@@ -4115,6 +4115,32 @@ EOF
   # desbloquee gnome-keyring con el authtok. El acceso sin contraseña
   # (nopasswdlogin) rompe ese desbloqueo y provoca el diálogo del llavero.
 
+  cat <<'EOF'
+
+SDDM y el llavero de GNOME (Seahorse):
+  El diálogo «El depósito de claves de inicio de sesión no se desbloqueó»
+  pide la contraseña del llavero. Al entrar en SDDM sin contraseña, PAM
+  no recibe la clave necesaria para desbloquearlo automáticamente.
+
+  Para conservar el cifrado del llavero, desbloquéalo una vez por sesión
+  o inicia sesión con contraseña en SDDM. Para el desbloqueo automático,
+  la contraseña del llavero debe coincidir con la del inicio de sesión.
+
+  Si prefieres entrar sin contraseña y evitar también el diálogo del llavero:
+    1. Abre «Contraseñas y claves» ejecutando seahorse, sin sudo.
+       Si no está instalado: sudo pacman -S --needed seahorse
+    2. En «Contraseñas», haz clic derecho en «Inicio de sesión» / «Login».
+    3. Selecciona «Cambiar contraseña» e introduce la contraseña actual
+       del llavero (normalmente la de tu usuario).
+    4. Deja vacías la contraseña nueva y su confirmación.
+    5. Acepta el aviso de almacenar sin cifrar y prueba en la siguiente sesión.
+
+  IMPORTANTE: esta opción conserva las claves guardadas, pero elimina
+  el cifrado propio de ese llavero en disco. No cambia la contraseña de sudo.
+  No necesitas borrar el llavero ni crear una entrada con su propia clave.
+  El instalador no cambia la contraseña del llavero: es una decisión manual.
+EOF
+
   sudo systemctl enable sddm
   sudo ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
   cd ~

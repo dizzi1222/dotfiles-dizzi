@@ -7,11 +7,17 @@
   },
   "mcp": {
     "engram": {
-      "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
-      "enabled": true,
-      "type": "local"
+      "type": "local",
+      "command": [
+        "/lib64/ld-linux-x86-64.so.2",
+        "/home/diego/.local/bin/engram",
+        "mcp",
+        "--tools=agent"
+      ],
+      "enabled": true
     },
     "figma": {
+      "type": "local",
       "command": [
         "npx",
         "-y",
@@ -19,8 +25,7 @@
         "--figma-api-key={env:FIGMA_API_KEY}",
         "--stdio"
       ],
-      "enabled": true,
-      "type": "local"
+      "enabled": true
     },
     "composio-connect": {
       "type": "remote",
@@ -29,40 +34,9 @@
       "headers": {
         "x-api-key": "{env:COMPOSIO_API_KEY}"
       }
-    },
-    "webshare-uk": {
-      "type": "local",
-      "command": [
-        "node",
-        "/home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-        "DI_USER": "{env:WS_USER}",
-        "DI_PASS": "{env:WS_PASS}",
-        "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-        "DI_PROXY_PORT": "REDACTED"
-      },
-      "enabled": true
-    },
-    "webshare-us": {
-      "type": "local",
-      "command": [
-        "node",
-        "/home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-        "DI_USER": "{env:WS_USER}",
-        "DI_PASS": "{env:WS_PASS}",
-        "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-        "DI_PROXY_PORT": "REDACTED"
-      },
-      "enabled": true
     }
   },
-  "plugins": [
-    "opencode-gemini-auth@latest",
-    "/home/diego/workspace/opencode-discord-rpc"
-  ],
+  "plugins": ["opencode-gemini-auth@latest"],
   "small_model": "opencode/deepseek-v4-flash-free",
   "provider": {
     "google": {
