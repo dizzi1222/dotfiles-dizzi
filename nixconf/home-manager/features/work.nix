@@ -52,6 +52,7 @@
     kdePackages.filelight
     peazip
     p7zip
+    unrar
     git
     lazygit
     lazysql
