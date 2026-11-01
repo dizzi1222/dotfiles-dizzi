@@ -83,6 +83,10 @@
         # instalación exista en ~/.wine-vortex116 antes de lanzar (wine + pty
         # + --disable-gpu). El binario es `vortex-wine`, el .desktop "Vortex (Wine)".
         vortex-wine = prev.callPackage ./packages/vortex-wine.nix { };
+        # OpenCode: nixpkgs sigue en 1.18.x; pin al release prebuilt 2.2.5.
+        # Sin autoPatchelf (rompe Bun compile); usa programs.nix-ld.
+        # Ver packages/opencode-2.2.5.nix.
+        opencode = prev.callPackage ./packages/opencode-2.2.5.nix { };
         # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
         # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
         # El patch pasa `request` como primer argumento (nueva firma).
@@ -93,6 +97,7 @@
         });
       })
     ];
+
 
     pkgs = import nixpkgs {
       inherit system overlays;

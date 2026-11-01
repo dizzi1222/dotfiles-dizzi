@@ -6,5 +6,5 @@
     "theme_list": "<leader>t",
     "variant_list": "<leader>v"
   },
-  "plugin": ["opencode-subagent-statusline"]
+  "plugin": []
 }

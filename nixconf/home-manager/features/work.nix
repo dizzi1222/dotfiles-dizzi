@@ -3,7 +3,7 @@
 {
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
-    cursor-cli
+    # cursor-cli
     # Editors
     code-cursor # neocursor.nvim requiere la APP
     # antigravity-ide
@@ -81,8 +81,9 @@
     # gemini-cli # Deshabilitado: Reemplazado por antigravity-cli (agy). Usar alias `gemini` -> `agy`
     antigravity-cli
     # claude-code
-    opencode
+    opencode # overlay → packages/opencode-2.2.5.nix (no nixpkgs 1.18.x)
     # qwen-code
+
     # (mistral-vibe.overrideAttrs (old: { doCheck = false; }))
     # openclaw # Omitido: requiere construir monorepo gigante de 1390 paquetes pnpm; ejecutar via npx openclaw si se necesita
     codex # Codex desktop en @codexDesktopLinux-L197
