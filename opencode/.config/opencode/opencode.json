@@ -30,18 +30,6 @@
         "x-api-key": "{env:COMPOSIO_API_KEY}"
       }
     },
-    "dataimpulse": {
-      "type": "local",
-      "command": [
-        "node",
-        "/home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-        "DI_USER": "{env:DI_USER}",
-        "DI_PASS": "{env:DI_PASS}"
-      },
-      "enabled": true
-    },
     "webshare-uk": {
       "type": "local",
       "command": [
@@ -71,7 +59,7 @@
       "enabled": true
     }
   },
-  "plugin": [
+  "plugins": [
     "opencode-gemini-auth@latest",
     "/home/diego/workspace/opencode-discord-rpc"
   ],
