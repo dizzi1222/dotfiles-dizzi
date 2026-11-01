@@ -1,5 +1,5 @@
 #!/bin/bash
-# ~/.config/eww/scripts/game-mode.sh
+# toggle-game-mode.sh — configuración visual de gaming
 
 STATE_FILE="/tmp/hypr_game_mode"
 
@@ -27,32 +27,16 @@ apply_config() {
   done
 }
 
-apply_charge() {
-  local mode="$1"
-  if command -v tlp >/dev/null 2>&1; then
-    if [ "$mode" = "full" ]; then
-      # Modo gaming: carga completa (100%) vía fullcharge.
-      sudo -n tlp fullcharge >/dev/null 2>&1 || true
-    else
-      # Modo desktop: umbral 50/80 (solo thresholds; NO toca el perfil
-      # balanced/performance, eso lo gestiona el script de power-modes).
-      sudo -n tlp setcharge 50 80 >/dev/null 2>&1 || true
-    fi
-  fi
-}
-
 case "${1:-toggle}" in
 on)
   apply_config "${GAME_CONFIG[@]}"
-  apply_charge full
   touch "$STATE_FILE"
-  notify-send "🚀 Modo Juego Activado" "Hyprland optimizado + carga 100%"
+  notify-send "🚀 Modo Juego Activado" "Hyprland optimizado"
   ;;
 off)
   apply_config "${DEFAULT_CONFIG[@]}"
-  apply_charge desktop
   rm -f "$STATE_FILE"
-  notify-send "🎮 Modo Juego Desactivado" "Configuración normal + carga 50/80"
+  notify-send "🎮 Modo Juego Desactivado" "Configuración visual normal"
   ;;
 status)
   [[ -f "$STATE_FILE" ]] && echo "active" || echo "inactive"
