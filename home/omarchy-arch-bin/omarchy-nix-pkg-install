@@ -1,0 +1,195 @@
+#!/bin/bash
+# Instalador temporal de paquetes de nixpkgs mediante nix shell
+
+set -uo pipefail
+
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+RESET='\033[0m'
+NIX_LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+NIX_LOG_FILE="$NIX_LOG_DIR/nix-temporary-install.log"
+
+print_error() {
+  echo -e "${RED}❌ $1${RESET}" >&2
+}
+
+prepare_nix_log() {
+  mkdir -p "$NIX_LOG_DIR" 2>/dev/null || true
+  {
+    printf 'Fecha: %s\n' "$(date --iso-8601=seconds)"
+    printf 'Modo: %s\n' "${install_mode:-desconocido}"
+    printf 'Paquetes: %s\n' "${packages[*]:-desconocidos}"
+    df -h --output=avail /nix/store 2>/dev/null | tail -n 1 | sed 's/^/Espacio libre: /'
+    printf '\n'
+  } > "$NIX_LOG_FILE" 2>/dev/null || true
+}
+
+run_nix_with_log() {
+  local log_pid
+  local command_status
+
+  prepare_nix_log
+
+  # Conserva el progreso de Nix visible mientras tee escribe el mismo stderr
+  # en el log. Cerrar el descriptor y esperar evita notificaciones incompletas.
+  exec 3> >(tee -a "$NIX_LOG_FILE" >&2)
+  log_pid=$!
+
+  "$@" 2>&3
+  command_status=$?
+
+  exec 3>&-
+  wait "$log_pid" 2>/dev/null || true
+
+  return "$command_status"
+}
+
+pause_after_error() {
+  gum input --placeholder 'Presiona Enter para cerrar...' >/dev/null 2>&1 || true
+}
+
+for command_name in nix tv gum nix-search-tv; do
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    print_error "No se encontró '$command_name'."
+    echo "Instálalo o verifica la configuración de Nix antes de continuar."
+    if command -v gum >/dev/null 2>&1; then
+      pause_after_error
+    else
+      read -r -p 'Presiona Enter para cerrar...' || true
+    fi
+    exit 1
+  fi
+done
+
+echo -e "${CYAN}🔍 Abriendo catálogo Nix...${RESET}"
+echo -e "${YELLOW}TAB: seleccionar varios · ENTER: confirmar · ESC: cancelar${RESET}"
+
+# El canal existente de Television aporta el layout, preview y keybindings:
+# ~/.config/television/cable/nix.toml
+# Sobrescribimos la fuente para limitarla a paquetes de nixpkgs y no mezclar
+# entradas de nixos, home-manager o NUR.
+selected_packages=$(tv nix \
+  --source-command 'nix-search-tv print --indexes nixpkgs 2>/dev/null | sed "/^Indexing packages\\.\\.\\.$/d"' \
+  --preview-command 'nix-search-tv preview {}' \
+  --source-output '{}')
+tv_status=$?
+
+if [ "$tv_status" -ne 0 ] || [ -z "$selected_packages" ]; then
+  echo -e "${YELLOW}ℹ️  No se seleccionaron paquetes.${RESET}"
+  exit 0
+fi
+
+mapfile -t packages <<< "$selected_packages"
+normalized_packages=()
+installables=()
+
+for package in "${packages[@]}"; do
+  # Algunas versiones/configuraciones del canal devuelven `nixpkgs/ paquete`.
+  # El installable de nix shell necesita únicamente el atributo del paquete.
+  if [[ "$package" == nixpkgs/* ]]; then
+    package="${package#nixpkgs/}"
+    package="${package# }"
+  fi
+
+  if [[ ! "$package" =~ ^[[:alnum:]_.+-]+$ ]]; then
+    print_error "Nombre de paquete inválido: $package"
+    pause_after_error
+    exit 1
+  fi
+
+  normalized_packages+=("$package")
+  installables+=("nixpkgs#$package")
+done
+packages=("${normalized_packages[@]}")
+
+echo -e "\n${GREEN}📦 Paquetes seleccionados:${RESET}"
+printf '%s\n' "${packages[@]}" | sed 's/^/  • /'
+echo
+
+install_mode=$(gum choose \
+  --header '¿Cómo quieres usar estos paquetes?' \
+  'Shell temporal' \
+  'Sesión temporal')
+mode_status=$?
+
+if [ "$mode_status" -ne 0 ] || [ -z "$install_mode" ]; then
+  echo -e "${YELLOW}ℹ️  Selección cancelada.${RESET}"
+  exit 0
+fi
+
+if ! gum confirm "¿Continuar con: $install_mode?"; then
+  echo -e "${YELLOW}ℹ️  Instalación cancelada.${RESET}"
+  exit 0
+fi
+
+run_session_mode() {
+  if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+    print_error 'XDG_RUNTIME_DIR no está definido; no se puede crear un perfil de sesión seguro.'
+    return 1
+  fi
+
+  local session_profile="$XDG_RUNTIME_DIR/nix-session-profile"
+
+  echo -e "\n${BLUE}⚙️  Instalando en el perfil temporal de esta sesión...${RESET}"
+  echo -e "${CYAN}Perfil: $session_profile${RESET}"
+
+  # El perfil vive en XDG_RUNTIME_DIR y no modifica el perfil permanente del
+  # usuario. Las opciones de espacio evitan que el auto-GC del daemon bloquee
+  # esta operación puntual; no modifican la configuración global de Nix.
+  NIXPKGS_ALLOW_UNFREE=1 run_nix_with_log nix profile add \
+    --impure \
+    --option min-free 0 \
+    --option max-free 0 \
+    --profile "$session_profile" \
+    "${installables[@]}"
+  local profile_status=$?
+
+  if [ "$profile_status" -ne 0 ]; then
+    print_error 'No se pudieron agregar los paquetes al perfil temporal.'
+    return "$profile_status"
+  fi
+
+  echo -e "\n${GREEN}✅ Paquetes disponibles para toda la sesión de usuario.${RESET}"
+  echo -e "${CYAN}Este perfil no es permanente y se limpia con el runtime de la sesión.${RESET}"
+  echo -e "${CYAN}Las terminales nuevas los cargarán automáticamente.${RESET}"
+  echo -e "${CYAN}En terminales ya abiertas ejecuta: source ~/.zshrc${RESET}\n"
+
+  return 0
+}
+
+case "$install_mode" in
+'Shell temporal')
+  echo -e "\n${BLUE}⚙️  Abriendo shell temporal de Nix...${RESET}"
+  echo -e "${CYAN}Nota: los paquetes no se agregan a ningún perfil. Sal con 'exit' para cerrar.${RESET}\n"
+
+  # NIXPKGS_ALLOW_UNFREE y las opciones de espacio solo se aplican a esta
+  # invocación. Así cualquier atributo seleccionado puede abrir la shell sin
+  # quedar bloqueado por el auto-GC configurado en el daemon.
+  NIXPKGS_ALLOW_UNFREE=1 run_nix_with_log \
+    nix shell --impure \
+    --option min-free 0 \
+    --option max-free 0 \
+    "${installables[@]}"
+  nix_status=$?
+  ;;
+'Sesión temporal')
+  run_session_mode
+  nix_status=$?
+  ;;
+*)
+  print_error "Modo desconocido: $install_mode"
+  exit 1
+  ;;
+esac
+
+if [ "$nix_status" -eq 0 ]; then
+  echo -e "\n${GREEN}✅ $install_mode finalizada.${RESET}"
+else
+  print_error "La operación Nix terminó con código $nix_status."
+  pause_after_error
+fi
+
+exit "$nix_status"

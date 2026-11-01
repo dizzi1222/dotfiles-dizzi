@@ -26,6 +26,19 @@ bindkey '^?' backward-kill-word
 # =============================================================================
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# Paquetes Nix temporales para toda la sesión de usuario. El perfil vive en
+# XDG_RUNTIME_DIR, así que las terminales nuevas lo detectan automáticamente y
+# deja de existir al cerrar la sesión o reiniciar.
+NIX_SESSION_PROFILE="${XDG_RUNTIME_DIR:-}/nix-session-profile"
+if [[ -n "${XDG_RUNTIME_DIR:-}" && -d "$NIX_SESSION_PROFILE/bin" ]]; then
+  case ":$PATH:" in
+    *":$NIX_SESSION_PROFILE/bin:"*) ;;
+    *) export PATH="$NIX_SESSION_PROFILE/bin:$PATH" ;;
+  esac
+fi
+unset NIX_SESSION_PROFILE
+
 # ---------------------------------------------------------------------------------------------
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -782,7 +795,7 @@ gitflow() {
       ;;
     13)
       echo "💾 Savepoint: aplastando al commit raíz..."
-      git reset --soft 3ce8c59e # newbie NixOS savepoitn commit
+      git reset --soft 1f6616d8 # newbie NixOS savepoitn commit
       git add -A
       git commit --amend --no-edit
       echo "✅ Savepoint creado: $(git rev-parse --short HEAD) ($(git rev-list --count HEAD) commits)"

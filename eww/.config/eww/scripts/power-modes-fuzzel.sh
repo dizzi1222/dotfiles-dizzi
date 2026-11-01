@@ -16,6 +16,20 @@ fi
 
 GAME_SCRIPT="$HOME/.config/eww/scripts/toggle-game-mode.sh"
 
+# TLP solo se orquesta desde este selector de modos.
+apply_charge() {
+    local fullcharge="$1"
+    if command -v tlp >/dev/null 2>&1; then
+        if [ "$fullcharge" = true ]; then
+            # Modo gaming/ahorro: carga completa (100%) vía fullcharge.
+            sudo -n tlp fullcharge >/dev/null 2>&1 || true
+        else
+            # Modo desktop/balanced: umbral 30/80. No toca el governor.
+            sudo -n tlp setcharge 30 80 >/dev/null 2>&1 || true
+        fi
+    fi
+}
+
 # Función helper
 game_off() { [[ -f "$GAME_STATE" ]] && bash "$GAME_SCRIPT" off; }
 
@@ -33,25 +47,29 @@ $BLUR_OPTION
 case "$CHOICE" in
     *"Modo Ahorro"*)
         game_off
+        apply_charge true
         eww update power-mode-icon="󰂄"
         cpupower frequency-set -g powersave
-        notify-send "󰂄 Modo Ahorro Activo" "Energía optimizada"
+        notify-send "󰂄 Modo Ahorro Activo" "Energía optimizada + carga completa"
         ;;
 
     *"Modo Equilibrado"*)
         game_off
+        apply_charge false
         eww update power-mode-icon=""
         cpupower frequency-set -g powersave
-        notify-send " Modo Equilibrado" "Configuración normal"
+        notify-send " Modo Equilibrado" "Configuración normal + carga 30/80"
         ;;
 
     *"Modo Juego"*)
         bash "$GAME_SCRIPT"
 
         if [[ -f "$GAME_STATE" ]]; then
+            apply_charge true
             cpupower frequency-set -g performance
             eww update power-mode-icon=""
         else
+            apply_charge false
             cpupower frequency-set -g powersave
             eww update power-mode-icon=""
         fi
@@ -72,10 +90,10 @@ case "$CHOICE" in
     *"RESET"*)
         game_off
         [[ -f "$BLUR_STATE" ]] && hyprctl keyword decoration:blur:enabled false && rm "$BLUR_STATE"
+        apply_charge false
         cpupower frequency-set -g powersave
         hyprctl reload
         eww update power-mode-icon=""
         notify-send "🔄 Sistema Reseteado" "Configuración por defecto"
         ;;
 esac
-
