@@ -830,7 +830,8 @@ print_step "22c/23: Atajo de Termux:Widget"
 read -p "¿Crear atajo de opencode para Termux:Widget? [S/n]: " widget_ok
 if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   WIDGET_DIR="$HOME/.termux/widget/dynamic_shortcuts"
-  mkdir -p "$WIDGET_DIR/icons"
+  ICONS_DIR="$HOME/.shortcuts/icons"
+  mkdir -p "$WIDGET_DIR" "$ICONS_DIR"
 
   # Copia la versión versionada en dotfiles; si no está, la genera al vuelo.
   WIDGET_SRC=""
@@ -851,6 +852,15 @@ WIDGET
   fi
   chmod +x "$WIDGET_DIR/opencode"
   print_success "Atajo creado: $WIDGET_DIR/opencode"
+
+  # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
+  # no en ~/.termux/widget/dynamic_shortcuts/icons.
+  if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/opencode.png" ]]; then
+    cp "$(dirname "$WIDGET_SRC")/icons/opencode.png" "$ICONS_DIR/opencode.png"
+    print_success "Ícono copiado: $ICONS_DIR/opencode.png"
+  else
+    print_info "Ícono opcional: poné un PNG en $ICONS_DIR/opencode.png y recreá los atajos."
+  fi
 
   # Abre la pantalla exacta del permiso para que sea un solo toggle.
   print_info "Android 10+ exige 'Mostrar sobre otras apps' en Termux para lanzar la terminal desde el widget."
