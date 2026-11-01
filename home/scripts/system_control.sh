@@ -273,6 +273,15 @@ case "$ICON" in
     notify-send "system-control" "omarchy-pkg-install: script no encontrado en ~/omarchy-arch-bin/"
   fi
   ;;
+"")
+  if ! command -v nix >/dev/null 2>&1; then
+    kitty --hold -e bash -c 'echo "Nix no está disponible en este sistema"'
+  elif [ -x "$HOME/omarchy-arch-bin/omarchy-nix-pkg-install" ]; then
+    kitty -e "$HOME/omarchy-arch-bin/omarchy-nix-pkg-install"
+  else
+    kitty --hold -e bash -c 'echo "omarchy-nix-pkg-install: script no encontrado en ~/omarchy-arch-bin/"'
+  fi
+  ;;
 "󰣇")
   if [ -x ~/omarchy-arch-bin/omarchy-pkg-aur-install ]; then
     kitty -e ~/omarchy-arch-bin/omarchy-pkg-aur-install
