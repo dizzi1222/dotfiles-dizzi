@@ -16,12 +16,30 @@ Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 | `wofi/.config/wofi/system-control.css` | GTK CSS con paleta wal (hover/selected, Nerd Font) |
 | `eww/.config/eww/scripts/system-menu-manifest.tsv` | Fuente única: categoría / icono / label (64 ítems) |
 | `eww/.config/eww/scripts/system-menu-kw.tsv` | Keywords por icono para búsqueda recursiva |
+| `eww/.config/eww/scripts/toggle-game-mode.sh` | Configuración visual del modo gaming |
+| `eww/.config/eww/scripts/power-modes-fuzzel.sh` | Orquestación de perfiles y carga TLP |
 | `home/omarchy-arch-bin/omarchy-nix-pkg-install` | Selector Television para abrir shells temporales con paquetes de nixpkgs |
 
 ## Añadir un ítem
 1. Edita `system-menu-manifest.tsv` → nueva línea `Categoría<TAB>icono<TAB>Label`
 2. Si querés keywords de búsqueda, agrégalas en `system-menu-kw.tsv`
 3. Crea el handler en `system_control.sh` (bloque `case "$ICON"`)
+
+## Modo gaming y carga TLP
+
+La política persistente de NixOS está en `nixconf/nixos/base-configuration.nix` y
+usa el perfil desktop `30/80`. `power-modes-fuzzel.sh` es el único orquestador de
+TLP; `toggle-game-mode.sh` solo cambia la configuración visual de Hyprland.
+
+| Opción | Efecto visual/CPU | Carga TLP |
+|---|---|---|
+| Modo Ahorro | `powersave` | `true` → `tlp fullcharge` (100%) |
+| Modo Equilibrado | `powersave` | `false` → `tlp setcharge 30 80` |
+| Modo Juego activo | `performance` + layout gaming | `true` → `tlp fullcharge` (100%) |
+| Modo Juego desactivado/reset | `powersave` + layout desktop | `false` → `tlp setcharge 30 80` |
+
+El selector usa `sudo -n`; si TLP o el permiso sudo no están disponibles, la
+operación de carga se omite y el cambio de CPU/layout continúa sin bloquearse.
 
 ## Nix temporal
 
