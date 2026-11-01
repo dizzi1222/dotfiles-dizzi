@@ -10,8 +10,8 @@
 #     disk  : no cambia nada
 #     /ruta : directorio propio (ideal: otro disco con espacio)
 #   MIN_FREE_GB=10   umbral de disco libre en /
-#   MIN_OUTPUT_FREE_GB=6  piso absoluto: por debajo se aborta porque los
-#                    outputs finales siempre se escriben en /nix aunque TMP sea RAM
+#   MIN_OUTPUT_FREE_GB=6  umbral recomendado: por debajo se advierte, pero el
+#                    rebuild continúa porque los cambios pequeños pueden caber
 #   MIN_RAM_GB=8     RAM disponible mínima para permitir el modo ram
 #                    (con ~10G de MemAvailable reales, 10G truncaba a 9 → no
 #                    activaba el tmpfs; 8G lo activa. La RAM justa ya no pide
@@ -73,9 +73,8 @@ ram_gb="${ram_gb:-0}"
 
 min_output_bytes=$(( MIN_OUTPUT_FREE_GB * 1024 * 1024 * 1024 ))
 if [ "$free_bytes" -lt "$min_output_bytes" ]; then
-  echo "${C_RED}✗ Solo hay ${free_gb}G libres en /; el piso para reconstruir es ${MIN_OUTPUT_FREE_GB} GiB.${C_RST}" >&2
-  echo "  Ejecutá nixconf-cleanup o liberá espacio antes del rebuild." >&2
-  exit 1
+  echo "${C_YEL}⚠ Solo hay ${free_gb}G libres en /; se recomiendan ${MIN_OUTPUT_FREE_GB} GiB para reconstruir.${C_RST}" >&2
+  echo "  Continuando igualmente; ejecutá nixconf-cleanup si el build se queda sin espacio." >&2
 fi
 
 BUILD_TMP=""
