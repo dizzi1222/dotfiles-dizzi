@@ -818,6 +818,66 @@ if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 22c: Atajo de Termux:Widget (opencode)
+# ───────────────────────────────────────────────────────────
+# Termux:Widget lee los atajos dinámicos de ~/.termux/widget/dynamic_shortcuts.
+# En Android 10+ el permiso "Mostrar sobre otras apps" va en TERMUX (no en
+# Termux:Widget): sin él, el widget no puede abrir la terminal en foreground.
+# En MIUI/HyperOS se llama "Mostrar ventanas emergentes mientras se ejecuta
+# en segundo plano" y está en Ajustes → Apps → Termux → Otros permisos.
+# ═══════════════════════════════════════════════════════════
+print_step "22c/23: Atajo de Termux:Widget"
+read -p "¿Crear atajo de opencode para Termux:Widget? [S/n]: " widget_ok
+if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
+  WIDGET_DIR="$HOME/.termux/widget/dynamic_shortcuts"
+  mkdir -p "$WIDGET_DIR/icons"
+
+  # Copia la versión versionada en dotfiles; si no está, la genera al vuelo.
+  WIDGET_SRC=""
+  for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
+    if [[ -f "$dir/home/termux/dynamic_shortcuts/opencode" ]]; then
+      WIDGET_SRC="$dir/home/termux/dynamic_shortcuts/opencode"
+      break
+    fi
+  done
+  if [[ -n "$WIDGET_SRC" ]]; then
+    cp "$WIDGET_SRC" "$WIDGET_DIR/opencode"
+  else
+    cat >"$WIDGET_DIR/opencode" <<'WIDGET'
+#!/data/data/com.termux/files/usr/bin/bash
+cd ~
+opencode
+WIDGET
+  fi
+  chmod +x "$WIDGET_DIR/opencode"
+  print_success "Atajo creado: $WIDGET_DIR/opencode"
+
+  # Abre la pantalla exacta del permiso para que sea un solo toggle.
+  print_info "Android 10+ exige 'Mostrar sobre otras apps' en Termux para lanzar la terminal desde el widget."
+  read -p "¿Abrir los ajustes del permiso ahora? [S/n]: " overlay_ok
+  if [[ ! "$overlay_ok" =~ ^[Nn]$ ]]; then
+    if am start -n com.miui.securitycenter/com.miui.permcenter.permissions.PermissionsEditorActivity --es extra_pkgname com.termux >/dev/null 2>&1; then
+      print_success "Ajustes de permisos abiertos (MIUI)"
+    elif am start -a android.settings.action.MANAGE_OVERLAY_PERMISSION -d package:com.termux >/dev/null 2>&1; then
+      print_success "Ajustes de 'Mostrar sobre otras apps' abiertos"
+    elif am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux >/dev/null 2>&1; then
+      print_success "Info de la app Termux abierta"
+    else
+      print_warning "Abrilo a mano: Ajustes → Apps → Termux → Otros permisos → Mostrar ventanas emergentes mientras se ejecuta en segundo plano"
+    fi
+    print_info "En MIUI el permiso se llama 'Mostrar ventanas emergentes mientras se ejecuta en segundo plano'."
+  fi
+
+  # Abre Termux:Widget para que solo quede tocar CREATE SHORTCUTS.
+  read -p "¿Abrir Termux:Widget para crear los atajos? [S/n]: " tw_ok
+  if [[ ! "$tw_ok" =~ ^[Nn]$ ]]; then
+    am start -n com.termux.widget/.activities.TermuxWidgetMainActivity >/dev/null 2>&1 ||
+      print_warning "No se pudo abrir Termux:Widget (¿está instalado?)"
+  fi
+  print_info "Después: mantené presionado el home → Widgets → Termux:Widget → elegí opencode."
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 23: Finalización
 # ═══════════════════════════════════════════════════════════
 print_step "23/23: Finalización"
