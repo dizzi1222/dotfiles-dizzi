@@ -535,3 +535,13 @@ export const Engram: Plugin = async (ctx) => {
     },
   }
 }
+
+// V2 default export for OpenCode v2 plugin API
+export default {
+  id: "engram",
+  server: Engram,
+  setup: async (ctx: any) => {
+    // V2 setup - minimal initialization
+    return { success: true };
+  }
+} as any;
