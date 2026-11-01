@@ -132,10 +132,6 @@ in
     networkmanagerapplet
     udiskie
 
-    # Dev tools
-    opencode
-    # opencode-desktop
-
     # Qt/GTK Wayland
     qt5.qtwayland
     qt6.qtwayland

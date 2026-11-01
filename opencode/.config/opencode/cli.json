@@ -8,19 +8,14 @@
     "theme.switch": "<leader>t",
     "variant.list": "<leader>v"
   },
-  "plugins": [
-    "opencode-subagent-statusline"
-  ],
+  "plugins": [],
   "diffs": {
     "wrap": "word"
   },
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "show"
   },
-  "animations": true,
-  "tabs": {
-    "mode": "on"
-  }
+  "animations": true
 }
