@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Wine Discord IPC Bridge (Bottles)
 Comment=Lanza el bridge manual (0e4ef622) en la botella gaming — lanzar ANTES del juego
-Exec=/home/diego/.local/bin/juegos/wine-discord-ipc-bridge.sh bottles
+Exec=/home/diego/.local/bin/juegos/wine-discord-ipc-bridge-cross.sh bottles
 Icon=wine
 Type=Application
 Terminal=false

@@ -2,8 +2,8 @@
 Version=1.0
 Name=Deepseek AI
 Comment=Open Deepseek AI
-Exec=brave --app="https://chat.deepseek.com/"
-# Exec=zen-browser --new-window --kiosk "https://chat.deepseek.com/"
+Exec=brave-app --app="https://chat.deepseek.com/"
+# Exec=zen-app --new-window --kiosk "https://chat.deepseek.com/"
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Deepseek_AI.png

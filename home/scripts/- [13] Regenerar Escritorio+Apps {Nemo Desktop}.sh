@@ -23,6 +23,10 @@ DOCS="/home/diego/Documents"
 WINE_DESKTOP="/home/diego/.wine/drive_c/users/diego/Desktop"
 # WINE_DOCUMENTS="/home/diego/.wine/drive_c/users/diego/Documents"
 GDRIVE_ICONS="/home/diego/mi_gdrive/Mi unidad/[Documentos]/[Iconos - Status personalizados DISCORD CustomRP]"
+# Bottles (Flatpak) — botella "gaming"
+BOTTLES_BASE="/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming"
+BOTTLES_DESKTOP="$BOTTLES_BASE/drive_c/users/diego/Desktop"
+BOTTLES_CUSTOMRP="$BOTTLES_BASE/drive_c/CustomRP_Icons"
 WINE_CUSTOMRP="/home/diego/.wine/drive_c/CustomRP_Icons"
 
 # =================================================================================
@@ -294,6 +298,36 @@ else
   print_error "No se pudo crear symlink en Desktop de Wine"
 fi
 
+# 3.4: Symlink en Bottles drive_c (para CustomRP en Bottles gaming)
+print_step "Creando symlink en Bottles C:\\ (botella gaming)..."
+if [ -d "$BOTTLES_BASE" ]; then
+  if [ -L "$BOTTLES_CUSTOMRP" ] || [ -e "$BOTTLES_CUSTOMRP" ]; then
+    rm -rf "$BOTTLES_CUSTOMRP"
+  fi
+  if ln -s "$GDRIVE_ICONS" "$BOTTLES_CUSTOMRP" 2>/dev/null; then
+    print_success "Symlink creado: Bottles gaming C:\\CustomRP_Icons"
+  else
+    print_error "No se pudo crear symlink en Bottles gaming"
+  fi
+else
+  print_warning "Bottles gaming no encontrado en $BOTTLES_BASE (se omite)"
+fi
+
+# 3.5: Symlink en Desktop de Bottles (para menús Windows dentro de la botella)
+print_step "Creando symlink en Desktop de Bottles gaming..."
+if [ -d "$BOTTLES_BASE" ]; then
+  if [ -L "$BOTTLES_DESKTOP/CustomRP_Icons" ] || [ -e "$BOTTLES_DESKTOP/CustomRP_Icons" ]; then
+    rm -rf "$BOTTLES_DESKTOP/CustomRP_Icons"
+  fi
+  if ln -s "$GDRIVE_ICONS" "$BOTTLES_DESKTOP/CustomRP_Icons" 2>/dev/null; then
+    print_success "Symlink creado: Bottles gaming Desktop\\CustomRP_Icons"
+  else
+    print_error "No se pudo crear symlink en Desktop de Bottles"
+  fi
+else
+  print_warning "Bottles gaming no encontrado (se omite)"
+fi
+
 # =================================================================================
 # PASO 4: COPIAR ARCHIVOS .crp AL DESKTOP DE WINE
 # =================================================================================
@@ -382,10 +416,22 @@ if [ -L "$WINE_DESKTOP/CustomRP_Icons" ]; then
 fi
 
 echo ""
+echo -e "${GREEN}Archivos en Bottles (gaming):${NC}"
+if [ -L "$BOTTLES_CUSTOMRP" ]; then
+  B_ICON_COUNT=$(find "$BOTTLES_CUSTOMRP" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | wc -l)
+  echo -e "  • Iconos en C:\\CustomRP_Icons: ${GREEN}$B_ICON_COUNT${NC}"
+fi
+if [ -L "$BOTTLES_DESKTOP/CustomRP_Icons" ]; then
+  echo -e "  • Desktop de Bottles CustomRP_Icons: ${GREEN}✓ Enlazado${NC}"
+fi
+
+echo ""
 echo -e "${BLUE}📍 Rutas importantes:${NC}"
 echo -e "  • Escritorio Linux: ${GREEN}~/Escritorio/${NC}"
 echo -e "  • Wine Desktop: ${GREEN}~/.wine/drive_c/users/diego/Desktop/${NC}"
-echo -e "  • CustomRP Icons: ${GREEN}C:\\CustomRP_Icons\\${NC}"
+echo -e "  • Bottles Desktop: ${GREEN}~/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/drive_c/users/diego/Desktop/${NC}"
+echo -e "  • CustomRP Icons (Wine): ${GREEN}C:\\CustomRP_Icons\\${NC}"
+echo -e "  • CustomRP Icons (Bottles): ${GREEN}C:\\CustomRP_Icons\\${NC}"
 
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

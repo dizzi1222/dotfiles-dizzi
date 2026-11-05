@@ -1,0 +1,6 @@
+game:
+  exe: /home/diego/Applications/streaming_scripts/xbox-cloud
+  working_dir: /home/diego
+  name: Xbox Cloud Gaming
+  description: Xbox Cloud Gaming via StreamingServiceLauncher
+  category: Game

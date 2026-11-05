@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+if [ "$EUID" -eq 0 ]; then
+  echo "Please do not run as root"
+  exit 1
+fi
+
+if [ -z "$1" ]; then
+  echo "Usage: steamos-install-streaming-app <appName>"
+  exit 1
+fi
+
+APPNAME="$1"
+mkdir -p "$HOME/Applications/streaming_scripts"
+
+SCRIPT_PATH="$HOME/Applications/streaming_scripts/$APPNAME.sh"
+cat << EOF > "$SCRIPT_PATH"
+#!/bin/bash
+"$HOME/.local/bin/streaming-service-launcher" "$APPNAME"
+EOF
+
+chmod +x "$SCRIPT_PATH"
+
+if command -v steamos-add-to-steam >/dev/null 2>&1 && steamos-add-to-steam "$SCRIPT_PATH" 2>/dev/null; then
+  echo "Added $APPNAME ($SCRIPT_PATH) to Steam!"
+elif command -v steam >/dev/null 2>&1; then
+  # Workaround for KDE 6 kmimetypefinder returning text/x-shellscript instead of application/x-shellscript
+  ENCODED_URL="steam://addnonsteamgame/$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$SCRIPT_PATH")"
+  touch /tmp/addnonsteamgamefile
+  steam "$ENCODED_URL" >/dev/null 2>&1 &
+  echo "Added $APPNAME ($SCRIPT_PATH) to Steam!"
+else
+  echo "Created $SCRIPT_PATH (Steam not found)"
+fi

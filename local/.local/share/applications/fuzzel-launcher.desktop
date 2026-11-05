@@ -4,4 +4,3 @@ Icon=applications-system
 Name=Fuzzel Launcher
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/fuzzel-launcher.sh
 NoDisplay=true
-Hidden=true

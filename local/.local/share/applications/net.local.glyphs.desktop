@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Glyphs Picker
+Exec=/home/diego/scripts/glyphs.sh
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true

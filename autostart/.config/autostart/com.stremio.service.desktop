@@ -9,3 +9,5 @@ Categories=Utility;AudioVideo;Video;Player;
 Keywords=Stremio;Media;Play;
 StartupNotify=true
 Icon=com.stremio.service
+Hidden=false
+

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xbox Cloud Gaming
+Comment=Juega por streaming desde Xbox Cloud Gaming
+Exec="/home/diego/Applications/streaming_scripts/xbox-cloud"
+Icon=xbox-cloud-gaming
+Terminal=false
+Categories=Game;
+StartupNotify=true

@@ -1,0 +1,246 @@
+#!/usr/bin/env bash
+# ============================================================
+# fedora-pkg-install — Buscador/instalador TUI de paquetes Fedora
+# ============================================================
+# Equivalente Bazzite/Fedora a "TV + gum" de Nix/Omarchy:
+#   dnf5 repoquery  ->  índice de paquetes
+#   gum filter      ->  búsqueda fuzzy y selección múltiple
+#   rpm-ostree      ->  instalación real en Bazzite (capa + reboot)
+#
+# En Fedora normal usa `dnf5 install`; en Bazzite detecta
+# /run/ostree-booted y usa `rpm-ostree install`.
+#
+# Uso:
+#   fedora-pkg-install
+#
+# No ejecutar como root.
+# ============================================================
+
+set -uo pipefail
+
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+RESET=$'\033[0m'
+
+die() {
+  echo -e "${RED}✗ $*${RESET}" >&2
+  exit 1
+}
+
+pause() {
+  if command -v gum >/dev/null 2>&1; then
+    gum input --placeholder 'Presiona Enter para cerrar...' >/dev/null 2>&1 || true
+  else
+    read -r -p 'Presiona Enter para cerrar...' || true
+  fi
+}
+
+[ "$(id -u)" -eq 0 ] && die 'No ejecutes este script como root.'
+command -v gum >/dev/null 2>&1 || die 'Falta gum. Instálalo con: brew install gum'
+
+if command -v dnf5 >/dev/null 2>&1; then
+  DNF=dnf5
+elif command -v dnf >/dev/null 2>&1; then
+  DNF=dnf
+else
+  die 'No se encontró dnf5 ni dnf.'
+fi
+export DNF
+
+OSTREE=0
+if [ -e /run/ostree-booted ] || command -v rpm-ostree >/dev/null 2>&1; then
+  OSTREE=1
+fi
+
+if [ "$OSTREE" -eq 1 ] && ! command -v rpm-ostree >/dev/null 2>&1; then
+  die 'Sistema ostree detectado, pero rpm-ostree no está disponible.'
+fi
+
+# Caché del índice: ~/.cache/fedora-pkg-index.txt (TTL 24h)
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+CACHE_FILE="$CACHE_DIR/fedora-pkg-index.txt"
+CACHE_TTL=86400  # 24h en segundos
+
+# Flag --refresh para forzar regeneración
+REFRESH=0
+for arg in "$@"; do
+  case "$arg" in
+    --refresh|-r) REFRESH=1 ;;
+  esac
+done
+
+# Usar caché si existe y no expiro (y no se pidió --refresh)
+INDEX=""
+if [ "$REFRESH" -eq 0 ] && [ -f "$CACHE_FILE" ]; then
+  cache_age=$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0) ))
+  if [ "$cache_age" -lt "$CACHE_TTL" ]; then
+    INDEX="$CACHE_FILE"
+  fi
+fi
+
+# Si no hay caché válido, crear uno nuevo
+if [ -z "$INDEX" ]; then
+  INDEX=$(mktemp "${XDG_RUNTIME_DIR:-/tmp}/fedora-pkg-index.XXXXXX") || die 'No se pudo crear el índice temporal.'
+  trap 'rm -f "$INDEX"' EXIT
+
+  index_packages() {
+    "$DNF" repoquery --available --quiet \
+      --queryformat '%{name}|%{arch}|%{evr}|%{reponame}|%{summary}\n' 2>/dev/null \
+      | awk -F'|' '$2 == "x86_64" || $2 == "noarch"' \
+      | sort -t'|' -k1,1 -u
+  }
+  export -f index_packages
+
+  echo -e "${CYAN}${BOLD}󰣇 Fedora / Bazzite — buscador de paquetes${RESET}"
+  if [ "$OSTREE" -eq 1 ]; then
+    echo -e "${YELLOW}Modo Bazzite: la instalación se hace con rpm-ostree y requiere reinicio.${RESET}"
+  else
+    echo -e "${YELLOW}Modo Fedora: la instalación se hace con $DNF.${RESET}"
+  fi
+
+  gum spin --spinner dot --title 'Indexando paquetes Fedora (primera vez / --refresh)...' -- \
+    bash -c 'index_packages > "$1"' _ "$INDEX"
+  spin_status=$?
+  [ "$spin_status" -eq 0 ] || die 'Falló la indexación de paquetes.'
+  [ -s "$INDEX" ] || die 'El índice quedó vacío. Revisa la conexión o los repositorios.'
+
+  # Guardar en caché para próximas ejecuciones
+  mkdir -p "$CACHE_DIR"
+  cp "$INDEX" "$CACHE_FILE"
+  echo -e "${GREEN}✓ Índice guardado en $CACHE_FILE (válido 24h). Use --refresh para forzar actualización.${RESET}"
+else
+  echo -e "${CYAN}${BOLD}󰣇 Fedora / Bazzite — buscador de paquetes${RESET} ${GREEN}(caché)${RESET}"
+  if [ "$OSTREE" -eq 1 ]; then
+    echo -e "${YELLOW}Modo Bazzite: la instalación se hace con rpm-ostree y requiere reinicio.${RESET}"
+  else
+    echo -e "${YELLOW}Modo Fedora: la instalación se hace con $DNF.${RESET}"
+  fi
+fi
+
+
+COUNT=$(wc -l < "$INDEX")
+echo -e "${GREEN}✓${RESET} $COUNT paquetes disponibles.\n"
+
+# Pre-filtrado: input query -> grep -> gum filter
+# Reduce 67K items a ~100-500 antes del TUI = latencia input instantánea
+QUERY=$(gum input \
+  --placeholder "Buscar paquete (ej: kitty, htop, neovim)..." \
+  --prompt " > " \
+  --width 60)
+[ -z "$QUERY" ] && { echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"; exit 0; }
+
+FILTERED=$(grep -i "$QUERY" "$INDEX")
+FILTERED_COUNT=$(echo "$FILTERED" | grep -c '^')
+[ "$FILTERED_COUNT" -eq 0 ] && { echo -e "${YELLOW}No hay coincidencias para: $QUERY${RESET}"; pause; exit 0; }
+
+echo -e "${GREEN}✓${RESET} $FILTERED_COUNT coincidencias para \"$QUERY\" (de $COUNT).\n"
+
+SELECTED=$(echo "$FILTERED" | gum filter \
+  --strict \
+  --no-limit \
+  --no-sort \
+  --height 25 \
+  --header "Fedora · $FILTERED_COUNT resultados · TAB selecciona · ENTER confirma" \
+  --placeholder "Refinar búsqueda..." )
+filter_status=$?
+
+if [ "$filter_status" -ne 0 ] || [ -z "$SELECTED" ]; then
+  echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"
+  exit 0
+fi
+
+mapfile -t packages < <(
+  printf '%s\n' "$SELECTED" \
+    | cut -d'|' -f1 \
+    | sed '/^$/d' \
+    | sort -u
+)
+
+[ "${#packages[@]}" -gt 0 ] || die 'No se seleccionó ningún paquete válido.'
+
+pending=()
+installed=()
+for pkg in "${packages[@]}"; do
+  if rpm -q --quiet "$pkg" >/dev/null 2>&1; then
+    installed+=("$pkg")
+  else
+    pending+=("$pkg")
+  fi
+done
+
+if [ "${#installed[@]}" -gt 0 ]; then
+  echo -e "${YELLOW}Ya instalados:${RESET} ${installed[*]}"
+fi
+
+if [ "${#pending[@]}" -eq 0 ]; then
+  echo -e "${GREEN}✓ No hay nada nuevo que instalar.${RESET}"
+  pause
+  exit 0
+fi
+
+echo -e "\n${BOLD}Paquetes a instalar:${RESET}"
+printf '  • %s\n' "${pending[@]}"
+echo
+
+if ! gum confirm "¿Instalar ${#pending[@]} paquete(s)?"; then
+  echo -e "${YELLOW}ℹ  Instalación cancelada.${RESET}"
+  exit 0
+fi
+
+if [ "$OSTREE" -eq 1 ]; then
+  echo -e "\n${CYAN}Creando capa rpm-ostree...${RESET}"
+  # rpm-ostree en el host no acepta --disablerepo (solo en container build).
+  # Si updates-archive da 404, se ofrece un override en /etc/yum.repos.d.
+  INSTALL_LOG=$(mktemp "${XDG_RUNTIME_DIR:-/tmp}/fedora-pkg-rpm-ostree.XXXXXX")
+  if ! sudo rpm-ostree install --idempotent "${pending[@]}" 2>&1 | tee "$INSTALL_LOG"; then
+    if grep -q 'updates-archive' "$INSTALL_LOG"; then
+      echo
+      echo -e "${YELLOW}El repo updates-archive está fallando (404 en Fedora 45).${RESET}"
+      if gum confirm '¿Deshabilitar updates-archive y reintentar?'; then
+        sudo tee /etc/yum.repos.d/fedora-updates-archive.repo >/dev/null <<'EOF'
+[updates-archive]
+enabled=0
+EOF
+        echo -e "${CYAN}Reintentando sin updates-archive...${RESET}"
+        if ! sudo rpm-ostree install --idempotent "${pending[@]}"; then
+          echo -e "${RED}Falló el reintento de rpm-ostree.${RESET}"
+          rm -f "$INSTALL_LOG"
+          pause
+          exit 1
+        fi
+      else
+        echo -e "${YELLOW}Instalación cancelada.${RESET}"
+        rm -f "$INSTALL_LOG"
+        pause
+        exit 1
+      fi
+    else
+      echo
+      echo -e "${RED}Falló rpm-ostree install.${RESET}"
+      echo "Revisa el log: $INSTALL_LOG"
+      pause
+      exit 1
+    fi
+  fi
+  rm -f "$INSTALL_LOG"
+
+  echo
+  if gum confirm '¿Reiniciar ahora para aplicar los paquetes?'; then
+    systemctl reboot
+  else
+    echo -e "${YELLOW}Los paquetes quedan en la próxima deployment.${RESET}"
+    echo 'Reinicia cuando quieras con: systemctl reboot'
+    pause
+  fi
+else
+  echo
+  if ! sudo "$DNF" install "${pending[@]}"; then
+    pause
+    exit 1
+  fi
+  echo -e "\n${GREEN}✓ Instalación completada.${RESET}"
+  pause
+fi

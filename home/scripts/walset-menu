@@ -3,8 +3,30 @@
 # Configs DIZZI - Wallpaper Selector con Animaciones Aleatorias
 #######################################################################################
 
-# Directorio de wallpapers
-WALL_DIR="$HOME/wallpapers/wallpapers/wallpapers/"
+# Directorio de wallpapers — detectado por condicionales (soporta Bazzite, Nix, etc.)
+CANDIDATE_WALL_DIRS=(
+  "$HOME/wallpapers/wallpapers/wallpapers"
+  "$HOME/wallpapers/wallpapers"
+  "$HOME/wallpapers"
+  "$HOME/Pictures/wallpapers"
+  "$HOME/.local/share/wallpapers"
+  "$HOME/.config/wallpapers"
+  "$HOME/Imágenes/wallpapers"
+)
+
+WALL_DIR=""
+for d in "${CANDIDATE_WALL_DIRS[@]}"; do
+  if [ -d "$d" ]; then
+    WALL_DIR="$d"
+    break
+  fi
+done
+
+if [ -z "$WALL_DIR" ]; then
+  notify-send "❌ Wallpaper" "No se encontró el directorio de wallpapers"
+  exit 1
+fi
+
 CACHE_DIR="$HOME/.cache/wallpaper"
 cd "$WALL_DIR" || exit
 

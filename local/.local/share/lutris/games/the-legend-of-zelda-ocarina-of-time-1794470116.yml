@@ -1,0 +1,7 @@
+game:
+  args: ''
+  exe: /home/diego/dotfiles-dizzi/local/.local/bin/juegos/zelda-remake-oot.sh
+  working_dir: /run/media/diego/Marian/NintendoSwitch2
+system:
+  env:
+    DRI_PRIME: '1002:687f!'

@@ -12,6 +12,16 @@ VENV_DIR="$SCRIPT_DIR/venv"
 
 WAYDROID_NET="/usr/lib/waydroid/data/scripts/waydroid-net.sh"
 
+copy_clipboard() {
+  if command -v wl-copy >/dev/null 2>&1; then
+    wl-copy
+  elif command -v xclip >/dev/null 2>&1; then
+    xclip -selection clipboard
+  else
+    return 1
+  fi
+}
+
 # ─── Colores ─────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -99,7 +109,9 @@ install_libhoudini_auto() {
 }
 
 # ─── Net fix al arrancar ──────────────────────────────────────────────
-if [ -f "$WAYDROID_NET" ]; then
+if grep -qiE "bazzite|fedora" /etc/os-release 2>/dev/null; then
+  echo -e "${GREEN}✅ Bazzite/Fedora: se omite el fix de nftables.${RESET}"
+elif [ -f "$WAYDROID_NET" ]; then
   if grep -qiE "endeavouros|cachyos" /etc/os-release 2>/dev/null; then
     echo -e "${CYAN}🐧 Sistema detectado: $(grep '^NAME=' /etc/os-release | cut -d'=' -f2 | tr -d '\"')${RESET}"
     apply_net_fix
@@ -193,7 +205,7 @@ case "$option" in
     echo ""
     echo -e "${CYAN}Registra en: ${YELLOW}https://www.google.com/android/uncertified/${RESET}"
     echo ""
-    echo "$ANDROID_ID" | xclip -selection clipboard 2>/dev/null && echo -e "${GREEN}✓ Copiado al portapapeles${RESET}"
+    echo "$ANDROID_ID" | copy_clipboard && echo -e "${GREEN}✓ Copiado al portapapeles${RESET}"
   else
     echo -e "${RED}✗ No se pudo obtener el ID. ¿Waydroid está corriendo?${RESET}"
   fi
@@ -265,7 +277,7 @@ case "$option" in
     echo ""
     echo -e "${RED}⚠️  Recuerda reinstalar libhoudini (opción 5) después del reset.${RESET}"
 
-    echo "$NEW_ID" | xclip -selection clipboard 2>/dev/null && echo -e "${GREEN}✓ Nuevo ID copiado al portapapeles${RESET}"
+    echo "$NEW_ID" | copy_clipboard && echo -e "${GREEN}✓ Nuevo ID copiado al portapapeles${RESET}"
   else
     echo -e "${RED}✗ No se pudo obtener el ID. Espera más o verifica logs.${RESET}"
   fi

@@ -1,0 +1,43 @@
+#!/usr/bin/bash
+
+if [ "$EUID" -eq 0 ]; then
+  echo "Please do not run as root"
+  exit 1
+fi
+
+if [ -z "$1" ]; then
+  echo "Usage: create-streaming-app-desktop-entry <appName>"
+  exit 1
+fi
+
+mkdir -p "$HOME/.local/share/applications"
+
+APPNAME="$1"
+LAUNCHER_PATH="$HOME/.local/bin/streaming-service-launcher"
+DESKTOP_ENTRY_PATH="$HOME/.local/share/applications/streamingservicelauncher-$APPNAME.desktop"
+
+ICON_NAME="streaming-service-launcher"
+if [ "$APPNAME" = "geForceNow" ] && [ -f "$HOME/.local/share/icons/hicolor/256x256/apps/geforce-now.png" ]; then
+  ICON_NAME="geforce-now"
+elif [ "$APPNAME" = "xboxGamePassStreaming" ] && [ -f "$HOME/.local/share/icons/hicolor/256x256/apps/xbox-cloud-gaming.png" ]; then
+  ICON_NAME="xbox-cloud-gaming"
+fi
+
+cat << EOF > "$DESKTOP_ENTRY_PATH"
+[Desktop Entry]
+Version=1.0
+Name=$APPNAME (StreamingServiceLauncher)
+Comment=Launch $APPNAME via StreamingServiceLauncher
+Exec="$LAUNCHER_PATH" $APPNAME
+TryExec=$LAUNCHER_PATH
+Icon=$ICON_NAME
+Terminal=false
+Type=Application
+StartupWMClass=StreamingServiceLauncher
+Categories=Game;
+StartupNotify=true
+EOF
+
+cat "$DESKTOP_ENTRY_PATH"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+echo "Desktop entry added to $DESKTOP_ENTRY_PATH"

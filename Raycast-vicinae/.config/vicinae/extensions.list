@@ -1,0 +1,32 @@
+# Extensiones de Vicinae — manifiesto declarativo
+# =================================================
+# Formato: <tienda>:<autor>/<nombre>
+#   vicinae → https://api.vicinae.com/v1/store   (tienda propia)
+#   raycast → https://backend.raycast.com        (tienda Raycast)
+#
+# Destino real: ~/.local/share/vicinae/extensions/store.<tienda>.<nombre>
+# (misma ruta y formato que usa el módulo programs.vicinae de NixOS).
+#
+# Instalar todo:   vicinae-ext-install --sync
+# Buscar más:      vicinae-ext-install           (TUI con gum)
+# Importar lo ya instalado desde la GUI:
+#                  vicinae-ext-install --adopt
+# Listar:          vicinae-ext-install --list
+
+# ── Núcleo / desarrollo ──
+vicinae:knoopx/nix
+vicinae:knoopx/systemd
+raycast:meshal/antigravity
+raycast:degouville/cursor-recent-projects
+raycast:RG-IL/neovim
+
+# ── Iconos y glifos (dashboardicons, Iconify, Nerd Fonts) ──
+vicinae:aurelleb/dashboard-icons
+vicinae:nino-mau/iconify
+vicinae:fbosch/nerdfont-search
+raycast:gbgk/glyph-search
+
+# ── Escritorio ──
+vicinae:sovereign/awww-switcher
+vicinae:sovereign/hypr-keybinds
+vicinae:knoopx/niri

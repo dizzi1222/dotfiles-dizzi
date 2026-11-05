@@ -2,7 +2,7 @@
 Version=1.0
 Name=Canva (Design, Logos, Editor de Fotos, simple y Basico)
 Comment=Open Canva (Design, Logos, Editor de Fotos, simple y Basico)
-Exec=zen-browser --new-window --kiosk https://www.canva.com/
+Exec=zen-app --new-window --kiosk https://www.canva.com/
 Terminal=false
 Type=Application
 Icon=/home/diego/dotfiles-dizzi/local/.local/share/applications/logos/Canva.png

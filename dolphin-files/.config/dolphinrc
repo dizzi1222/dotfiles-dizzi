@@ -1,6 +1,10 @@
 [General]
+LockPanels=false
 Version=202
 ViewPropsTimestamp=2026,2,16,18,56,41.236
+
+[IconsMode]
+PreviewSize=256
 
 [KFileDialog Settings]
 Places Icons Auto-resize=false

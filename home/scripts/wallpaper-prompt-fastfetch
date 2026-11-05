@@ -1,21 +1,44 @@
 #!/bin/bash
 
-# Get current wallpaper path from swww
-# Extract everything after "image: " (taking the first monitor found)
-WALLPAPER_PATH=$(swww query 2>/dev/null | grep 'image:' | head -n 1 | sed 's/.*image: //')
+# Wallpaper actual - cross-system (Plasma, Hyprland/swww, niri/swaybg vía cache de walset-menu)
+urldecode() { local s="${1#file://}"; printf '%b' "${s//%/\\x}"; }
+
+get_wallpaper() {
+  local p c
+  # 1) Plasma: solo si plasmashell corre (evita leer un appletsrc viejo en Hyprland/niri)
+  if pgrep -x plasmashell >/dev/null 2>&1; then
+    while IFS= read -r c; do
+      p=$(urldecode "${c#Image=}"); [[ -f "$p" ]] && { echo "$p"; return; }
+    done < <(awk '/^\[.*\]\[Wallpaper\]\[org.kde.image\]\[General\]/{f=1;next} /^\[/{f=0} f&&/^Image=/{print}' \
+             ~/.config/plasma-org.kde.plasma.desktop-appletsrc 2>/dev/null)
+  fi
+  # 2) Hyprland/swww
+  if command -v swww >/dev/null 2>&1; then
+    p=$(swww query 2>/dev/null | grep -m1 'image:' | sed 's/.*image: //')
+    [[ -f "$p" ]] && { echo "$p"; return; }
+  fi
+  # 3) Cache que escribe walset-menu (única fuente en niri/swaybg; respaldo en el resto)
+  p=$(head -n1 "$HOME/.cache/wallpaper/last" 2>/dev/null)
+  [[ -f "$p" ]] && { echo "$p"; return; }
+  return 1   # sin fallback a imágenes de Bazzite: mejor sin imagen que la equivocada
+}
+WALLPAPER_PATH="$(get_wallpaper)" || WALLPAPER_PATH=""
+
+# Deja que fastfetch decida el tipo de logo (kitty-direct, iterm, chafa, builtin...)
+LOGO_TYPE=auto
 
 # Define available modes
 # Added more presets and logo variants
 MODES=("wallpaper" "arch" "hyprland" "groups" "minimal" "config" "archcraft" "archcraft2" "anarchy" "hypros")
 
 # Select a random mode
-RANDOM_MODE=${MODES[$RANDOM % ${#MODES[@]}]}
+RANDOM_MODE="${1:-${MODES[$RANDOM % ${#MODES[@]}]}}"
 
 case "$RANDOM_MODE" in
 "wallpaper")
   if [[ -n "$WALLPAPER_PATH" ]] && [[ -f "$WALLPAPER_PATH" ]]; then
     # Display wallpaper using fastfetch with chafa
-    fastfetch --logo "$WALLPAPER_PATH" --logo-width 80 --logo-padding-top 1 --logo-type chafa
+    fastfetch --logo "$WALLPAPER_PATH" --logo-width 80 --logo-padding-top 1 --logo-type "$LOGO_TYPE"
   else
     # Fallback if no wallpaper found
     fastfetch
@@ -42,7 +65,7 @@ case "$RANDOM_MODE" in
   if [[ -f "$CONFIG_PATH" ]]; then
     # Override logo in the config to use the current wallpaper if available, or keep config default
     if [[ -n "$WALLPAPER_PATH" ]] && [[ -f "$WALLPAPER_PATH" ]]; then
-      fastfetch --config "$CONFIG_PATH" --logo "$WALLPAPER_PATH" --logo-width 80
+      fastfetch --config "$CONFIG_PATH" --logo "$WALLPAPER_PATH" --logo-type "$LOGO_TYPE" --logo-width 80
     else
       fastfetch --config "$CONFIG_PATH"
     fi

@@ -4,7 +4,7 @@
 Type=Application
 Name=Cuphead
 # Icon=lutris_cuphead
-Icon=/home/diego/.local/share/bottles/bottles/gaming/icons/Cuphead.png
+Icon=/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/icons/Cuphead.png
 Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/1782237136
 Categories=Game
 TryExec=lutris

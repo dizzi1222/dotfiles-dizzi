@@ -1,0 +1,7 @@
+game:
+  exe: /home/diego/Applications/StreamingServiceLauncher.AppImage
+  args: --no-sandbox
+  working_dir: /home/diego
+  name: Streaming Service Launcher
+  description: Launcher for cloud gaming services (Xbox Cloud, GeForce Now, etc.)
+  category: Game

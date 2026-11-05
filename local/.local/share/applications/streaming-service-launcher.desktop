@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Streaming Service Launcher
+Comment=Launcher for cloud gaming services (Xbox Cloud, GeForce Now, etc.)
+Exec="/home/diego/Applications/StreamingServiceLauncher.AppImage" --no-sandbox
+Icon=streaming-service-launcher
+Terminal=false
+Categories=Game;Network;
+StartupNotify=true

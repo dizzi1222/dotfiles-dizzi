@@ -167,6 +167,11 @@
   # ── Lazygit ────────────────────────────────────────────────
   programs.lazygit = {
     enable = true;
+    settings = {
+      # lazygit corre `$SHELL -c`; este archivo define gitflow() y re-ejecuta
+      # un zsh interactivo que carga ~/.zshrc.
+      os.shellFunctionsFile = "/home/diego/.config/lazygit/functions.zsh";
+    };
   };
 
   # ── Git ────────────────────────────────────────────────────

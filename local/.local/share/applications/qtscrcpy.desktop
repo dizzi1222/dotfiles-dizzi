@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=QtScrcpy
+Comment=Android screen mirroring and control
+Exec=env QTSCRCPY_CONFIG_PATH=/home/diego/dotfiles-dizzi/qtscrcpy/.config/QtScrcpy /home/diego/Applications/QtScrcpy/AppRun
+Icon=phone
+Categories=Utility;Network;
+Terminal=false

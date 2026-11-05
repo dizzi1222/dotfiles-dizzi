@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=geForceNow (StreamingServiceLauncher)
+Comment=Launch geForceNow via StreamingServiceLauncher
+Exec="/home/diego/.local/bin/streaming-service-launcher" geForceNow
+TryExec=/home/diego/.local/bin/streaming-service-launcher
+Icon=geforce-now
+Terminal=false
+Type=Application
+StartupWMClass=StreamingServiceLauncher
+Categories=Game;
+StartupNotify=true

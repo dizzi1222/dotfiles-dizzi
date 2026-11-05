@@ -1,0 +1,2 @@
+#!/bin/bash
+"/home/diego/.local/bin/streaming-service-launcher" "geForceNow"

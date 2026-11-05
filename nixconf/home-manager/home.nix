@@ -115,6 +115,8 @@ in
       ".config/kitty".source = link "kitty/.config/kitty";
       # Starship
       ".config/starship".source = link "starship/.config/starship";
+      # Lazygit: funciones para el prompt ':' (gitflow vive en .zshrc)
+      ".config/lazygit/functions.zsh".source = link "lazygit/.config/lazygit/functions.zsh";
       # Neovim
       ".config/nvim".source = link "nvim/.config/nvim";
       # Fastfetch
