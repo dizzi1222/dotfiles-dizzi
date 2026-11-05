@@ -846,12 +846,29 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   else
     cat >"$WIDGET_DIR/opencode" <<'WIDGET'
 #!/data/data/com.termux/files/usr/bin/bash
-cd ~
 opencode
 WIDGET
   fi
   chmod +x "$WIDGET_DIR/opencode"
   print_success "Atajo creado: $WIDGET_DIR/opencode"
+
+  # El helper de core-termux ejecuta el loader glibc directo y opencode intenta
+  # spawnear "serve" con process.execPath = ld-linux -> error 127. El launcher
+  # proot hace que process.execPath sea el binario real y el spawn funcione.
+  LAUNCHER="$HOME/.local/bin/opencode"
+  mkdir -p "$HOME/.local/bin"
+  if [[ -f "$LAUNCHER" ]]; then
+    grep -q 'PROOT_NO_SECCOMP' "$LAUNCHER" || \
+      sed -i '/^export SSL_CERT_FILE/a export PROOT_NO_SECCOMP=1' "$LAUNCHER"
+  elif [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/../opencode-launcher.sh" ]]; then
+    cp "$(dirname "$WIDGET_SRC")/../opencode-launcher.sh" "$LAUNCHER"
+    chmod +x "$LAUNCHER"
+  fi
+  if [[ -f "$PREFIX/bin/opencode" && ! -L "$PREFIX/bin/opencode" ]]; then
+    mv "$PREFIX/bin/opencode" "$PREFIX/bin/opencode.core-termux.bak"
+  fi
+  ln -sf "$LAUNCHER" "$PREFIX/bin/opencode"
+  print_success "Launcher proot enlazado en \$PREFIX/bin/opencode"
 
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
   # no en ~/.termux/widget/dynamic_shortcuts/icons.
