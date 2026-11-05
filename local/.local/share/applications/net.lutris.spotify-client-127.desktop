@@ -6,6 +6,7 @@ Type=Application
 Name=Spotify
 Comment=Spotify instalado con Lutris y parcheado en Spicetify
 Hidden=true
+NoDisplay=true
 Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/127
 Categories=Game
 TryExec=lutris

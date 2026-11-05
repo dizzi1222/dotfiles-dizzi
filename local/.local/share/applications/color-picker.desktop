@@ -4,4 +4,3 @@ Icon=applications-graphics
 Name=Color Picker
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/color-picker.sh
 NoDisplay=true
-Hidden=true

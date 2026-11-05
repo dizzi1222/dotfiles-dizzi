@@ -2,7 +2,7 @@
 Version=1.0
 Name=Render [Hosting]
 Comment=Open Render [Hosting]
-Exec=zen-browser --new-window --kiosk https://dashboard.render.com/
+Exec=zen-app --new-window --kiosk https://dashboard.render.com/
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Render_[Hosting].png

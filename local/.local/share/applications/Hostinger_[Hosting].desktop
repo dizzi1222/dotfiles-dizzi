@@ -2,7 +2,7 @@
 Version=1.0
 Name=Hostinger [Hosting]
 Comment=Open Hostinger [Hosting]
-Exec=zen-browser --new-window --kiosk https://www.hostinger.com/es
+Exec=zen-app --new-window --kiosk https://www.hostinger.com/es
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Hostinger_[Hosting].png

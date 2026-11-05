@@ -43,8 +43,8 @@ if [ -z "$BOTTLES_BASE" ]; then
   exit 1
 fi
 
-# 1) Prefijo nativo ~/.wine (blank si el servicio ya lo tiene corriendo)
-env WINEPREFIX="/home/diego/.wine" wine "$BRIDGE_WINE" &
+# 1) Prefijo nativo ~/.wine (ignora si wine no está instalado)
+env WINEPREFIX="/home/diego/.wine" wine "$BRIDGE_WINE" &>/dev/null || true
 
 # 2) Botella gaming: asegurar bridge.exe dentro de ella y ejecutarlo
 if [ ! -f "$BOTTLE_DIR/bridge.exe" ]; then

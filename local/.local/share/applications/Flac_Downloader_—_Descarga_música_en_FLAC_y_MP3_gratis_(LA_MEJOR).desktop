@@ -2,7 +2,7 @@
 Version=1.0
 Name=Flac Downloader — Descarga música en FLAC y MP3 gratis (LA MEJOR)
 Comment=Open Flac Downloader — Descarga música en FLAC y MP3 gratis (LA MEJOR)
-Exec=zen-browser --new-window --kiosk https://flacdownloader.com/
+Exec=zen-app --new-window --kiosk https://flacdownloader.com/
 Terminal=false
 Type=Application
 # Icon=web-browser

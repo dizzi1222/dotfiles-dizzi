@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- wine-discord-ipc-bridge (Bottles): botella + Discord -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#1b1b1f"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="none" stroke="#3a3a42" stroke-width="1.5"/>
+  <path d="M17 17 h8 v6 l4 6 v15 a5 5 0 0 1 -5 5 h-6 a5 5 0 0 1 -5 -5 v-15 l4 -6 z"
+        fill="#4ea26b" stroke="#2f7a4c" stroke-width="1.5"/>
+  <rect x="15.5" y="30" width="11" height="11" rx="2" fill="#e8f5ee" opacity="0.55"/>
+  <circle cx="45" cy="27" r="6" fill="#5865f2"/>
+  <circle cx="52" cy="37" r="6" fill="#5865f2"/>
+  <circle cx="47" cy="46" r="6" fill="#5865f2"/>
+  <path d="M48.5 31.5 L49.5 33.5 M49.5 40.5 L48.5 42.5" stroke="#b9bff9" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

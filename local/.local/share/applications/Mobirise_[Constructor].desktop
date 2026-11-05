@@ -2,7 +2,7 @@
 Version=1.0
 Name=Mobirise [Constructor]
 Comment=Open Mobirise [Constructor]
-Exec=zen-browser --new-window --kiosk https://mobirise.com/
+Exec=zen-app --new-window --kiosk https://mobirise.com/
 Terminal=false
 Type=Application
 Icon=/home/diego/.local/share/icons/Mobirise_[Constructor].png

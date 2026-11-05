@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
-# clean-boot: limpiador interactivo de /boot para NixOS
-# - Protege kernel actual (desde bootloader entries)
-# - Detecta y pregunta por kernels viejos en /boot/EFI/nixos/ (excluye .extra-files)
-# - ncdu para limpieza manual guiada
-# - Borra generaciones Nix viejas (con feedback)
-# - Rebuild automático al final
+# clean-boot: limpiador interactivo de /boot — compatible NixOS + Bazzite/Fedora ostree
+# Detecta el sistema automáticamente y usa la estrategia correcta.
 set -euo pipefail
 
 BOOT="/boot"
-KERNELS_DIR="$BOOT/kernels"
-ENTRIES_DIR="$BOOT/loader/entries"
-EFI_DIR="$BOOT/EFI/nixos"
-DOTFILES="/home/diego/dotfiles-dizzi/nixconf"
-USER="diego"
+
+# ── Detectar distro ────────────────────────────────────────────────────
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  ID="${ID:-}"
+  VARIANT_ID="${VARIANT_ID:-}"
+else
+  ID="unknown"
+fi
 
 command -v ncdu >/dev/null || {
-  echo "Instalá ncdu: nix profile add nixpkgs#ncdu"
+  echo "ncdu no está instalado."
+  case "$ID" in
+    nixos) echo "  nix profile add nixpkgs#ncdu" ;;
+    fedora|bazzite|universal-blue) echo "  sudo dnf install ncdu" ;;
+    *) echo "  instala ncdu con tu gestor de paquetes" ;;
+  esac
+  read -r -p "Presiona Enter para cerrar..."
   exit 1
 }
 
@@ -23,81 +29,93 @@ echo "=== Estado actual de /boot ==="
 df -h "$BOOT"
 echo
 
-# Kernel ACTUAL desde bootloader (PROTEGIDO)
-CURRENT_INITRD=$(grep -h '^initrd' "$ENTRIES_DIR"/*.conf 2>/dev/null | head -1 | sed 's|.*/||')
-CURRENT_KERNEL=$(grep -h '^linux' "$ENTRIES_DIR"/*.conf 2>/dev/null | head -1 | sed 's|.*/||')
-
+# ── Kernel actual protegido ───────────────────────────────────────────
 echo "=== Kernel ACTUAL (NO SE TOCA) ==="
-echo "  initrd: $CURRENT_INITRD"
-echo "  kernel: $CURRENT_KERNEL"
+case "$ID" in
+  nixos)
+    ENTRIES_DIR="$BOOT/loader/entries"
+    CURRENT_INITRD=$(grep -h '^initrd' "$ENTRIES_DIR"/*.conf 2>/dev/null | head -1 | sed 's|.*/||')
+    CURRENT_KERNEL=$(grep -h '^linux' "$ENTRIES_DIR"/*.conf 2>/dev/null | head -1 | sed 's|.*/||')
+    [ -n "$CURRENT_KERNEL" ] && echo "  initrd: $CURRENT_INITRD"
+    [ -n "$CURRENT_KERNEL" ] && echo "  kernel: $CURRENT_KERNEL"
+    ;;
+  fedora|bazzite|universal-blue)
+    # ostree: kernel actual desde /boot/loader/entries (grubby no funciona bien en ostree)
+    ls "$BOOT"/loader/entries/*.conf 2>/dev/null | head -5 | xargs -r grep -h '^linux' | sed 's|.*/||' | sort -u | xargs -r -I{} echo "  kernel: {}"
+    ls "$BOOT"/loader/entries/*.conf 2>/dev/null | head -5 | xargs -r grep -h '^initrd' | sed 's|.*/||' | sort -u | xargs -r -I{} echo "  initrd: {}"
+    ;;
+  *)
+    grubby --default-kernel 2>/dev/null | sed 's|.*/||' | xargs -r -I{} echo "  kernel: {}" || true
+    ;;
+esac
 echo
 
-# Detectar kernels viejos en EFI (excluyendo .extra-files y kernel actual)
-OLD_EFI=()
-for f in "$EFI_DIR/"*-linux-*.efi; do
-  [ -e "$f" ] || continue
-  name=$(basename "$f")
-  [[ "$name" == *"$CURRENT_INITRD"* ]] && continue
-  [[ "$name" == *"$CURRENT_KERNEL"* ]] && continue
-  [[ "$name" == ".extra-files" ]] && continue
-  OLD_EFI+=("$name")
-done
-
-if [ ${#OLD_EFI[@]} -gt 0 ]; then
-  echo "=== Kernels VIEJOS detectados en $EFI_DIR/ ==="
-  for f in "${OLD_EFI[@]}"; do
-    size=$(du -sh "$EFI_DIR/$f" 2>/dev/null | cut -f1)
-    echo "  $size  $f"
-  done
-  echo
-  read -rp "¿Borrar TODOS estos kernels viejos de EFI? [y/N] " -n1
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    for f in "${OLD_EFI[@]}"; do rm -v "$EFI_DIR/$f"; done
-  fi
-else
-  echo "No hay kernels viejos en EFI."
-fi
+# ── Listar kernels viejos según distro ────────────────────────────────
+echo "=== Kernels / entradas viejas detectadas ==="
+case "$ID" in
+  nixos)
+    EFI_DIR="$BOOT/EFI/nixos"
+    if [ -d "$EFI_DIR" ]; then
+      find "$EFI_DIR" -maxdepth 1 -type f \( -name '*.efi' -o -name '*.img' \) ! -name '*.extra-files' -printf '%f\n' 2>/dev/null | sort -V
+    fi
+    ;;
+  fedora|bazzite|universal-blue)
+    # ostree deployments
+    echo "  Deployments ostree:"
+    ls -1 "$BOOT"/ostree/ 2>/dev/null | sed 's/^/    /' || echo "    (ninguno visible)"
+    echo "  Bootloader entries:"
+    ls -1 "$BOOT"/loader/entries/ 2>/dev/null | sed 's/^/    /' || echo "    (ninguno visible)"
+    ;;
+  *)
+    ls -1 "$BOOT"/ 2>/dev/null | grep -E 'vmlinuz|initramfs|kernel|initrd' | head -20 || true
+    ;;
+esac
 echo
 
-# ncdu guiado
-echo "=== ncdu (limpieza manual adicional) ==="
+# ── ncdu manual (compatible kitty TERM) ───────────────────────────────
+echo "=== ncdu (limpieza manual) ==="
 echo "  - Navegá con flechas, 'd' para borrar, 'q' para salir"
-echo "  - NO borres nada del kernel actual ni /boot/kernels/"
-read -rp "ENTER para abrir ncdu..."
-sudo ncdu "$BOOT"
+echo "  - NO borres nada del kernel actual ni /boot/kernels/ (NixOS) ni /boot/ostree/ (Bazzite)"
+read -r -p "ENTER para abrir ncdu..."
+sudo TERM=xterm-256color ncdu "$BOOT" 2>/dev/null || sudo ls -la "$BOOT"
 echo
 
-# Generaciones Nix viejas
-set +e
-CURRENT_GEN=$(readlink -f /nix/var/nix/profiles/system 2>/dev/null | grep -o '[0-9]*$')
-OLD_GENS=$(nix-env --list-generations --profile /nix/var/nix/profiles/system 2>/dev/null | awk '{print $1}' | grep -v "^$CURRENT_GEN$")
-set -e
+# ── Limpieza automática específica por distro ─────────────────────────
+case "$ID" in
+  nixos)
+    echo "=== Generaciones Nix viejas ==="
+    if command -v nix-env >/dev/null; then
+      nix-env --list-generations -p /nix/var/nix/profiles/system | head -20
+      read -r -p "¿Borrar generaciones viejas? (nix-collect-garbage -d) [y/N] " ans
+      case "${ans:-N}" in y|Y) sudo nix-collect-garbage -d ;; *) echo "omitido" ;; esac
+    fi
+    echo "=== Rebuild NixOS ==="
+    read -r -p "¿Ejecutar rebuild switch? [y/N] " ans
+    case "${ans:-N}" in y|Y)
+      [ -d "/home/diego/dotfiles-dizzi/nixconf" ] && cd /home/diego/dotfiles-dizzi/nixconf
+      sudo nixos-rebuild switch --flake ".#diego"
+      ;;
+    esac
+    ;;
+  fedora|bazzite|universal-blue)
+    echo "=== rpm-ostree cleanup ==="
+    rpm-ostree status --json 2>/dev/null | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for x in d.get('deployments',[]):
+    if not x.get('booted') and not x.get('staged'):
+        print(x.get('version'))
+" | xargs -r -I{} echo "  Rollback disponible: {}"
+    read -r -p "¿Eliminar rollback deployment? [y/N] " ans
+    case "${ans:-N}" in y|Y) sudo rpm-ostree cleanup -r ;; *) echo "omitido" ;; esac
+    echo "=== ujust clean-system ==="
+    read -r -p "¿Ejecutar ujust clean-system? [y/N] " ans
+    case "${ans:-N}" in y|Y) ujust clean-system ;; *) echo "omitido" ;; esac
+    ;;
+  *)
+    echo "Distro no reconocida para limpieza automática."
+    ;;
+esac
 
-if [ -n "$OLD_GENS" ]; then
-  echo "=== Generaciones Nix viejas (actual: $CURRENT_GEN) ==="
-  echo "$OLD_GENS" | sed 's/^/  /'
-  read -rp "¿Borrar generaciones viejas + nix-collect-garbage -d? [y/N] " -n1
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "→ Borrando generaciones viejas..."
-    for g in $OLD_GENS; do
-      nix-env --delete-generations "$g" --profile /nix/var/nix/profiles/system 2>/dev/null || true
-    done
-    echo "→ Ejecutando nix-collect-garbage -d (puede tardar)..."
-    sudo nix-collect-garbage -d 2>/dev/null || true
-    echo "→ Limpieza de store completada."
-  fi
-else
-  echo "No hay generaciones viejas."
-fi
 echo
-
-# REBUILD AUTOMÁTICO (git como usuario, rebuild como root)
-hyprctl dispatch exec "[float; size 1000 700; center] kitty -- sh -c '~/.local/bin/nixconf-rebuild; read -p \"Presiona Enter para cerrar...\"'"
-
-echo
-echo "=== Resultado final ==="
-df -h "$BOOT"
-EOF
-chmod +x /home/diego/.local/bin/clean-boot
+read -r -p "Presiona Enter para cerrar..."

@@ -1,0 +1,284 @@
+#!/usr/bin/env bash
+# ============================================================
+# vicinae-ext-install — Extensiones de Vicinae desde el store oficial
+# ============================================================
+# Instala bundles reales en ~/.local/share/vicinae/extensions/<id>,
+# que es exactamente la ruta que usa el módulo de NixOS (xdg.dataFile).
+# El nombre del directorio es el id y define la procedencia:
+#   store.vicinae.<name>  → tienda Vicinae (api.vicinae.com)
+#   store.raycast.<name>  → tienda Raycast (backend.raycast.com)
+#
+# Uso:
+#   vicinae-ext-install                 # TUI (buscar/instalar/quitar)
+#   vicinae-ext-install --sync          # instala todo el manifiesto
+#   vicinae-ext-install --list          # lista instaladas
+#   vicinae-ext-install --install vicinae:knoopx/nix
+#   vicinae-ext-install --remove store.vicinae.nix
+#   vicinae-ext-install --adopt         # importa al manifiesto lo ya instalado
+#   vicinae-ext-install --refresh       # re-indexa el store (cache 24h)
+#
+# Manifiesto: ~/.config/vicinae/extensions.list (stowed desde dotfiles)
+# ============================================================
+
+set -uo pipefail
+
+BOLD=$'\033[1m'; DIM=$'\033[2m'; RED=$'\033[0;31m'; GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'; CYAN=$'\033[0;36m'; NC=$'\033[0m'
+
+EXT_DIR="$HOME/.local/share/vicinae/extensions"
+MANIFEST="${VICINAE_EXT_MANIFEST:-$HOME/.config/vicinae/extensions.list}"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/vicinae-ext"
+VSTORE="$CACHE_DIR/vicinae-store.json"
+CACHE_TTL=86400
+
+die() { echo "${RED}✗ $*${NC}" >&2; exit 1; }
+ok()  { echo "${GREEN}✓${NC} $*"; }
+info(){ echo "${CYAN}•${NC} $*"; }
+
+need() {
+  local c
+  for c in curl unzip python3; do
+    command -v "$c" >/dev/null 2>&1 || die "Falta '$c' en PATH"
+  done
+}
+
+ensure_dirs() { mkdir -p "$EXT_DIR" "$CACHE_DIR"; }
+
+refresh_store() {
+  ensure_dirs
+  info "Indexando tienda Vicinae…"
+  if curl -fsSL --max-time 30 "https://api.vicinae.com/v1/store/list?page=1&limit=500" -o "$VSTORE.tmp" 2>/dev/null; then
+    mv "$VSTORE.tmp" "$VSTORE"
+    ok "Índice actualizado ($(python3 -c 'import json,sys;print(len(json.load(open(sys.argv[1]))["extensions"]))' "$VSTORE") extensiones)"
+  else
+    rm -f "$VSTORE.tmp"
+    [ -s "$VSTORE" ] && info "Sin red: uso el índice en caché" || die "No pude descargar el índice"
+  fi
+}
+
+ensure_store() {
+  ensure_dirs
+  if [ ! -s "$VSTORE" ]; then refresh_store; return; fi
+  local age=$(( $(date +%s) - $(stat -c %Y "$VSTORE") ))
+  [ "$age" -gt "$CACHE_TTL" ] && refresh_store
+  return 0
+}
+
+# Líneas de la tienda Vicinae: "vicinae:autor/nombre  Título  ⤓N"
+list_vicinae() {
+  ensure_store
+  python3 - "$VSTORE" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1]))
+for e in sorted(d.get("extensions", []), key=lambda x: -x.get("downloadCount", 0)):
+    a = e.get("author", {}).get("handle", "?")
+    print(f'{a}/{e["name"]}\tvicinae:{a}/{e["name"]}\t{e.get("title", e["name"])}\t{e.get("downloadCount", 0)}')
+PY
+}
+
+# Búsqueda en la tienda Raycast: "raycast:autor/nombre  Título"
+search_raycast() {
+  local q="$1"
+  [ -n "$q" ] || return 0
+  curl -fsSL --max-time 20 \
+    "https://backend.raycast.com/api/v1/store_listings/search?q=$(python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1]))' "$q")" 2>/dev/null \
+  | python3 -c '
+import json, sys
+try: d = json.load(sys.stdin)
+except Exception: sys.exit(0)
+items = d.get("data") if isinstance(d, dict) else d
+for e in items or []:
+    a = (e.get("author") or {}).get("handle", "?")
+    if not e.get("name"): continue
+    print(f"{a}/{e[\"name\"]}\traycast:{a}/{e[\"name\"]}\t{e.get(\"title\", e[\"name\"])}")
+' 2>/dev/null
+  return 0
+}
+
+resolve_url() {
+  local store="$1" author="$2" name="$3"
+  if [ "$store" = "vicinae" ]; then
+    ensure_store
+    python3 - "$VSTORE" "$name" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1])); n = sys.argv[2]
+print(next((e.get("downloadUrl", "") for e in d.get("extensions", []) if e.get("name") == n), ""))
+PY
+  else
+    curl -fsSL --max-time 20 "https://backend.raycast.com/api/v1/extensions/$author/$name" 2>/dev/null \
+    | python3 -c 'import json,sys
+try: print(json.load(sys.stdin).get("download_url",""))
+except Exception: print("")' 2>/dev/null
+  fi
+}
+
+restart_daemon() {
+  systemctl --user restart vicinae.service 2>/dev/null || true
+}
+
+add_to_manifest() {
+  local spec="$1"
+  [ -n "$MANIFEST" ] || return 0
+  mkdir -p "$(dirname "$MANIFEST")"
+  touch "$MANIFEST"
+  grep -qxF "$spec" "$MANIFEST" && return 0
+  printf '%s\n' "$spec" >> "$MANIFEST"
+  ok "Añadida al manifiesto: $spec"
+}
+
+install_ext() {
+  local spec="$1" store tuple author name id url tmp zip root
+  store="${spec%%:*}"; tuple="${spec#*:}"
+  author="${tuple%%/*}"; name="${tuple##*/}"
+  [ "$store" = "vicinae" ] || [ "$store" = "raycast" ] || { echo "${RED}✗ formato inválido: $spec${NC}"; return 1; }
+  id="store.$store.$name"
+
+  if [ -d "$EXT_DIR/$id" ]; then
+    echo "${DIM}= $id (ya instalada)${NC}"
+    return 0
+  fi
+
+  url="$(resolve_url "$store" "$author" "$name")"
+  if [ -z "$url" ]; then
+    echo "${RED}✗ $id: no encontrada en el store${NC}"
+    return 1
+  fi
+
+  tmp="$(mktemp -d)"
+  zip="$tmp/ext.zip"
+  if ! curl -fsSL --max-time 60 "$url" -o "$zip" 2>/dev/null || ! unzip -tqq "$zip" >/dev/null 2>&1; then
+    echo "${RED}✗ $id: descarga inválida${NC}"; rm -rf "$tmp"; return 1
+  fi
+
+  mkdir -p "$tmp/unpack"
+  unzip -qq "$zip" -d "$tmp/unpack" 2>/dev/null || true
+  root="$tmp/unpack"
+  [ -f "$root/package.json" ] || root="$(find "$tmp/unpack" -maxdepth 2 -name package.json -printf '%h\n' 2>/dev/null | head -1)"
+  if [ -z "$root" ] || [ ! -f "$root/package.json" ]; then
+    echo "${RED}✗ $id: bundle sin package.json${NC}"; rm -rf "$tmp"; return 1
+  fi
+
+  rm -rf "$EXT_DIR/$id"
+  mv "$root" "$EXT_DIR/$id"
+  rm -rf "$tmp"
+  ok "$id"
+  return 0
+}
+
+list_installed() {
+  local d title
+  [ -d "$EXT_DIR" ] || { echo "${DIM}(ninguna instalada)${NC}"; return 0; }
+  shopt -s nullglob
+  for d in "$EXT_DIR"/*/; do
+    title="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("title","?"))' "$d/package.json" 2>/dev/null || echo "?")"
+    printf '  %-38s %s%s%s\n' "$(basename "$d")" "$BOLD" "$title" "$NC"
+  done
+  shopt -u nullglob
+}
+
+remove_ext() {
+  local id="$1"
+  id="${id%/}"; id="$(basename "$id")"
+  [ -d "$EXT_DIR/$id" ] || { echo "${RED}✗ $id no está instalada${NC}"; return 1; }
+  rm -rf "$EXT_DIR/$id"
+  ok "eliminada $id"
+  restart_daemon
+}
+
+# Importa al manifiesto lo que ya esté instalado (p. ej. instalado desde la GUI).
+adopt_installed() {
+  local d id author name store spec added=0
+  [ -d "$EXT_DIR" ] || { info "No hay extensiones instaladas"; return 0; }
+  shopt -s nullglob
+  for d in "$EXT_DIR"/store.*/; do
+    id="$(basename "$d")"
+    store="${id#store.}"; store="${store%%.*}"
+    read -r author name < <(python3 -c 'import json,sys
+try:
+    m=json.load(open(sys.argv[1]))
+    print(m.get("author","?"), m.get("name","?"))
+except Exception:
+    print("? ?")' "$d/package.json" 2>/dev/null)
+    [ -n "${name:-}" ] && [ "$name" != "?" ] || continue
+    spec="$store:$author/$name"
+    if grep -qxF "$spec" "$MANIFEST" 2>/dev/null; then
+      echo "${DIM}= $spec (ya en manifiesto)${NC}"
+    else
+      printf '%s\n' "$spec" >> "$MANIFEST"
+      ok "adoptada $spec"
+      added=$((added + 1))
+    fi
+  done
+  shopt -u nullglob
+  [ "$added" -gt 0 ] && info "$added extensión(es) añadida(s) a $MANIFEST"
+  return 0
+}
+
+sync_manifest() {
+  local spec total=0
+  if [ ! -f "$MANIFEST" ]; then
+    info "Sin manifiesto ($MANIFEST); nada que sincronizar"
+    return 0
+  fi
+  info "Sincronizando $MANIFEST"
+  while IFS= read -r spec || [ -n "$spec" ]; do
+    spec="${spec%%#*}"; spec="$(echo "$spec" | tr -d '[:space:]')"
+    [ -n "$spec" ] || continue
+    install_ext "$spec" && total=$((total + 1))
+  done < "$MANIFEST"
+  [ "$total" -gt 0 ] && restart_daemon
+  ok "Manifiesto procesado"
+}
+
+tui() {
+  local choice picked line spec
+  while true; do
+    choice="$(gum choose --header "Vicinae · extensiones" \
+      "Buscar e instalar" "Ver instaladas" "Quitar extensión" "Sincronizar manifiesto" "Salir")" || return 0
+    case "$choice" in
+      "Buscar e instalar")
+        local q; q="$(gum input --placeholder "dashboard icons, nix, github…")" || continue
+        local cands
+        cands="$(
+          { list_vicinae | awk -F'\t' -v q="$q" 'tolower($0) ~ tolower(q) {printf "%s  %s  ⤓%s\n", $2, $3, $4}'
+            search_raycast "$q" | awk -F'\t' '{printf "%s  %s\n", $2, $3}'
+          } 2>/dev/null
+        )"
+        [ -n "$cands" ] || { info "Sin resultados para '$q'"; continue; }
+        picked="$(printf '%s\n' "$cands" | gum filter --height 20 --header "Instalar")" || continue
+        spec="${picked%% *}"
+        install_ext "$spec" && restart_daemon && add_to_manifest "$spec"
+        ;;
+      "Ver instaladas") list_installed ;;
+      "Quitar extensión")
+        local ids
+        ids="$(ls -1 "$EXT_DIR" 2>/dev/null)"
+        [ -n "$ids" ] || { info "No hay extensiones instaladas"; continue; }
+        picked="$(printf '%s\n' "$ids" | gum filter --height 20 --header "Quitar")" || continue
+        gum confirm "¿Eliminar $picked?" && remove_ext "$picked"
+        ;;
+      "Sincronizar manifiesto") sync_manifest ;;
+      "Adoptar instaladas") adopt_installed ;;
+      *) return 0 ;;
+    esac
+  done
+}
+
+main() {
+  need
+  ensure_dirs
+  case "${1:---tui}" in
+    --tui|"") tui ;;
+    --sync) sync_manifest ;;
+    --list) list_installed ;;
+    --adopt) adopt_installed ;;
+    --refresh) refresh_store ;;
+    --install) shift; [ $# -ge 1 ] || die "Falta <tienda:autor/nombre>"
+              install_ext "$1" && restart_daemon && add_to_manifest "$1" ;;
+    --remove) shift; [ $# -ge 1 ] || die "Falta <id>"; remove_ext "$1" ;;
+    -h|--help) sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//' ;;
+    *) die "Opción desconocida: $1 (usa --help)" ;;
+  esac
+}
+
+main "$@"

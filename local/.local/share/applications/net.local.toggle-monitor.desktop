@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Toggle Monitor
+Exec=/home/diego/scripts/toggle-monitor.sh
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true

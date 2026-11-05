@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=System Control
+Comment=Menú de control del sistema (wofi)
+Exec=/home/diego/scripts/system_control.sh
+Icon=view-grid
+Terminal=false
+NoDisplay=true

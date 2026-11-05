@@ -3,6 +3,7 @@
 Icon=/home/diego/.local/share/lutris/coverart/mp3tag.png
 Type=Application
 Name=Mp3tag
-Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/80
+# Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/80
+Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=puddletag --file-forwarding net.puddletag.puddletag @@ %F @@
 Categories=Game
 TryExec=lutris

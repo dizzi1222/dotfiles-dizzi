@@ -1,0 +1,9 @@
+game:
+  args: ""
+  exe: /home/diego/dotfiles-dizzi/local/.local/bin/juegos/nintendo-switch-2.sh
+  working_dir: /var/mnt/games-swap/NintendoSwitch2
+system:
+  env:
+    DRI_PRIME: '1'
+    __NV_PRIME_RENDER_OFFLOAD: '1'
+    __VK_LAYER_NV_optimus: NVIDIA_only

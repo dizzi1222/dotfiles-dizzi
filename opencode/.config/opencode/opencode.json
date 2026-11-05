@@ -5,6 +5,9 @@
     "prune": false,
     "reserved": 10000
   },
+  "experimental": {
+    "todo": true
+  },
   "mcp": {
     "engram": {
       "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
@@ -13,12 +16,11 @@
     },
     "figma": {
       "command": [
-        "npx",
-        "-y",
-        "figma-developer-mcp",
-        "--figma-api-key={env:FIGMA_API_KEY}",
-        "--stdio"
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && exec /home/diego/.npm-global/bin/figma-developer-mcp --stdio"
       ],
+      "cwd": "/var/home/diego/workspace",
       "enabled": true,
       "type": "local"
     },
@@ -33,12 +35,11 @@
     "webshare-uk": {
       "type": "local",
       "command": [
-        "node",
-        "/home/diego/workspace/dataimpulse-mcp/index.js"
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
       ],
       "environment": {
-        "DI_USER": "{env:WS_USER}",
-        "DI_PASS": "{env:WS_PASS}",
         "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
         "DI_PROXY_PORT": "REDACTED"
       },
@@ -47,16 +48,28 @@
     "webshare-us": {
       "type": "local",
       "command": [
-        "node",
-        "/home/diego/workspace/dataimpulse-mcp/index.js"
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
       ],
       "environment": {
-        "DI_USER": "{env:WS_USER}",
-        "DI_PASS": "{env:WS_PASS}",
         "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
         "DI_PROXY_PORT": "REDACTED"
       },
       "enabled": true
+    },
+    "servers": {
+      "swissdevjobs": {
+        "type": "local",
+        "command": [
+          "swissdevjobs-mcp"
+        ],
+        "environment": {
+          "SDJ_NAME": "Diego Samuel Hardi Santana",
+          "SDJ_EMAIL": "diegosamuel042@gmail.com",
+          "SDJ_CV": "/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
+        }
+      }
     }
   },
   "plugins": [
