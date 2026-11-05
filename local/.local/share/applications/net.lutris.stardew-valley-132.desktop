@@ -2,7 +2,7 @@
 [Desktop Entry]
 Type=Application
 Name=Stardew Valley
-Icon=lutris_stardew-valley
-Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/132
+Icon=/home/diego/.var/app/com.usebottles.bottles/data/bottles/bottles/gaming/icons/Stardew Valley.png
+Exec=/home/diego/.local/bin/juegos/stardew.sh
 Categories=Game
-TryExec=lutris
+TryExec=/home/diego/.local/bin/juegos/stardew.sh

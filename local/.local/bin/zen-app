@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# zen-app — abre una URL en Zen nativo, zen-beta, o Flatpak
+set -euo pipefail
+
+if command -v zen-browser >/dev/null 2>&1; then
+  exec zen-browser "$@"
+elif command -v zen-beta >/dev/null 2>&1; then
+  exec zen-beta "$@"
+else
+  exec flatpak run app.zen_browser.zen "$@"
+fi

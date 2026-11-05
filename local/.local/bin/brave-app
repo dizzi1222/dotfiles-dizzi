@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# brave-app — abre una URL/app en Brave nativo o, si no existe, en Flatpak
+set -euo pipefail
+
+if command -v brave >/dev/null 2>&1; then
+  exec brave "$@"
+elif [ -x /opt/brave-bin/brave ]; then
+  exec /opt/brave-bin/brave "$@"
+else
+  exec flatpak run com.brave.Browser "$@"
+fi

@@ -1,5 +1,6 @@
 [Adapters]
 3C:F0:11:13:D5:48_powered=true
+A4:B1:C1:6C:89:22_powered=true
 
 [Devices]
 connectedDevices=

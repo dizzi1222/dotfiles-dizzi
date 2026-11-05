@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Career Copilot
+Comment=Buscador de empleo local (Electron + FastAPI)
+Exec=/home/diego/.local/bin/career-copilot
+Icon=/home/diego/.local/share/icons/career-copilot.png
+Terminal=false
+Categories=Utility;Office;
+StartupWMClass=career-copilot

@@ -38,3 +38,12 @@ toggle_key: OFF
 # clipboard_threshold: 100
 
 # For a list of all the available options, visit the official docs at: https://espanso.org/docs/
+
+# --- Wayland: layout explícito (la autodetección falla fuera de X11)
+keyboard_layout:
+  layout: es
+  variant: ""
+
+debug: true
+
+backend: Inject

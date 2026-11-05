@@ -1,0 +1,444 @@
+#!/usr/bin/env bash
+# ============================================================
+# flatpak-pkg-install — Buscador/instalador TUI de paquetes Flatpak
+# ============================================================
+# Características:
+#   - Indexa TODOS los remotos (instalación sistema + usuario)
+#   - Detecta en qué instalación vive cada remoto y usa el scope correcto
+#     (--system con sudo, o --user) automáticamente
+#   - Agrega remotos faltantes con confirmación
+#   - Caché de índice por conjunto de remotos (TTL 24h)
+#
+# Uso:
+#   flatpak-pkg-install                     # modo interactivo
+#   flatpak-pkg-install --refresh           # re-indexar
+#   flatpak-pkg-install --system            # forzar instalación system
+#   flatpak-pkg-install --user              # forzar instalación user
+#   flatpak-pkg-install --auto-add          # agregar remotos sin preguntar
+#   flatpak-pkg-install --install ID        # instalar un ID sin TUI
+#   flatpak-pkg-install --install ID --dry-run   # solo mostrar el plan
+#   flatpak-pkg-install --install ID --yes       # sin confirmación
+#
+# No ejecutar como root.
+# ============================================================
+
+set -uo pipefail
+
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+RESET=$'\033[0m'
+
+die() {
+  echo -e "${RED}✗ $*${RESET}" >&2
+  exit 1
+}
+
+pause() {
+  if command -v gum >/dev/null 2>&1 && [ -t 0 ]; then
+    gum input --placeholder 'Presiona Enter para cerrar...' >/dev/null 2>&1 || true
+  elif [ -t 0 ]; then
+    read -r -p 'Presiona Enter para cerrar...' || true
+  fi
+}
+
+usage() {
+  sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+# ============================================================
+# Flags
+# ============================================================
+REFRESH=0
+SCOPE_REQUEST="auto"   # auto | user | system
+AUTO_ADD_REPO=0
+INSTALL_APP=""
+DRY_RUN=0
+ASSUME_YES=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --refresh|-r)   REFRESH=1 ;;
+    --system)       SCOPE_REQUEST="system" ;;
+    --user)         SCOPE_REQUEST="user" ;;
+    --auto-add)     AUTO_ADD_REPO=1 ;;
+    --dry-run)      DRY_RUN=1 ;;
+    --yes|-y)       ASSUME_YES=1 ;;
+    --install)
+      shift
+      INSTALL_APP="${1:-}"
+      [ -n "$INSTALL_APP" ] || die '--install requiere un ID de aplicación (ej: com.brave.Browser)'
+      ;;
+    --help|-h) usage; exit 0 ;;
+    *) die "Flag desconocido: $1 (usa --help)" ;;
+  esac
+  shift
+done
+
+[ "$(id -u)" -eq 0 ] && die 'No ejecutes este script como root.'
+command -v gum >/dev/null 2>&1 || die 'Falta gum. Instálalo con: brew install gum'
+command -v flatpak >/dev/null 2>&1 || die 'Falta flatpak.'
+
+# Algunos entornos no exportan el bus de sesión y `flatpak remotes --system`
+# devuelve vacío. Lo definimos solo si no existe.
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -d "/run/user/$(id -u)" ]; then
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+fi
+
+# ============================================================
+# Remotos conocidos
+# ============================================================
+declare -A KNOWN_REPOS=(
+  [flathub]="https://flathub.org/repo/flathub.flatpakrepo"
+  [gnome-nightly]="https://nightly.gnome.org/gnome-nightly.flatpakrepo"
+  [elementary]="https://flatpak.elementary.io/repo.flatpakrepo"
+)
+
+SYSTEM_REMOTES=()
+USER_REMOTES=()
+
+load_remotes() {
+  mapfile -t SYSTEM_REMOTES < <(flatpak remotes --system --columns=name 2>/dev/null)
+  mapfile -t USER_REMOTES   < <(flatpak remotes --user   --columns=name 2>/dev/null)
+}
+
+in_list() {
+  local needle="$1"
+  shift
+  local x
+  for x in "$@"; do
+    [ "$x" = "$needle" ] && return 0
+  done
+  return 1
+}
+
+# Devuelve: user | system | none
+remote_scope() {
+  local r="$1"
+  if in_list "$r" ${USER_REMOTES[@]+"${USER_REMOTES[@]}"}; then
+    echo user
+  elif in_list "$r" ${SYSTEM_REMOTES[@]+"${SYSTEM_REMOTES[@]}"}; then
+    echo system
+  else
+    echo none
+  fi
+}
+
+has_remote() {
+  [ "$(remote_scope "$1")" != "none" ]
+}
+
+add_remote() {
+  local name="$1"
+  local scope="$2"
+  local url="${KNOWN_REPOS[$name]:-}"
+
+  if [ -z "$url" ]; then
+    echo -e "${RED}Repo desconocido: $name${RESET}"
+    return 1
+  fi
+  if has_remote "$name"; then
+    echo -e "${GREEN}✓ Repo '$name' ya configurado${RESET}"
+    return 0
+  fi
+
+  echo -e "${CYAN}Agregando repo '$name' ($scope): $url${RESET}"
+  if [ "$scope" = "user" ]; then
+    flatpak remote-add --if-not-exists --user "$name" "$url" \
+      && echo -e "${GREEN}✓ Repo '$name' agregado (user)${RESET}"
+  else
+    sudo flatpak remote-add --if-not-exists --system "$name" "$url" \
+      && echo -e "${GREEN}✓ Repo '$name' agregado (system)${RESET}"
+  fi
+}
+
+load_remotes
+
+# ============================================================
+# Índice: app-id | nombre | descripción | remotos
+# ============================================================
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+mkdir -p "$CACHE_DIR"
+
+remote_key=$(
+  { printf '%s\n' ${SYSTEM_REMOTES[@]+"${SYSTEM_REMOTES[@]}"}
+    printf '%s\n' ${USER_REMOTES[@]+"${USER_REMOTES[@]}"}; } \
+    | sed '/^$/d' | sort -u | md5sum | cut -c1-8
+)
+CACHE_FILE="$CACHE_DIR/flatpak-pkg-index-$remote_key.txt"
+CACHE_TTL="${FLATPAK_PKG_CACHE_TTL:-86400}"
+
+build_index() {
+  {
+    flatpak search "" --system --columns=name,description,application,remotes 2>/dev/null
+    flatpak search "" --user   --columns=name,description,application,remotes 2>/dev/null
+  } | awk -F'\t' 'NF >= 4 && $1 != "" && $3 != "" {
+      gsub(/\|/, "/", $1)
+      gsub(/\|/, "/", $2)
+      gsub(/\|/, "/", $4)
+      print $3 "|" $1 "|" $2 "|" $4
+    }' | sort -t'|' -k1,1 | awk -F'|' '!seen[$1]++'
+}
+
+INDEX=""
+if [ "$REFRESH" -eq 0 ] && [ -s "$CACHE_FILE" ]; then
+  cache_age=$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0) ))
+  if [ "$cache_age" -lt "$CACHE_TTL" ]; then
+    INDEX="$CACHE_FILE"
+  fi
+fi
+
+if [ -z "$INDEX" ]; then
+  echo -e "${CYAN}${BOLD}󰏓 Flatpak — indexando remotos...${RESET}"
+  TMP_INDEX=$(mktemp "${XDG_RUNTIME_DIR:-/tmp}/flatpak-pkg-index.XXXXXX") \
+    || die 'No se pudo crear el índice temporal.'
+  build_index > "$TMP_INDEX"
+  [ -s "$TMP_INDEX" ] || { rm -f "$TMP_INDEX"; die 'El índice quedó vacío. Revisa la conexión o los repositorios.'; }
+  mv "$TMP_INDEX" "$CACHE_FILE"
+  INDEX="$CACHE_FILE"
+  echo -e "${GREEN}✓${RESET} Índice guardado en $CACHE_FILE (válido 24h; --refresh para actualizar)."
+else
+  echo -e "${CYAN}${BOLD}󰏓 Flatpak — buscador de paquetes${RESET} ${GREEN}(caché)${RESET}"
+fi
+
+COUNT=$(wc -l < "$INDEX")
+remotes_str=$( { printf '%s\n' ${SYSTEM_REMOTES[@]+"${SYSTEM_REMOTES[@]}"}
+                 printf '%s\n' ${USER_REMOTES[@]+"${USER_REMOTES[@]}"}; } \
+               | sed '/^$/d' | sort -u | tr '\n' ' ')
+echo -e "${YELLOW}Remotos: ${remotes_str:-ninguno} | $COUNT aplicaciones${RESET}"
+[ "$COUNT" -gt 0 ] || die 'No hay paquetes en el índice.'
+echo
+
+# ============================================================
+# Selección de paquetes
+# ============================================================
+apps=()
+
+if [ -n "$INSTALL_APP" ]; then
+  apps=("$INSTALL_APP")
+else
+  QUERY=$(gum input \
+    --placeholder "Buscar (ej: brave, spotify, vscode)..." \
+    --prompt " > " \
+    --width 70)
+  [ -z "$QUERY" ] && { echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"; exit 0; }
+
+  FILTERED=$(grep -iF -- "$QUERY" "$INDEX")
+  [ -n "$FILTERED" ] || { echo -e "${YELLOW}No hay coincidencias para: $QUERY${RESET}"; pause; exit 0; }
+
+  FILTERED_COUNT=$(printf '%s\n' "$FILTERED" | grep -c '^')
+  echo -e "${GREEN}✓${RESET} $FILTERED_COUNT coincidencias para \"$QUERY\" (de $COUNT)."
+  echo
+
+  SELECTED=$(printf '%s\n' "$FILTERED" | gum filter \
+    --no-limit \
+    --no-sort \
+    --height 25 \
+    --header "Flatpak · $FILTERED_COUNT resultados · TAB selecciona · ENTER confirma" \
+    --placeholder "Refinar búsqueda...")
+  filter_status=$?
+
+  if [ "$filter_status" -ne 0 ] || [ -z "$SELECTED" ]; then
+    echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"
+    exit 0
+  fi
+
+  # El ID de aplicación es el primer campo y es único
+  mapfile -t apps < <(
+    printf '%s\n' "$SELECTED" \
+      | cut -d'|' -f1 \
+      | sed '/^$/d' \
+      | awk '!seen[$0]++'
+  )
+fi
+
+[ "${#apps[@]}" -gt 0 ] || die 'No se seleccionó ningún paquete válido.'
+
+# ============================================================
+# Resolver remoto + scope por aplicación
+# ============================================================
+app_name() {
+  awk -F'|' -v a="$1" '$1 == a { print $2; exit }' "$INDEX"
+}
+
+app_remotes() {
+  awk -F'|' -v a="$1" '$1 == a { print $4; exit }' "$INDEX"
+}
+
+# Elige el remoto disponible según el scope pedido.
+# Salida: "remoto|scope" o "|" si no hay ninguno.
+resolve_app() {
+  local app="$1"
+  local remotes_str
+  remotes_str=$(app_remotes "$app")
+  local -a candidates=()
+  IFS=',' read -r -a candidates <<< "$remotes_str"
+
+  local r
+  case "$SCOPE_REQUEST" in
+    user)
+      for r in ${candidates[@]+"${candidates[@]}"}; do
+        [ "$(remote_scope "$r")" = "user" ] && { printf '%s|user' "$r"; return; }
+      done
+      ;;
+    system)
+      for r in ${candidates[@]+"${candidates[@]}"}; do
+        [ "$(remote_scope "$r")" = "system" ] && { printf '%s|system' "$r"; return; }
+      done
+      ;;
+    auto)
+      # Preferir user (sin sudo); si no, system
+      for r in ${candidates[@]+"${candidates[@]}"}; do
+        [ "$(remote_scope "$r")" = "user" ] && { printf '%s|user' "$r"; return; }
+      done
+      for r in ${candidates[@]+"${candidates[@]}"}; do
+        [ "$(remote_scope "$r")" = "system" ] && { printf '%s|system' "$r"; return; }
+      done
+      ;;
+  esac
+  printf '|'
+}
+
+# Resolver todo primero; juntar remotos faltantes
+declare -A app_resolved=()
+missing_remotes=()
+
+for app in "${apps[@]}"; do
+  line=$(awk -F'|' -v a="$app" '$1 == a { print; exit }' "$INDEX")
+  if [ -z "$line" ]; then
+    echo -e "${YELLOW}⚠ $app no está en el índice (prueba --refresh)${RESET}"
+    continue
+  fi
+
+  resolved=$(resolve_app "$app")
+  remote="${resolved%%|*}"
+  scope="${resolved##*|}"
+
+  if [ -z "$remote" ]; then
+    # Ver qué remotos candidatos no están configurados
+    remotes_str=$(app_remotes "$app")
+    IFS=',' read -r -a candidates <<< "$remotes_str"
+    for r in ${candidates[@]+"${candidates[@]}"}; do
+      if ! has_remote "$r"; then
+        missing_remotes+=("$r")
+      fi
+    done
+  fi
+  app_resolved["$app"]="$remote|$scope"
+done
+
+# Deduplicar remotos faltantes
+if [ "${#missing_remotes[@]}" -gt 0 ]; then
+  mapfile -t missing_remotes < <(printf '%s\n' "${missing_remotes[@]}" | sed '/^$/d' | sort -u)
+fi
+
+if [ "${#missing_remotes[@]}" -gt 0 ]; then
+  echo -e "${YELLOW}Repositorios no configurados que se necesitan:${RESET}"
+  for r in "${missing_remotes[@]}"; do
+    echo -e "  • $r"
+  done
+
+  add_scope="system"
+  [ "$SCOPE_REQUEST" = "user" ] && add_scope="user"
+
+  if [ "$AUTO_ADD_REPO" -eq 1 ] || { [ "$DRY_RUN" -eq 1 ] && [ "$ASSUME_YES" -eq 1 ]; } \
+     || { [ -t 0 ] && gum confirm "¿Agregar los repositorios faltantes ($add_scope)?"; }; then
+    for r in "${missing_remotes[@]}"; do
+      add_remote "$r" "$add_scope"
+    done
+    load_remotes
+  else
+    echo -e "${YELLOW}Se omitirán los paquetes de repos no configurados.${RESET}"
+  fi
+fi
+
+# ============================================================
+# Construir plan de instalación
+# ============================================================
+installed_apps=$(flatpak list --app --columns=application 2>/dev/null)
+pending=()   # app|remote|scope
+installed=()
+skipped=()
+
+for app in "${apps[@]}"; do
+  [ -n "${app_resolved[$app]:-}" ] || continue
+  remote="${app_resolved[$app]%%|*}"
+  scope="${app_resolved[$app]##*|}"
+
+  if [ -z "$remote" ]; then
+    skipped+=("$app")
+    continue
+  fi
+
+  if printf '%s\n' "$installed_apps" | grep -qx "$app"; then
+    installed+=("$app")
+    continue
+  fi
+
+  pending+=("$app|$remote|$scope")
+done
+
+[ "${#installed[@]}" -gt 0 ] && echo -e "${YELLOW}Ya instalados:${RESET} ${installed[*]}"
+[ "${#skipped[@]}" -gt 0 ] && echo -e "${YELLOW}Sin repo disponible:${RESET} ${skipped[*]}"
+
+if [ "${#pending[@]}" -eq 0 ]; then
+  echo -e "${GREEN}✓ No hay nada nuevo que instalar.${RESET}"
+  [ "$DRY_RUN" -eq 0 ] && pause
+  exit 0
+fi
+
+echo -e "\n${BOLD}Plan de instalación:${RESET}"
+for entry in "${pending[@]}"; do
+  app="${entry%%|*}"; rest="${entry#*|}"
+  remote="${rest%%|*}"; scope="${rest##*|}"
+  name=$(app_name "$app")
+  scope_label="user"
+  [ "$scope" = "system" ] && scope_label="system · sudo"
+  printf '  • %-32s %-24s → %s (%s)\n' "$app" "$name" "$remote" "$scope_label"
+done
+echo
+
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo -e "${CYAN}ℹ  --dry-run: no se instaló nada.${RESET}"
+  exit 0
+fi
+
+if [ "$ASSUME_YES" -ne 1 ]; then
+  if [ -t 0 ]; then
+    gum confirm "¿Instalar ${#pending[@]} paquete(s)?" || {
+      echo -e "${YELLOW}ℹ  Instalación cancelada.${RESET}"
+      exit 0
+    }
+  else
+    die 'Sin TTY para confirmar. Usa --yes.'
+  fi
+fi
+
+# ============================================================
+# Instalación
+# ============================================================
+echo -e "\n${CYAN}Instalando paquetes...${RESET}"
+failed=()
+
+for entry in "${pending[@]}"; do
+  app="${entry%%|*}"; rest="${entry#*|}"
+  remote="${rest%%|*}"; scope="${rest##*|}"
+
+  echo -e "  → $app  [$remote, $scope]"
+  if [ "$scope" = "system" ]; then
+    sudo flatpak install --noninteractive --system "$remote" "$app" || failed+=("$app")
+  else
+    flatpak install --noninteractive --user "$remote" "$app" || failed+=("$app")
+  fi
+done
+
+echo
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo -e "${RED}✗ Fallaron: ${failed[*]}${RESET}"
+  exit 1
+fi
+
+echo -e "${GREEN}✓ Instalación completada.${RESET}"
+pause

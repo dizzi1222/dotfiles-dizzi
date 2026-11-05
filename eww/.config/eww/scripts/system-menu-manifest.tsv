@@ -21,12 +21,13 @@ Style		GTK Fix
 Style	󰐫	Design
 Setup		Drive
 Setup	󱛟	Disco
-Setup	 	Waydroid
-Setup		Portal
+Setup	 	Waydroid Script
+Setup		Bazzite Desktop Boot
 Setup	󱛍	WiFi Docs
 Setup		Zoom
 System		Rebuild Nix
 System	󰮮	Clean Boot
+System	󰃢	Fedora Cleanup
 System		Nix GC
 System		Nix Cleanup
 System		Git Clean
@@ -48,17 +49,20 @@ Herramientas		AI Conf
 About		Git Help
 About		README Wofi
 About		Créditos
-Android	 	Waydroid
 Android		Fotos Way
 Multimedia	󰝛	MP3 128k
 Multimedia	󰋌	Libros
 Multimedia		Suwayomi
 Instalar	󰣇	Inst. AUR
 Instalar		Inst. pkg
+Instalar	󰏓	Flatpak Pkg
+Instalar		Fedora Pkg
+Instalar	󰒓	Bazzite Install
 Instalar		Inst. Nix-Shell temporal
 Instalar	󰬺	Hypr fase1
 Instalar	󰬻	Hypr fase2
 Instalar	󰋊󰬼	CachyOS
 Instalar	󰟝	Inst. juego
 Instalar		Ext. IDE (Antigravity/Cursor/VSCode)
+Instalar	󰅴	JobCopilot Free
 Sistema	 󱕴	Gnome keyring

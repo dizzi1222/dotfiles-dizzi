@@ -1,6 +1,9 @@
 󰋚	historial history HISTORIAL history commands zsh bash terminal
 󰣇	aur yay instalar paquetes arch
 	pkg instalar paquetes pacman
+	fedora bazzite Bazzite Fedora linux dnf dnf5 rpm rpm-ostree paquete paquetes instalar buscar search gum tui bazzite
+󰏓	flatpak flathub Fedora Flatpak Flathub fedora bazzite Bazzite buscar instalar paquetes app aplicaciones flathub search install
+󰒓	bazzite install Fedora fedora Bazzite instalador instalación script personal setup bazzite-install.sh capa rpm-ostree sistema
 	nix nixos nixpkgs shell temporal tmp paquete instalar unfree unrar
 󰜫	webapp instalar aplicaciones web
 󰳾	autoclick mouse macro tinytask god
@@ -9,6 +12,7 @@
 	git clean limpiar repositorio
 	limpiar cache limpieza
 󰮮	limpiar boot clean-boot reconstruir
+󰃢	fedora Fedora bazzite cleanup limpiar dnf5 rpm-ostree flatpak journal coredump cache basura
 	nix os nixos nixconf rebuild build config home-manager
 󰌌 󱊮	autopress de tecla teclado keyboard macro auto
 	red network wifi ethernet network internet
@@ -34,7 +38,7 @@
  	waydroid scripts gapps gms magisk ROOT android 13 11 phablet telefono configurar
 	widgets eww lanzar
 	git ayuda help comandos
-	XDG xdg Portal Fix del GDM/SDDM Desktop Env
+	Bazzite plasma Plasma Desktop Boot fedora Fedora bazzite grub boot regenerar !== XDG xdg Portal Fix del GDM/SDDM Desktop Env
 🦙	Ollama ollama llama local cloud
 	gtk font fuente nerd icons iconos refresh cache fix
 󰐫	design extract blueprint colores palette css tokens prompt ia imagen
@@ -59,3 +63,4 @@
 	creditos creditos izzi1222 autor thank you gracias
 	anso reiniciar restart restart-espanso text expander expansion crashea crasheo died died-again
 	instalar extensiones antigravity cursor vscode vscodium code ide extensions vsix
+󰅴	jobcopilot job copilot jobcopilot-free career ai job copilot swissdevjobs sdj empleo trabajo curriculum cv ollama docker podman drive instalar install setup

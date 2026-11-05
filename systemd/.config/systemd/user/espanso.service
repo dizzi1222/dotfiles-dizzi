@@ -1,11 +1,11 @@
 [Unit]
-Description=espanso
+Description=espanso text expander (Wayland via distrobox)
 
 [Service]
-ExecStart=/usr/bin/espanso launcher 
+ExecStart=/usr/bin/distrobox enter espanso-box -- /usr/bin/espanso service start --unmanaged
+ExecStop=/usr/bin/distrobox enter espanso-box -- /usr/bin/espanso service stop
 Restart=on-failure
-RestartSec=3
+RestartSec=5
 
 [Install]
 WantedBy=default.target
-

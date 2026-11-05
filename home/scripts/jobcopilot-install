@@ -1,0 +1,654 @@
+#!/usr/bin/env bash
+# ============================================================
+# jobcopilot-install — instalación selectiva de JobCopilot Free
+# ============================================================
+# Tres componentes independientes, cada uno con su propia fuente:
+#
+#   1. swissdevjobs-cli   CLI + MCP de 9 tableros     → internet (GitHub)
+#   2. career-copilot     app Electron (opcional)     → internet (GitHub)
+#   3. ai-job-copilot     stack Docker/podman         → Google Drive gd-musica
+#
+# El componente 3 vive en el Drive personal (proyecto propio); los otros dos
+# se bajan de GitHub. Nada se instala "todo de golpe": elegís qué querés.
+#
+# Uso:
+#   jobcopilot-install                    # menú interactivo
+#   jobcopilot-install --list             # componentes disponibles
+#   jobcopilot-install --status           # qué está instalado y cómo
+#   jobcopilot-install --component swissdevjobs|career|aijob
+#   jobcopilot-install --all              # los tres, en orden
+#   jobcopilot-install --source internet|drive|auto
+#   jobcopilot-install --yes              # sin confirmaciones
+#   jobcopilot-install --dry-run          # muestra los comandos, no ejecuta
+#
+# Destino por defecto: ~/JobCopilot-Free (override con JOBCOPILOT_HOME).
+# No ejecutar como root.
+# ============================================================
+
+set -uo pipefail
+
+# ------------------------------------------------------------
+# Constantes y estado
+# ------------------------------------------------------------
+BASE="${JOBCOPILOT_HOME:-$HOME/JobCopilot-Free}"
+BIN_DIR="$HOME/.local/bin"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/jobcopilot"
+LOG="$STATE_DIR/install.log"
+SWISS_REPO="https://github.com/Stupidoodle/swissdevjobs-cli"
+SWISS_TAG="v0.9.2"
+CAREER_REPO="https://github.com/SyedmaazSaif/career-copilot.git"
+AIJOB_REPO="https://github.com/gprasantkumarvarma/ai-job-copilot.git"
+AIJOB_MODEL="qwen2.5:14b"
+
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
+
+COMPONENT=""
+SOURCE="auto"
+ASSUME_YES=0
+DRY_RUN=0
+
+mkdir -p "$STATE_DIR" "$BIN_DIR"
+
+# ------------------------------------------------------------
+# Helpers de salida
+# ------------------------------------------------------------
+log() {
+  local line
+  line="[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+  printf '%s\n' "$line" >>"$LOG"
+}
+
+info()  { printf '%s\n' "${CYAN}• $*${RESET}"; log "INFO $*"; }
+ok()    { printf '%s\n' "${GREEN}✓ $*${RESET}"; log "OK $*"; }
+warn()  { printf '%s\n' "${YELLOW}! $*${RESET}" >&2; log "WARN $*"; }
+fail()  { printf '%s\n' "${RED}✗ $*${RESET}" >&2; log "ERROR $*"; }
+title() { printf '\n%s\n' "${BOLD}$*${RESET}"; }
+
+die() {
+  fail "$*"
+  exit 1
+}
+
+run() {
+  printf '%s\n' "${DIM}\$ $*${RESET}"
+  log "RUN $*"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    return 0
+  fi
+  "$@" 2>&1 | tee -a "$LOG"
+  return "${PIPESTATUS[0]}"
+}
+
+run_shell() {
+  printf '%s\n' "${DIM}\$ $*${RESET}"
+  log "RUN $*"
+  [ "$DRY_RUN" -eq 1 ] && return 0
+  bash -c "$*" 2>&1 | tee -a "$LOG"
+  return "${PIPESTATUS[0]}"
+}
+
+confirm() {
+  local prompt="$1"
+  [ "$ASSUME_YES" -eq 1 ] && return 0
+  if command -v gum >/dev/null 2>&1 && [ -t 0 ]; then
+    gum confirm "$prompt"
+  elif [ -t 0 ]; then
+    local reply
+    read -r -p "$prompt [s/N] " reply
+    [[ "$reply" =~ ^[sSyY]$ ]]
+  else
+    return 0
+  fi
+}
+
+pause() {
+  [ "$ASSUME_YES" -eq 1 ] && return 0
+  if command -v gum >/dev/null 2>&1 && [ -t 0 ]; then
+    gum input --placeholder 'Presiona Enter para continuar...' >/dev/null 2>&1 || true
+  elif [ -t 0 ]; then
+    read -r -p 'Presiona Enter para continuar...' || true
+  fi
+}
+
+ask() {
+  local prompt="$1" default="${2:-}" value
+  if command -v gum >/dev/null 2>&1 && [ -t 0 ]; then
+    if [ -n "$default" ]; then
+      value=$(gum input --prompt "$prompt " --value "$default")
+    else
+      value=$(gum input --prompt "$prompt ")
+    fi
+  elif [ -t 0 ]; then
+    read -r -p "$prompt${default:+ [$default]}: " value
+    value="${value:-$default}"
+  else
+    value="$default"
+  fi
+  printf '%s' "$value"
+}
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+require() {
+  local missing=()
+  for cmd in "$@"; do
+    have "$cmd" || missing+=("$cmd")
+  done
+  [ "${#missing[@]}" -eq 0 ] || die "Faltan dependencias: ${missing[*]}"
+}
+
+free_gb() {
+  local path="${1:-$HOME}"
+  [ -e "$path" ] || path="$HOME"
+  df -BG --output=avail "$path" 2>/dev/null | tail -1 | tr -dc '0-9'
+}
+
+check_space() {
+  local need="$1" free
+  free=$(free_gb "$BASE")
+  if [ -n "$free" ] && [ "$free" -lt "$need" ]; then
+    fail "Espacio insuficiente: ${free} GB libres, se necesitan ~${need} GB en ${BASE}"
+    confirm "¿Continuar igualmente?" || exit 1
+  fi
+}
+
+# ------------------------------------------------------------
+# Localizar la copia del Drive (rclone)
+# ------------------------------------------------------------
+drive_root() {
+  local candidate
+  for candidate in \
+    "$HOME/mi_gdmusica/JobCopilot-Free" \
+    "$HOME/mi_gd-musica/JobCopilot-Free" \
+    "$HOME/mi_gdrive/JobCopilot-Free" \
+    "$HOME/Google Drive/JobCopilot-Free"; do
+    [ -d "$candidate" ] && { printf '%s' "$candidate"; return 0; }
+  done
+  return 1
+}
+
+have_drive() { drive_root >/dev/null 2>&1; }
+
+# rsync desde rclone: evita arrastrar artefactos de otra plataforma.
+copy_from_drive() {
+  local src="$1" dst="$2"
+  [ "$DRY_RUN" -eq 1 ] || mkdir -p "$dst"
+  run rsync -a --info=progress2 \
+    --exclude '.venv' --exclude 'node_modules' --exclude '__pycache__' \
+    --exclude 'backend/data' --exclude '.git' \
+    "$src"/ "$dst"/
+}
+
+# ------------------------------------------------------------
+# Estado de cada componente
+# ------------------------------------------------------------
+swiss_installed() { have swissdevjobs || have sdj; }
+career_installed() { [ -d "$BASE/Apps/career-copilot" ] && [ -d "$BASE/Apps/career-copilot/node_modules" ]; }
+aijob_installed() { [ -d "$BASE/CLIs/ai-job-copilot" ]; }
+
+compose_cmd() {
+  if have docker && docker compose version >/dev/null 2>&1; then
+    printf 'docker compose'
+  elif have podman-compose; then
+    printf 'podman-compose'
+  elif have podman && podman compose version >/dev/null 2>&1; then
+    printf 'podman compose'
+  else
+    return 1
+  fi
+}
+
+show_status() {
+  title "JobCopilot Free — estado"
+  printf '  %-22s %s\n' "Destino:" "$BASE"
+  printf '  %-22s %s\n' "Drive:" "$(drive_root 2>/dev/null || echo 'no montado')"
+  printf '  %-22s %s\n' "Espacio libre:" "$(free_gb "$BASE") GB"
+  printf '  %-22s %s\n' "uv / node / python:" "$(have uv && echo -n 'uv ' || true)$(have node && echo -n 'node ' || true)$(have python3 && echo 'python3' || true)"
+  printf '  %-22s %s\n' "Runtime contenedores:" "$(compose_cmd 2>/dev/null || echo 'ninguno')"
+  echo
+
+  if swiss_installed; then
+    printf '  %b✓%b swissdevjobs-cli  %s\n' "$GREEN" "$RESET" "$(swissdevjobs --version 2>/dev/null || echo 'instalado')"
+  else
+    printf '  %b○%b swissdevjobs-cli  no instalado\n' "$DIM" "$RESET"
+  fi
+
+  if career_installed; then
+    printf '  %b✓%b career-copilot    %s\n' "$GREEN" "$RESET" "$BASE/Apps/career-copilot"
+  else
+    printf '  %b○%b career-copilot    no instalado (opcional)\n' "$DIM" "$RESET"
+  fi
+
+  if aijob_installed; then
+    printf '  %b✓%b ai-job-copilot    %s\n' "$GREEN" "$RESET" "$BASE/CLIs/ai-job-copilot"
+    if [ -f "$BASE/CLIs/ai-job-copilot/docker-compose.yml" ]; then
+      printf '      compose: %s\n' "$(compose_cmd 2>/dev/null || echo 'sin runtime')"
+    fi
+  else
+    printf '  %b○%b ai-job-copilot    no instalado (fuente: Drive)\n' "$DIM" "$RESET"
+  fi
+
+  echo
+  printf '  Log: %s\n' "$LOG"
+}
+
+# ------------------------------------------------------------
+# 1. swissdevjobs-cli (CLI + MCP)
+# ------------------------------------------------------------
+register_swiss_mcp() {
+  if ! have opencode; then
+    warn "OpenCode no está en PATH; se omite el registro del MCP"
+    return 0
+  fi
+
+  if opencode mcp list 2>/dev/null | grep -qi 'swissdevjobs'; then
+    ok "MCP swissdevjobs ya registrado en OpenCode"
+    return 0
+  fi
+
+  confirm "¿Registrar el MCP swissdevjobs en OpenCode (global)?" || return 0
+
+  local args=()
+  local name email cv
+  if [ "$ASSUME_YES" -eq 0 ] && [ -t 0 ] && confirm "¿Cargar nombre/email/CV para aplicar a ofertas?"; then
+    name=$(ask "Nombre completo")
+    email=$(ask "Email")
+    cv=$(ask "Ruta absoluta del CV (PDF)" "$HOME/Documentos/cv.pdf")
+    [ -n "$name" ]  && args+=(--env "SDJ_NAME=$name")
+    [ -n "$email" ] && args+=(--env "SDJ_EMAIL=$email")
+    [ -f "$cv" ]    && args+=(--env "SDJ_CV=$cv")
+  fi
+
+  run opencode mcp add swissdevjobs --global "${args[@]}" -- swissdevjobs-mcp
+  ok "MCP swissdevjobs agregado a OpenCode"
+  info "Si OpenCode ya estaba abierto: ejecutá /reload (o reiniciá) para verlo en /mcps"
+}
+
+install_swissdevjobs() {
+  title "1/3 · swissdevjobs-cli (CLI + MCP)"
+  require uv
+
+  local src source_label target
+  src=$(choose_source "swissdevjobs" "internet")
+  if [ "$src" = "drive" ]; then
+    local drive
+    drive=$(drive_root) || die "No encuentro la copia del Drive (¿rclone montado?)"
+    target="$drive/CLIs/swissdevjobs-cli"
+    source_label="copia local $target"
+  else
+    target="git+${SWISS_REPO}@${SWISS_TAG}"
+    source_label="${SWISS_REPO}@${SWISS_TAG}"
+  fi
+
+  info "Fuente: $source_label"
+  confirm "¿Instalar/actualizar swissdevjobs-cli con uv tool?" || return 0
+
+  check_space 1
+  run uv tool install --force "$target" || die "uv tool install falló (ver $LOG)"
+  hash -r
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    info "dry-run: se omite la verificación del binario y el registro del MCP"
+    return 0
+  fi
+
+  if swiss_installed; then
+    ok "swissdevjobs $(swissdevjobs --version 2>/dev/null) instalado"
+    info "Prueba: sdj list --tech Python --remote --min-salary 90000 --sort salary"
+  else
+    fail "La instalación terminó pero el binario no aparece en PATH (~/.local/bin)"
+    warn "Asegurate de que ~/.local/bin esté en PATH y volvé a abrir la terminal"
+  fi
+
+  register_swiss_mcp
+}
+
+# ------------------------------------------------------------
+# 2. career-copilot (app Electron, opcional)
+# ------------------------------------------------------------
+write_career_launcher() {
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '%s\n' "${DIM}dry-run: escribiría $BIN_DIR/career-copilot y la entrada .desktop${RESET}"
+    return 0
+  fi
+
+  cat >"$BIN_DIR/career-copilot" <<EOF
+#!/usr/bin/env bash
+cd "$BASE/Apps/career-copilot" || exit 1
+exec node scripts/start.js "\$@"
+EOF
+  chmod +x "$BIN_DIR/career-copilot"
+
+  [ "$DRY_RUN" -eq 1 ] || mkdir -p "$HOME/.local/share/icons"
+  [ "$DRY_RUN" -eq 1 ] || run curl -sL -o "$HOME/.local/share/icons/career-copilot.png" "https://jobcopilot.com/wp-content/uploads/2024/05/Square-1000px.png"
+
+  local desktop="$HOME/.local/share/applications/career-copilot.desktop"
+  mkdir -p "$(dirname "$desktop")"
+  cat >"$desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Career Copilot
+Comment=Buscador de empleo local (Electron + FastAPI)
+Exec=$BIN_DIR/career-copilot
+Icon=$HOME/.local/share/icons/career-copilot.png
+Terminal=false
+Categories=Utility;Office;
+StartupWMClass=career-copilot
+EOF
+  ok "Lanzador: $BIN_DIR/career-copilot (y entrada de escritorio con ícono)"
+}
+
+install_career() {
+  title "2/3 · Career Copilot (app Electron — opcional)"
+  require git node npm
+  [ "$(node -p 'process.versions.node.split(".")[0]')" -ge 18 ] || die "Se necesita Node >= 18"
+
+  local target="$BASE/Apps/career-copilot"
+  local src
+  src=$(choose_source "career" "internet")
+
+  if [ -d "$target/.git" ]; then
+    info "Repositorio existente; se actualiza con git pull --ff-only"
+    if ! git -C "$target" diff --quiet || ! git -C "$target" diff --cached --quiet; then
+      warn "Hay cambios locales en $target; no se hace pull automático"
+    else
+      run git -C "$target" pull --ff-only || warn "git pull falló; sigo con la copia actual"
+    fi
+  else
+    [ "$DRY_RUN" -eq 1 ] || mkdir -p "$BASE/Apps"
+    if [ "$src" = "drive" ]; then
+      local drive
+      drive=$(drive_root) || die "No encuentro la copia del Drive"
+      info "Copiando desde $drive/Apps/career-copilot (rclone, puede tardar)"
+      copy_from_drive "$drive/Apps/career-copilot" "$target"
+    elif [ -d "$target" ]; then
+      warn "$target ya existe y no es un repo git; se conserva tal cual"
+    else
+      run git clone --depth 1 "$CAREER_REPO" "$target" || die "git clone falló"
+    fi
+  fi
+
+  [ -d "$target" ] || [ "$DRY_RUN" -eq 1 ] || die "No existe $target"
+
+  check_space 2
+  info "Instalando dependencias Node (Electron + Vite)…"
+  if [ -f "$target/package-lock.json" ]; then
+    run npm --prefix "$target" ci || run npm --prefix "$target" install
+  else
+    run npm --prefix "$target" install
+  fi
+
+  info "Preparando backend Python…"
+  if have uv; then
+    run uv venv --python 3.12 "$target/backend/.venv"
+    run uv pip install --python "$target/backend/.venv/bin/python" -r "$target/backend/requirements.txt"
+  else
+    run python3 -m venv "$target/backend/.venv"
+    run "$target/backend/.venv/bin/pip" install -r "$target/backend/requirements.txt"
+  fi
+
+  [ -f "$target/.env" ] || run cp "$target/.env.example" "$target/.env"
+
+  write_career_launcher
+  ok "Career Copilot listo"
+  info "Abrilo con: career-copilot   (logs en ~/.career-copilot/logs/app.log)"
+}
+
+# ------------------------------------------------------------
+# 3. ai-job-copilot (stack Docker/podman, fuente Drive)
+# ------------------------------------------------------------
+ensure_env_secrets() {
+  local envfile="$1"
+  [ -f "$envfile" ] || return 0
+
+  python3 - "$envfile" <<'PY'
+import base64, os, re, secrets, sys
+
+path = sys.argv[1]
+text = open(path, encoding="utf-8").read()
+
+def fill(key, value):
+    global text
+    pattern = re.compile(rf"^{key}=.*$", re.M)
+    if pattern.search(text):
+        text = pattern.sub(f"{key}={value}", text, count=1)
+    else:
+        text += f"\n{key}={value}\n"
+
+changed = False
+for key, value in {
+    "JWT_SECRET": secrets.token_hex(32),
+    "ENCRYPTION_KEY": base64.urlsafe_b64encode(os.urandom(32)).decode(),
+    "POSTGRES_PASSWORD": secrets.token_urlsafe(24),
+}.items():
+    m = re.search(rf"^{key}=(.*)$", text, re.M)
+    if not m or not m.group(1).strip():
+        fill(key, value)
+        changed = True
+
+if changed:
+    open(path, "w", encoding="utf-8").write(text)
+    print("secretos generados")
+else:
+    print("secretos ya presentes")
+PY
+}
+
+install_aijob() {
+  title "3/3 · AI Job Copilot (stack Docker — fuente Drive)"
+  local target="$BASE/CLIs/ai-job-copilot"
+  local src
+  src=$(choose_source "aijob" "drive")
+
+  if [ "$src" = "drive" ]; then
+    local drive
+    drive=$(drive_root) || die "No encuentro la copia del Drive. Montá gd-musica o usá --source internet"
+    info "Copiando desde $drive/CLIs/ai-job-copilot (rclone, puede tardar)"
+    check_space 6
+    copy_from_drive "$drive/CLIs/ai-job-copilot" "$target"
+  else
+    if [ -d "$target/.git" ]; then
+      run git -C "$target" pull --ff-only || warn "git pull falló; sigo con la copia actual"
+    elif [ -d "$target" ]; then
+      warn "$target ya existe y no es un repo git; se conserva tal cual"
+    else
+      [ "$DRY_RUN" -eq 1 ] || mkdir -p "$BASE/CLIs"
+      run git clone --depth 1 "$AIJOB_REPO" "$target" || die "git clone falló"
+    fi
+  fi
+
+  [ -d "$target" ] || [ "$DRY_RUN" -eq 1 ] || die "No existe $target"
+
+  local envfile="$target/.env"
+  if [ ! -f "$envfile" ] && [ -f "$target/.env.example" ]; then
+    run cp "$target/.env.example" "$envfile"
+  fi
+  [ -f "$envfile" ] || warn "No hay .env; revisá $target antes de levantar el stack"
+  if [ -f "$envfile" ] && [ "$DRY_RUN" -eq 0 ]; then
+    info "Secretos: $(ensure_env_secrets "$envfile")"
+  fi
+
+  local compose
+  if ! compose=$(compose_cmd); then
+    warn "No hay runtime de contenedores (docker compose / podman-compose)."
+    echo
+    echo "  Opciones:"
+    echo "    a) Instalar el plugin:   uv tool install podman-compose"
+    echo "    b) Usar Docker Desktop:  https://docs.docker.com/desktop/linux/install/"
+    echo "    c) Dejar solo el código: ya está en $target"
+    echo
+    if have uv && confirm "¿Instalar podman-compose ahora con uv tool?"; then
+      run uv tool install podman-compose
+      if [ "$DRY_RUN" -eq 1 ]; then
+        info "dry-run: se omite levantar el stack"
+        return 0
+      fi
+      hash -r
+      compose=$(compose_cmd) || die "podman-compose sigue sin estar disponible"
+    else
+      warn "Stack copiado pero no levantado"
+      return 0
+    fi
+  fi
+
+  info "Runtime: $compose"
+  echo
+  info "Construyendo imágenes en $target (puede tardar la primera vez, 2–3 GB)…"
+  run_shell "cd '$target' && ${compose} build" || warn "falló el build de imágenes"
+  echo
+  info "Levantando contenedores…"
+  run_shell "cd '$target' && ${compose} up -d" || warn "El stack no se levantó automáticamente. Levantalo vos:"
+  echo "    cd $target && ${compose} up -d"
+  echo "    Luego respondé los prompts de podman que aparezcan (short-name resolution)."
+  echo
+  echo "  Servicios una vez levantados:"
+  echo "    Frontend: http://localhost:3000"
+  echo "    API docs: http://localhost:8000/docs"
+  echo "    Neo4j:    http://localhost:7474"
+  echo "    Qdrant:   http://localhost:6333"
+  echo
+  echo "  Opcional – bajar modelo local (~9 GB):"
+  echo "     ${compose} exec -T ollama ollama pull $AIJOB_MODEL"
+  echo
+  ok "AI Job Copilot listo."
+}
+
+# ------------------------------------------------------------
+# Selección de fuente
+# ------------------------------------------------------------
+choose_source() {
+  local component="$1" default="$2"
+  local explicit="$SOURCE"
+
+  if [ "$explicit" != "auto" ]; then
+    [ "$explicit" = "drive" ] && ! have_drive && die "Pediste --source drive pero el Drive no está montado"
+    printf '%s' "$explicit"
+    return 0
+  fi
+
+  [ "$ASSUME_YES" -eq 1 ] && { printf '%s' "$default"; return 0; }
+  [ ! -t 0 ] && { printf '%s' "$default"; return 0; }
+
+  local options=()
+  case "$component" in
+    aijob)
+      have_drive && options+=("Google Drive · gd-musica (recomendado)")
+      options+=("GitHub · respaldo público")
+      ;;
+    *)
+      options+=("Internet · GitHub (recomendado)")
+      have_drive && options+=("Copia local · Google Drive")
+      ;;
+  esac
+
+  local choice
+  if command -v gum >/dev/null 2>&1; then
+    choice=$(printf '%s\n' "${options[@]}" | gum choose --header "Fuente para $component")
+  else
+    printf '%s\n' "${options[@]}" | cat -n
+    choice=$(ask "Elegí un número" "1")
+  fi
+  [ -z "$choice" ] && die "Selección cancelada"
+
+  case "$choice" in
+    *Drive*|*drive*|*local*) printf 'drive' ;;
+    *) printf 'internet' ;;
+  esac
+}
+
+# ------------------------------------------------------------
+# Menú principal
+# ------------------------------------------------------------
+list_components() {
+  cat <<'EOF'
+Componentes de JobCopilot Free:
+
+  swissdevjobs   CLI + MCP de 9 tableros (CH/DE/UK/US-CA/NL/FR/SG)
+                 Fuente: GitHub · requiere uv · binarios sdj/swissdevjobs/swissdevjobs-mcp
+  career         App Electron + FastAPI (opcional)
+                 Fuente: GitHub · requiere Node >= 18, Python · lanzador career-copilot
+  aijob          Stack autónomo con 16 agentes (Docker/podman)
+                 Fuente: Google Drive gd-musica · requiere docker compose o podman-compose
+EOF
+}
+
+main_menu() {
+  local choice
+  if ! command -v gum >/dev/null 2>&1; then
+    list_components
+    choice=$(ask "Componente (swissdevjobs|career|aijob|all|status)" "status")
+    COMPONENT="$choice"
+    return 0
+  fi
+
+  choice=$(gum choose --height 14 --header "JobCopilot Free · elegí qué instalar" \
+    "1 · swissdevjobs-cli  · CLI + MCP (internet)" \
+    "2 · Career Copilot    · app Electron (opcional)" \
+    "3 · AI Job Copilot    · stack Docker (Drive)" \
+    "Los 3, en orden" \
+    "Estado / diagnóstico" \
+    "Salir") || exit 0
+
+  case "$choice" in
+    1*) COMPONENT="swissdevjobs" ;;
+    2*) COMPONENT="career" ;;
+    3*) COMPONENT="aijob" ;;
+    Los*) COMPONENT="all" ;;
+    Estado*) COMPONENT="status" ;;
+    *) exit 0 ;;
+  esac
+}
+
+# ------------------------------------------------------------
+# Flags
+# ------------------------------------------------------------
+usage() { sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; }
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --component) COMPONENT="${2:-}"; shift 2 ;;
+    --source)    SOURCE="${2:-}"; shift 2 ;;
+    --all)       COMPONENT="all"; shift ;;
+    --list)      list_components; exit 0 ;;
+    --status)    show_status; exit 0 ;;
+    --yes|-y)    ASSUME_YES=1; shift ;;
+    --dry-run)   DRY_RUN=1; shift ;;
+    -h|--help)   usage; exit 0 ;;
+    *) die "Opción desconocida: $1 (usá --help)" ;;
+  esac
+done
+
+case "$SOURCE" in
+  auto|internet|drive) ;;
+  *) die "Fuente inválida: $SOURCE (auto|internet|drive)" ;;
+esac
+
+[ -z "$COMPONENT" ] && main_menu
+
+case "$COMPONENT" in
+  status)          show_status ;;
+  swissdevjobs|swiss) install_swissdevjobs ;;
+  career)          install_career ;;
+  aijob|ai-job)    install_aijob ;;
+  all)
+    install_swissdevjobs
+    pause
+    install_career
+    pause
+    install_aijob
+    ;;
+  *) die "Componente inválido: $COMPONENT" ;;
+esac
+
+echo
+ok "Listo. Log: $LOG"
+
+# Mantener la terminal abierta para que puedas ver lo que pasó y
+# responder los prompts de podman si aparecen.
+pause

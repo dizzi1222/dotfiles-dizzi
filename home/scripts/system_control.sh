@@ -124,14 +124,22 @@ case "$ICON" in
 "󰗃")
   kitty --hold -e bash -c "
     if ! command -v bindfs &>/dev/null; then
-      if is_arch; then
-        echo '📦 Instalando bindfs...'
+      if grep -qiE 'arch|cachyos' /etc/os-release; then
         yay -S bindfs --noconfirm
+      elif grep -qiE 'bazzite|fedora' /etc/os-release; then
+        echo '❌ bindfs no está instalado.'
+        echo '   Ejecuta: sudo rpm-ostree install bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
+      elif grep -qi 'nixos' /etc/os-release; then
+        echo '❌ bindfs no está instalado en NixOS.'
+        echo '   Usa: nix shell nixpkgs#bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       else
-        echo '📦 bindfs no disponible en NixOS. Montando sin bindfs...'
-        sudo mkdir -p /mnt/waydroid
-        sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
-        sudo mount -o remount,bind,uid=\$(id -u),gid=\$(id -g) /mnt/waydroid
+        echo '❌ bindfs no está instalado.'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       fi
     fi
 
@@ -161,11 +169,20 @@ case "$ICON" in
 "")
   kitty --hold -e bash -c "
     if ! command -v bindfs &>/dev/null; then
-      if is_arch; then
-        echo '📦 Instalando bindfs...'
+      if grep -qiE 'arch|cachyos' /etc/os-release; then
         yay -S bindfs --noconfirm
+      elif grep -qiE 'bazzite|fedora' /etc/os-release; then
+        echo '❌ bindfs no está instalado.'
+        echo '   Ejecuta: sudo rpm-ostree install bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
+      elif grep -qi 'nixos' /etc/os-release; then
+        echo '❌ bindfs no está instalado en NixOS.'
+        echo '   Usa: nix shell nixpkgs#bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       else
-        echo '❌ bindfs no disponible en NixOS. Instálalo con: nix shell nixpkgs#bindfs'
+        echo '❌ bindfs no está instalado.'
         read -p 'Presiona Enter para cerrar...'
         exit 1
       fi
@@ -253,6 +270,9 @@ case "$ICON" in
 "󰮮")
   wm_spawn "800 600" kitty --title "CleanBoot" -- sh -c 'sudo ~/.local/bin/clean-boot; read -p "Presiona Enter para cerrar..."'
   ;;
+"󰃢")
+  wm_spawn "1000 700" kitty --title "FedoraCleanup" -- sh -c '~/scripts/fedora-cleanup.sh; read -p "Presiona Enter para cerrar..."'
+  ;;
 "")
   wm_spawn "1000 700" kitty --title "NixRebuild" -- sh -c '~/.local/bin/nixconf-rebuild 2>&1 | tee ~/.cache/nixconf-rebuild.log; read -p "Presiona Enter para cerrar..."'
   ;;
@@ -271,6 +291,36 @@ case "$ICON" in
     kitty -e ~/omarchy-arch-bin/omarchy-pkg-install
   else
     notify-send "system-control" "omarchy-pkg-install: script no encontrado en ~/omarchy-arch-bin/"
+  fi
+  ;;
+"󰏓")
+  if [ -x "$HOME/scripts/flatpak-pkg-install" ]; then
+    kitty --title "Flatpak Pkg" -e "$HOME/scripts/flatpak-pkg-install"
+  else
+    notify-send "system-control" "flatpak-pkg-install: script no encontrado en ~/scripts/"
+  fi
+  ;;
+"")
+  if [ -x "$HOME/scripts/fedora-pkg-install" ]; then
+    kitty --title "Fedora Pkg" -e "$HOME/scripts/fedora-pkg-install"
+  else
+    notify-send "system-control" "fedora-pkg-install: script no encontrado en ~/scripts/"
+  fi
+  ;;
+"󰒓")
+  INSTALLER="$HOME/bazzite-install.sh"
+  [ -f "$INSTALLER" ] || INSTALLER="$HOME/dotfiles-dizzi/home/bazzite-install.sh"
+  if [ -f "$INSTALLER" ]; then
+    konsole --hold --title "Bazzite Install" -e bash "$INSTALLER"
+  else
+    notify-send "system-control" "bazzite-install.sh no encontrado en ~/ ni en el repo"
+  fi
+  ;;
+"󰅴")
+  if [ -x "$HOME/scripts/jobcopilot-install" ]; then
+    wm_spawn "1100 750" kitty --title "JobCopilot Free" -e "$HOME/scripts/jobcopilot-install"
+  else
+    notify-send "system-control" "jobcopilot-install: script no encontrado en ~/scripts/"
   fi
   ;;
 "")
@@ -368,11 +418,8 @@ case "$ICON" in
   fi
   ;;
 "")
-  if is_arch; then
-    kitty -e ~/fix-plasma-post-install.sh
-  else
-    notify-send "system-control" "XDG Portal — configurado en NixOS via flake"
-  fi
+  # PLasma Bazzite Desktop
+  kitty -e sudo ~/scripts/bazzite-desktop-boot-entry.sh
   ;;
 "🦙")
   if is_arch; then

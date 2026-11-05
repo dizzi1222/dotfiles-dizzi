@@ -5,6 +5,9 @@
     "prune": false,
     "reserved": 10000
   },
+  "experimental": {
+    "todo": true
+  },
   "mcp": {
     "engram": {
       "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
@@ -57,6 +60,19 @@
         "DI_PROXY_PORT": "6361"
       },
       "enabled": true
+    },
+    "servers": {
+      "swissdevjobs": {
+        "type": "local",
+        "command": [
+          "swissdevjobs-mcp"
+        ],
+        "environment": {
+          "SDJ_NAME": "Diego Samuel Hardi Santana",
+          "SDJ_EMAIL": "diegosamuel042@gmail.com",
+          "SDJ_CV": "/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
+        }
+      }
     }
   },
   "plugins": [

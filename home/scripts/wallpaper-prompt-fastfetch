@@ -1,8 +1,36 @@
 #!/bin/bash
 
-# Get current wallpaper path from swww
-# Extract everything after "image: " (taking the first monitor found)
-WALLPAPER_PATH=$(swww query 2>/dev/null | grep 'image:' | head -n 1 | sed 's/.*image: //')
+# Get current wallpaper path - cross-system (Plasma/KWin, Hyprland/swww, GNOME)
+WALLPAPER_PATH=""
+
+# Method 1: Plasma/KWin (qdbus6)
+if command -v qdbus6 >/dev/null 2>&1; then
+  WALLPAPER_PATH=$(qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.currentWallpaper 0 2>/dev/null | head -n1 | sed 's|^file://||')
+fi
+
+# Method 2: Fallback to plasmashellrc
+if [[ -z "$WALLPAPER_PATH" ]] || [[ ! -f "$WALLPAPER_PATH" ]]; then
+  WALLPAPER_PATH=$(grep -E '^Image=' ~/.config/plasmashellrc 2>/dev/null | head -n1 | sed 's|^Image=||' | sed 's|^file://||')
+fi
+
+# Method 3: Fallback to plasma-org.kde.plasma.desktop-appletsrc
+if [[ -z "$WALLPAPER_PATH" ]] || [[ ! -f "$WALLPAPER_PATH" ]]; then
+  WALLPAPER_PATH=$(grep -E 'image=' ~/.config/plasma-org.kde.plasma.desktop-appletsrc 2>/dev/null | head -n1 | sed 's/.*image=//' | sed 's|^file://||' | cut -d',' -f1)
+fi
+
+# Method 4: Hyprland/swww
+if [[ -z "$WALLPAPER_PATH" ]] || [[ ! -f "$WALLPAPER_PATH" ]]; then
+  WALLPAPER_PATH=$(swww query 2>/dev/null | grep 'image:' | head -n 1 | sed 's/.*image: //')
+fi
+
+# Method 5: Check default Bazzite wallpaper (actual directory structure)
+if [[ -z "$WALLPAPER_PATH" ]] || [[ ! -f "$WALLPAPER_PATH" ]]; then
+  shopt -s nullglob
+  for f in /usr/share/wallpapers/*.jpg /usr/share/wallpapers/*.png /usr/share/wallpapers/*.jxl            /usr/share/wallpapers/bazzite/*/*.jpg /usr/share/wallpapers/bazzite/*/*.png /usr/share/wallpapers/bazzite/*/*.jxl            /usr/share/wallpapers/convergence/*.jpg /usr/share/wallpapers/convergence/*.png /usr/share/wallpapers/convergence/*.jxl; do
+    [[ -f "$f" ]] && WALLPAPER_PATH="$f" && break
+  done
+  shopt -u nullglob
+fi
 
 # Define available modes
 # Added more presets and logo variants
