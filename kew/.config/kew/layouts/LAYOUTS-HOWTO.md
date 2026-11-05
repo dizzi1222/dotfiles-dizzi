@@ -56,6 +56,8 @@ visualizer, progress, song, playlist, library, search, footer, layout
 
 ## Components
 
+NOTE: error_row is a required component. Otherwise you won't be able to visibly name a playlist.
+
 Every region that does anything is a component. The allowed components are:
 
 empty, logo, now_playing, now_playing_and_artist,
@@ -80,7 +82,7 @@ help, version
 
 ## Limitations
 
-We still ideally would like to allow people to have things like the playlist and library on the same view, decide which views to include and name them in the footer. That sort of stuff is currently not possible. The playlist component has to be in the playlist view and so on or it wont work.
+We still ideally would like to allow people to have things like the playlist and library on the same view, decide which views to include and name them in the footer. That sort of stuff is currently not possible. The playlist component has to be in the playlist view and so on or it won't work.
 
 
 ## Example

@@ -5,5 +5,6 @@
 # El comando swaync-client --get-dnd ya devuelve directamente "true" o "false",
 # que es el formato exacto que SwayNC necesita para el estado del botón.
 
-# Nota: En Arch Linux, el ejecutable debería estar en /usr/bin/swaync-client.
-/usr/bin/swaync-client --get-dnd
+# swaync puede estar en ~/.local/bin (build desde fuente) o en /usr/bin.
+SWAYNC_CLIENT="$(command -v swaync-client || echo "$HOME/.local/bin/swaync-client")"
+exec "$SWAYNC_CLIENT" --get-dnd

@@ -1,5 +1,2 @@
-[Adapters]
-3C:F0:11:13:D5:48_powered=true
-
 [Devices]
-connectedDevices=
+connectedDevices=E4:17:D8:26:74:F2

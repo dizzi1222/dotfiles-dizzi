@@ -1,4 +1,4 @@
-version=10
+version=15
 
 [footer_pane]
 
@@ -68,7 +68,7 @@ width=auto
 
 row
 height=fixed:2
-col=indent
+col=indent_normal
 
 pane
 layout=footer_pane
@@ -121,7 +121,7 @@ width=auto
 
 row
 height=fixed:2
-col=indent
+col=indent_normal
 
 pane
 layout=footer_pane
@@ -148,7 +148,7 @@ width=auto
 
 row
 height=fixed:2
-col=indent
+col=indent_normal
 
 pane
 layout=footer_pane
@@ -170,11 +170,6 @@ width=auto
 row
 height=window_minus:2
 col=0
-
-pane
-component=landscape_cover
-dirty=song
-width=from_height
 
 pane
 layout=track_landscape_pane
@@ -240,7 +235,7 @@ width=auto
 
 row
 height=fixed:2
-col=indent
+col=indent_normal
 
 pane
 layout=footer_pane
@@ -273,6 +268,7 @@ col=0
 
 pane
 component=help
+dirty=help
 width=auto
 offsetX=2
 
@@ -289,11 +285,12 @@ width=indent_wide
 
 pane
 layout=help_pane
+dirty=help
 width=auto
 
 row
 height=fixed:2
-col=indent
+col=indent_normal
 
 pane
 layout=footer_pane

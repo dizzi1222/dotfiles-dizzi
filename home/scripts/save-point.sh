@@ -4,9 +4,25 @@
 # ================================================================================
 
 SAVE_BRANCH="main"
-SAVE_COMMIT="977d536a" # newbie NixOS savepoitn commit
+SAVE_COMMIT="e22d039c" # Bazzite es clave
+# NixOS last commit: 977d536a
 # CachyOS was the last savepoint commit: 6998fed
-SAVE_MSG="feat(dotfiles): add design-extract blueprint tool, arzopa vertical fix & hypr/niri sync.mejorar el cierre de waydroid y añadir soporte para HDMI-A-1 en rotación de monitores ✨ (input-remapper): añadir configuración para mouse Logitech G305 zurdo y actualizar mapeo de teclas ♻️ (hypr/niri): centralizar configuración de teclados en script setup-keyboard.sh y añadir rotación automática de monitores 📝 (nvim): actualizar subproyecto de configuración de Neovim ➕ (local): añadir lanzador de escritorio para Geforce Now Web"
+SAVE_MSG="
+    @Migration to Bazzite con ascii de fedora no puede faltar.
+    
+    - Dotfiles: stow completo 98 dirs, sparse checkout desactivado (~0.68 GiB)
+    - fedora-pkg-install: caché 24h + pre-filtrado (gum input + grep) = latencia input instantánea
+    - fedora-cleanup.sh: estilo nixconf-cleanup (1.1 GB liberados)
+    - bazzite-install.sh: +waybar/swaync rpm-ostree, agy (curl oficial), codex (npm/pipx)
+    - walset-menu: path fix, pywal instalado
+    - wofi/kitty: warnings fix (CSS/conf)
+    - Zen Alt+D fix: customKeys.json limpio (focusURLBar Alt+S)
+    - system_control.sh + eww/wofi: Fedora Cleanup entry (󰃢)
+    - zsh: gitflow savepoint fix (commit raíz real dbaa3cdd)
+    - nvim submodule: unshallow (147 commits)
+    - system_control.sh: kitty para Fedora Pkg, konsole para Bazzite Install (arranque <1s)
+    - fedora-pkg-install: pre-filtrado gum input + grep antes de gum filter (input latency instantánea)
+"
 
 # ── Verificar dependencia ────────────────────────────────────────────────────────
 if ! command -v gum &>/dev/null; then

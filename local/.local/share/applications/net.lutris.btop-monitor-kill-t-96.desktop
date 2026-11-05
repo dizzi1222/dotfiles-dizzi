@@ -6,7 +6,8 @@ Icon=/home/diego/.local/share/lutris/coverart/monitor-del-sistema.png
 Type=Application
 Name=Btop Monitor
 Comment=Kill = T
-Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/96
+Exec=kitty -e btop
 Hidden=true
-Categories=Game
-TryExec=lutris
+NoDisplay=true
+Categories=System;Monitor;
+TryExec=kitty

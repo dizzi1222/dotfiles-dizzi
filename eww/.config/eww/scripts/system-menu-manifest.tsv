@@ -3,6 +3,7 @@ Apps	󰺐	Scrcpy
 Apps	󰜫	Webapp
 Apps	󰗃	Soundbound
 Apps	󱄲󰖳	Bottles
+Apps	󰊴	Gamescope
 Apps	󱦥	Sunshine
 Apps		Start Espanso
 Trigger	󰳾	AutoClick
@@ -16,20 +17,23 @@ Trigger		Kill Gamescope
 Style		Night
 Style		Hypridle
 Style	󱓞	Power Mode
-Style		Game Mode
+Style		Game Mode
 Style		GTK Fix
 Style	󰐫	Design
 Setup		Drive
 Setup	󱛟	Disco
-Setup	 	Waydroid
-Setup		Portal
+Setup	 	Waydroid Script
+Setup		Bazzite Desktop Boot
 Setup	󱛍	WiFi Docs
 Setup		Zoom
+System		Return to SteamOS
 System		Rebuild Nix
 System	󰮮	Clean Boot
+System	󰃢	Fedora Cleanup
 System		Nix GC
 System		Nix Cleanup
 System		Git Clean
+System		Re stow
 System		Docker
 System		Red/Net
 System		Bluetooth
@@ -48,17 +52,24 @@ Herramientas		AI Conf
 About		Git Help
 About		README Wofi
 About		Créditos
-Android	 	Waydroid
 Android		Fotos Way
 Multimedia	󰝛	MP3 128k
 Multimedia	󰋌	Libros
 Multimedia		Suwayomi
+Multimedia	󰄀	Captura Pantalla
+Multimedia	󰄀	Captura Región
 Instalar	󰣇	Inst. AUR
 Instalar		Inst. pkg
+Instalar	󰏓	Flatpak Pkg
+Instalar		Fedora Pkg
+Instalar	󰍺	Brew Pkg
+Instalar	󰒓	Bazzite Install
+Instalar		Spicetify
 Instalar		Inst. Nix-Shell temporal
 Instalar	󰬺	Hypr fase1
 Instalar	󰬻	Hypr fase2
 Instalar	󰋊󰬼	CachyOS
 Instalar	󰟝	Inst. juego
 Instalar		Ext. IDE (Antigravity/Cursor/VSCode)
+Instalar	󰅴	JobCopilot Free
 Sistema	 󱕴	Gnome keyring

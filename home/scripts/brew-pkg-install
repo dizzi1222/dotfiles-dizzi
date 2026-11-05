@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# ============================================================
+# brew-pkg-install — Buscador/instalador TUI de paquetes Homebrew
+# ============================================================
+# Equivalente Bazzite/Linux a fedora-pkg-install:
+#   brew search     ->  índice de paquetes Homebrew
+#   gum filter      ->  búsqueda fuzzy y selección múltiple
+#   brew install    ->  instalación real (user, sin sudo)
+#
+# En macOS y Linux Homebrew.
+#
+# Uso:
+#   brew-pkg-install
+#   brew-pkg-install --refresh   # forzar re-indexado
+#
+# No ejecutar como root.
+# ============================================================
+
+set -uo pipefail
+
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+YELLOW=$'\033[1;33m'
+CYAN=$'\033[0;36m'
+BOLD=$'\033[1m'
+RESET=$'\033[0m'
+
+die() {
+  echo -e "${RED}✗ $*${RESET}" >&2
+  exit 1
+}
+
+pause() {
+  if command -v gum >/dev/null 2>&1; then
+    gum input --placeholder 'Presiona Enter para cerrar...' >/dev/null 2>&1 || true
+  else
+    read -r -p 'Presiona Enter para cerrar...' || true
+  fi
+}
+
+[ "$(id -u)" -eq 0 ] && die 'No ejecutes este script como root.'
+command -v gum >/dev/null 2>&1 || die 'Falta gum. Instálalo con: brew install gum'
+command -v brew >/dev/null 2>&1 || die 'Falta brew. Instálalo con Homebrew.'
+
+# Detectar brew path (Bazzite suele tenerlo en /home/linuxbrew/.linuxbrew/bin/brew)
+BREW_BIN="$(command -v brew || echo /home/linuxbrew/.linuxbrew/bin/brew)"
+export BREW_BIN
+
+# Caché del índice: ~/.cache/brew-pkg-index.txt (TTL 24h)
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+CACHE_FILE="$CACHE_DIR/brew-pkg-index.txt"
+CACHE_TTL=86400  # 24h en segundos
+
+# Flag --refresh para forzar regeneración
+REFRESH=0
+for arg in "$@"; do
+  case "$arg" in
+    --refresh|-r) REFRESH=1 ;;
+  esac
+done
+
+# Usar caché si existe y no expiró (y no se pidió --refresh)
+INDEX=""
+if [ "$REFRESH" -eq 0 ] && [ -f "$CACHE_FILE" ]; then
+  cache_age=$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0) ))
+  if [ "$cache_age" -lt "$CACHE_TTL" ]; then
+    INDEX="$CACHE_FILE"
+  fi
+fi
+
+# Si no hay caché válido, crear uno nuevo
+if [ -z "$INDEX" ]; then
+  INDEX=$(mktemp "${XDG_RUNTIME_DIR:-/tmp}/brew-pkg-index.XXXXXX") || die 'No se pudo crear el índice temporal.'
+  trap 'rm -f "$INDEX"' EXIT
+
+  index_packages() {
+    "$BREW_BIN" search --formulae --casks 2>/dev/null | sort -u
+  }
+  export -f index_packages
+
+  echo -e "${CYAN}${BOLD}󰍺 Homebrew — buscador de paquetes${RESET}"
+  gum spin --spinner dot --title 'Indexando paquetes Homebrew (primera vez / --refresh)...' -- \
+    bash -c 'index_packages > "$1"' _ "$INDEX"
+  spin_status=$?
+  [ "$spin_status" -eq 0 ] || die 'Falló la indexación de paquetes Homebrew.'
+  [ -s "$INDEX" ] || die 'El índice quedó vacío. Revisa la conexión o que brew esté funcionando.'
+
+  # Guardar en caché para próximas ejecuciones
+  mkdir -p "$CACHE_DIR"
+  cp "$INDEX" "$CACHE_FILE"
+  echo -e "${GREEN}✓ Índice guardado en $CACHE_FILE (válido 24h). Use --refresh para forzar actualización.${RESET}"
+else
+  echo -e "${CYAN}${BOLD}󰍺 Homebrew — buscador de paquetes${RESET} ${GREEN}(caché)${RESET}"
+fi
+
+COUNT=$(wc -l < "$INDEX")
+echo -e "${GREEN}✓${RESET} $COUNT paquetes disponibles.\n"
+
+# Pre-filtrado: input query -> grep -> gum filter
+QUERY=$(gum input \
+  --placeholder "Buscar paquete (ej: kitty, htop, neovim, gum)..." \
+  --prompt " > " \
+  --width 60)
+[ -z "$QUERY" ] && { echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"; exit 0; }
+
+FILTERED=$(grep -i "$QUERY" "$INDEX")
+FILTERED_COUNT=$(echo "$FILTERED" | grep -c '^')
+[ "$FILTERED_COUNT" -eq 0 ] && { echo -e "${YELLOW}No hay coincidencias para: $QUERY${RESET}"; pause; exit 0; }
+
+echo -e "${GREEN}✓${RESET} $FILTERED_COUNT coincidencias para \"$QUERY\" (de $COUNT).\n"
+
+SELECTED=$(echo "$FILTERED" | gum filter \
+  --strict \
+  --no-limit \
+  --no-sort \
+  --height 25 \
+  --header "Homebrew · $FILTERED_COUNT resultados · TAB selecciona · ENTER confirma" \
+  --placeholder "Refinar búsqueda...")
+filter_status=$?
+
+if [ "$filter_status" -ne 0 ] || [ -z "$SELECTED" ]; then
+  echo -e "${YELLOW}ℹ  Búsqueda cancelada.${RESET}"
+  exit 0
+fi
+
+mapfile -t packages < <(
+  printf '%s\n' "$SELECTED" \
+    | sed '/^$/d' \
+    | sort -u
+)
+
+[ "${#packages[@]}" -gt 0 ] || die 'No se seleccionó ningún paquete válido.'
+
+pending=()
+installed=()
+for pkg in "${packages[@]}"; do
+  if "$BREW_BIN" list --formula "$pkg" >/dev/null 2>&1 || "$BREW_BIN" list --cask "$pkg" >/dev/null 2>&1; then
+    installed+=("$pkg")
+  else
+    pending+=("$pkg")
+  fi
+done
+
+if [ "${#installed[@]}" -gt 0 ]; then
+  echo -e "${YELLOW}Ya instalados:${RESET} ${installed[*]}"
+fi
+
+if [ "${#pending[@]}" -eq 0 ]; then
+  echo -e "${GREEN}✓ No hay nada nuevo que instalar.${RESET}"
+  pause
+  exit 0
+fi
+
+echo -e "\n${BOLD}Paquetes a instalar:${RESET}"
+printf '  • %s\n' "${pending[@]}"
+echo
+
+if ! gum confirm "¿Instalar ${#pending[@]} paquete(s)?"; then
+  echo -e "${YELLOW}ℹ  Instalación cancelada.${RESET}"
+  exit 0
+fi
+
+echo -e "\n${CYAN}Instalando paquetes...${RESET}"
+failed=()
+for pkg in "${pending[@]}"; do
+  echo -e "  → $pkg"
+  if ! "$BREW_BIN" install "$pkg"; then
+    failed+=("$pkg")
+  fi
+done
+
+echo
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo -e "${RED}✗ Fallaron: ${failed[*]}${RESET}"
+  exit 1
+fi
+
+echo -e "${GREEN}✓ Instalación completada.${RESET}"
+pause

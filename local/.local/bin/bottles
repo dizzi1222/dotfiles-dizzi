@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# bottles — wrapper para Bottles (flatpak) en PATH nativo
+set -euo pipefail
+
+exec flatpak run com.usebottles.bottles "$@"

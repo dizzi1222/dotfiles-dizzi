@@ -737,10 +737,25 @@ echo
 read -p "¿Configurar Wine prefix ahora? [S/n]: " setup_wine
 
 if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
-  if ! command -v wine &>/dev/null || ! command -v winetricks &>/dev/null; then
-    print_warning "wine/winetricks no están en PATH. En NixOS usa: nix-shell -p wine winetricks"
-    print_warning "Omitiendo Wine prefix (Bottles usa sus propios runners)."
+  WINE_BIN=""
+  WINE_RUNNER=""
+  
+  if command -v wine &>/dev/null && command -v winetricks &>/dev/null; then
+    WINE_BIN="$(command -v wine)"
+    WINE_RUNNER="system"
+  elif [ -x "$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/soda-11.0-10/bin/wine" ]; then
+    # Fallback a runner soda de Bottles (tiene .NET 4.8 funcional)
+    R="$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/soda-11.0-10"
+    export PATH="$R/bin:$PATH"
+    export LD_LIBRARY_PATH="$R/lib:$R/lib/wine/x86_64-unix:$R/lib/wine/i386-unix${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    WINE_BIN="$R/bin/wine"
+    WINE_RUNNER="bottles-soda"
+    print_warning "wine del sistema no disponible; usando runner soda de Bottles ($WINE_RUNNER)"
   else
+    print_warning "wine/winetricks no disponibles; omitiendo Wine prefix (Bottles usa sus propios runners)."
+  fi
+
+  if [ -n "$WINE_BIN" ]; then
     export WINEPREFIX="$HOME/.wine"
     # Solo forzar win64 cuando se va a recrear limpio; un prefix win32 con
     # WINEARCH=win64 hace que winetricks/wine/funcionen mal (arch desalineada).
@@ -773,24 +788,42 @@ if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
     fi
 
     print_status "Inicializando Wine prefix"
-    wineboot -u 2>/dev/null &
+    "$WINE_BIN" wineboot -u 2>/dev/null &
     sleep 5
 
-    print_status "Instalando componentes Wine con winetricks"
-    wt_fail=0
-    for wt_args in \
-      "corefonts dotnet40 dotnet48 dxvk d3dx9 vcrun2022" \
-      "d3dcompiler_47 d3dx11_42 win10" \
-      "vcrun2013 vcrun2012 vcrun2010 vcrun2008 vcrun2005" \
-      "mf quartz"
-    do
-      print_status "winetricks $wt_args"
-      winetricks $wt_args 2>&1 || wt_fail=1
+    # Fix explícito: forzar Windows 10 (10.0/19041) en HKLM y Wow6432Node
+    # winetricks win10 a veces no aplica con runners custom; esto lo fuerza.
+    print_status "Forzando Windows 10 (10.0/19041) en registro..."
+    for root in "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion" \
+                "HKLM\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion"; do
+      "$WINE_BIN" reg add "$root" /v CurrentVersion /t REG_SZ /d "10.0" /f >/dev/null 2>&1
+      "$WINE_BIN" reg add "$root" /v CurrentBuild /t REG_SZ /d "19041" /f >/dev/null 2>&1
+      "$WINE_BIN" reg add "$root" /v ReleaseId /t REG_SZ /d "2009" /f >/dev/null 2>&1
     done
-    if [[ "$wt_fail" -ne 0 ]]; then
-      print_warning "Algunos componentes winetricks reportaron error (revisa el output de arriba)."
+
+    # winetricks usa el wine del PATH; ya exportamos PATH/LD_LIBRARY_PATH arriba
+    sleep 5
+
+    # winetricks usa el wine del PATH; ya exportamos PATH/LD_LIBRARY_PATH arriba
+    if command -v winetricks &>/dev/null; then
+      print_status "Instalando componentes Wine con winetricks"
+      wt_fail=0
+      for wt_args in \
+        "corefonts dotnet40 dotnet48 dxvk d3dx9 vcrun2022" \
+        "d3dcompiler_47 d3dx11_42 win10" \
+        "vcrun2013 vcrun2012 vcrun2010 vcrun2008 vcrun2005" \
+        "mf quartz"
+      do
+        print_status "winetricks $wt_args"
+        winetricks $wt_args 2>&1 || wt_fail=1
+      done
+      if [[ "$wt_fail" -ne 0 ]]; then
+        print_warning "Algunos componentes winetricks reportaron error (revisa el output de arriba)."
+      else
+        print_success "Componentes winetricks instalados."
+      fi
     else
-      print_success "Componentes winetricks instalados."
+      print_warning "winetricks no encontrado; saltando componentes (usa: winetricks corefonts dotnet48 dxvk ...)"
     fi
 
     # Wine Dark Theme
@@ -799,7 +832,7 @@ if [[ ! "$setup_wine" =~ ^[Nn]$ ]]; then
       apply_wine_dark_theme "$WINEPREFIX" "Wine (~/.wine)"
     fi
 
-    print_success "Wine configurado"
+    print_success "Wine configurado ($WINE_RUNNER)"
   fi
 else
   print_warning "Wine prefix omitido"
@@ -1200,3 +1233,87 @@ echo
 
 echo -e "${GREEN}🎮 ¡Disfruta tu setup Gaming optimizado! 🎮${NC}"
 echo
+
+# =============================================================================
+# GE-Proton runner (wine-staging) para AF_UNIX sockets (Discord IPC bridge)
+# =============================================================================
+print_header "GE-Proton runner (wine-staging) para Discord IPC bridge"
+
+GE_RUNNER="$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/GE-Proton8-26"
+if [ ! -d "$GE_RUNNER" ]; then
+  print_status "Descargando GE-Proton8-26 (wine-staging)..."
+  cd /tmp
+  curl -fsSL -o wine-ge.tar.xz "https://github.com/GloriousEggroll/wine-ge-custom/releases/download/GE-Proton8-26/wine-lutris-GE-Proton8-26-x86_64.tar.xz"
+  mkdir -p wine-ge && tar -xf wine-ge.tar.xz -C wine-ge
+  mkdir -p "$GE_RUNNER"
+  cp -r /tmp/wine-ge/lutris-GE-Proton8-26-x86_64/* "$GE_RUNNER/"
+  print_success "GE-Proton8-26 instalado"
+else
+  print_success "GE-Proton8-26 ya instalado"
+fi
+
+# Wrapper wine-staging
+cat > "$HOME/.local/bin/wine-staging" <<'WINE_STAGING_EOF'
+#!/bin/bash
+R="$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/GE-Proton8-26"
+export LD_LIBRARY_PATH="$R/lib:$R/lib/wine/x86_64-unix:$R/lib/wine/i386-unix${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export WINEPREFIX="${WINEPREFIX:-$HOME/.wine}"
+exec "$R/bin/wine" "$@"
+WINE_STAGING_EOF
+chmod +x "$HOME/.local/bin/wine-staging"
+print_success "wine-staging wrapper creado en ~/.local/bin/"
+
+# Launcher customrp-discord.sh
+cat > "$HOME/.local/bin/juegos/customrp-discord.sh" <<'CUSTOMRP_DISCORD_EOF'
+#!/bin/bash
+# customrp-discord.sh — Lanza CustomRP con bridge IPC para Discord
+set -euo pipefail
+MODE="${1:-wine}"
+STAGING_RUNNER="$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/GE-Proton8-26"
+SODA_RUNNER="$HOME/.var/app/com.usebottles.bottles/data/bottles/runners/soda-11.0-10"
+
+kill_old_bridges() {
+  pkill -f "bridge.exe" 2>/dev/null || true
+  pkill -f "winediscordipcbridge" 2>/dev/null || true
+  sleep 1
+}
+
+wait_for_socket() {
+  local timeout=10 elapsed=0
+  while [ ! -S "/run/user/1000/discord-ipc-0" ] && [ $elapsed -lt $timeout ]; do sleep 0.5; elapsed=$((elapsed+1)); done
+  [ -S "/run/user/1000/discord-ipc-0" ]
+}
+
+case "${1:-wine}" in
+  wine)
+    echo "=== Modo Wine (~/.wine) con wine-staging ==="
+    kill_old_bridges
+    export WINEPREFIX="$HOME/.wine"
+    export LD_LIBRARY_PATH="$STAGING_RUNNER/lib:$STAGING_RUNNER/lib/wine/x86_64-unix:$STAGING_RUNNER/lib/wine/i386-unix"
+    echo "Iniciando bridge.exe (wine-staging)..."
+    "$STAGING_RUNNER/bin/wine" "$WINEPREFIX/drive_c/windows/system32/discord/bridge.exe" >/tmp/bridge-wine.log 2>&1 &
+    BRIDGE_PID=$!
+    if wait_for_socket; then
+      echo "Iniciando CustomRP..."
+      "$STAGING_RUNNER/bin/wine" "$WINEPREFIX/drive_c/users/diego/AppData/Roaming/CustomRP/CustomRP.exe"
+    else
+      kill $BRIDGE_PID 2>/dev/null || true; exit 1
+    fi
+    ;;
+  bottles)
+    echo "=== Modo Bottles (botella gaming) ==="
+    kill_old_bridges
+    flatpak run --command=bottles-cli com.usebottles.bottles run -b gaming -e "C:\\windows\\system32\\discord\\bridge.exe" >/tmp/bridge-bottles.log 2>&1 &
+    BRIDGE_PID=$!
+    if wait_for_socket; then
+      flatpak run --command=bottles-cli com.usebottles.bottles run -b gaming -e "C:\\Users\\diego\\AppData\\Roaming\\CustomRP\\CustomRP.exe"
+    else
+      kill $BRIDGE_PID 2>/dev/null || true; exit 1
+    fi
+    ;;
+  *) echo "Uso: $0 {wine|bottles}"; exit 1 ;;
+esac
+CUSTOMRP_DISCORD_EOF
+chmod +x "$HOME/.local/bin/juegos/customrp-discord.sh"
+print_success "customrp-discord.sh creado"
+

@@ -4,4 +4,3 @@ Icon=user-desktop
 Name=Vicinae Launcher
 Exec=/home/diego/.config/scripts-plasma-windows-desktop/vicinae-launcher.sh
 NoDisplay=true
-Hidden=true

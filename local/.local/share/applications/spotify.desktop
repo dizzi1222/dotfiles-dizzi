@@ -2,8 +2,8 @@
 Type=Application
 Name=Spotify
 Comment=Spotify music player
-Icon=spotify-client
-Exec=env -u DISPLAY spotify %U
+Icon=spotify
+Exec=env -u DISPLAY /home/diego/dotfiles-dizzi/home/scripts/spotify-spicetify-launch.sh %U
 Categories=Audio;AudioVideo;Player;
 Terminal=false
 StartupNotify=false

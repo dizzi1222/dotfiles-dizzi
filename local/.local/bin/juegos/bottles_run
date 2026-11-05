@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# bottles_run — wrapper CLI para llamar a bottles_run de _bottles.sh desde .desktop
+# Uso: bottles_run <botella> "C:\ruta\windows\app.exe" [args...]
+set -euo pipefail
+
+. "$(dirname "$(readlink -f "$0")")/_bottles.sh"
+
+bottles_run "$@"

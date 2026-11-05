@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=swaync-toggle
+Exec=/home/diego/.local/bin/swaync-client -t -sw
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true

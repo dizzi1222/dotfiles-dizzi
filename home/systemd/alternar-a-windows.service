@@ -1,0 +1,11 @@
+[Unit]
+Description=Configurar UEFI para bootear Windows en el próximo arranque
+DefaultDependencies=no
+Before=shutdown.target umount.target systemd-reboot.service systemd-poweroff.service systemd-halt.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/alternar-windows-bazzite.sh
+
+[Install]
+WantedBy=reboot.target poweroff.target halt.target

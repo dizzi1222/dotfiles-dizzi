@@ -1,7 +1,13 @@
 󰋚	historial history HISTORIAL history commands zsh bash terminal
-󰣇	aur yay instalar paquetes arch
-	pkg instalar paquetes pacman
-	nix nixos nixpkgs shell temporal tmp paquete instalar unfree unrar
+󰣇	aur pkg Pkg yay instalar paquetes arch
+	pkg Pkg instalar paquetes pacman
+	fedora bazzite Bazzite pkg Pkg Fedora linux dnf dnf5 rpm rpm-ostree paquete paquetes instalar buscar search gum tui bazzite
+󰍺	brew homebrew Pkg pkg paquetes instalar buscar search gum tui fórmula cask linux macOS
+󰏓	flatpak flathub Pkg pkg Fedora Flatpak Flathub fedora bazzite Bazzite buscar instalar paquetes app aplicaciones flathub search install
+󰒓	bazzite install Fedora fedora Bazzite instalador instalación script personal setup bazzite-install.sh capa rpm-ostree sistema
+	spicetify spotify marketplace tema temas themes extensions extensiones personalizar aplicar actualizar musica bazzite
+	stow restow re-stow reestow symlinks enlaces dotfiles adopt adoptar local repo reaplicar enlazar
+	nix Pkg pkg nixos nixpkgs shell temporal tmp paquete instalar unfree unrar
 󰜫	webapp instalar aplicaciones web
 󰳾	autoclick mouse macro tinytask god
 	pulse audio control volumen
@@ -9,11 +15,12 @@
 	git clean limpiar repositorio
 	limpiar cache limpieza
 󰮮	limpiar boot clean-boot reconstruir
+󰃢	fedora Fedora bazzite cleanup limpiar dnf5 rpm-ostree flatpak journal coredump cache basura
 	nix os nixos nixconf rebuild build config home-manager
 󰌌 󱊮	autopress de tecla teclado keyboard macro auto
 	red network wifi ethernet network internet
 	bluetooth bluetuith conexion
-	game modo juego gaming
+	game modo juego gaming steam Steam
 󱓞	power perfomance optimizar rendimiento energia bateria
 	gyazo captura screenshot menu
 󰩫	gyazo captura recortar screenshot clipboard
@@ -25,6 +32,7 @@
 󰬻	hyprland install fase2 user instalacion arch
 󰋊󰬼	Instalar CachyOS fase2-HyprInstall-CachyOS-Edition cachyos cachy os Cachy OS
 󱄲󰖳	bottles wine windows instalar
+󰊴	gamescope juego game gaming cursor raton mouse bloquear lock confinar desktop app lanzar wrapper fullscreen 1080p
 󱦥	sunshine audio local loopback aurifonos headphones streaming
 	fix de ydotool para macros autoclick systemd
  󱕴	gnome keyring Gnome Keyring llaves reparar para GDM SDDM Brave
@@ -34,7 +42,7 @@
  	waydroid scripts gapps gms magisk ROOT android 13 11 phablet telefono configurar
 	widgets eww lanzar
 	git ayuda help comandos
-	XDG xdg Portal Fix del GDM/SDDM Desktop Env
+	Bazzite plasma Plasma Desktop Boot fedora Fedora bazzite grub boot regenerar !== XDG xdg Portal Fix del GDM/SDDM Desktop Env
 🦙	Ollama ollama llama local cloud
 	gtk font fuente nerd icons iconos refresh cache fix
 󰐫	design extract blueprint colores palette css tokens prompt ia imagen
@@ -59,3 +67,6 @@
 	creditos creditos izzi1222 autor thank you gracias
 	anso reiniciar restart restart-espanso text expander expansion crashea crasheo died died-again
 	instalar extensiones antigravity cursor vscode vscodium code ide extensions vsix
+󰅴	jobcopilot job copilot jobcopilot-free career ai job copilot swissdevjobs sdj empleo trabajo curriculum cv ollama docker podman drive instalar install setup
+󰄀	satty captura screenshot pantalla region grim slurp annotar editar imagen fullscreen regional
+	steam Steam shutdown logout sesion volver steamos Bazzite Plasma SDDM cerrar sesion regresar game SteamOs SteamOS steamOS steamOS STEAMOS STEAM return to before

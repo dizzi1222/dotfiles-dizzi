@@ -336,3 +336,9 @@ local/.local/share/applications/mimeinfo.cache
 # (localconfig/registry/compat son binarios volátiles que Steam reescribe)
 **/.local/share/Steam/userdata/*/config/*.vdf
 !**/.local/share/Steam/userdata/*/config/shortcuts.vdf
+
+# Cache de shaders de juegos (volátil, cientos de MB)
+local/.local/bin/juegos/GLCache/
+
+# Logs de Sunshine (rotan y se reescriben solos)
+sunshine/.config/sunshine/sunshine.log*

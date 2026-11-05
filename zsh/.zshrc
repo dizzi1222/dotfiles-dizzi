@@ -27,9 +27,7 @@ bindkey '^?' backward-kill-word
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# Paquetes Nix temporales para toda la sesión de usuario. El perfil vive en
-# XDG_RUNTIME_DIR, así que las terminales nuevas lo detectan automáticamente y
-# deja de existir al cerrar la sesión o reiniciar.
+# Paquetes Nix temporales para toda la sesión (solo si existe el perfil)
 NIX_SESSION_PROFILE="${XDG_RUNTIME_DIR:-}/nix-session-profile"
 if [[ -n "${XDG_RUNTIME_DIR:-}" && -d "$NIX_SESSION_PROFILE/bin" ]]; then
   case ":$PATH:" in
@@ -39,7 +37,6 @@ if [[ -n "${XDG_RUNTIME_DIR:-}" && -d "$NIX_SESSION_PROFILE/bin" ]]; then
 fi
 unset NIX_SESSION_PROFILE
 
-# ---------------------------------------------------------------------------------------------
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -141,8 +138,6 @@ plugins=(
   git
   zsh-syntax-highlighting
   zsh-autosuggestions
-  zsh-completions
-  zsh-history-substring-search
     # alias-tips          # OPCIONAL -← FALTA ESTE
     # zsh-vi-mode         # OPCIONAL -← FALTA ESTE
 )
@@ -208,9 +203,21 @@ source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 # ---------------------------------------------------------------------------------------------
 # ///////////////////////////////////////////////////////////////////////
 
-# Carga de un programa al iniciar la terminal (opcional).
-# fastfetch con wallpaper actual
+# Banner MOTD de Bazzite (el mismo de Bash) en zsh.
+if [ -x /usr/libexec/ublue-motd ] && [ ! -e "$HOME/.config/no-show-user-motd" ]; then
+  /usr/libexec/ublue-motd
+fi
+
+# fastfetch con wallpaper aleatorio (estilo clásico)
 $HOME/dotfiles-dizzi/home/scripts/wallpaper-prompt-fastfetch
+
+# Banner MOTD de Bazzite (el mismo de Bash) en zsh.
+if [ -x /usr/libexec/ublue-motd ] && [ ! -e "$HOME/.config/no-show-user-motd" ]; then
+  /usr/libexec/ublue-motd
+fi
+
+# fastfetch con los colores de Bazzite (alias para uso manual)
+alias fastfetch='/usr/bin/fastfetch --color $(/usr/libexec/bazzite-bling-fastfetch) -c /usr/share/ublue-os/bazzite/fastfetch.jsonc'
 
 
 # guardar el historial:
@@ -258,17 +265,17 @@ alias history='fc -l 1 > /tmp/history && cat /tmp/history'
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # ls - 🖼️ Ver imágenes en la terminal
-alias ls='exa --icons --color=always'
+alias ls='eza --icons --color=always'
 
 # Aliases NUEVOS (agregar estos):
-alias ll='exa -lha --icons --git --color=always'           # Detallado completo
-alias la='exa -a --icons --color=always'                   # Mostrar ocultos
-alias lt='exa -T --icons --color=always'                   # Árbol simple
-alias lta='exa -Ta --icons --color=always'                 # Árbol + ocultos
-alias ltl='exa -lTa --icons --git --color=always'          # Árbol detallado
-alias lsd='exa -D --icons --color=always'                  # Solo directorios
-alias lss='exa -lha --sort=size --reverse --icons'         # Por tamaño
-alias lst='exa -lha --sort=modified --reverse --icons'     # Por fecha
+alias ll='eza -lha --icons --git --color=always'           # Detallado completo
+alias la='eza -a --icons --color=always'                   # Mostrar ocultos
+alias lt='eza -T --icons --color=always'                   # Árbol simple
+alias lta='eza -Ta --icons --color=always'                 # Árbol + ocultos
+alias ltl='eza -lTa --icons --git --color=always'          # Árbol detallado
+alias lsd='eza -D --icons --color=always'                  # Solo directorios
+alias lss='eza -lha --sort=size --reverse --icons'         # Por tamaño
+alias lst='eza -lha --sort=modified --reverse --icons'     # Por fecha
 
 # notepad estilo Windows
 notepad() {
@@ -348,19 +355,11 @@ wine11file() {
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto"
-alias code="code --enable-features=WaylandWindowDecorations --ozone-platform-hint=auto"
+# VS Code no instalado: el editor principal es Cursor (~/.local/bin/cursor).
 
 export PATH=$PATH:/home/diego/.spicetify
 
-# NixOS aliases
-alias nixrb='sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2'
-alias hm='home-manager switch --flake ~/dotfiles-dizzi/nixconf#diego@thinkpad-x1e2'
-alias nixos='nix-shell -p'
-alias nixup='nix flake update --flake ~/dotfiles-dizzi/nixconf'
-alias nixgc='sudo nix-collect-garbage -d'
-alias ns='nix search nixpkgs'
-alias rebuild='sudo nixos-rebuild switch --flake ~/dotfiles-dizzi/nixconf#thinkpad-x1e2'
+# Aliases de NixOS eliminados: Bazzite no usa Nix.
 
 # Zoxide
 eval "$(zoxide init zsh)"
@@ -371,17 +370,9 @@ eval "$(zoxide init zsh)"
 #
 # =============================================================================
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# Carga la configuración del prompt.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# HABILITAR OH MY POSH [trae mas temas]
-# https://ohmyposh.dev/docs/themes
-eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json')"
-
-# HABILITAR STARSHIP [AESTHETIC UPGRADE]
-# export STARSHIP_CONFIG="$HOME/dotfiles-dizzi/starship/.config/starship/starship.toml"
-# eval "$(starship init zsh)"
+# Prompt único: Starship, con la config stowed en ~/.config/starship/starship.toml.
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+eval "$(starship init zsh)"
 
 # Configuración global de Git
 git config --global core.quotepath false
@@ -752,7 +743,8 @@ gitflow() {
   echo "  13. 💾 Savepoint (amend al commit raíz)"
   echo "  14. 🌐 Sincronizar ~/workspace (dual push dizzi1222 + dhardi007)"
   echo "  15. 🗣️ Commit (Head) Actual"
-  echo "  16. ❌ Cancelar"
+  echo "  16. 🔧 Reescribir migración Bazzite (amend a2455f6c)"
+  echo "  17. ❌ Cancelar"
   echo ""
   echo -n "Elige opción: "
   read option
@@ -795,7 +787,7 @@ gitflow() {
       ;;
     13)
       echo "💾 Savepoint: aplastando al commit raíz..."
-      git reset --soft 977d536a # newbie NixOS savepoitn commit
+      git reset --soft e22d039c # commit raíz real
       git add -A
       git commit --amend --no-edit
       echo "✅ Savepoint creado: $(git rev-parse --short HEAD) ($(git rev-list --count HEAD) commits)"
@@ -824,7 +816,13 @@ gitflow() {
       git rev-list --count HEAD   # debe dar 325
       git status --short           # working tree limpio
       ;;
-    16) echo "❌ Cancelado" ;;
+    16)
+      cd /home/diego/dotfiles-dizzi
+      git add .
+      git commit --fixup a2455f6c
+      GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash a2455f6c^
+      ;;
+    17) echo "❌ Cancelado" ;;
     *) echo "❌ Opción inválida" ;;
   esac
 }

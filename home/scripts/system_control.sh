@@ -79,7 +79,7 @@ case "$ICON" in
   ;;
 "")
   # networkmanager_dmenu
-  kitty -e impala # Mejor para gestionar redes
+  kitty -e bash -c 'impala || wlctl'
   ;;
 "☠")
   kitty -e ~/scripts/save-point.sh
@@ -124,14 +124,22 @@ case "$ICON" in
 "󰗃")
   kitty --hold -e bash -c "
     if ! command -v bindfs &>/dev/null; then
-      if is_arch; then
-        echo '📦 Instalando bindfs...'
+      if grep -qiE 'arch|cachyos' /etc/os-release; then
         yay -S bindfs --noconfirm
+      elif grep -qiE 'bazzite|fedora' /etc/os-release; then
+        echo '❌ bindfs no está instalado.'
+        echo '   Ejecuta: sudo rpm-ostree install bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
+      elif grep -qi 'nixos' /etc/os-release; then
+        echo '❌ bindfs no está instalado en NixOS.'
+        echo '   Usa: nix shell nixpkgs#bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       else
-        echo '📦 bindfs no disponible en NixOS. Montando sin bindfs...'
-        sudo mkdir -p /mnt/waydroid
-        sudo mount --bind \$HOME/.local/share/waydroid/data/media/0 /mnt/waydroid
-        sudo mount -o remount,bind,uid=\$(id -u),gid=\$(id -g) /mnt/waydroid
+        echo '❌ bindfs no está instalado.'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       fi
     fi
 
@@ -161,11 +169,20 @@ case "$ICON" in
 "")
   kitty --hold -e bash -c "
     if ! command -v bindfs &>/dev/null; then
-      if is_arch; then
-        echo '📦 Instalando bindfs...'
+      if grep -qiE 'arch|cachyos' /etc/os-release; then
         yay -S bindfs --noconfirm
+      elif grep -qiE 'bazzite|fedora' /etc/os-release; then
+        echo '❌ bindfs no está instalado.'
+        echo '   Ejecuta: sudo rpm-ostree install bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
+      elif grep -qi 'nixos' /etc/os-release; then
+        echo '❌ bindfs no está instalado en NixOS.'
+        echo '   Usa: nix shell nixpkgs#bindfs'
+        read -p 'Presiona Enter para cerrar...'
+        exit 1
       else
-        echo '❌ bindfs no disponible en NixOS. Instálalo con: nix shell nixpkgs#bindfs'
+        echo '❌ bindfs no está instalado.'
         read -p 'Presiona Enter para cerrar...'
         exit 1
       fi
@@ -214,8 +231,12 @@ case "$ICON" in
 "󱓞")
   sh ~/.config/eww/scripts/power-modes-fuzzel.sh
   ;;
-"")
+"")
   sh ~/.config/eww/scripts/toggle-game-mode.sh
+  ;;
+"")
+  # Return to SteamOS
+  qdbus-qt6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
   ;;
 "󰂜")
   sh ~/.config/eww/scripts/toggle-dnd.sh
@@ -250,14 +271,29 @@ case "$ICON" in
 "")
   kitty -e ~/scripts/limpiar_cache.sh
   ;;
+"󰍉")
+  # WinBoot removido del menú wofi: ahora es automático vía systemd
+  # alternar-a-windows.service (se ejecuta al apagar/reiniciar)
+  ;;
+
 "󰮮")
   wm_spawn "800 600" kitty --title "CleanBoot" -- sh -c 'sudo ~/.local/bin/clean-boot; read -p "Presiona Enter para cerrar..."'
+  ;;
+"󰃢")
+  wm_spawn "1000 700" kitty --title "FedoraCleanup" -- sh -c '~/scripts/fedora-cleanup.sh; read -p "Presiona Enter para cerrar..."'
   ;;
 "")
   wm_spawn "1000 700" kitty --title "NixRebuild" -- sh -c '~/.local/bin/nixconf-rebuild 2>&1 | tee ~/.cache/nixconf-rebuild.log; read -p "Presiona Enter para cerrar..."'
   ;;
 "")
   sh ~/scripts/git_clean.sh
+  ;;
+"")
+  if command -v stow >/dev/null 2>&1; then
+    kitty --hold --title "Re stow" -e bash -c 'cd "$HOME/dotfiles-dizzi" && stow local --adopt'
+  else
+    notify-send "system-control" "stow no está instalado; instálalo con brew install stow"
+  fi
   ;;
 "󰜫")
   if [ -x ~/omarchy-arch-bin/omarchy-webapp-install ]; then
@@ -271,6 +307,51 @@ case "$ICON" in
     kitty -e ~/omarchy-arch-bin/omarchy-pkg-install
   else
     notify-send "system-control" "omarchy-pkg-install: script no encontrado en ~/omarchy-arch-bin/"
+  fi
+  ;;
+"󰏓")
+  if [ -x "$HOME/scripts/flatpak-pkg-install" ]; then
+    kitty --title "Flatpak Pkg" -e "$HOME/scripts/flatpak-pkg-install"
+  else
+    notify-send "system-control" "flatpak-pkg-install: script no encontrado en ~/scripts/"
+  fi
+  ;;
+"")
+  if [ -x "$HOME/scripts/fedora-pkg-install" ]; then
+    kitty --title "Fedora Pkg" -e "$HOME/scripts/fedora-pkg-install"
+  else
+    notify-send "system-control" "fedora-pkg-install: script no encontrado en ~/scripts/"
+  fi
+  ;;
+"󰍺")
+  if [ -x "$HOME/scripts/brew-pkg-install" ]; then
+    kitty --title "Brew Pkg" -e "$HOME/scripts/brew-pkg-install"
+  else
+    notify-send "system-control" "brew-pkg-install: script no encontrado en ~/scripts/"
+  fi
+  ;;
+"󰒓")
+  INSTALLER="$HOME/bazzite-install.sh"
+  [ -f "$INSTALLER" ] || INSTALLER="$HOME/dotfiles-dizzi/home/bazzite-install.sh"
+  if [ -f "$INSTALLER" ]; then
+    konsole --hold --title "Bazzite Install" -e bash "$INSTALLER"
+  else
+    notify-send "system-control" "bazzite-install.sh no encontrado en ~/ ni en el repo"
+  fi
+  ;;
+"")
+  SPICETIFY_HELPER="$HOME/dotfiles-dizzi/home/scripts/spicetify-native-apply.sh"
+  if [ -f "$SPICETIFY_HELPER" ]; then
+    kitty --hold --title "Spicetify" -e bash "$SPICETIFY_HELPER"
+  else
+    notify-send "system-control" "spicetify-native-apply.sh no encontrado en el repo"
+  fi
+  ;;
+"󰅴")
+  if [ -x "$HOME/scripts/jobcopilot-install" ]; then
+    wm_spawn "1100 750" kitty --title "JobCopilot Free" -e "$HOME/scripts/jobcopilot-install"
+  else
+    notify-send "system-control" "jobcopilot-install: script no encontrado en ~/scripts/"
   fi
   ;;
 "")
@@ -364,15 +445,14 @@ case "$ICON" in
   if is_arch; then
     kitty -e nvim ~/.zsh_history
   else
-    kitty -e nvim ~/.local/share/fish/fish_history
+    # kitty -e nvim ~/.local/share/fish/fish_history
+    # NO USO Fish history por ahora.
+    kitty -e nvim ~/.zsh_history
   fi
   ;;
 "")
-  if is_arch; then
-    kitty -e ~/fix-plasma-post-install.sh
-  else
-    notify-send "system-control" "XDG Portal — configurado en NixOS via flake"
-  fi
+  # PLasma Bazzite Desktop
+  kitty -e sudo ~/scripts/bazzite-desktop-boot-entry.sh
   ;;
 "🦙")
   if is_arch; then
@@ -389,6 +469,11 @@ case "$ICON" in
   ;;
 "")
   kitty --hold -e zsh -is -c "sleep 0.5; aicommitconfig"
+  ;;
+"󰊴")
+  # Lanza cualquier app .desktop dentro de Gamescope con el cursor confinado.
+  # Selector fuzzel/wofi + --force-grab-cursor (ver ~/scripts/gamescope-launcher.sh).
+  bash ~/scripts/gamescope-launcher.sh
   ;;
 "")
   kitty -e ~/scripts/kill-gamescope
@@ -420,10 +505,10 @@ case "$ICON" in
 "")
   # Google Drive rclone: montar los remotes gdrive y gd-musica
   kitty --hold -e bash -c "
-    bash ~/montar_gdrive.sh
+    bash ~/montar_gdrive.sh || echo '⚠️  gdrive no montado: comprueba OAuth y el log mostrado arriba'
     bash ~/montar_gd-musica.sh
-    sleep 2
-    mount | grep -E 'mi_gdrive|mi_gdmusica' || echo '⚠️  no se montó ningún remote'
+    findmnt -T ~/mi_gdrive -t fuse.rclone || echo '⚠️  mi_gdrive no está montado'
+    findmnt -T ~/mi_gdmusica -t fuse.rclone || echo '⚠️  mi_gdmusica no está montado'
     read -p 'Presiona Enter para cerrar...'
   "
   ;;
@@ -513,6 +598,14 @@ case "$ICON" in
     echo ""
     read -p "Conversión finalizada. Presiona Enter para cerrar..."
 '
+  ;;
+"󰄀")
+  ICON_LABEL=$(echo "$CHOICE" | awk -F'\t' '{print $3}')
+  if [ "$ICON_LABEL" = "Captura Pantalla" ]; then
+    kitty --hold -e bash ~/scripts/cinnamon-satty-fullscreen.sh
+  elif [ "$ICON_LABEL" = "Captura Región" ]; then
+    kitty --hold -e bash ~/scripts/cinnamon-satty-region.sh
+  fi
   ;;
 "󰊭")
   kitty --hold -e bash -c '~/scripts/antigravity-wipe-nuclear.sh'
