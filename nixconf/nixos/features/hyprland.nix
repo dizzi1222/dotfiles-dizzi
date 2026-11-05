@@ -38,7 +38,7 @@ in
     hyprsunset
     hyprcursor
     hyprutils
-    hyprland-qtutils
+    hyprland-guiutils
 
     # Waybar + widgets
     waybar

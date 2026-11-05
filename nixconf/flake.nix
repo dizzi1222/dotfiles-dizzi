@@ -31,166 +31,165 @@
     # Codex Desktop (GUI oficial de OpenAI para Linux). Reempaqueta el .deb
     # firmado que OpenAI publica en persistent.oaistatic.com. Trae su propio
     # modulo de Home Manager (homeManagerModules.default), por eso NO hace
-    # falta un packages/codex-desktop.nix local como con figma-desktop.
-    codex-desktop = {
+    # falta un packages/chatgpt.nix local como con figma-desktop.
+    chatgpt = {
       url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = { self, nixpkgs, home-manager, stylix, zen-browser, swww, spicetify-nix, vicinae, niri-flake, ... }@inputs:
-  let
-    system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
 
-    # mongodb-compass: el package.nix de nixpkgs (rev 624af66, 1.49.10) llama
-    # `wrapGAppsHook $out/bin/mongodb-compass` como comando directo al final del
-    # buildCommand. wrapGAppsHook solo funciona como fixupOutputHook (corre en
-    # fixupPhase, donde $output existe); llamado directo falla con
-    # "wrapGAppsHookHasRunForOutput: bad array subscript". El wrapGAppsHook3 de
-    # fixupPhase ya envuelve el binario igual, asi que la llamada es redundante.
-    overlays = [
-      (final: prev: {
-        mongodb-compass = prev.mongodb-compass.overrideAttrs (old: {
-          buildCommand = builtins.replaceStrings
-            [ "wrapGAppsHook $out/bin/mongodb-compass" ]
-            [ "# wrapGAppsHook direct call removed: runs via fixupPhase" ]
-            old.buildCommand;
-        });
-        # wine-discord-ipc-bridge: el package.nix de nixpkgs compila el .exe
-        # con mingw (i686-windows) → falla en Linux sin cross-toolchain.
-        # Usamos el paquete local con los binarios precompilados del release
-        # v0.0.3 + el script .sh (ver packages/wine-discord-ipc-bridge.nix).
-        # Uso en Steam → Launch Options por juego:
-        #   winediscordipcbridge-steam.sh %command%
-        wine-discord-ipc-bridge = prev.callPackage ./packages/wine-discord-ipc-bridge.nix { };
-        # Soundbound (AppImage x64, sucesor de SpotiFlyer) — descargador de
-        # música. spotiflyer.nix se mantiene disponible pero DESACTIVADO en
-        # media.nix (proyecto discontinuado 2023; no funciona con Spotify).
-        soundbound = prev.callPackage ./packages/soundbound.nix { };
-        spotiflyer = prev.callPackage ./packages/spotiflyer.nix { };
-        # CurseForge App (gestor de mods: Minecraft, WoW, etc.) — AppImage
-        # Linux oficial de Overwolf. No está en nixpkgs ni Flathub.
-        curseforge = prev.callPackage ./packages/curseforge.nix { };
-        # Amethyst Mod Manager — gestor de mods nativo Linux (MO2-style).
-        # AppImage oficial v2.5.2. No está en nixpkgs ni Flathub.
-        amethyst = prev.callPackage ./packages/amethyst.nix { };
-        # Vortex (NexusMods.App): AppImage oficial de GitHub + wrapper `vortex`
-        # + .desktop keywords "Vortex;Nexus Mods;mods".
-        # Antes usaba nixpkgs `nexusmods-app-unfree` (build from source de
-        # ~20 GB, no está en cache.nixos.org). Ver nota en packages/vortex.nix.
-        vortex = prev.callPackage ./packages/vortex.nix { };
-        # Vortex Mod Manager (clásico) bajo Wine: wrapper que verifica que la
-        # instalación exista en ~/.wine-vortex116 antes de lanzar (wine + pty
-        # + --disable-gpu). El binario es `vortex-wine`, el .desktop "Vortex (Wine)".
-        vortex-wine = prev.callPackage ./packages/vortex-wine.nix { };
-        # OpenCode: nixpkgs sigue en 1.18.x; pin al release prebuilt 2.2.5.
-        # Sin autoPatchelf (rompe Bun compile); usa programs.nix-ld.
-        # Ver packages/opencode-2.2.5.nix.
-        opencode = prev.callPackage ./packages/opencode-2.2.5.nix { };
-        # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
-        # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
-        # El patch pasa `request` como primer argumento (nueva firma).
-        spotdl = prev.spotdl.overrideAttrs (old: {
-          patches = (old.patches or []) ++ [
-            ./patches/spotdl-web-templateresponse.patch
-          ];
-        });
-      })
-    ];
-
-
-    pkgs = import nixpkgs {
-      inherit system overlays;
-      config = {
-        allowUnfree = true;
-        permittedInsecurePackages = [
-          "electron-39.8.10"
-          "openclaw-2026.6.33"
-        ];
-      };
-    };
-    stateVersion = "25.05";
-    username = "diego";
-    hostname = "thinkpad-x1e2";
-
-    # Suwayomi actualizado a 2.3.x: nixpkgs trae 2.1.1867, que NO soporta el
-    # formato nuevo de index.json de keiyoushi (Mihon 0.20.1+ con signing keys).
-    suwayomiServerPkg = pkgs.suwayomi-server.overrideAttrs (old: {
-      version = "2.3.2243";
-      src = pkgs.fetchurl {
-        url = "https://github.com/Suwayomi/Suwayomi-Server/releases/download/v2.3.2243/Suwayomi-Server-v2.3.2243.jar";
-        hash = "sha256-ghFBsy4XDUoC08vf7Vd+2PB70iOD/19BMuu1rkDpjdU=";
-      };
-    });
-
-    # kew 4.1.8 crashea en NixOS (abort/core dump al abrir la TUI): bug
-    # upstream en set_full_path() que usa buffer fijo KEW_PATH_MAX con snprintf
-    # y glibc-fortify lo detecta (__snprintf_chk -> __chk_fail). Fix del PR
-    # upstream #559: pasar el tamaño real `needed`. kew 4.2.7 ya lo incluye.
-    kewPatchedPkg = pkgs.kew.overrideAttrs (old: {
-      patches = (old.patches or []) ++ [
-        ./patches/kew-set-full-path-buffer.patch
-        ./patches/kew-list-persists-playlist.patch
-        ./patches/kew-window-title-prefix.patch
-      ];
-    });
-
-    # Pear Desktop (fork de th-ch/youtube-music): renombrar el desktop entry
-    # de "Pear Desktop" a "YouTube Music" (el nombre upstream original).
-    pearDesktopPkg = pkgs.pear-desktop.overrideAttrs (old: {
-      desktopItems = [
-        (pkgs.makeDesktopItem {
-          name = "com.github.th-ch.youtube-music";
-          exec = "pear-desktop %u";
-          icon = "pear-desktop";
-          desktopName = "YouTube Music";
-          startupWMClass = "com.github.th-ch.youtube-music";
-          categories = [ "AudioVideo" ];
+      # mongodb-compass: el package.nix de nixpkgs (rev 624af66, 1.49.10) llama
+      # `wrapGAppsHook $out/bin/mongodb-compass` como comando directo al final del
+      # buildCommand. wrapGAppsHook solo funciona como fixupOutputHook (corre en
+      # fixupPhase, donde $output existe); llamado directo falla con
+      # "wrapGAppsHookHasRunForOutput: bad array subscript". El wrapGAppsHook3 de
+      # fixupPhase ya envuelve el binario igual, asi que la llamada es redundante.
+      overlays = [
+        (final: prev: {
+          mongodb-compass = prev.mongodb-compass.overrideAttrs (old: {
+            buildCommand = builtins.replaceStrings
+              [ "wrapGAppsHook $out/bin/mongodb-compass" ]
+              [ "# wrapGAppsHook direct call removed: runs via fixupPhase" ]
+              old.buildCommand;
+          });
+          # wine-discord-ipc-bridge: el package.nix de nixpkgs compila el .exe
+          # con mingw (i686-windows) → falla en Linux sin cross-toolchain.
+          # Usamos el paquete local con los binarios precompilados del release
+          # v0.0.3 + el script .sh (ver packages/wine-discord-ipc-bridge.nix).
+          # Uso en Steam → Launch Options por juego:
+          #   winediscordipcbridge-steam.sh %command%
+          wine-discord-ipc-bridge = prev.callPackage ./packages/wine-discord-ipc-bridge.nix { };
+          # Soundbound (AppImage x64, sucesor de SpotiFlyer) — descargador de
+          # música. spotiflyer.nix se mantiene disponible pero DESACTIVADO en
+          # media.nix (proyecto discontinuado 2023; no funciona con Spotify).
+          soundbound = prev.callPackage ./packages/soundbound.nix { };
+          spotiflyer = prev.callPackage ./packages/spotiflyer.nix { };
+          # CurseForge App (gestor de mods: Minecraft, WoW, etc.) — AppImage
+          # Linux oficial de Overwolf. No está en nixpkgs ni Flathub.
+          curseforge = prev.callPackage ./packages/curseforge.nix { };
+          # Amethyst Mod Manager — gestor de mods nativo Linux (MO2-style).
+          # AppImage oficial v2.5.2. No está en nixpkgs ni Flathub.
+          amethyst = prev.callPackage ./packages/amethyst.nix { };
+          # Vortex (NexusMods.App): AppImage oficial de GitHub + wrapper `vortex`
+          # + .desktop keywords "Vortex;Nexus Mods;mods".
+          # Antes usaba nixpkgs `nexusmods-app-unfree` (build from source de
+          # ~20 GB, no está en cache.nixos.org). Ver nota en packages/vortex.nix.
+          vortex = prev.callPackage ./packages/vortex.nix { };
+          # Vortex Mod Manager (clásico) bajo Wine: wrapper que verifica que la
+          # instalación exista en ~/.wine-vortex116 antes de lanzar (wine + pty
+          # + --disable-gpu). El binario es `vortex-wine`, el .desktop "Vortex (Wine)".
+          vortex-wine = prev.callPackage ./packages/vortex-wine.nix { };
+          # OpenCode: nixpkgs sigue en 1.18.x; pin al release prebuilt 2.2.5.
+          # Sin autoPatchelf (rompe Bun compile); usa programs.nix-ld.
+          # Ver packages/opencode-2.2.5.nix.
+          opencode = prev.callPackage ./packages/opencode-2.2.5.nix { };
+          # spotdl 4.5.2: el `web` (Jinja2Templates.TemplateResponse) rompe con
+          # starlette >=0.29 (500 "missing 1 required positional argument: 'request'".
+          # El patch pasa `request` como primer argumento (nueva firma).
+          spotdl = prev.spotdl.overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [
+              ./patches/spotdl-web-templateresponse.patch
+            ];
+          });
         })
       ];
-    });
 
-    # Vicinae parcheado: en la lista del store (vicinae y raycast) mostrar
-    # "Install extension" cuando no esta instalada y "Uninstall" solo cuando
-    # lo esta (bugs upstream: uninstall incondicional, sin boton install).
-    vicinaePatchedPkg =
-      (vicinae.packages.${system}.default or vicinae.packages.x86_64-linux.default)
-      .overrideAttrs (old: {
-        patches = (old.patches or [])
-          ++ [
+
+      pkgs = import nixpkgs {
+        inherit system overlays;
+        config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [
+            "electron-39.8.10"
+            "openclaw-2026.6.33"
+          ];
+        };
+      };
+      stateVersion = "25.05";
+      username = "diego";
+      hostname = "thinkpad-x1e2";
+
+      # Suwayomi actualizado a 2.3.x: nixpkgs trae 2.1.1867, que NO soporta el
+      # formato nuevo de index.json de keiyoushi (Mihon 0.20.1+ con signing keys).
+      suwayomiServerPkg = pkgs.suwayomi-server.overrideAttrs (old: {
+        version = "2.3.2243";
+        src = pkgs.fetchurl {
+          url = "https://github.com/Suwayomi/Suwayomi-Server/releases/download/v2.3.2243/Suwayomi-Server-v2.3.2243.jar";
+          hash = "sha256-ghFBsy4XDUoC08vf7Vd+2PB70iOD/19BMuu1rkDpjdU=";
+        };
+      });
+
+      # kew 4.1.8 crashea en NixOS (abort/core dump al abrir la TUI): bug
+      # upstream en set_full_path() que usa buffer fijo KEW_PATH_MAX con snprintf
+      # y glibc-fortify lo detecta (__snprintf_chk -> __chk_fail). Fix del PR
+      # upstream #559: pasar el tamaño real `needed`. kew 4.2.7 ya lo incluye.
+      kewPatchedPkg = pkgs.kew.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [
+          ./patches/kew-set-full-path-buffer.patch
+          ./patches/kew-list-persists-playlist.patch
+          ./patches/kew-window-title-prefix.patch
+        ];
+      });
+
+      # Pear Desktop (fork de th-ch/youtube-music): renombrar el desktop entry
+      # de "Pear Desktop" a "YouTube Music" (el nombre upstream original).
+      pearDesktopPkg = pkgs.pear-desktop.overrideAttrs (old: {
+        desktopItems = [
+          (pkgs.makeDesktopItem {
+            name = "com.github.th-ch.youtube-music";
+            exec = "pear-desktop %u";
+            icon = "pear-desktop";
+            desktopName = "YouTube Music";
+            startupWMClass = "com.github.th-ch.youtube-music";
+            categories = [ "AudioVideo" ];
+          })
+        ];
+      });
+
+      # Vicinae parcheado: en la lista del store (vicinae y raycast) mostrar
+      # "Install extension" cuando no esta instalada y "Uninstall" solo cuando
+      # lo esta (bugs upstream: uninstall incondicional, sin boton install).
+      vicinaePatchedPkg =
+        (vicinae.packages.${system}.default or vicinae.packages.x86_64-linux.default).overrideAttrs (old: {
+          patches = (old.patches or [ ])
+            ++ [
             ./patches/vicinae-store-list-actions.patch
             ./patches/raycast-store-list-actions.patch
           ];
-      });
-  in
-  {
-    nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-      inherit system;
-      specialArgs = { inherit inputs stateVersion hostname username; };
-      modules = [
-        ./hosts/${hostname}/configuration.nix
-        stylix.nixosModules.stylix
-        inputs.niri-flake.nixosModules.niri
-      ];
-    };
-
-    homeConfigurations."${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      extraSpecialArgs = {
-        inherit inputs stateVersion username;
-        homeDirectory = "/home/${username}";
-        spicePkgs = spicetify-nix.legacyPackages.${system};
-        figureDesktopPkg = pkgs.callPackage ./packages/figma-desktop.nix { };
-        vicinaePatchedPkg = vicinaePatchedPkg;
-        suwayomiServerPkg = suwayomiServerPkg;
-        pearDesktopPkg = pearDesktopPkg;
-        kewPatchedPkg = kewPatchedPkg;
+        });
+    in
+    {
+      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs stateVersion hostname username; };
+        modules = [
+          ./hosts/${hostname}/configuration.nix
+          stylix.nixosModules.stylix
+          inputs.niri-flake.nixosModules.niri
+        ];
       };
-      modules = [
-        ./hosts/${hostname}/home-manager.nix
-        stylix.homeModules.stylix
-        vicinae.homeManagerModules.default
-      ];
+
+      homeConfigurations."${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        extraSpecialArgs = {
+          inherit inputs stateVersion username;
+          homeDirectory = "/home/${username}";
+          spicePkgs = spicetify-nix.legacyPackages.${system};
+          figureDesktopPkg = pkgs.callPackage ./packages/figma-desktop.nix { };
+          vicinaePatchedPkg = vicinaePatchedPkg;
+          suwayomiServerPkg = suwayomiServerPkg;
+          pearDesktopPkg = pearDesktopPkg;
+          kewPatchedPkg = kewPatchedPkg;
+        };
+        modules = [
+          ./hosts/${hostname}/home-manager.nix
+          stylix.homeModules.stylix
+          vicinae.homeManagerModules.default
+        ];
+      };
     };
-  };
 }

@@ -497,7 +497,19 @@ case "$ICON" in
 "󰝛")
   wm_spawn "1000 700" kitty --title "Convertir MP3 128kbps" -- sh -c '
     mkdir -p "$HOME/Descargas/128kbps"
-    nix-shell -p ffmpeg --run "for f in \$HOME/Descargas/*.mp3; do [ -f \"\$f\" ] || continue; ffmpeg -i \"\$f\" -b:a 128k \"\$HOME/Descargas/128kbps/\$(basename \"\$f\")\"; done"
+    for f in $HOME/Descargas/*.mp3; do
+      [ -f "$f" ] || continue
+      outfile="$HOME/Descargas/128kbps/$(basename "$f")"
+      tmpcover=$(mktemp /tmp/portada_XXXXXX.jpg)
+      ffmpeg -y -v error -i "$f" -map 0:v -c copy -frames:v 1 "$tmpcover" 2>/dev/null
+      if [ -s "$tmpcover" ]; then
+        ffmpeg -i "$f" -i "$tmpcover" -map_metadata 0 -map 0:a -map 1:v -c:a libmp3lame -b:a 128k -c:v mjpeg -disposition:v attached_pic "$outfile" 2>&1
+        rm -f "$tmpcover"
+      else
+        rm -f "$tmpcover"
+        ffmpeg -i "$f" -vn -map 0:a -c:a libmp3lame -b:a 128k "$outfile" 2>&1
+      fi
+    done
     echo ""
     read -p "Conversión finalizada. Presiona Enter para cerrar..."
 '

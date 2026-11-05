@@ -109,9 +109,15 @@
   # ── Niri (Wayland compositor) ──────────────────────────────
   # programs.niri.enable = true;  # Comentado: build broken (libdisplay-info-sys v0.3.0 vs libdisplay-info 0.4.0)
   programs.niri.enable = true;
-  # niri-stable del flake sigue hardcodeado a v25.08 (sin soporte `include`);
-  # usamos niri-unstable (rama main de niri, includes desde v25.11).
-  programs.niri.package = inputs.niri-flake.packages.${pkgs.system}.niri-unstable;
+  # niri-unstable del flake depende de libdisplay-info_0_2 (eliminado de nixpkgs);
+  # niri de nixpkgs tambien lo necesita. Overlay: crear libdisplay-info_0_2
+  # como alias de libdisplay-info (existe en nixpkgs) para que compile.
+  nixpkgs.overlays = [
+    (final: prev: {
+      libdisplay-info_0_2 = prev.libdisplay-info;
+    })
+  ];
+  programs.niri.package = pkgs.niri;
 
   # ── Networking ─────────────────────────────────────────────
   networking = {
@@ -565,7 +571,7 @@
     # File transfer / MTP
     android-file-transfer
     gvfs
-    simple-mtpfs
+    # simple-mtpfs: eliminado de nixpkgs (unmaintained). Usar android-file-transfer o gvfs.
 
     # Clipboard history
     cliphist
