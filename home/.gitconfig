@@ -1,18 +1,23 @@
 # git config --global user.name "dizzi1222"
 # git config --global user.email "diegosamuel042@gmail.com"
 [user]
-    name = dizzi1222
-    email = diegosamuel042@gmail.com
+	name = dizzi1222
+	email = diegosamuel042@gmail.com
+
+[push]
+	autoSetupRemote = true
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+
 [credential "https://github.com"]
-	helper = 
 	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
 
 [core]
-editor = nvim
-filemode = true
+	editor = nvim
+	filemode = true
 	quotepath = false
 	precomposeunicode = true
 [i18n]
