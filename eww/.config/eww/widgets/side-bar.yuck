@@ -31,19 +31,19 @@
                   :tooltip "Suspend"
                   :onclick "systemctl suspend" "")
           (button :class "exit"
-                  :tooltip "exit Hyprland"
-                  :onclick "hyprctl dispatch exit" ""))))))
+                  :tooltip "Exit"
+                  :onclick "~/.config/eww/scripts/logout.sh" ""))))))
 
 ;; Workspaces ;;
 (defwidget workspaces-vert []
-  (eventbox :onscroll "sh ~/.config/eww/bar/scripts/change-active-workspace.sh {} ${current_workspace}"
+  (eventbox :onscroll "~/.config/eww/scripts/change-active-workspace.sh {}"
     (box :orientation "vertical"
          :space-evenly false
          :class "workspaces-vert"
          :vexpand "false"
       (for workspace in workspaces
         (button :class "workspace-vert ${current_workspace == workspace.id ? "current" : ""}"
-                :onclick "hyprctl dispatch workspace ${workspace.id}"
+                :onclick "~/.config/eww/scripts/switch-workspace.sh ${workspace.id}"
                 "${current_workspace == workspace.id ? "" : ""}"))
       ;; --- SPECIAL WORKSPACES ---
     ;;  (button :class "workspace special"
@@ -245,6 +245,7 @@
 ;; Idle Toggle ;;
 (defwidget toggle-idle []
   (button :class "toggle-idle"
+          :visible {desktop == "hyprland" || desktop == "niri" || desktop == "plasma" || desktop == "cinnamon" || desktop == "gnome"}
           :tooltip {idle ? "idle disabled" : "idle enabled" }
           :onclick "~/.config/eww/scripts/toggle-idle.sh"
           {idle ? "" : ""  }))
