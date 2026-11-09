@@ -67,7 +67,7 @@
 
 ;; Idle ;;
 (defwidget idle-control []
-  (eventbox :cursor "pointer"
+  (eventbox :cursor "pointer" :visible {desktop == "hyprland" || desktop == "niri" || desktop == "plasma" || desktop == "cinnamon" || desktop == "gnome"}
   (box  :class "idle-control"
         :orientation "vertical"
         :space-evenly "false"
@@ -96,7 +96,7 @@
 
 ;; Game Mode Button ;;
 (defwidget game-mode-control []
-  (eventbox :cursor "pointer"
+  (eventbox :cursor "pointer" :visible {desktop == "hyprland" || desktop == "niri" || desktop == "plasma" || desktop == "cinnamon" || desktop == "gnome"}
     (box :class "game-mode-control"
          :orientation "vertical"
          :space-evenly "false"
@@ -116,12 +116,12 @@
 
 ;; Power Modes Menu Button
 (defwidget power-mode-menu-control []
-  (eventbox :cursor "pointer"
+  (eventbox :cursor "pointer" :visible {desktop == "hyprland" || desktop == "niri" || desktop == "plasma" || desktop == "cinnamon" || desktop == "gnome"}
     (box :class "power-mode-menu-control"
          :orientation "vertical"
          :space-evenly "false"
       (button :class "power-mode-menu-icon-control"
-              :onclick "hyprctl dispatch exec '~/.config/eww/scripts/power-modes-fuzzel.sh'"
+              :onclick "~/.config/eww/scripts/power-modes-fuzzel.sh"
               power-mode-icon))))
 
 ;; Volume Group ;;

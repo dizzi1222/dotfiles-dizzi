@@ -88,7 +88,7 @@
                   :onclick "reboot" "")
           (button :class "exit"
                   :tooltip "Exit"
-                  :onclick "pkill Hyprland" "")
+                  :onclick "~/.config/eww/scripts/logout.sh" "")
         (button :class "suspend"
                 :tooltip "Suspend"
                 :onclick "systemctl suspend" ""))))))
@@ -112,7 +112,7 @@
 
 ;; Workspaces ;;
 (defwidget workspaces []
-  (eventbox :onscroll "sh ~/.config/eww/scripts/change-active-workspace.sh {} ${current_workspace}"
+  (eventbox :onscroll "~/.config/eww/scripts/change-active-workspace.sh {}"
     (box :orientation "h"
          :space-evenly false
          :class "workspaces"
@@ -121,14 +121,16 @@
       ;; Workspaces normales
       (for workspace in workspaces
         (button :class "workspace ${current_workspace == workspace.id ? "current" : ""}"
-                :onclick "hyprctl dispatch workspace ${workspace.id}"
+                :onclick "~/.config/eww/scripts/switch-workspace.sh ${workspace.id}"
                 "${current_workspace == workspace.id ? "" : ""}"))
 
       ;; --- SPECIAL WORKSPACES ---
       (button :class "workspace special"
+              :visible {desktop == "hyprland" || desktop == "niri"}
               :onclick "caelestia toggle music"
               "󰎄")
       (button :class "workspace special"
+              :visible {desktop == "hyprland" || desktop == "niri"}
               :onclick "caelestia toggle magic"
               "󰖳  "))))
 

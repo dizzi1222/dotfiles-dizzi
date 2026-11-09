@@ -1,6 +1,7 @@
-;;;;; Variables ;;;;;;
+;;;; Variables ;;;;;;
 (deflisten workspaces :initial "[]" "sh ~/.config/eww/scripts/get-workspaces.sh")
 (deflisten current_workspace :initial "1" "sh ~/.config/eww/scripts/get-active-workspace.sh")
+(defpoll desktop :interval "30s" :initial "unknown" "~/.config/eww/scripts/get-desktop.sh")
 
 (defvar power-vert false)
 (defvar volume false)
