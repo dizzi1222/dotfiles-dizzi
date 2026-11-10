@@ -818,7 +818,7 @@ if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22c: Atajo de Termux:Widget (opencode)
+# PASO 22c: Atajos de Termux:Widget (OpenCode y Neovim)
 # ───────────────────────────────────────────────────────────
 # Termux:Widget lee los atajos dinámicos de ~/.termux/widget/dynamic_shortcuts.
 # En Android 10+ el permiso "Mostrar sobre otras apps" va en TERMUX (no en
@@ -826,14 +826,14 @@ fi
 # En MIUI/HyperOS se llama "Mostrar ventanas emergentes mientras se ejecuta
 # en segundo plano" y está en Ajustes → Apps → Termux → Otros permisos.
 # ═══════════════════════════════════════════════════════════
-print_step "22c/23: Atajo de Termux:Widget"
-read -p "¿Crear atajo de opencode para Termux:Widget? [S/n]: " widget_ok
+print_step "22c/23: Atajos de Termux:Widget"
+read -p "¿Crear atajos de OpenCode y Neovim para Termux:Widget? [S/n]: " widget_ok
 if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   WIDGET_DIR="$HOME/.termux/widget/dynamic_shortcuts"
   ICONS_DIR="$HOME/.shortcuts/icons"
   mkdir -p "$WIDGET_DIR" "$ICONS_DIR"
 
-  # Copia la versión versionada en dotfiles; si no está, la genera al vuelo.
+  # Copia las versiones guardadas en dotfiles; si faltan, genera los comandos.
   WIDGET_SRC=""
   for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
     if [[ -f "$dir/home/termux/dynamic_shortcuts/opencode" ]]; then
@@ -841,16 +841,15 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       break
     fi
   done
-  if [[ -n "$WIDGET_SRC" ]]; then
-    cp "$WIDGET_SRC" "$WIDGET_DIR/opencode"
-  else
-    cat >"$WIDGET_DIR/opencode" <<'WIDGET'
-#!/data/data/com.termux/files/usr/bin/bash
-opencode
-WIDGET
-  fi
-  chmod +x "$WIDGET_DIR/opencode"
-  print_success "Atajo creado: $WIDGET_DIR/opencode"
+  for shortcut in opencode nvim; do
+    if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/$shortcut" ]]; then
+      cp "$(dirname "$WIDGET_SRC")/$shortcut" "$WIDGET_DIR/$shortcut"
+    else
+      printf '#!/data/data/com.termux/files/usr/bin/bash\n%s\n' "$shortcut" >"$WIDGET_DIR/$shortcut"
+    fi
+    chmod +x "$WIDGET_DIR/$shortcut"
+    print_success "Atajo creado: $WIDGET_DIR/$shortcut"
+  done
 
   # El helper de core-termux ejecuta el loader glibc directo y opencode intenta
   # spawnear "serve" con process.execPath = ld-linux -> error 127. El launcher
@@ -872,12 +871,29 @@ WIDGET
 
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
   # no en ~/.termux/widget/dynamic_shortcuts/icons.
-  if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/opencode.png" ]]; then
-    cp "$(dirname "$WIDGET_SRC")/icons/opencode.png" "$ICONS_DIR/opencode.png"
-    print_success "Ícono copiado: $ICONS_DIR/opencode.png"
-  else
-    print_info "Ícono opcional: poné un PNG en $ICONS_DIR/opencode.png y recreá los atajos."
-  fi
+  for shortcut in opencode nvim; do
+    if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" ]]; then
+      cp "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" "$ICONS_DIR/$shortcut.png"
+      chmod 600 "$ICONS_DIR/$shortcut.png"
+      print_success "Ícono copiado: $ICONS_DIR/$shortcut.png"
+    elif [[ -s "$ICONS_DIR/$shortcut.png" ]]; then
+      print_info "Ícono existente: $ICONS_DIR/$shortcut.png"
+    elif [[ "$shortcut" == "nvim" ]]; then
+      # Si se ejecuta sin el repo, descarga la marca oficial de Neovim.
+      if curl -fLsS --max-time 30 \
+        https://raw.githubusercontent.com/neovim/neovim.github.io/6568b9011ddb2965dc5118d28f17d5b7ce7dd8da/static/logos/neovim-mark.png \
+        -o "$ICONS_DIR/nvim.png.tmp"; then
+        mv "$ICONS_DIR/nvim.png.tmp" "$ICONS_DIR/nvim.png"
+        chmod 600 "$ICONS_DIR/nvim.png"
+        print_success "Ícono de Neovim descargado"
+      else
+        rm -f "$ICONS_DIR/nvim.png.tmp"
+        print_warning "No se pudo descargar el ícono: copiá un PNG a $ICONS_DIR/nvim.png"
+      fi
+    else
+      print_info "Ícono opcional: poné un PNG en $ICONS_DIR/$shortcut.png y recreá los atajos."
+    fi
+  done
 
   # Abre la pantalla exacta del permiso para que sea un solo toggle.
   print_info "Android 10+ exige 'Mostrar sobre otras apps' en Termux para lanzar la terminal desde el widget."
@@ -901,7 +917,8 @@ WIDGET
     am start -n com.termux.widget/.activities.TermuxWidgetMainActivity >/dev/null 2>&1 ||
       print_warning "No se pudo abrir Termux:Widget (¿está instalado?)"
   fi
-  print_info "Después: mantené presionado el home → Widgets → Termux:Widget → elegí opencode."
+  print_info "En Termux:Widget tocá CREATE SHORTCUTS para publicar opencode y nvim con sus íconos."
+  print_info "Después: mantené presionado el ícono de Termux:Widget en el launcher y añadí el atajo al inicio."
 fi
 
 # ═══════════════════════════════════════════════════════════
