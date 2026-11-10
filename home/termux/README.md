@@ -1,5 +1,19 @@
 # Herramientas para Termux
 
+## Atajos de OpenCode y Neovim
+
+El paso **22c** de `../termux-basic-setup.sh` instala los scripts `opencode` y
+`nvim` en `~/.termux/widget/dynamic_shortcuts/`. Ejecutan el comando tal cual.
+Los íconos se instalan en `~/.shortcuts/icons/<nombre-del-script>.png`.
+
+Abrí **Termux:Widget → CREATE SHORTCUTS**. Luego mantené presionado el ícono de
+Termux:Widget en el launcher y añadí `nvim` al inicio. Si ya había un atajo con
+el ícono viejo, quitá ese acceso del inicio y agregalo otra vez.
+
+`dynamic_shortcuts/icons/nvim.png` usa la [marca oficial de Neovim](https://github.com/neovim/neovim.github.io/blob/6568b9011ddb2965dc5118d28f17d5b7ce7dd8da/static/logos/neovim-mark.png),
+reducida proporcionalmente y centrada en un PNG transparente de 192×192.
+Licencia del recurso: [MIT](dynamic_shortcuts/icons/LICENSE.neovim).
+
 ## Control de volumen por aplicación en Xiaomi
 
 **Probado en el dispositivo del propietario, quien confirmó que funciona:**
