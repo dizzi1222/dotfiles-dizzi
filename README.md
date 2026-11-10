@@ -42,6 +42,7 @@ bash ~/dotfiles-dizzi/home/termux/quick_termux-setup.sh
 | `activar-todo.sh` | Configuración completa: ADB/Shizuku + PIN automático + activar servicios + install en **Termux:Boot** |
 | `activar-servicios.sh` / `ver-servicios.sh` | Activar / verificar servicios de accesibilidad |
 | `quick-connect.sh` | Conexión rápida ADB |
+| [`audio-aplicaciones.sh`](home/termux/AUDIO-APLICACIONES.md) | Abre el control nativo de volumen por app de Xiaomi; funcionamiento confirmado en Redmi Note 9 Pro (`joyeuse`), MIUI 14 Global / Android 12, sin root ni Shizuku. |
 | `start_shizuku.sh` / `start_shizuku_enhanced.sh` | Iniciar Shizuku |
 | `ejecutar_comando_PIN_sin_ok.sh` | Ejecutar comando PIN sin OK manual |
 
