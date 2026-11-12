@@ -30,6 +30,28 @@ Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 2. Si querés keywords de búsqueda, agrégalas en `system-menu-kw.tsv`
 3. Crea el handler en `system_control.sh` (bloque `case "$ICON"`)
 
+## Orden por uso reciente en "Todos"
+
+`system_control.sh` guarda los iconos invocados en
+`${XDG_STATE_HOME:-$HOME/.local/state}/system-control/recent`, con el más
+reciente primero y un máximo de 32. Al abrir **Todos**, los ítems usados
+recientemente aparecen arriba; el resto conserva el orden del manifest. Las
+demás categorías no se reordenan.
+
+El historial se actualiza al seleccionar una acción, tanto desde wofi como
+desde el menú de eww. Cancelar no registra nada. Para borrarlo:
+
+```bash
+rm -f "${XDG_STATE_HOME:-$HOME/.local/state}/system-control/recent"
+```
+
+Wofi respeta el orden de entrada solo cuando no hay búsqueda; al escribir,
+reordena por coincidencia fuzzy y el historial deja de influir en el orden.
+
+El historial usa el icono como identificador, igual que el menú. Las entradas
+que comparten icono también comparten posición: `Nix GC` es la misma acción y
+las dos capturas (`Captura Pantalla`/`Captura Región`) se mueven juntas.
+
 ## Gamescope (cursor confinado)
 
 `Apps → 󰊴 Gamescope` abre un selector **fuzzel** (o wofi con
