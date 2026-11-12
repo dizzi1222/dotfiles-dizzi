@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Nintendo Switch 2 (CheezyEmu)
+Comment=CheezyEmu — Nintendo Switch 2 Emulator
+Icon=/var/home/diego/.local/share/lutris/coverart/nintendo-switch-2.png
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/140
+Categories=Game;Emulator;
+Keywords=Switch;Nintendo;CheezyEmu;Lichii;
+TryExec=lutris

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=The Legend of Zelda: Ocarina of Time Remake
+Comment=The Legend of Zelda: Ocarina of Time Remake (CheezyEmu / Switch 2)
+Icon=lutris_the-legend-of-zelda-ocarina-of-time-remake
+Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/141
+Categories=Game;Emulator;
+Keywords=Zelda;Ocarina;Switch;CheezyEmu;Lichii;
+TryExec=lutris
