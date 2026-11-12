@@ -1,5 +1,5 @@
 game:
-  args: ""
+  args: -g /var/mnt/games-swap/NintendoSwitch2/oot.nup
   exe: /home/diego/dotfiles-dizzi/local/.local/bin/juegos/nintendo-switch-2.sh
   working_dir: /var/mnt/games-swap/NintendoSwitch2
 system:
