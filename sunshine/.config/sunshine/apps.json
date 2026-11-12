@@ -148,6 +148,17 @@
                     "undo": "setsid steam steam://close/bigpicture"
                 }
             ]
+        },
+        {
+            "auto-detach": true,
+            "cmd": "",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/diego/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/covers/igdb_182313.png",
+            "name": "The Legend of Zelda: Ocarina of Time Remake",
+            "output": "/var/home/diego/dotfiles-dizzi/local/.local/bin/juegos/zelda-remake-oot.sh",
+            "wait-all": true
         }
     ],
     "env": {
