@@ -12,11 +12,29 @@ source "$SCRIPT_DIR/lib/platform.sh"
 # Extraer solo el ícono (antes del meta tag)
 # Modo dual: si se llama con un argumento (desde eww system-menu), se usa ese
 # ícono directamente; sin argumentos abre el wofi grid con categorías.
+MANIFEST="$HOME/.config/eww/scripts/system-menu-manifest.tsv"
+KW_FILE="$HOME/.config/eww/scripts/system-menu-kw.tsv"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/system-control"
+RECENT_FILE="$STATE_DIR/recent"
+
+# Historial MRU de iconos invocados. Se usa para ordenar "Todos".
+record_recent() {
+  local icon="$1" tmp
+  [ -n "$icon" ] || return 0
+  mkdir -p "$STATE_DIR" || return 0
+  tmp=$(mktemp "$STATE_DIR/recent.XXXXXX") || return 0
+  {
+    printf '%s\n' "$icon"
+    if [ -f "$RECENT_FILE" ]; then
+      awk -v i="$icon" '$0 != i' "$RECENT_FILE"
+    fi
+  } | head -n 32 > "$tmp"
+  mv -f "$tmp" "$RECENT_FILE" || rm -f "$tmp"
+}
+
 if [ -n "$1" ]; then
   ICON="$1"
 else
-  MANIFEST="$HOME/.config/eww/scripts/system-menu-manifest.tsv"
-  KW_FILE="$HOME/.config/eww/scripts/system-menu-kw.tsv"
   WOFI_CONF="$HOME/.config/wofi/system-control.conf"
   WOFI_STYLE="$HOME/.config/wofi/system-control.css"
 
@@ -64,14 +82,26 @@ Sistema:󰠅"
   # Paso 2 — elegir item (grid 2 columnas). Con keywords invisibles para
   # búsqueda recursiva ("nixconf cleanup" encuentra "Nix Cleanup").
   # Cada entrada lleva el chevron ' ' a la derecha (estilo Omarchy).
-  CHOICE=$(awk -F'\t' -v c="$CATEGORY" '
-    $1==c || c=="Todos" { printf "%s\t%s\t%s\n", $2, $3, "KW" }
-  ' "$MANIFEST" | while IFS=$'\t' read -r icon label _; do
+  # "Todos" ordena primero los iconos usados recientemente (MRU); el resto
+  # conserva el orden del manifest. En las demás categorías no se altera.
+  CHOICE=$(awk -F'\t' -v c="$CATEGORY" -v recent="$RECENT_FILE" '
+    BEGIN {
+      while ((getline line < recent) > 0)
+        if (line != "") rank[line] = ++n
+    }
+    $1==c || c=="Todos" {
+      r = (c=="Todos" && ($2 in rank)) ? rank[$2] : 9999
+      printf "%d\t%06d\t%s\t%s\n", r, NR, $2, $3
+    }
+  ' "$MANIFEST" | LC_ALL=C sort -t $'\t' -k1,1n -k2,2n | while IFS=$'\t' read -r _ _ icon label; do
     printf '%s\t%s %s %s\n' "$icon" "$label" "" "$(kw_span "$icon")"
   done | wofi --dmenu -m -l center --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 2 --prompt "󱍕 $CATEGORY")
   [ -z "$CHOICE" ] && exit 0
   ICON=$(echo "$CHOICE" | awk -F'\t' '{print $1}')
 fi
+
+# Registrar la invocación (wofi o eww) para el orden MRU de "Todos".
+record_recent "$ICON"
 
 case "$ICON" in
 "")
