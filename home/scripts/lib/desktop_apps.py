@@ -28,6 +28,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from collections import Counter
 from pathlib import Path
@@ -54,6 +55,10 @@ DEFAULT_ICON = "󰀄"
 DROP_FIELD_CODES = set("fFuUdDnNvm")
 SHELL_OPS = {"||", "&&", ";", "|", "&", "|&"}
 SHELL_REDIR = re.compile(r"^[0-9]*(?:>>?|<<?|&>|>&|<&)[0-9-]*$")
+
+# Extracción de iconos → PNG 128x128 para el tema hicolor del usuario.
+ICON_EXTS = (".png", ".svg", ".xpm")
+ICON_SIZE = 128
 
 
 def truthy(value: str | None) -> bool:
@@ -138,7 +143,9 @@ class Entry:
         return " ".join(w for w in words if w).strip()
 
 
-def parse_desktop(path: Path) -> Entry | None:
+def parse_desktop(
+    path: Path, *, allow_hidden: bool = False, require_exec: bool = True
+) -> Entry | None:
     keys: dict[str, str] = {}
     in_entry = False
     try:
@@ -158,11 +165,13 @@ def parse_desktop(path: Path) -> Entry | None:
     except OSError:
         return None
 
-    if truthy(keys.get("Hidden")) or truthy(keys.get("NoDisplay")):
+    if not allow_hidden and (
+        truthy(keys.get("Hidden")) or truthy(keys.get("NoDisplay"))
+    ):
         return None
     if keys.get("Type", "Application") != "Application":
         return None
-    if not keys.get("Exec"):
+    if require_exec and not keys.get("Exec"):
         return None
 
     tryexec = keys.get("TryExec", "")
@@ -182,6 +191,10 @@ def app_dirs() -> list[Path]:
     data_home = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
     candidates = [
         data_home / "applications",
+        Path("/usr/local/share/applications"),
+        Path("/usr/share/applications"),
+        Path("/run/current-system/sw/share/applications"),
+        Path.home() / ".nix-profile/share/applications",
         Path.home() / ".local/share/flatpak/exports/share/applications",
         Path("/var/lib/flatpak/exports/share/applications"),
     ]
@@ -251,6 +264,383 @@ def cmd_list(args: argparse.Namespace) -> int:
         )
         print(line)
     return 0
+
+
+def ini_value(path: Path, section: str, key: str) -> str:
+    current = ""
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return ""
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            current = line[1:-1].strip()
+            continue
+        if current != section or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        if k.strip() == key:
+            return v.strip()
+    return ""
+
+
+def icon_roots() -> list[Path]:
+    home = Path.home()
+    user = os.environ.get("USER") or ""
+    data_home = Path(os.environ.get("XDG_DATA_HOME", home / ".local/share"))
+    candidates: list[Path | None] = [
+        home / ".local/share/icons",
+        home / ".icons",
+        data_home / "icons",
+        home / ".local/share/flatpak/exports/share/icons",
+        Path("/var/lib/flatpak/exports/share/icons"),
+        Path("/usr/share/icons"),
+        Path("/usr/local/share/icons"),
+        Path("/run/current-system/sw/share/icons"),
+        home / ".nix-profile/share/icons",
+        Path("/etc/profiles/per-user") / user / "share/icons" if user else None,
+    ]
+    roots: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate is None or not candidate.is_dir():
+            continue
+        try:
+            real = candidate.resolve()
+        except OSError:
+            real = candidate
+        if real in seen:
+            continue
+        seen.add(real)
+        roots.append(candidate)
+    return roots
+
+
+def configured_icon_theme() -> str:
+    for path in (
+        Path.home() / ".config/gtk-4.0/settings.ini",
+        Path.home() / ".config/gtk-3.0/settings.ini",
+    ):
+        value = ini_value(path, "Settings", "gtk-icon-theme-name")
+        if value:
+            return value
+    return "hicolor"
+
+
+def theme_parents(theme: str) -> list[str]:
+    for root in icon_roots():
+        index = root / theme / "index.theme"
+        if index.is_file():
+            value = ini_value(index, "Icon Theme", "Inherits")
+            if value:
+                return [t.strip() for t in value.split(",") if t.strip()]
+    return []
+
+
+def theme_chain() -> list[str]:
+    chain: list[str] = []
+
+    def add(name: str) -> None:
+        name = name.strip()
+        if name and name not in chain:
+            chain.append(name)
+
+    add("hicolor")
+    theme = configured_icon_theme()
+    add(theme)
+    for parent in theme_parents(theme):
+        add(parent)
+    for name in ("Adwaita", "breeze", "breeze-dark", "breeze-light"):
+        add(name)
+    return chain
+
+
+
+def icon_score(path: Path) -> int:
+    """Puntúa un icono: vectorial y grande primero, simbólicos al final."""
+    text = path.as_posix().lower()
+    suffix = path.suffix.lower()
+    size = 0
+    match = re.search(r"/(\d+)x(\d+)/", text) or re.search(
+        r"/(?:apps|applications)/(\d+)/", text
+    )
+    if match:
+        size = int(match.group(1))
+    if suffix == ".svg":
+        # Un SVG es nítido a cualquier tamaño; los "scalable" son los buenos.
+        score = 900 if "/scalable/" in text else 400 + size
+    else:
+        score = size
+    if "/apps/" in text or "/applications/" in text:
+        score += 50
+    if "/hicolor/" in text:
+        score += 150
+    if "symbolic" in path.name.lower() or "/symbolic/" in text:
+        score -= 5000
+    if suffix != ".svg" and 0 < size < 48:
+        # Iconos de panel (16/22/24) quedan horribles al ampliarlos a 128.
+        score -= 200
+    if "/oxygen/" in text:
+        score += 30
+    return score
+
+
+# A partir de aquí el icono es suficientemente bueno (SVG o PNG grande).
+ICON_GOOD_ENOUGH = 200
+
+
+def same_file(a: Path, b: Path) -> bool:
+    try:
+        return a.resolve() == b.resolve()
+    except OSError:
+        return False
+
+
+_THEME_INDEX: dict[tuple[str, str], dict[str, list[Path]]] = {}
+
+
+def theme_index(root: Path, theme: str) -> dict[str, list[Path]]:
+    """Índice filename → rutas de un tema (se construye una sola vez)."""
+    key = (str(root), theme)
+    index = _THEME_INDEX.get(key)
+    if index is not None:
+        return index
+    index = {}
+    base = root / theme
+    if base.is_dir():
+        for dirpath, _dirnames, filenames in os.walk(base):
+            for filename in filenames:
+                if filename.endswith(ICON_EXTS):
+                    index.setdefault(filename, []).append(
+                        Path(dirpath) / filename
+                    )
+    _THEME_INDEX[key] = index
+    return index
+
+
+def search_theme(theme: str, name: str, exclude: Path | None = None) -> Path | None:
+    wanted = [f"{name}{ext}" for ext in ICON_EXTS]
+    best: tuple[int, Path] | None = None
+    for root in icon_roots():
+        if not (root / theme).is_dir():
+            continue
+        index = theme_index(root, theme)
+        for filename in wanted:
+            for candidate in index.get(filename, ()):
+                if exclude is not None and same_file(candidate, exclude):
+                    continue
+                score = icon_score(candidate)
+                if best is None or score > best[0]:
+                    best = (score, candidate)
+    return best[1] if best else None
+
+
+_ICON_CACHE: dict[tuple[str, str], Path | None] = {}
+
+
+def find_icon(name: str, exclude: Path | None = None) -> Path | None:
+    key = (name, str(exclude) if exclude is not None else "")
+    if key in _ICON_CACHE:
+        return _ICON_CACHE[key]
+    result = _find_icon(name, exclude)
+    _ICON_CACHE[key] = result
+    return result
+
+
+def _find_icon(name: str, exclude: Path | None = None) -> Path | None:
+    for root in (
+        Path.home() / ".local/share/icons",
+        Path.home() / ".icons",
+        Path("/usr/share/pixmaps"),
+    ):
+        for ext in ICON_EXTS:
+            flat = root / f"{name}{ext}"
+            if flat.is_file() and not (exclude is not None and same_file(flat, exclude)):
+                return flat
+
+    # Se queda el mejor de la cadena de temas; un 22px de Colloid no debe
+    # ganarle a un SVG de hicolor.
+    best: tuple[int, int, Path] | None = None
+    for rank, theme in enumerate(theme_chain()):
+        hit = search_theme(theme, name, exclude)
+        if hit is None:
+            continue
+        score = icon_score(hit)
+        if best is None or (score, -rank) > (best[0], best[1]):
+            best = (score, -rank, hit)
+        if score >= ICON_GOOD_ENOUGH:
+            return hit
+    if best is not None:
+        return best[2]
+
+    # Fallback: cualquier tema instalado (Colloid-Pink-Light, Gruvbox, etc.)
+    seen: set[str] = set()
+    for root in icon_roots():
+        try:
+            themes = [d for d in root.iterdir() if d.is_dir()]
+        except OSError:
+            continue
+        for directory in themes:
+            if directory.name in seen:
+                continue
+            seen.add(directory.name)
+            hit = search_theme(directory.name, name, exclude)
+            if hit is None:
+                continue
+            if icon_score(hit) < -1000:  # simbólico: no sirve como icono de app
+                continue
+            return hit
+    return None
+
+def icon_field_name(entry: Entry) -> str:
+    raw = entry.get("Icon").strip()
+    if not raw:
+        return entry.path.stem
+    path = Path(raw)
+    if path.suffix.lower() in ICON_EXTS:
+        return path.stem
+    return path.name
+
+
+def user_icon_roots() -> list[Path]:
+    """Rutas de iconos instaladas por el usuario."""
+    home = Path.home()
+    data_home = Path(os.environ.get("XDG_DATA_HOME", home / ".local/share"))
+    return [
+        p
+        for p in (
+            data_home / "icons",
+            home / ".icons",
+            home / ".local/share/flatpak/exports/share/icons",
+        )
+        if p.is_dir()
+    ]
+
+
+def find_user_icon(name: str, exclude: Path | None = None) -> Path | None:
+    """Icono por nombre solo en las rutas del usuario (icono propio de la app)."""
+    for root in user_icon_roots():
+        for ext in ICON_EXTS:
+            flat = root / f"{name}{ext}"
+            if flat.is_file() and not (
+                exclude is not None and same_file(flat, exclude)
+            ):
+                return flat
+    best: tuple[int, Path] | None = None
+    for root in user_icon_roots():
+        try:
+            themes = [d for d in root.iterdir() if d.is_dir()]
+        except OSError:
+            continue
+        for theme in themes:
+            hit = search_theme(theme.name, name, exclude)
+            if hit is None:
+                continue
+            score = icon_score(hit)
+            if score < 0:
+                continue
+            if best is None or score > best[0]:
+                best = (score, hit)
+    return best[1] if best else None
+
+
+def find_entry_icon(entry: Entry, exclude: Path | None = None) -> Path | None:
+    raw = entry.get("Icon").strip()
+    if raw:
+        path = Path(raw).expanduser()
+        if path.is_file() and not (exclude is not None and same_file(path, exclude)):
+            return path
+        if not path.is_absolute():
+            for base in (Path.home(), entry.path.parent):
+                candidate = base / raw
+                if candidate.is_file() and not (
+                    exclude is not None and same_file(candidate, exclude)
+                ):
+                    return candidate
+
+    # Icono propio instalado por el usuario (p. ej. wine-discord-ipc-bridge.svg)
+    # aunque el .desktop use un Icon= genérico como "wine".
+    stem = entry.path.stem
+    parts = stem.split("-")
+    candidates = [stem]
+    for cut in range(1, min(3, len(parts))):
+        candidates.append("-".join(parts[:-cut]))
+    for name in candidates:
+        own = find_user_icon(name, exclude)
+        if own is not None:
+            return own
+
+    name = icon_field_name(entry)
+    found = find_icon(name, exclude)
+    if found:
+        return found
+    return find_icon(entry.path.stem, exclude)
+
+
+def icon_output_name(
+    entry: Entry, override: str = "", src: Path | None = None
+) -> str:
+    base = override or (src.stem if src is not None else "") or icon_field_name(entry)
+    name = base.strip()
+    name = name.replace("/", "_").replace("\\", "_").replace("\0", "")
+    if not name or name in {".", ".."}:
+        name = entry.path.stem
+    return name if name.lower().endswith(".png") else f"{name}.png"
+
+
+def png_dimensions(path: Path) -> tuple[int, int] | None:
+    try:
+        with path.open("rb") as fh:
+            head = fh.read(24)
+    except OSError:
+        return None
+    if len(head) >= 24 and head[:8] == b"\x89PNG\r\n\x1a\n" and head[12:16] == b"IHDR":
+        return (
+            int.from_bytes(head[16:20], "big"),
+            int.from_bytes(head[20:24], "big"),
+        )
+    return None
+
+
+def render_png(src: Path, size: int, tmpdir: Path) -> Path:
+    out = tmpdir / "icon.png"
+    suffix = src.suffix.lower()
+    if suffix == ".png" and png_dimensions(src) == (size, size):
+        shutil.copy2(src, out)
+        return out
+    magick = shutil.which("magick") or shutil.which("convert")
+    ffmpeg = shutil.which("ffmpeg")
+    rsvg = shutil.which("rsvg-convert")
+    intermediate = src
+    if suffix == ".svg" and rsvg:
+        rendered = tmpdir / "rendered.png"
+        run_quiet([rsvg, "-w", str(size), "-o", str(rendered), str(src)])
+        intermediate = rendered
+    if magick:
+        run_quiet([magick, str(intermediate), "-background", "none",
+                   "-resize", f"{size}x{size}", "-gravity", "center",
+                   "-extent", f"{size}x{size}", str(out)])
+        return out
+    if ffmpeg:
+        video_filter = (
+            f"scale={size}:{size}:force_original_aspect_ratio=decrease,"
+            f"pad={size}:{size}:(ow-iw)/2:(oh-ih)/2:color=0x00000000"
+        )
+        run_quiet([ffmpeg, "-y", "-loglevel", "error", "-i", str(intermediate),
+                   "-vf", video_filter, "-frames:v", "1", str(out)])
+        return out
+    if intermediate.suffix.lower() == ".png":
+        shutil.copy2(intermediate, out)
+        return out
+    raise RuntimeError("no hay convertidor PNG disponible")
+
+
+def run_quiet(cmd: list[str], timeout: int = 30) -> None:
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL, timeout=timeout)
 
 
 def expand_field_codes(tokens: list[str], entry: Entry) -> list[str]:
@@ -387,6 +777,87 @@ def find_entry(label: str) -> Entry:
     return matches[0]
 
 
+def extract_icon(
+    entry: Entry, outdir: Path, size: int, name_override: str = ""
+) -> tuple[Path, Path] | None:
+    """Extrae el icono de `entry`; None si no hay un icono válido."""
+    guess = outdir / icon_output_name(entry, name_override)
+    src = find_entry_icon(entry, exclude=guess)
+    if src is None:
+        return None
+    dest = outdir / icon_output_name(entry, name_override, src)
+    if src.resolve() != dest.resolve():
+        with tempfile.TemporaryDirectory(prefix="desktop-icon-") as tmp:
+            rendered = render_png(src, size, Path(tmp))
+            data = rendered.read_bytes()
+        with dest.open("wb") as fh:
+            fh.write(data)
+    return dest, src
+
+
+def matching_entries(term: str) -> list[Entry]:
+    folded = term.strip().casefold()
+    if not folded:
+        return []
+    return [
+        e
+        for e in load_entries()
+        if folded in e.label.casefold() or folded in e.search_terms().casefold()
+    ]
+
+
+def cmd_icon(args: argparse.Namespace) -> int:
+    outdir = (
+        Path(args.output_dir).expanduser()
+        if args.output_dir
+        else Path.home() / f".local/share/icons/hicolor/{args.size}x{args.size}/apps"
+    )
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    if args.file:
+        entry = parse_desktop(Path(args.file).expanduser(),
+                              allow_hidden=True, require_exec=False)
+        if entry is None:
+            raise SystemExit(f"No se pudo leer el .desktop: {args.file}")
+        entries = [entry]
+    elif args.match:
+        entries = matching_entries(args.match)
+        if not entries:
+            raise SystemExit(f"Ninguna app coincide con: {args.match}")
+    elif args.all:
+        entries = load_entries()
+    else:
+        entries = [find_entry(args.label)]
+
+    done: set[Path] = set()
+    failed: list[str] = []
+    for entry in entries:
+        result = extract_icon(entry, outdir, args.size, args.name)
+        if result is None:
+            failed.append(entry.label)
+            continue
+        dest, src = result
+        if dest in done:
+            continue
+        done.add(dest)
+        print(f"{dest}\t{entry.label}\t{src}")
+
+    cache = shutil.which("gtk-update-icon-cache")
+    if cache:
+        parent = outdir
+        while parent != parent.parent and parent.name != "hicolor":
+            parent = parent.parent
+        if parent.name == "hicolor":
+            try:
+                run_quiet([cache, "-f", "-t", str(parent)], timeout=10)
+            except (OSError, subprocess.SubprocessError):
+                pass
+
+    for label in failed:
+        print(f"AVISO: sin icono para {label}", file=sys.stderr)
+    return 0
+
+
 def cmd_launch(args: argparse.Namespace) -> int:
     entry = find_entry(args.label)
     app_argv, cwd = build_app_argv(entry)
@@ -467,6 +938,15 @@ def main() -> int:
         "--plain", action="store_true", help="sin markup pango (para fuzzel)"
     )
 
+    icon = sub.add_parser("icon", help="extrae el icono .desktop a PNG")
+    icon.add_argument("--label")
+    icon.add_argument("--match")
+    icon.add_argument("--all", action="store_true")
+    icon.add_argument("--file")
+    icon.add_argument("--output-dir")
+    icon.add_argument("--name", default="")
+    icon.add_argument("--size", type=int, default=ICON_SIZE)
+
     launch = sub.add_parser("launch", help="lanza una app dentro de gamescope")
     launch.add_argument("--label", required=True)
     launch.add_argument("--gamescope", default="gamescope")
@@ -479,6 +959,10 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "list":
         return cmd_list(args)
+    if args.command == "icon":
+        if not args.label and not args.match and not args.all and not args.file:
+            parser.error("icon requiere --label, --match o --file")
+        return cmd_icon(args)
     return cmd_launch(args)
 
 

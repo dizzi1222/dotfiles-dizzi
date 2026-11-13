@@ -509,6 +509,10 @@ case "$ICON" in
   # Selector fuzzel/wofi + --force-grab-cursor (ver ~/scripts/gamescope-launcher.sh).
   bash ~/scripts/gamescope-launcher.sh
   ;;
+"󰋩")
+  # Extrae el Icon= de un .desktop a PNG 128x128 en hicolor/128x128/apps.
+  bash ~/scripts/desktop-icon-extractor.sh
+  ;;
 "")
   kitty -e ~/scripts/kill-gamescope
   ;;

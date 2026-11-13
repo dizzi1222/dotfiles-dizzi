@@ -129,7 +129,7 @@ else
     SELECTED=$(printf '%s\n' "${ENTRIES[@]}" |
       fuzzel --dmenu --only-match --no-run-if-empty \
         --prompt "$PROMPT_ICON Gamescope · " \
-        --with-nth="{1} {2}" --accept-nth=2 --match-nth="{2} {3}")
+        --with-nth="{1} {2}" --accept-nth=2 --match-nth=3)
     ;;
   wofi)
     mapfile -t ENTRIES < <(python3 "$HELPER" list)
