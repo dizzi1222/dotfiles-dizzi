@@ -3,7 +3,7 @@
 Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 
 ## Qué hace
-- **Categorías** (grid 3 col): Apps, Trigger, Style, Setup, System, Audio, Herramientas, About, Android, Multimedia, Instalar, Sistema + **"Todos"** (búsqueda recursiva en los 75 ítems).
+- **Categorías** (grid 3 col): Apps, Trigger, Style, Setup, System, Audio, Herramientas, About, Android, Multimedia, Instalar, Sistema + **"Todos"** (búsqueda recursiva en los 77 ítems).
 - **Items** (grid 2 col): cada acción con icono, nombre y chevron ` ` a la derecha.
 - **Búsqueda recursiva**: escribe `nixconf cleanup` y encuentra **Nix Cleanup** (keywords ocultas vía pango markup).
 - **Navegación**: Tab/Enter/flchas. wofi en grid navega por filas/columnas (el `↓` a veces va a la derecha el primer paso — comportamiento nativo del FlowBox de GTK).
@@ -11,10 +11,10 @@ Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 ## Archivos
 | Archivo | Rol |
 |---|---|
-| `home/scripts/system_control.sh` | Script principal: drill-down 2 pasos + case de 75 acciones |
+| `home/scripts/system_control.sh` | Script principal: drill-down 2 pasos + case de 77 acciones |
 | `wofi/.config/wofi/system-control.conf` | Config dedicada (grid, matching fuzzy, allow_markup, centrado) |
 | `wofi/.config/wofi/system-control.css` | GTK CSS con paleta wal (hover/selected, Nerd Font) |
-| `eww/.config/eww/scripts/system-menu-manifest.tsv` | Fuente única: categoría / icono / label (75 ítems) |
+| `eww/.config/eww/scripts/system-menu-manifest.tsv` | Fuente única: categoría / icono / label (77 ítems) |
 | `eww/.config/eww/scripts/system-menu-kw.tsv` | Keywords por icono para búsqueda recursiva |
 | `eww/.config/eww/scripts/toggle-game-mode.sh` | Configuración visual del modo gaming |
 | `eww/.config/eww/scripts/power-modes-fuzzel.sh` | Orquestación de perfiles y carga TLP |
@@ -120,6 +120,60 @@ Si ya hay un Gamescope abierto, el selector pregunta si cerrarlo antes de
 lanzar el siguiente. Para cerrar el actual: `Alt+F4` o `Trigger → 󰊢 Kill
 Gamescope`. Los errores de arranque se muestran con `notify-send` y el comando
 completo queda en `~/.cache/gamescope-launcher.log`.
+
+## Extractor de iconos PNG
+
+`Herramientas → 󰋩 Extraer icono` abre el mismo selector fuzzel/wofi (con las
+apps de `.desktop`) y extrae el `Icon=` de la app elegida como PNG **128×128**,
+instalándolo automáticamente en:
+
+```
+~/.local/share/icons/hicolor/128x128/apps/<Icon>.png
+```
+
+El nombre del PNG es el valor de `Icon=` (sin extensión), así la app lo
+encuentra por nombre de tema. Si `Icon=` es una ruta absoluta, se usa el
+basename.
+
+El selector lista los `.desktop` de `~/.local/share/applications`,
+`/usr/share/applications`, Flatpak, Nix y `$XDG_DATA_HOME` — así aparecen apps
+del sistema como Wine al escribir `wine`. La búsqueda de fuzzel mira nombre,
+comentario, `GenericName`, `Keywords`, categorías, el nombre del `.desktop` y el
+binario de `Exec`.
+
+Para resolver el icono se prioriza calidad: rutas directas, un icono propio del
+usuario con el nombre del `.desktop` (`<id>.svg`, aunque `Icon=` sea genérico),
+iconos planos en `~/.local/share/icons`, y luego `hicolor` (SVG `scalable` o
+PNG grande) antes que el tema activo y su herencia. Un icono de panel (22 px) o
+`symbolic` nunca le gana a un SVG; si solo existe uno simbólico se aborta con
+error en vez de generar un PNG feo. Se ignora el propio archivo de destino para
+no reutilizar una extracción anterior, y el PNG resultante toma el nombre del
+icono encontrado (`wine-discord-ipc-bridge.png`, no `wine.png`).
+
+Conversión: SVG → PNG con `rsvg-convert`, y normalización a 128×128 con
+`magick`/`convert` o `ffmpeg` (fondo transparente, sin deformar). Los PNG
+existentes se copian/reescalan. Al escribir se respeta el symlink si el archivo
+ya existe, para no romper el enlace al repo de dotfiles. Después se refresca la
+caché con `gtk-update-icon-cache` si está disponible.
+
+```bash
+~/scripts/desktop-icon-extractor.sh                    # selector
+~/scripts/desktop-icon-extractor.sh wine               # TODAS las que coincidan
+~/scripts/desktop-icon-extractor.sh --match discord    # ídem, explícito
+~/scripts/desktop-icon-extractor.sh --all              # todas las apps visibles
+~/scripts/desktop-icon-extractor.sh --file app.desktop # un .desktop concreto
+ICON_OUTPUT_DIR=/tmp/iconos ~/scripts/desktop-icon-extractor.sh steam
+ICON_SIZE=256 ~/scripts/desktop-icon-extractor.sh steam   # usa hicolor/256x256/apps
+ICON_PICKER=wofi ~/scripts/desktop-icon-extractor.sh
+```
+
+Con `--match`/posición se extraen de golpe todas las coincidencias (p. ej.
+`wine` genera 11 PNG: `wine.png`, `wine-winecfg.png`,
+`wine-discord-ipc-bridge.png`…), y `--all` recorre todas las apps visibles.
+Los iconos repetidos se cuentan una sola vez y la notificación resume el total.
+
+La ruta final se anuncia con `notify-send` (con preview del icono) y se imprime
+en stdout para poder usarla desde otros scripts.
 
 ## Modo gaming y carga TLP
 
