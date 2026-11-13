@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run dev.lizardbyte.app.Sunshine
+  working_dir: /home/diego

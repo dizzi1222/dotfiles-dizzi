@@ -5,7 +5,6 @@ Icon=/home/diego/.local/share/lutris/coverart/neovim.png
 Type=Application
 Name=Neovim
 Hidden=true
-Exec=kitty -e /usr/bin/nvim
-# Exec=env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/124
+Exec=kitty -e /home/linuxbrew/.linuxbrew/bin/nvim
 Categories=Game
 TryExec=lutris

@@ -1,3 +1,4 @@
 game:
-  exe: protonvpn-app
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run com.protonvpn.www
+  working_dir: /home/diego

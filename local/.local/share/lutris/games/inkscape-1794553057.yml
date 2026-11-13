@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run org.inkscape.Inkscape
+  working_dir: /home/diego

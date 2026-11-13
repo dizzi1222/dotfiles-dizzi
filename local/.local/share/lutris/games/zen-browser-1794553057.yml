@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run app.zen_browser.zen
+  working_dir: /home/diego

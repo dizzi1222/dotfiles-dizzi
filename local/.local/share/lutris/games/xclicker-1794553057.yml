@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run xyz.xclicker.xclicker
+  working_dir: /home/diego

@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run app.tsumiru.Tsumiru
+  working_dir: /home/diego

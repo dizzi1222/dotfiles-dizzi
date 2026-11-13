@@ -1,3 +1,4 @@
 game:
-  exe: ghb
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run fr.handbrake.ghb
+  working_dir: /home/diego

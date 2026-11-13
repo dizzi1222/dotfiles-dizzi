@@ -1,2 +1,5 @@
+[Adapters]
+A4:B1:C1:6C:89:22_powered=true
+
 [Devices]
 connectedDevices=E4:17:D8:26:74:F2

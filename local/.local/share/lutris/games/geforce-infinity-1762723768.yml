@@ -1,3 +1,4 @@
 game:
-  exe: geforce-infinity
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run io.github.astralvixen.geforce-infinity
+  working_dir: /home/diego

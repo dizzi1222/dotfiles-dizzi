@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run io.github.peazip.PeaZip
+  working_dir: /home/diego
