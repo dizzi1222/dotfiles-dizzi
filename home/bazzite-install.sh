@@ -508,6 +508,93 @@ if command -v flatpak >/dev/null 2>&1; then
   fi
 
   # =============================================================================
+  # Iriun Webcam — usar el móvil como webcam (alternativa a DroidCam)
+  # El RPM oficial instala /usr/local/bin/iriunwebcam; en Bazzite /usr/local es
+  # un symlink y rpm-ostree falla con "opendir(local)". Se repaqueta el RPM
+  # moviendo el binario a /usr/bin y parcheando el .desktop.
+  # Requiere podman (incluido en Bazzite) y reboot.
+  # =============================================================================
+  if gum confirm "¿Instalar Iriun Webcam (móvil como webcam, alternativa a DroidCam)?"; then
+    IRIUN_VER="2.9.3"
+    IRIUN_TMP="$(mktemp -d)"
+    IRIUN_RPM="$IRIUN_TMP/iriunwebcam-${IRIUN_VER}.rpm"
+
+    echo "  Descargando RPM beta de Iriun Webcam v${IRIUN_VER}…"
+    if curl -fL -o "$IRIUN_RPM" "https://iriun.com/iriunwebcam-${IRIUN_VER}.rpm"; then
+      if ! command -v podman >/dev/null 2>&1; then
+        echo "  ⚠️  podman no está disponible; no se puede repaquetar el RPM."
+      else
+        echo "  Repaquetando para /usr/bin (evita el bug de /usr/local)…"
+        mkdir -p "$IRIUN_TMP/extract"
+        if (cd "$IRIUN_TMP/extract" && rpm2cpio "$IRIUN_RPM" | cpio -idm --quiet); then
+          cat > "$IRIUN_TMP/iriunwebcam.spec" <<'SPEC'
+Name:           iriunwebcam
+Version:        2.9.3
+Release:        1
+Summary:        Iriun Webcam for Linux
+License:        Proprietary
+URL:            https://iriun.com
+Requires:       v4l2loopback
+BuildArch:      x86_64
+
+%description
+Use your phone's camera as a wireless webcam in PC.
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}
+cp -a /work/extract/usr %{buildroot}/
+cp -a /work/extract/etc %{buildroot}/
+rm -rf %{buildroot}/usr/lib/.build-id
+mkdir -p %{buildroot}/usr/bin
+mv %{buildroot}/usr/local/bin/iriunwebcam %{buildroot}/usr/bin/iriunwebcam
+rmdir %{buildroot}/usr/local/bin %{buildroot}/usr/local 2>/dev/null || true
+sed -i 's|/usr/local/bin/iriunwebcam|/usr/bin/iriunwebcam|' %{buildroot}/usr/share/applications/iriunwebcam.desktop
+
+%files
+%attr(0755,root,root) /usr/bin/iriunwebcam
+%attr(0755,root,root) /usr/lib64/spa-0.2/iriunaudio/libspa-iriunaudio.so
+%config(noreplace) /etc/modprobe.d/iriunwebcam-options.conf
+%config(noreplace) /etc/modules-load.d/iriunwebcam.conf
+/usr/share/applications/iriunwebcam.desktop
+%config(noreplace) /usr/share/pipewire/pipewire.conf.d/iriunaudio.conf
+/usr/share/pixmaps/iriunwebcam.png
+SPEC
+          sed -i "s/^Version:.*/Version:        ${IRIUN_VER}/" "$IRIUN_TMP/iriunwebcam.spec"
+
+          FEDORA_VER="$(rpm -E %fedora)"
+          if podman run --rm -v "$IRIUN_TMP:/work:Z" -w /work \
+            "registry.fedoraproject.org/fedora:${FEDORA_VER}" \
+            bash -c 'dnf -y install rpm-build >/dev/null 2>&1 && rpmbuild -bb --define "_topdir /work/rpmbuild" iriunwebcam.spec' \
+            >"$IRIUN_TMP/build.log" 2>&1; then
+            IRIUN_PATCHED="$IRIUN_TMP/rpmbuild/RPMS/x86_64/iriunwebcam-${IRIUN_VER}-1.x86_64.rpm"
+            if [ -f "$IRIUN_PATCHED" ]; then
+              echo "  Instalando RPM repaquetado con rpm-ostree…"
+              if sudo rpm-ostree install --idempotent "$IRIUN_PATCHED"; then
+                echo "  ✓ Iriun Webcam instalado. REQUERIDO: systemctl reboot para aplicar."
+              else
+                echo "  ⚠️  Falló rpm-ostree install de Iriun Webcam."
+              fi
+            else
+              echo "  ⚠️  No se generó el RPM repaquetado."
+            fi
+          else
+            echo "  ⚠️  Falló el repaquetado con podman/rpmbuild."
+            tail -10 "$IRIUN_TMP/build.log" 2>/dev/null | sed 's/^/    /'
+          fi
+        else
+          echo "  ⚠️  Falló la extracción del RPM."
+        fi
+      fi
+    else
+      echo "  ⚠️  Falló la descarga. Intenta manualmente:"
+      echo "    curl -fL -o /tmp/iriunwebcam-${IRIUN_VER}.rpm https://iriun.com/iriunwebcam-${IRIUN_VER}.rpm"
+    fi
+
+    rm -rf "$IRIUN_TMP"
+  fi
+
+  # =============================================================================
   # Wine (mínimo, para Wine Discord IPC Bridge + customrp en prefijo ~/.wine)
   # =============================================================================
   echo
