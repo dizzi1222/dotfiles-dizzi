@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run org.gnome.Loupe
+  working_dir: /home/diego

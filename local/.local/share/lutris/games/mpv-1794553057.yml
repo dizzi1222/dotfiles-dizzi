@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run io.mpv.Mpv
+  working_dir: /home/diego

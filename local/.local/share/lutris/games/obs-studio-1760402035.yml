@@ -1,3 +1,4 @@
 game:
-  exe: obs
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run com.obsproject.Studio
+  working_dir: /home/diego

@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run net.davidotek.pupgui2
+  working_dir: /home/diego

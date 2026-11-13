@@ -1,0 +1,3 @@
+game:
+  exe: /usr/bin/bazaar
+  working_dir: /home/diego

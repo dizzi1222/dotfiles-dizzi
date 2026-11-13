@@ -1,3 +1,4 @@
 game:
-  exe: brave
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run com.brave.Browser
+  working_dir: /home/diego

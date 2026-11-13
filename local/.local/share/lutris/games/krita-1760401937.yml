@@ -1,3 +1,4 @@
 game:
-  exe: krita
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run org.kde.krita
+  working_dir: /home/diego
