@@ -3,6 +3,7 @@
 	pkg Pkg instalar paquetes pacman
 	fedora bazzite Bazzite pkg Pkg Fedora linux dnf dnf5 rpm rpm-ostree paquete paquetes instalar buscar search gum tui bazzite
 󰍺	brew homebrew Pkg pkg paquetes instalar buscar search gum tui fórmula cask linux macOS
+󰍹	zen arzopa monitor mover ventana browser kwin gamescope desktop mode flatpak
 󰏓	flatpak flathub Pkg pkg Fedora Flatpak Flathub fedora bazzite Bazzite buscar instalar paquetes app aplicaciones flathub search install
 󰒓	bazzite install Fedora fedora Bazzite instalador instalación script personal setup bazzite-install.sh capa rpm-ostree sistema
 	spicetify spotify marketplace tema temas themes extensions extensiones personalizar aplicar actualizar musica bazzite
@@ -63,7 +64,7 @@
 	television tv fuzzy buscar channel picker files git
 	nix gc nix-collect-garbage nix-store optimise optimizar garbage deduplicar perezoso limpiar generaciones
 	nixconf-cleanup nixconf cleanup limpiar cache limpieza nix trash basura generaciones
-󰝛	convertir tus MP3 en lote 128kbps mp3 FLAC to 128kbps in downloadas	readme documentacion ayuda wofi system control guia
+󰝛	convertir tus MP3 en lote 128kbps mp3 FLAC to 128kbps in downloadas readme documentacion ayuda wofi system control guia
 	creditos creditos izzi1222 autor thank you gracias
 	anso reiniciar restart restart-espanso text expander expansion crashea crasheo died died-again
 	instalar extensiones antigravity cursor vscode vscodium code ide extensions vsix
