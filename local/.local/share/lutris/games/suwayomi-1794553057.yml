@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run online.hatsune_miku.tachidesk-vaadinui
+  working_dir: /home/diego

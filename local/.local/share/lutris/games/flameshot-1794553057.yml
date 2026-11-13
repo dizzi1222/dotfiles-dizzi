@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run org.flameshot.Flameshot
+  working_dir: /home/diego

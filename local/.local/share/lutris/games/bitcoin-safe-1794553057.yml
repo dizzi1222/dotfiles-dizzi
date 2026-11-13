@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run org.bitcoin_safe.BitcoinSafe
+  working_dir: /home/diego

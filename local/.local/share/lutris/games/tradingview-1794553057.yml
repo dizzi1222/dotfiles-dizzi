@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run com.tradingview.tradingview
+  working_dir: /home/diego

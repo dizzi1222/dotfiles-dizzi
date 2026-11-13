@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run sh.ppy.osu
+  working_dir: /home/diego

@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run moe.launcher.an-anime-game-launcher
+  working_dir: /home/diego

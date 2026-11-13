@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run org.kde.kcalc
+  working_dir: /home/diego

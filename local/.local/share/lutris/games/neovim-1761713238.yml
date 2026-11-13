@@ -1,4 +1,4 @@
 game:
-  args: ''
-  exe: nvim
-  working_dir: ''
+  exe: /home/diego/.local/kitty.app/bin/kitty
+  args: -e /home/linuxbrew/.linuxbrew/bin/nvim
+  working_dir: /home/diego

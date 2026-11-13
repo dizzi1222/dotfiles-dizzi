@@ -1,3 +1,4 @@
 game:
-  exe: btop
-  working_dir: ''
+  exe: /home/diego/.local/kitty.app/bin/kitty
+  args: -e /usr/bin/btop
+  working_dir: /home/diego

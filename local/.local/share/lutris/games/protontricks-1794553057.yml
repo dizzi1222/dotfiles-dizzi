@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run com.github.Matoking.protontricks
+  working_dir: /home/diego

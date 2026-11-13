@@ -1,0 +1,4 @@
+game:
+  exe: /usr/bin/flatpak
+  args: run net.puddletag.puddletag
+  working_dir: /home/diego

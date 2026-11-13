@@ -1,4 +1,4 @@
 game:
-  args: ''
-  exe: prismlauncher
-  working_dir: ''
+  exe: /usr/bin/flatpak
+  args: run org.prismlauncher.PrismLauncher
+  working_dir: /home/diego
