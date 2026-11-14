@@ -25,37 +25,131 @@
       "figma": {
         "type": "local",
         "command": [
-          "node",
-          "/data/data/com.termux/files/home/.npm-global/lib/node_modules/figma-developer-mcp/dist/bin.js",
-          "--figma-api-key={env:FIGMA_API_KEY}",
-          "--stdio"
-        ]
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && exec node /data/data/com.termux/files/home/.npm-global/lib/node_modules/figma-developer-mcp/dist/bin.js --stdio"
+        ],
+        "enabled": true
       },
       "webshare-uk": {
         "type": "local",
         "command": [
-          "node",
-          "/data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_UK\" DI_PROXY_PORT=\"$WS_PORT_UK\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
         ],
         "environment": {
-          "DI_USER": "{env:WS_USER}",
-          "DI_PASS": "{env:WS_PASS}",
-          "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-          "DI_PROXY_PORT": "REDACTED"
-        }
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": true
+      },
+      "webshare-es": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
       },
       "webshare-us": {
         "type": "local",
         "command": [
-          "node",
-          "/data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US\" DI_PROXY_PORT=\"$WS_PORT_US\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
         ],
         "environment": {
-          "DI_USER": "{env:WS_USER}",
-          "DI_PASS": "{env:WS_PASS}",
-          "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-          "DI_PROXY_PORT": "REDACTED"
-        }
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": true
+      },
+      "webshare-us-2": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_2\" DI_PROXY_PORT=\"$WS_PORT_US_2\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-us-3": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_3\" DI_PROXY_PORT=\"$WS_PORT_US_3\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-us-4": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_4\" DI_PROXY_PORT=\"$WS_PORT_US_4\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-us-5": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_5\" DI_PROXY_PORT=\"$WS_PORT_US_5\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-us-6": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_6\" DI_PROXY_PORT=\"$WS_PORT_US_6\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-us-7": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_7\" DI_PROXY_PORT=\"$WS_PORT_US_7\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
+      },
+      "webshare-pl": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_PL\" DI_PROXY_PORT=\"$WS_PORT_PL\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+        },
+        "enabled": false
       }
     }
   },
