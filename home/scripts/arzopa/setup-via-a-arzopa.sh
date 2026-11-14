@@ -166,8 +166,8 @@ PartOf=gamescope-session-plus@ogui-steam.service
 
 [Service]
 Type=simple
-ExecStart=$SCRIPT_DIR/arzopa/arzopa-gamemode.sh start
-ExecStop=$SCRIPT_DIR/arzopa/arzopa-gamemode.sh stop
+ExecStart=$SCRIPT_DIR/arzopa-gamemode.sh start
+ExecStop=$SCRIPT_DIR/arzopa-gamemode.sh stop
 Restart=on-failure
 RestartSec=3
 
