@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Arzopa
+GenericName=Monitor externo
+Comment=Elegir qué abrir en la Arzopa: apps, Zen en Game Mode o Desktop Mode
+Exec=/home/diego/scripts/arzopa-menu.sh
+TryExec=/home/diego/scripts/arzopa-menu.sh
+Icon=video-display
+Terminal=false
+Categories=Utility;
+Keywords=arzopa;monitor;zen;cage;gamescope;touchpad;teclado;
+StartupNotify=false
+NoDisplay=false
