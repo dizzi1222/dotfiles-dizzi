@@ -17,6 +17,18 @@ home/.claude/sessions/
 home/.claude/shell-snapshots/
 home/.claude/file-history/
 home/.claude/settings.local.json
+# Sunshine: logs, estado y credenciales del equipo (no portables)
+sunshine/.config/sunshine/sunshine.log*
+sunshine/.config/sunshine/sunshine_state.json
+sunshine/.config/sunshine/credentials/
+sunshine/.config/sunshine/portal_token
+# policy-limits: limites de politica firmados (JWS) + identity/stamp del equipo.
+# Datos personales del dispositivo, no configuracion portable.
+home/.claude/policy-limits.json
+home/.claude/policy-limits.json.*
+# estado de sincronizacion remota (marcador de tiempo, no configuracion)
+home/.claude/remote-settings.json
+home/.claude/remote-settings.json.*
 
 # Antigravity - ignorar todo EXCEPTO settings y keybindings
 Antigravity/.config/Antigravity/*
@@ -336,3 +348,9 @@ local/.local/share/applications/mimeinfo.cache
 # (localconfig/registry/compat son binarios volátiles que Steam reescribe)
 **/.local/share/Steam/userdata/*/config/*.vdf
 !**/.local/share/Steam/userdata/*/config/shortcuts.vdf
+
+# Cache de shaders de juegos (volátil, cientos de MB)
+local/.local/bin/juegos/GLCache/
+
+# Logs de Sunshine (rotan y se reescriben solos)
+/opencode/.config/opencode/service.json
