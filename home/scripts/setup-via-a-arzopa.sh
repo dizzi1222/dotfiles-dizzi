@@ -24,21 +24,52 @@ USER_UID="$(id -u "$USER_NAME")"
 USER_RUNTIME="/run/user/$USER_UID"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# 0. Shim de libseat: que libinput use seat-arzopa en vez de seat0 -----------
+install -d /usr/local/lib
+gcc -shared -fPIC -O2 -o /usr/local/lib/libseat-seat-arzopa.so \
+    "$SCRIPT_DIR/libseat-seat-arzopa.c"
+
 # 1. Helpers root de attach/detach ------------------------------------------
 cat > /usr/local/bin/arzopa-attach <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+
 CARD="$(readlink -f /sys/class/drm/card0)"
 loginctl attach seat-arzopa "$CARD"
+
+# Touchpad dedicado a la Arzopa (input34 es el padre con tag seat).
+TOUCH=""
+for e in /sys/class/input/event*; do
+  if [ "$(cat "$e/device/name" 2>/dev/null)" = "Synaptics TM3512-010" ]; then
+    TOUCH="$(dirname "$(readlink -f "$e")")"
+    break
+  fi
+done
+if [ -n "$TOUCH" ]; then
+  loginctl attach seat-arzopa "$TOUCH"
+fi
 EOF
 chmod 755 /usr/local/bin/arzopa-attach
 
 cat > /usr/local/bin/arzopa-detach <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+
 CARD="$(readlink -f /sys/class/drm/card0)"
 loginctl detach seat-arzopa "$CARD" 2>/dev/null || true
 loginctl attach seat0 "$CARD" 2>/dev/null || true
+
+TOUCH=""
+for e in /sys/class/input/event*; do
+  if [ "$(cat "$e/device/name" 2>/dev/null)" = "Synaptics TM3512-010" ]; then
+    TOUCH="$(dirname "$(readlink -f "$e")")"
+    break
+  fi
+done
+if [ -n "$TOUCH" ]; then
+  loginctl detach seat-arzopa "$TOUCH" 2>/dev/null || true
+  loginctl attach seat0 "$TOUCH" 2>/dev/null || true
+fi
 EOF
 chmod 755 /usr/local/bin/arzopa-detach
 
@@ -49,10 +80,13 @@ EOF
 chmod 440 /etc/sudoers.d/arzopa-gamemode
 visudo -cf /etc/sudoers.d/arzopa-gamemode >/dev/null
 
-# 3. Grupo video: acceso a card0 cuando está fuera de seat0 -----------------
-if ! id -nG "$USER_NAME" | tr ' ' '\n' | grep -qx video; then
-  usermod -aG video "$USER_NAME"
-fi
+# 3. Acceso a card0 cuando está fuera de seat0 -------------------------------
+cat > /etc/udev/rules.d/70-arzopa-card0.rules <<EOF
+SUBSYSTEM=="drm", KERNEL=="card0", OWNER="$USER_NAME", MODE="0600"
+EOF
+udevadm control --reload-rules
+udevadm trigger --sysname-match=card0 || true
+chown "$USER_NAME" /dev/dri/card0 2>/dev/null || true
 
 # 4. Drop-in del unit de gamescope ------------------------------------------
 DROPIN_DIR="$USER_HOME/.config/systemd/user/gamescope-session-plus@ogui-steam.service.d"
