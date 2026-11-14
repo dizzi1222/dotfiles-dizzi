@@ -484,7 +484,7 @@ case "$ICON" in
   # PLasma Bazzite Desktop
   kitty -e sudo ~/scripts/bazzite-desktop-boot-entry.sh
   ;;
-"󰓓")
+"󰍹")
   # Menú Arzopa: abrir app, Zen en Game Mode o Zen en Desktop
   ~/scripts/arzopa-menu.sh
   ;;

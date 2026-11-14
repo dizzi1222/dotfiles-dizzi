@@ -24,7 +24,7 @@ start_arzopa() {
   log "start: DRM=$DRM_DEV renderer=${WLR_RENDERER:-gles2}"
 
   export LIBSEAT_BACKEND=noop
-  export WLR_BACKENDS=drm
+  export WLR_BACKENDS=drm,libinput
   export WLR_DRM_DEVICES="$DRM_DEV"
   export WLR_NO_HARDWARE_CURSORS=1
   export WLR_RENDERER="${WLR_RENDERER:-gles2}"
