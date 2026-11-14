@@ -5,9 +5,10 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 
-# Forzar TTY si no hay (necesario para gum)
-if [ ! -t 0 ] && [ -t 1 ]; then
-  exec < /dev/tty 2>/dev/null || true
+# Forzar TTY (necesario para gum/fzf/read)
+# En Steam/Lutris Game Mode, stdin no es TTY; /dev/tty sí lo es si kitty lo abre bien
+if [ ! -t 0 ]; then
+  exec < /dev/tty 2>/dev/null || exec < /dev/console 2>/dev/null || true
 fi
 
 has_gum() { command -v gum >/dev/null 2>&1 && [ -t 0 ]; }

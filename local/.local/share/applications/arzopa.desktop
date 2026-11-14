@@ -3,8 +3,8 @@ Type=Application
 Name=Arzopa
 GenericName=Monitor externo
 Comment=Menú Arzopa: apps, Zen Game Mode, Zen Desktop, toggle teclado
-Exec=kitty @ launch --type=tab --cwd=/home/diego --title="Arzopa Menu" bash -c '/home/diego/dotfiles-dizzi/home/scripts/arzopa/arzopa-tui.sh; read -p "Presiona Enter para cerrar..."'
-TryExec=kitty
+Exec=/home/diego/.local/kitty.app/bin/kitty -e /home/diego/dotfiles-dizzi/home/scripts/arzopa/arzopa-tui.sh
+TryExec=/home/diego/.local/kitty.app/bin/kitty
 Icon=video-display
 Terminal=false
 Categories=Utility;
