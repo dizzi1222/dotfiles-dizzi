@@ -1,9 +1,7 @@
 #!/bin/sh
-# Abre opencode continuando la última sesión de este directorio (juegos).
+# Abre opencode continuando la última sesión del directorio actual.
+# No cambia de carpeta: respeta el working_dir del lanzador (Lutris/Steam).
 set -u
-
-DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
-cd "$DIR" || exit 1
 
 if command -v opencode >/dev/null 2>&1; then
   exec opencode --continue "$@"
