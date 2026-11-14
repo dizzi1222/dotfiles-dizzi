@@ -10,7 +10,7 @@ done
 [ "${1:-}" = "--" ] && shift
 
 export LIBSEAT_BACKEND=noop
-export WLR_BACKENDS=drm
+export WLR_BACKENDS=drm,libinput
 export WLR_DRM_DEVICES="${ARZOPA_DRM_DEV:-/dev/dri/card0}"
 export WLR_NO_HARDWARE_CURSORS=1
 export WLR_RENDERER="${WLR_RENDERER:-gles2}"

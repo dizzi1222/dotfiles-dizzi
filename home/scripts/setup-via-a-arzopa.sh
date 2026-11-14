@@ -37,16 +37,23 @@ set -euo pipefail
 CARD="$(readlink -f /sys/class/drm/card0)"
 loginctl attach seat-arzopa "$CARD"
 
-# Touchpad dedicado a la Arzopa (input34 es el padre con tag seat).
-TOUCH=""
-for e in /sys/class/input/event*; do
-  if [ "$(cat "$e/device/name" 2>/dev/null)" = "Synaptics TM3512-010" ]; then
-    TOUCH="$(dirname "$(readlink -f "$e")")"
-    break
-  fi
-done
-if [ -n "$TOUCH" ]; then
-  loginctl attach seat-arzopa "$TOUCH"
+# Mouse dedicado a la Arzopa, con fallback: USB Lenovo → G203 → touchpad.
+find_device() {
+  local e name
+  for wanted in "Logitech Lenovo USB Optical Mouse" "G203" "Synaptics TM3512-010"; do
+    for e in /sys/class/input/event*; do
+      name="$(cat "$e/device/name" 2>/dev/null || true)"
+      case "$name" in
+        *"$wanted"*) dirname "$(readlink -f "$e")"; return 0 ;;
+      esac
+    done
+  done
+  return 1
+}
+
+DEV="$(find_device || true)"
+if [ -n "$DEV" ]; then
+  loginctl attach seat-arzopa "$DEV"
 fi
 EOF
 chmod 755 /usr/local/bin/arzopa-attach
@@ -59,16 +66,23 @@ CARD="$(readlink -f /sys/class/drm/card0)"
 loginctl detach seat-arzopa "$CARD" 2>/dev/null || true
 loginctl attach seat0 "$CARD" 2>/dev/null || true
 
-TOUCH=""
-for e in /sys/class/input/event*; do
-  if [ "$(cat "$e/device/name" 2>/dev/null)" = "Synaptics TM3512-010" ]; then
-    TOUCH="$(dirname "$(readlink -f "$e")")"
-    break
-  fi
-done
-if [ -n "$TOUCH" ]; then
-  loginctl detach seat-arzopa "$TOUCH" 2>/dev/null || true
-  loginctl attach seat0 "$TOUCH" 2>/dev/null || true
+find_device() {
+  local e name
+  for wanted in "Logitech Lenovo USB Optical Mouse" "G203" "Synaptics TM3512-010"; do
+    for e in /sys/class/input/event*; do
+      name="$(cat "$e/device/name" 2>/dev/null || true)"
+      case "$name" in
+        *"$wanted"*) dirname "$(readlink -f "$e")"; return 0 ;;
+      esac
+    done
+  done
+  return 1
+}
+
+DEV="$(find_device || true)"
+if [ -n "$DEV" ]; then
+  loginctl detach seat-arzopa "$DEV" 2>/dev/null || true
+  loginctl attach seat0 "$DEV" 2>/dev/null || true
 fi
 EOF
 chmod 755 /usr/local/bin/arzopa-detach

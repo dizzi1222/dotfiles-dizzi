@@ -11,7 +11,7 @@ HELPER="$SCRIPT_DIR/lib/desktop_apps.py"
 WOFI_CONF="${WOFI_CONF:-$HOME/.config/wofi/system-control.conf}"
 WOFI_STYLE="${WOFI_STYLE:-$HOME/.config/wofi/system-control.css}"
 SHIM="$SCRIPT_DIR/arzopa-gamescope-shim.sh"
-PROMPT_ICON="󰓓"
+PROMPT_ICON="󰍹"
 
 command -v python3 >/dev/null 2>&1 || { notify-send -u critical "Arzopa" "python3 no disponible"; exit 1; }
 [ -f "$HELPER" ] || { notify-send -u critical "Arzopa" "falta $HELPER"; exit 1; }
