@@ -8,17 +8,17 @@ WOFI_CONF="${WOFI_CONF:-$HOME/.config/wofi/system-control.conf}"
 WOFI_STYLE="${WOFI_STYLE:-$HOME/.config/wofi/system-control.css}"
 
 CHOICE=$(printf '%s\n' \
-  "󰓓 Abrir app en Arzopa" \
+  "󰍹 Abrir app en Arzopa" \
   "󰍹 Zen en Arzopa (Game Mode)" \
   "󰕮 Zen → Arzopa (Desktop Mode)" |
   wofi --dmenu --cache-file /dev/null -l center \
     --conf "$WOFI_CONF" --style "$WOFI_STYLE" --columns 1 \
-    --prompt "󰓓 Arzopa")
+    --prompt "󰍹 Arzopa")
 
 case "$CHOICE" in
   *"Abrir app"*) "$SCRIPT_DIR/arzopa-launcher.sh" ;;
   *"Game Mode"*)
-    kitty -e bash -c 'sudo "'"$SCRIPT_DIR"'/setup-via-a-arzopa.sh" && sudo /usr/local/bin/arzopa-attach && systemctl --user restart arzopa-gamemode.service; read -p "Enter para cerrar..."'
+    kitty -e bash -c 'env -u TERMINFO sudo "'"$SCRIPT_DIR"'/setup-via-a-arzopa.sh" && env -u TERMINFO sudo /usr/local/bin/arzopa-attach && systemctl --user restart arzopa-gamemode.service; read -p "Enter para cerrar..."'
     ;;
   *"Desktop"*) "$SCRIPT_DIR/zen-to-arzopa.sh" ;;
   *) exit 0 ;;
