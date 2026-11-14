@@ -484,9 +484,9 @@ case "$ICON" in
   # PLasma Bazzite Desktop
   kitty -e sudo ~/scripts/bazzite-desktop-boot-entry.sh
   ;;
-"󰍹")
-  # Mueve Zen Browser al monitor Arzopa (requiere Desktop Mode / KWin)
-  ~/scripts/zen-to-arzopa.sh
+"󰓓")
+  # Menú Arzopa: abrir app, Zen en Game Mode o Zen en Desktop
+  ~/scripts/arzopa-menu.sh
   ;;
 "🦙")
   if is_arch; then

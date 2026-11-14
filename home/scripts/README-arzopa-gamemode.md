@@ -147,6 +147,27 @@ La clave es mover `card0` a `seat-arzopa` **antes** de que gamescope haga
    (por ejemplo con `evsieve`) o aceptar que el teclado/touchpad dejen de estar
    en `seat0`.
 
+## Launcher genérico (nuevo)
+
+`arzopa-menu.sh` es el único icono del system-control (categoría Setup):
+
+1. **Abrir app en Arzopa** → `arzopa-launcher.sh` reutiliza
+   `lib/desktop_apps.py` (el mismo selector que `gamescope-launcher.sh`) y
+   lanza cualquier `.desktop` dentro de cage en `card0`.
+2. **Zen en Arzopa (Game Mode)** → instala/activa el servicio y adjunta
+   `card0` + touchpad a `seat-arzopa`.
+3. **Zen → Arzopa (Desktop Mode)** → `zen-to-arzopa.sh` vía KWin.
+
+`arzopa-gamescope-shim.sh` traduce los flags de gamescope a cage, para que el
+helper de apps funcione sin cambios.
+
+### Touchpad
+
+El touchpad (`Synaptics TM3512-010`, `input34`) se mueve a `seat-arzopa` con
+`loginctl attach`. El `event5` no tiene tag `seat`; el padre `input34` sí.
+El shim `libseat-seat-arzopa.so` hace que libinput de cage use `seat-arzopa`
+en vez del `seat0` que devuelve el backend `noop`.
+
 ## Estado
 
 - [x] Diagnóstico de gamescope single-output.
