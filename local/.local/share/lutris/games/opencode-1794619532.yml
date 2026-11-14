@@ -1,0 +1,2 @@
+game:
+  exe: kitty -e /home/diego/.local/bin/juegos/opencode.sh

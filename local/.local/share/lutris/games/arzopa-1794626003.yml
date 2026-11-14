@@ -1,3 +1,2 @@
 game:
-  exe: /home/diego/scripts/arzopa-menu.sh
-  working_dir: /home/diego
+  exe: env WAYLAND_DISPLAY=wayland-0 /home/diego/scripts/arzopa-menu.sh
