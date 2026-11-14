@@ -1,0 +1,3 @@
+game:
+  exe: /home/diego/.local/bin/juegos/rpc-bridge.sh
+  working_dir: /home/diego

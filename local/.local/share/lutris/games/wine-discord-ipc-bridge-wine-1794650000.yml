@@ -1,0 +1,4 @@
+game:
+  exe: /home/diego/.local/bin/juegos/wine-discord-ipc-bridge-cross.sh
+  args: wine
+  working_dir: /home/diego
