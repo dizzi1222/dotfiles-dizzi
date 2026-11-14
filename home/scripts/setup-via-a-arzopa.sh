@@ -32,15 +32,24 @@ gcc -shared -fPIC -O2 -o /usr/local/lib/libseat-seat-arzopa.so \
 # 1. Helpers root de attach/detach ------------------------------------------
 cat > /usr/local/bin/arzopa-attach <<'EOF'
 #!/usr/bin/env bash
+# uso: arzopa-attach [--keyboard] [--keyboard-only]
+#   sin flags      → card0 + puntero
+#   --keyboard     → card0 + puntero + teclado interno
+#   --keyboard-only→ solo teclado interno (toggle desde system-control)
 set -euo pipefail
 
-CARD="$(readlink -f /sys/class/drm/card0)"
-loginctl attach seat-arzopa "$CARD"
+WITH_KEYBOARD=0
+ONLY_KEYBOARD=0
+for arg in "$@"; do
+  case "$arg" in
+    --keyboard) WITH_KEYBOARD=1 ;;
+    --keyboard-only) ONLY_KEYBOARD=1 ;;
+  esac
+done
 
-# Mouse dedicado a la Arzopa, con fallback: USB Lenovo → G203 → touchpad.
-find_device() {
-  local e name
-  for wanted in "Logitech Lenovo USB Optical Mouse" "G203" "Synaptics TM3512-010"; do
+find_event_parent() {
+  local e name wanted
+  for wanted in "$@"; do
     for e in /sys/class/input/event*; do
       name="$(cat "$e/device/name" 2>/dev/null || true)"
       case "$name" in
@@ -51,24 +60,44 @@ find_device() {
   return 1
 }
 
-DEV="$(find_device || true)"
+KEYBOARD="$(find_event_parent "AT Translated Set 2 keyboard" || true)"
+
+if [ "$ONLY_KEYBOARD" = 1 ]; then
+  [ -n "$KEYBOARD" ] && loginctl attach seat-arzopa "$KEYBOARD"
+  exit 0
+fi
+
+CARD="$(readlink -f /sys/class/drm/card0)"
+loginctl attach seat-arzopa "$CARD"
+
+# Puntero dedicado: USB Lenovo → G203 → touchpad (fallback).
+DEV="$(find_event_parent \
+  "Logitech Lenovo USB Optical Mouse" \
+  "G203" \
+  "Synaptics TM3512-010" || true)"
 if [ -n "$DEV" ]; then
   loginctl attach seat-arzopa "$DEV"
+fi
+
+if [ "$WITH_KEYBOARD" = 1 ] && [ -n "$KEYBOARD" ]; then
+  loginctl attach seat-arzopa "$KEYBOARD"
 fi
 EOF
 chmod 755 /usr/local/bin/arzopa-attach
 
 cat > /usr/local/bin/arzopa-detach <<'EOF'
 #!/usr/bin/env bash
+# uso: arzopa-detach [--keyboard-only]
+#   sin flags      → devuelve card0 + puntero + teclado a seat0
+#   --keyboard-only→ solo devuelve el teclado interno
 set -euo pipefail
 
-CARD="$(readlink -f /sys/class/drm/card0)"
-loginctl detach seat-arzopa "$CARD" 2>/dev/null || true
-loginctl attach seat0 "$CARD" 2>/dev/null || true
+ONLY_KEYBOARD=0
+[ "${1:-}" = "--keyboard-only" ] && ONLY_KEYBOARD=1
 
-find_device() {
-  local e name
-  for wanted in "Logitech Lenovo USB Optical Mouse" "G203" "Synaptics TM3512-010"; do
+find_event_parent() {
+  local e name wanted
+  for wanted in "$@"; do
     for e in /sys/class/input/event*; do
       name="$(cat "$e/device/name" 2>/dev/null || true)"
       case "$name" in
@@ -79,7 +108,21 @@ find_device() {
   return 1
 }
 
-DEV="$(find_device || true)"
+KEYBOARD="$(find_event_parent "AT Translated Set 2 keyboard" || true)"
+if [ -n "$KEYBOARD" ]; then
+  loginctl detach seat-arzopa "$KEYBOARD" 2>/dev/null || true
+  loginctl attach seat0 "$KEYBOARD" 2>/dev/null || true
+fi
+[ "$ONLY_KEYBOARD" = 1 ] && exit 0
+
+CARD="$(readlink -f /sys/class/drm/card0)"
+loginctl detach seat-arzopa "$CARD" 2>/dev/null || true
+loginctl attach seat0 "$CARD" 2>/dev/null || true
+
+DEV="$(find_event_parent \
+  "Logitech Lenovo USB Optical Mouse" \
+  "G203" \
+  "Synaptics TM3512-010" || true)"
 if [ -n "$DEV" ]; then
   loginctl detach seat-arzopa "$DEV" 2>/dev/null || true
   loginctl attach seat0 "$DEV" 2>/dev/null || true
@@ -107,7 +150,7 @@ DROPIN_DIR="$USER_HOME/.config/systemd/user/gamescope-session-plus@ogui-steam.se
 install -d -o "$USER_NAME" -g "$USER_GROUP" "$DROPIN_DIR"
 cat > "$DROPIN_DIR/arzopa.conf" <<'EOF'
 [Service]
-ExecStartPre=/usr/bin/sudo -n /usr/local/bin/arzopa-attach
+ExecStartPre=/usr/bin/sudo -n /usr/local/bin/arzopa-attach --keyboard
 ExecStopPost=/usr/bin/sudo -n /usr/local/bin/arzopa-detach
 EOF
 chown "$USER_NAME:$USER_GROUP" "$DROPIN_DIR/arzopa.conf"
@@ -149,5 +192,6 @@ runuser -u "$USER_NAME" -- env XDG_RUNTIME_DIR="$USER_RUNTIME" systemctl --user 
 printf '\n✅ Instalado.\n'
 printf '⚠️  Reiniciá la sesión de Game Mode (o el equipo) para que card0 salga de\n'
 printf '    seat0 ANTES de que gamescope tome control.\n'
-printf '⚠️  Zen se muestra en la Arzopa sin input (visual-only) por ahora.\n'
+printf 'ℹ️  Input: puntero (Lenovo → G203 → touchpad) y teclado interno se\n'
+printf '    mueven a seat-arzopa; vuelven a seat0 al salir de Game Mode.\n'
 printf 'ℹ️  Log: ~/.cache/arzopa-gamemode.log\n'

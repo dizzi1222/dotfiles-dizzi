@@ -1,4 +1,4 @@
 game:
-  exe: /usr/bin/flatpak
   args: run org.gnome.seahorse.Application
+  exe: /usr/bin/flatpak
   working_dir: /home/diego

@@ -155,18 +155,26 @@ La clave es mover `card0` a `seat-arzopa` **antes** de que gamescope haga
    `lib/desktop_apps.py` (el mismo selector que `gamescope-launcher.sh`) y
    lanza cualquier `.desktop` dentro de cage en `card0`.
 2. **Zen en Arzopa (Game Mode)** → instala/activa el servicio y adjunta
-   `card0` + touchpad a `seat-arzopa`.
+   `card0` + puntero + teclado interno a `seat-arzopa`.
 3. **Zen → Arzopa (Desktop Mode)** → `zen-to-arzopa.sh` vía KWin.
+4. **Teclado → Arzopa / Laptop** → toggle de seat para el teclado interno.
 
 `arzopa-gamescope-shim.sh` traduce los flags de gamescope a cage, para que el
 helper de apps funcione sin cambios.
 
-### Touchpad
+### Puntero y teclado
 
-El touchpad (`Synaptics TM3512-010`, `input34`) se mueve a `seat-arzopa` con
-`loginctl attach`. El `event5` no tiene tag `seat`; el padre `input34` sí.
-El shim `libseat-seat-arzopa.so` hace que libinput de cage use `seat-arzopa`
-en vez del `seat0` que devuelve el backend `noop`.
+El puntero dedicado se elige con fallback: `Logitech Lenovo USB Optical Mouse`
+→ `G203` → touchpad `Synaptics TM3512-010`. El teclado interno
+(`AT Translated Set 2 keyboard`, `input3`) se adjunta a `seat-arzopa` al
+arrancar Game Mode (`arzopa-attach --keyboard`), así las apps de la Arzopa
+reciben las teclas; al volver a Desktop Mode, `arzopa-detach` lo devuelve a
+`seat0`.
+
+Mientras el teclado está en `seat-arzopa`, la UI de Steam (seat0) no recibe
+teclado y se maneja con gamepad. El toggle del menú permite devolverlo sin
+cambiar de sesión. Se adjunta el padre (`inputN`), no el `eventN`: los
+`event*` no siempre tienen el tag `seat`.
 
 ## Estado
 
@@ -175,8 +183,8 @@ en vez del `seat0` que devuelve el backend `noop`.
 - [x] Prueba de cage/gamescope/KMS y lectura del error real (`EBUSY`).
 - [x] Causa raíz documentada.
 - [ ] Validar el diseño corregido tras reiniciar Game Mode.
-- [ ] Input en la Arzopa (visual-only por ahora).
-- [ ] Integración estable con el menú de System Control.
+- [x] Input en la Arzopa (mouse + teclado vía `seat-arzopa`).
+- [x] Integración estable con el menú de System Control.
 
 ## Scripts
 
