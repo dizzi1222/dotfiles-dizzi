@@ -3,7 +3,7 @@
 	pkg Pkg instalar paquetes pacman
 	fedora bazzite Bazzite pkg Pkg Fedora linux dnf dnf5 rpm rpm-ostree paquete paquetes instalar buscar search gum tui bazzite
 󰍺	brew homebrew Pkg pkg paquetes instalar buscar search gum tui fórmula cask linux macOS
-󰍹	zen arzopa monitor mover ventana browser kwin gamescope desktop mode flatpak
+󰓓	arzopa monitor externo app gamescope cage touchpad zen desktop game mode abrir lanzar
 󰏓	flatpak flathub Pkg pkg Fedora Flatpak Flathub fedora bazzite Bazzite buscar instalar paquetes app aplicaciones flathub search install
 󰒓	bazzite install Fedora fedora Bazzite instalador instalación script personal setup bazzite-install.sh capa rpm-ostree sistema
 	spicetify spotify marketplace tema temas themes extensions extensiones personalizar aplicar actualizar musica bazzite

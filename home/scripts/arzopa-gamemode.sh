@@ -26,13 +26,14 @@ start_arzopa() {
   export LIBSEAT_BACKEND=noop
   export WLR_BACKENDS=drm
   export WLR_DRM_DEVICES="$DRM_DEV"
-  export WLR_LIBINPUT_NO_DEVICES=1
   export WLR_NO_HARDWARE_CURSORS=1
   export WLR_RENDERER="${WLR_RENDERER:-gles2}"
+  export LD_PRELOAD="/usr/local/lib/libseat-seat-arzopa.so"
+  unset WLR_LIBINPUT_NO_DEVICES
 
-  # sg video: el unit de usuario se lanzó con los grupos del login, que pueden
-  # no incluir video todavía. sg lee /etc/group en el momento.
-  exec sg video -c "cage -d -m last -- flatpak run app.zen_browser.zen" >>"$LOG" 2>&1
+  # Sin sg: cambia fsgid a video y rompe el portal FUSE de Flatpak.
+  # El acceso a card0 y al touchpad se resuelve con udev/seat-arzopa.
+  exec cage -d -m last -- flatpak run app.zen_browser.zen >>"$LOG" 2>&1
 }
 
 stop_arzopa() {
