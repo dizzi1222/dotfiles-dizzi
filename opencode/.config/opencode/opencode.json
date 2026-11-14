@@ -37,11 +37,22 @@
       "command": [
         "bash",
         "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_UK\" DI_PROXY_PORT=\"$WS_PORT_UK\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
       ],
       "environment": {
-        "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-        "DI_PROXY_PORT": "REDACTED"
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-es": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
       "enabled": true
     },
@@ -50,11 +61,94 @@
       "command": [
         "bash",
         "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US\" DI_PROXY_PORT=\"$WS_PORT_US\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
       ],
       "environment": {
-        "DI_PROXY_HOST": "REDACTED_PROXY_HOST",
-        "DI_PROXY_PORT": "REDACTED"
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-2": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_2\" DI_PROXY_PORT=\"$WS_PORT_US_2\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-3": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_3\" DI_PROXY_PORT=\"$WS_PORT_US_3\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-pl": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_PL\" DI_PROXY_PORT=\"$WS_PORT_PL\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-4": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_4\" DI_PROXY_PORT=\"$WS_PORT_US_4\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-5": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_5\" DI_PROXY_PORT=\"$WS_PORT_US_5\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-6": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_6\" DI_PROXY_PORT=\"$WS_PORT_US_6\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true
+    },
+    "webshare-us-7": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_7\" DI_PROXY_PORT=\"$WS_PORT_US_7\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+      ],
+      "environment": {
+                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
       "enabled": true
     },
