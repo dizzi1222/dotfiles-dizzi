@@ -1,2 +1,4 @@
 game:
-  exe: kitty @ launch --type=tab --cwd=/home/diego --title="Arzopa Menu" bash -c '/home/diego/dotfiles-dizzi/home/scripts/arzopa/arzopa-tui.sh; read -p "Presiona Enter para cerrar..."'
+  exe: /home/diego/.local/kitty.app/bin/kitty
+  args: -e /home/diego/dotfiles-dizzi/home/scripts/arzopa/arzopa-tui.sh
+  working_dir: /home/diego

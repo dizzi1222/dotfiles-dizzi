@@ -1,2 +1,4 @@
 game:
-  exe: kitty @ launch --type=tab --cwd=/home/diego/dotfiles-dizzi --title="Opencode" bash -c '/home/diego/.local/bin/juegos/opencode.sh'
+  exe: /home/diego/.local/kitty.app/bin/kitty
+  args: -e /home/diego/.local/bin/juegos/opencode.sh
+  working_dir: /home/diego
