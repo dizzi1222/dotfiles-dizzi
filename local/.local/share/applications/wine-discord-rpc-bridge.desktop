@@ -5,5 +5,6 @@ Exec=/home/diego/.local/bin/juegos/rpc-bridge.sh
 # Exec=env WINEPREFIX="/home/diego/.wine" wine "/home/diego/.wine/drive_c/windows/system32/discord/bridge.exe"
 Icon=72DC_CustomRP.0
 Type=Application
+Categories=Utility;
 Terminal=false
 StartupNotify=false
