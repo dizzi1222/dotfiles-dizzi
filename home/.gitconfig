@@ -11,9 +11,15 @@
 [pull]
 	rebase = false
 
+# gh vive en linuxbrew (Bazzite), en /usr/bin (CachyOS/NixOS) o en el prefijo
+# de Termux. El helper prueba las 3 rutas y usa la primera que exista; si
+# ninguna existe cae al gh del PATH.
 [credential "https://github.com"]
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+	helper =
+	helper = "!f() { for g in /home/linuxbrew/.linuxbrew/bin/gh /usr/bin/gh /data/data/com.termux/files/usr/bin/gh; do [ -x \"$g\" ] && exec \"$g\" auth git-credential \"$@\"; done; exec gh auth git-credential \"$@\"; }; f"
 [credential "https://gist.github.com"]
+	helper =
+	helper = "!f() { for g in /home/linuxbrew/.linuxbrew/bin/gh /usr/bin/gh /data/data/com.termux/files/usr/bin/gh; do [ -x \"$g\" ] && exec \"$g\" auth git-credential \"$@\"; done; exec gh auth git-credential \"$@\"; }; f"
 
 [core]
 	editor = nvim

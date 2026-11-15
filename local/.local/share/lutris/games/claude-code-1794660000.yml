@@ -1,0 +1,4 @@
+game:
+  exe: /home/diego/.local/kitty.app/bin/kitty
+  args: -e /home/diego/.local/bin/juegos/claude-code.sh
+  working_dir: /home/diego

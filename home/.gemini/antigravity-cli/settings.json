@@ -1,0 +1,15 @@
+{
+  "agentMode": "accept-edits",
+  "allowNonWorkspaceAccess": true,
+  "model": "GPT-OSS 120B (Medium)",
+  "permissions": {
+    "allow": ["command(*)"]
+  },
+  "toolPermission": "always-proceed",
+  "trustedWorkspaces": [
+    "/var/home/diego/dotfiles-dizzi",
+    "/home/diego",
+    "/var/home/diego",
+    "/var/home/diego/Documentos/ChatGPT/Bazzite"
+  ]
+}

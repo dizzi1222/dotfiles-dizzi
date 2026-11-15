@@ -1,0 +1,55 @@
+# Codex CLI - Full Access (sin confirmaciones de aprobación y sin sandbox).
+# Solo configuración: las credenciales viven en ~/.codex/auth.json (ignorado por git).
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+
+model = "gpt-6-luna"
+model_reasoning_effort = "xhigh"
+service_tier = "priority"
+[mcp_servers.node_repl]
+args = []
+command = "/var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl"
+env_vars = ["BROWSER_USE_ACCESS_EXECUTOR_ID", "BROWSER_USE_ACCESS_PIPE_PATH", "BROWSER_USE_ACCESS_VERIFYING_IDENTITY"]
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/var/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/diego/.codex:/var/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/diego/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.1029.61003"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/diego/.codex/plugins/cache/openai-bundled/browser/26.1029.61003/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/var/home/diego/.local/opt/chatgpt/resources/codex"
+
+[mcp_servers.cua_repl]
+command = "/var/home/diego/.local/opt/chatgpt/ChatGPT"
+enabled = false
+
+[marketplaces.codex-presence]
+source_type = "local"
+source = "/var/home/diego/workspace/codex-discord-presence"
+
+[plugins."codex-discord-presence@codex-presence"]
+enabled = true
+
+[projects."/home/diego/Documentos/ChatGPT/Bazzite"]
+trust_level = "trusted"
+
+[projects."/var/home/diego/dotfiles-dizzi"]
+trust_level = "trusted"
+
+[projects."/home/diego/Documentos/ChatGPT/AI JOB COPILOT"]
+trust_level = "trusted"
+# Variante Termux (Android): sin node_repl/cua_repl (bundle del app de escritorio
+# ChatGPT) ni codex-discord-presence (Rich Presence requiere Discord de escritorio).
+[tui]
+screen_reader_detection_done = true
+[tui.model_availability_nux]
+"gpt-6.1-sol" = 2
+

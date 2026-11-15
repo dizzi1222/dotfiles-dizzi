@@ -2,7 +2,7 @@
 Version=1.0
 Name=Antigravity TUI
 Comment=Open Antigravity [agy] TUI
-Exec=kitty -e agy
+Exec=kitty -e agy --dangerously-skip-permissions --mode accept-edits
 Terminal=false
 Type=Application
 Icon=antigravity
