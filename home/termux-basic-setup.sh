@@ -189,6 +189,23 @@ print_step "6/23: CLI Modernas"
 pkg install -y bat eza fd ripgrep fzf jq tree htop ncdu duf dust zoxide >/dev/null 2>&1
 print_success "CLI modernas"
 
+# btop: no está en los repos de Termux → instala el binario musl estático (aarch64)
+# desde GitHub Releases (aristocratos/btop). Binario fully-static, no necesita glibc.
+print_installing "btop (monitor interactivo - GitHub Releases)..."
+BTOP_VER=$(curl -s https://api.github.com/repos/aristocratos/btop/releases/latest \
+  | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
+[[ -z "$BTOP_VER" ]] && BTOP_VER="v1.4.8"
+BTOP_TMP=$(mktemp -d)
+if curl -fsSL --retry 3 -o "$BTOP_TMP/btop.tar.gz" \
+  "https://github.com/aristocratos/btop/releases/download/$BTOP_VER/btop-aarch64-unknown-linux-musl.tar.gz" \
+  && tar -xzf "$BTOP_TMP/btop.tar.gz" -C "$BTOP_TMP" \
+  && install -m 755 "$BTOP_TMP/btop/bin/btop" "$PREFIX/bin/btop"; then
+  print_success "btop $BTOP_VER instalado (\$PREFIX/bin/btop)"
+else
+  print_warning "btop: descarga falló (revisa red)"
+fi
+rm -rf "$BTOP_TMP"
+
 # ═══════════════════════════════════════════════════════════
 # PASO 7: GitHub CLI
 # ═══════════════════════════════════════════════════════════
@@ -384,14 +401,74 @@ POKE
   fi
 fi
 
-# Resto de pasos (11-18) - igual que antes
-print_step "11/23: Tmux"
+# ─────────────────────────────────────────────────────────────────────────────
+# PASO 11: Tmux + TPM + tmux-yank (portapapeles real en Termux)
+# ─────────────────────────────────────────────────────────────────────────────
+# Estrategia de clipboard en Termux (sin X11, sin Wayland):
+#   1. OSC52  — el terminal interpreta la secuencia y escribe al portapapeles
+#              del SO. Funciona en Termux nativo y la mayoría de emuladores.
+#              Requiere: tmux set-clipboard on + allow-passthrough all.
+#   2. termux-clipboard-set — API Android directa. Requiere la app Termux:API
+#              (com.termux.api). Si no está, el comando se cuelga → usar timeout.
+#   Los dos métodos se complementan: OSC52 cubre opencode/agy, termux-clipboard
+#   cubre copiar con y en copy-mode-vi cuando hay Termux:API instalada.
+# ─────────────────────────────────────────────────────────────────────────────
+print_step "11/23: Tmux + Clipboard"
 pkg install -y tmux >/dev/null 2>&1
-[[ ! -f ~/.tmux.conf ]] && cat >~/.tmux.conf <<'TMUX'
+
+# ~/.tmux.conf mínimo (solo si no existe ni el de dotfiles lo crea vía stow)
+[[ ! -f ~/.tmux.conf ]] && cat >~/.tmux.conf <<'TMUXMIN'
 set -g mouse on
 set -g base-index 1
-TMUX
-print_success "Tmux"
+set -g set-clipboard on
+set -g allow-passthrough all
+TMUXMIN
+
+# Garantizar las dos opciones críticas de clipboard en el .tmux.conf activo
+grep -q "set-clipboard" ~/.tmux.conf 2>/dev/null || echo 'set -g set-clipboard on' >>~/.tmux.conf
+grep -q "allow-passthrough" ~/.tmux.conf 2>/dev/null || echo 'set -g allow-passthrough all' >>~/.tmux.conf
+
+# ── TPM (Tmux Plugin Manager) ──────────────────────────────────────────────
+TPM_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
+if [[ ! -d "$TPM_DIR/.git" ]]; then
+  print_installing "TPM (Tmux Plugin Manager)..."
+  git clone --depth 1 -q https://github.com/tmux-plugins/tpm.git "$TPM_DIR" 2>/dev/null &&
+    print_success "TPM clonado → $TPM_DIR" ||
+    print_warning "TPM: clone falló (revisa red)"
+fi
+
+# ── Instalar plugins vía TPM headless ─────────────────────────────────────
+# Solo si tmux-yank todavía no está instalado (evita reinstalar cada setup).
+YANK_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-yank"
+if [[ -d "$TPM_DIR" && ! -d "$YANK_DIR" ]]; then
+  print_installing "Instalando plugins TPM (tmux-yank, tmux-sensible, etc.)..."
+  # TPM necesita una sesión tmux; arrancamos una detached temporal.
+  tmux new-session -d -s tpm_install 2>/dev/null || true
+  TMUX_PLUGIN_MANAGER_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/" \
+    bash "$TPM_DIR/bin/install_plugins" >/dev/null 2>&1 || true
+  tmux kill-session -t tpm_install 2>/dev/null || true
+  [[ -d "$YANK_DIR" ]] &&
+    print_success "tmux-yank instalado" ||
+    print_warning "tmux-yank: install TPM falló (abrí tmux y pulsá Prefix+I)"
+fi
+
+# ── Wrapper termux-clipboard-set con timeout ──────────────────────────────
+# Si la app Termux:API no está, termux-clipboard-set se cuelga para siempre.
+# El wrapper aplica timeout 3s para que no bloquee opencode/agy/tmux-yank.
+mkdir -p ~/.local/bin
+cat >~/.local/bin/tc-set <<'TCSET'
+#!/data/data/com.termux/files/usr/bin/bash
+# Wrapper de termux-clipboard-set con timeout de seguridad.
+# Termux:API ausente → el comando nativo se cuelga; timeout 3s lo mata limpio.
+exec timeout 3 termux-clipboard-set "$@" 2>/dev/null || true
+TCSET
+chmod +x ~/.local/bin/tc-set
+
+print_success "Tmux + portapapeles configurado (OSC52 + termux-clipboard)"
+print_info "  • OSC52      → opencode/agy pueden copiar sin Termux:API"
+print_info "  • tmux-yank  → 'y' en copy-mode copia al portapapeles Android"
+print_info "  • tc-set     → wrapper seguro (timeout 3s si falta la app)"
+print_info "  Instala Termux:API para copiar/pegar nativo: https://f-droid.org/packages/com.termux.api/"
 
 print_step "12/23: Yazi"
 pkg install -y yazi >/dev/null 2>&1
@@ -404,9 +481,28 @@ grep -q "fastfetch --config" ~/.zshrc 2>/dev/null ||
   echo 'command -v fastfetch >/dev/null 2>&1 && { [[ -f ~/.config/fastfetch/config.jsonc ]] && fastfetch --config ~/.config/fastfetch/config.jsonc || fastfetch; }' >>~/.zshrc
 print_success "System info"
 
-print_step "14/23: Termux-API"
+print_step "14/23: Portapapeles (Termux-API)"
 pkg install -y termux-api >/dev/null 2>&1
-print_success "termux-api"
+# OJO: el paquete termux-api NO alcanza. Sin la app Termux:API (com.termux.api)
+# termux-clipboard-get/set se cuelgan para siempre y opencode/agy quedan sin
+# portapapeles (agy prueba termux-clipboard-get ANTES que xclip/wl-copy).
+if pm list packages 2>/dev/null | grep -q "com.termux.api"; then
+  print_success "termux-api + app Termux:API (portapapeles operativo)"
+else
+  print_warning "termux-api instalado, pero falta la app Termux:API"
+  print_info "Sin la app, copiar/pegar se cuelga y opencode/agy no copian nada."
+  print_info "F-Droid: https://f-droid.org/packages/com.termux.api/"
+  read -p "  ¿Abrir la descarga ahora? [S/n]: " api_open
+  if [[ ! "$api_open" =~ ^[Nn]$ ]]; then
+    termux-open-url "https://f-droid.org/packages/com.termux.api/" >/dev/null 2>&1 ||
+      print_warning "No se pudo abrir el navegador; instalá Termux:API a mano"
+  fi
+fi
+# xclip solo funciona con X11 (Termux:X11) y wl-clipboard no está empaquetado
+# en Termux, así que no se instalan por defecto: no resuelven el caso nativo.
+if [[ -n "${DISPLAY:-}" ]] && ! command -v xclip >/dev/null 2>&1; then
+  pkg install -y xclip >/dev/null 2>&1 && print_success "xclip (X11 detectado)"
+fi
 
 print_step "15/23: Aliases"
 [[ ! -f ~/.termux_aliases ]] && cat >~/.termux_aliases <<'ALIASES'
@@ -658,7 +754,7 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     # Stow desde la raíz: cada paquete del repo tiene estructura .config/.
     # No enlazar zsh/.zshrc: Termux mantiene su propio archivo y el PASO 9
     # selecciona un solo prompt; solo se comparte la configuración .p10k.zsh.
-    for pkg in nvim nixconf assets home Antigravity starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+    for pkg in nvim nixconf assets home Antigravity codex starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
     [[ -f "zsh/.zshenv" ]] && ln -sfn "$DOTFILES/zsh/.zshenv" ~/.zshenv
@@ -771,7 +867,7 @@ if [[ ! "$ws_install" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22: Core-Termux (Modular Dev Env) + OpenCode
+# PASO 22: Core-Termux (Modular Dev Env) + OpenCode + Antigravity + Claude Code
 # ───────────────────────────────────────────────────────────
 # Android 16+ ignora el PT_INTERP glibc y fuerza linker64 (bionic)
 # → "Could not find a PHDR: broken executable?" (fallan los loaders
@@ -798,6 +894,32 @@ if [[ ! "$ct_install" =~ ^[Nn]$ ]]; then
     print_installing "core install ai --opencode"
     core install ai --opencode || print_warning "Falló; reintenta eligiendo 'proot-distro (ubuntu)'"
   fi
+
+  read -p "¿Instalar Antigravity CLI vía core? [S/n]: " agy_install
+  if [[ ! "$agy_install" =~ ^[Nn]$ ]] && command -v core >/dev/null 2>&1; then
+    print_warning "Elige en el selector: 'glibc (recommended)' — el binario pesa ~250 MB"
+    print_installing "core install ai --antigravity-cli"
+    if core install ai --antigravity-cli; then
+      print_success "Antigravity CLI instalado"
+      # Enlazar dotfiles de Antigravity si están disponibles
+      for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
+        if [[ -d "$dir/Antigravity" ]] && command -v stow >/dev/null 2>&1; then
+          (cd "$dir" && stow Antigravity --adopt 2>/dev/null || true)
+          print_success "Dotfiles de Antigravity enlazados con stow"
+          break
+        fi
+      done
+    else
+      print_warning "Falló; revisá red o espacio libre"
+    fi
+  fi
+
+  read -p "¿Instalar Claude Code vía core? [S/n]: " cc_install
+  if [[ ! "$cc_install" =~ ^[Nn]$ ]] && command -v core >/dev/null 2>&1; then
+    print_warning "Elige en el selector: 'glibc (recommended)' o 'glibc + proot (bad system call)'"
+    print_installing "core install ai --claude-code"
+    core install ai --claude-code || print_warning "Falló; reintenta con 'proot-distro (ubuntu)'"
+  fi
 fi
 
 # ═══════════════════════════════════════════════════════════
@@ -818,7 +940,7 @@ if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22c: Atajos de Termux:Widget (OpenCode y Neovim)
+# PASO 22c: Atajos de Termux:Widget (OpenCode, Neovim y Antigravity)
 # ───────────────────────────────────────────────────────────
 # Termux:Widget lee los atajos dinámicos de ~/.termux/widget/dynamic_shortcuts.
 # En Android 10+ el permiso "Mostrar sobre otras apps" va en TERMUX (no en
@@ -841,11 +963,13 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       break
     fi
   done
-  for shortcut in opencode nvim; do
+  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude; do
+    shortcut="${entry%%:*}"
+    command="${entry#*:}"
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/$shortcut" ]]; then
       cp "$(dirname "$WIDGET_SRC")/$shortcut" "$WIDGET_DIR/$shortcut"
     else
-      printf '#!/data/data/com.termux/files/usr/bin/bash\n%s\n' "$shortcut" >"$WIDGET_DIR/$shortcut"
+      printf '#!/data/data/com.termux/files/usr/bin/bash\n%s\n' "$command" >"$WIDGET_DIR/$shortcut"
     fi
     chmod +x "$WIDGET_DIR/$shortcut"
     print_success "Atajo creado: $WIDGET_DIR/$shortcut"
@@ -871,7 +995,7 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
 
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
   # no en ~/.termux/widget/dynamic_shortcuts/icons.
-  for shortcut in opencode nvim; do
+  for shortcut in opencode nvim agy codex claude-code; do
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" ]]; then
       cp "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" "$ICONS_DIR/$shortcut.png"
       chmod 600 "$ICONS_DIR/$shortcut.png"
@@ -889,6 +1013,18 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       else
         rm -f "$ICONS_DIR/nvim.png.tmp"
         print_warning "No se pudo descargar el ícono: copiá un PNG a $ICONS_DIR/nvim.png"
+      fi
+    elif [[ "$shortcut" == "agy" ]]; then
+      # Logo oficial de Google Antigravity (antigravity.google).
+      if curl -fLsS --max-time 30 \
+        https://antigravity.google/assets/image/antigravity-logo.png \
+        -o "$ICONS_DIR/agy.png.tmp"; then
+        mv "$ICONS_DIR/agy.png.tmp" "$ICONS_DIR/agy.png"
+        chmod 600 "$ICONS_DIR/agy.png"
+        print_success "Ícono de Antigravity descargado"
+      else
+        rm -f "$ICONS_DIR/agy.png.tmp"
+        print_warning "No se pudo descargar el ícono: copiá un PNG a $ICONS_DIR/agy.png"
       fi
     else
       print_info "Ícono opcional: poné un PNG en $ICONS_DIR/$shortcut.png y recreá los atajos."
@@ -934,6 +1070,7 @@ cat <<'FINAL'
 ║  ✅ Sistema + Git (auto-push habilitado)                ║
 ║  ✅ Zsh + Plugins                                       ║
 ║  ✅ Starship/Oh-My-Posh                                 ║
+║  ✅ CLI Modernas (btop, bat, eza, fzf…)                ║
 ║  ✅ IA Tools                                            ║
 ║  ✅ Core-Termux + OpenCode                              ║
 ║  ✅ .gitignore seguro                                   ║

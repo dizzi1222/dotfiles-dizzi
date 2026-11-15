@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
 # Lazygit shell wrapper
 # lazygit ejecuta los comandos del prompt ':' con "$SHELL -c <cmd>" (p.ej:
 # "~/.local/bin/lazygit-shell -c gitflow"). Este wrapper debe DESCARTAR el
