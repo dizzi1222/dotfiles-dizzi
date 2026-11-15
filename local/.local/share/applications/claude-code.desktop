@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Claude Code
+Comment=Open Claude Code TUI
+Exec=kitty -e /home/diego/.local/bin/juegos/claude-code.sh
+Terminal=false
+Type=Application
+Icon=claude-code
+Categories=Development;
+StartupNotify=true
+StartupWMClass=ClaudeCode

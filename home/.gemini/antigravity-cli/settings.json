@@ -1,0 +1,17 @@
+{
+  "agentMode": "accept-edits",
+  "allowNonWorkspaceAccess": true,
+  "model": "Claude Sonnet 4.6 (Thinking)",
+  "permissions": {
+    "allow": [
+      "command(*)"
+    ]
+  },
+  "toolPermission": "always-proceed",
+  "trustedWorkspaces": [
+    "/var/home/diego/dotfiles-dizzi",
+    "/home/diego",
+    "/var/home/diego",
+    "/var/home/diego/Documentos/ChatGPT/Bazzite"
+  ]
+}
