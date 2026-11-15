@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=OpenClaw
+Comment=Open OpenClaw TUI
+Exec=kitty -e /home/diego/.local/bin/juegos/openclaw.sh
+Terminal=false
+Type=Application
+Icon=openclaw
+Categories=Development;
+StartupNotify=true
+StartupWMClass=OpenClaw

@@ -66,7 +66,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-2": {
       "type": "local",
@@ -78,7 +78,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-3": {
       "type": "local",
@@ -90,7 +90,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-pl": {
       "type": "local",
@@ -102,7 +102,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-4": {
       "type": "local",
@@ -114,7 +114,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-5": {
       "type": "local",
@@ -126,7 +126,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-6": {
       "type": "local",
@@ -138,7 +138,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "webshare-us-7": {
       "type": "local",
@@ -150,7 +150,7 @@
       "environment": {
         "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": false
+      "disabled":  true
     },
     "servers": {
       "swissdevjobs": {
@@ -180,35 +180,35 @@
       "options": {
         "projectId": "cic-ptd-dev"
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       },
       "models": {
         "gemini-2.5-flash": {
           "options": {
             // "reasoning": {
-            //   "enabled": false
+            //   "disabled":  true
             // }
           }
         },
         "gemini-2.5-pro": {
           "options": {
             // "reasoning": {
-            //   "enabled": false
+            //   "disabled":  true
             // }
           }
         },
         "gemini-3-flash-preview": {
           "options": {
             // "reasoning": {
-            //   "enabled": false
+            //   "disabled":  true
             // }
           }
         },
         "gemini-3-pro-preview": {
           "options": {
             // "reasoning": {
-            //   "enabled": false
+            //   "disabled":  true
             // }
           }
         }
@@ -220,7 +220,7 @@
           "name": "nemotron-3-super:cloud",
           "options": {
             // "reasoning": {
-            //   "enabled": false
+            //   "disabled":  true
             // }
           }
         }
@@ -234,42 +234,42 @@
     "opencode": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     },
     "openai": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     },
     "anthropic": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     },
     "openrouter": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     },
     "deepseek": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     },
     "copilot": {
       "options": {
         // "reasoning": {
-        //   "enabled": false
+        //   "disabled":  true
         // }
       }
     }
