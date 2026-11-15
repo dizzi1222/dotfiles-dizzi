@@ -8,6 +8,14 @@
         "version": "1.0.0",
         "installedAt": "2026-07-06T20:12:24.246Z",
         "lastUpdated": "2026-07-06T20:12:24.246Z"
+      },
+      {
+        "scope": "project",
+        "installPath": "/home/diego/.claude/plugins/cache/claude-plugins-official/lua-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-11-16T01:05:48.449Z",
+        "lastUpdated": "2026-11-16T01:05:48.449Z",
+        "projectPath": "/var/home/diego"
       }
     ]
   }

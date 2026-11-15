@@ -1,7 +1,19 @@
-# Codex CLI — Termux
-# Full Access: sin confirmaciones de aprobación y sin sandbox.
+# Codex CLI - Full Access (sin confirmaciones de aprobación y sin sandbox).
+# Solo configuración: las credenciales viven en ~/.codex/auth.json (ignorado por git).
+# Variante Termux (Android): sin node_repl/cua_repl (bundle del app de escritorio
+# ChatGPT) ni codex-discord-presence (Rich Presence requiere Discord de escritorio).
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 
+model = "gpt-6-luna"
+model_reasoning_effort = "xhigh"
+service_tier = "priority"
+
 [tui]
 screen_reader_detection_done = true
+
+[tui.model_availability_nux]
+"gpt-6.1-sol" = 2
+
+[projects."/var/home/diego/dotfiles-dizzi"]
+trust_level = "trusted"

@@ -29,6 +29,9 @@ home/.claude/remote-settings.json.*
 # Datos personales del dispositivo, no configuracion portable.
 home/.claude/policy-limits.json
 home/.claude/policy-limits.json.*
+# estado de sincronizacion remota (marcador de tiempo, no configuracion)
+home/.claude/remote-settings.json
+home/.claude/remote-settings.json.*
 
 # Antigravity - ignorar todo EXCEPTO settings y keybindings
 Antigravity/.config/Antigravity/*
@@ -50,6 +53,12 @@ home/.gemini/*
 !home/.gemini/settings.json
 home/.gemini/antigravity/
 home/.gemini/antigravity-*/
+# antigravity-cli: solo se versiona settings.json y keybindings.json
+# (tokens, historial, sesiones y cache quedan fuera del repo)
+!home/.gemini/antigravity-cli/
+home/.gemini/antigravity-cli/*
+!home/.gemini/antigravity-cli/settings.json
+!home/.gemini/antigravity-cli/keybindings.json
 home/.gemini/config/
 home/.gemini/history/
 home/.gemini/google_accounts.json
@@ -60,6 +69,31 @@ home/.gemini/installation_id
 *.db-shm
 *.db-wal
 *.db-journal
+
+# ═══════════════════════════════════════════════════════════
+# CREDENCIALES LOCALES - NUNCA al repo
+# ═══════════════════════════════════════════════════════════
+# Sunshine: clave privada TLS y token del portal web
+sunshine/.config/sunshine/sunshine.log*
+sunshine/.config/sunshine/sunshine_state.json
+sunshine/.config/sunshine/credentials/
+sunshine/.config/sunshine/portal_token
+# Perfil de navegador de Antigravity: cookies, logins y sesiones
+home/.gemini/antigravity-browser-profile/
+# Token OAuth del CLI de Antigravity
+home/.gemini/antigravity-cli/antigravity-oauth-token
+
+# ═══════════════════════════════════════════════════════════
+# CODEX CLI - credenciales y estado local NUNCA al repo
+# ═══════════════════════════════════════════════════════════
+codex/.codex/auth.json
+codex/.codex/auth.lock
+codex/.codex/*.sqlite
+codex/.codex/installation_id
+codex/.codex/.sandbox_migration
+codex/.codex/log/
+codex/.codex/plugins/
+codex/.codex/vendor_imports/
 
 # MCP específico
 .mcp-global.json.local
@@ -348,6 +382,15 @@ local/.local/share/applications/mimeinfo.cache
 # (localconfig/registry/compat son binarios volátiles que Steam reescribe)
 **/.local/share/Steam/userdata/*/config/*.vdf
 !**/.local/share/Steam/userdata/*/config/shortcuts.vdf
+!**/.local/share/Steam/userdata/*/config/shortcuts.vdf
+
+# tmux nosek
 /tmux/.config/tmux/plugins/tpm
 /tmux/.config/tmux/plugins/tpm
-/tmux/.config/tmux/plugins/tpm
+/tmux/.config/tmux/plugins/tpm?
+
+# Cache de shaders de juegos (volátil, cientos de MB)
+local/.local/bin/juegos/GLCache/
+
+# opencode password xd
+opencode/.config/opencode/service.json
