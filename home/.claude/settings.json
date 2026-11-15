@@ -5,6 +5,7 @@
   "enabledPlugins": {
     "lua-lsp@claude-plugins-official": true
   },
+  "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
-  "skipDangerousModePermissionPrompt": true
+  "model": "haiku"
 }
