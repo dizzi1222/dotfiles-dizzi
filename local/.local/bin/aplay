@@ -1,0 +1,72 @@
+#!/data/data/com.termux/files/usr/bin/python3
+"""
+aplay compatibility wrapper for Antigravity (AGY) CLI on Termux Android.
+Translates ALSA aplay calls into Termux:API audio playback via ffmpeg.
+"""
+
+import sys, os, time, signal, subprocess, argparse
+
+prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+tmp_dir = os.environ.get("TMPDIR", os.path.join(prefix, "tmp"))
+os.makedirs(tmp_dir, exist_ok=True)
+
+# Parse typical aplay arguments
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument("-r", "--rate", type=int, default=24000)
+parser.add_argument("-c", "--channels", type=int, default=1)
+parser.add_argument("-f", "--format", type=str, default="S16_LE")
+parser.add_argument("-t", "--file-type", type=str, default="raw")
+parser.add_argument("-D", "--device", type=str, default=None)
+parser.add_argument("-q", "--quiet", action="store_true")
+parser.add_argument("-v", "--verbose", action="store_true")
+parser.add_argument("-N", "--nonblock", action="store_true")
+parser.add_argument("input", nargs="?", default="-")
+
+args, unknown = parser.parse_known_args()
+
+wav_file = os.path.join(tmp_dir, f"agy_play_{os.getpid()}.wav")
+
+def cleanup(signum=None, frame=None):
+    subprocess.run(["termux-media-player", "stop"], capture_output=True)
+    if os.path.exists(wav_file):
+        try: os.remove(wav_file)
+        except: pass
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, cleanup)
+signal.signal(signal.SIGTERM, cleanup)
+signal.signal(signal.SIGHUP, cleanup)
+
+# If reading from stdin or file
+if args.input and args.input != "-":
+    in_file = args.input
+    subprocess.run([
+        "ffmpeg", "-loglevel", "quiet",
+        "-i", in_file,
+        wav_file, "-y"
+    ])
+else:
+    pcm_data = sys.stdin.buffer.read()
+    if pcm_data:
+        ff = subprocess.Popen([
+            "ffmpeg", "-loglevel", "quiet",
+            "-f", "s16le",
+            "-ar", str(args.rate),
+            "-ac", str(args.channels),
+            "-i", "pipe:0",
+            wav_file, "-y"
+        ], stdin=subprocess.PIPE)
+        ff.communicate(input=pcm_data)
+
+# Play audio via Android MediaPlayer
+if os.path.exists(wav_file) and os.path.getsize(wav_file) > 0:
+    subprocess.run(["termux-media-player", "play", wav_file], capture_output=True)
+    # Give MediaPlayer a moment to start
+    time.sleep(0.3)
+    for _ in range(600): # max 3 minutes
+        res = subprocess.run(["termux-media-player", "info"], capture_output=True, text=True)
+        if "No track" in res.stdout or "not playing" in res.stdout or "Paused" in res.stdout:
+            break
+        time.sleep(0.3)
+
+cleanup()

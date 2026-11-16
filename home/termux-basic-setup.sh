@@ -1103,23 +1103,25 @@ AGY_KEYBINDINGS="${AGY_SETTINGS_DIR}/keybindings.json"
 # Asegurar dependencias de sistema
 pkg install -y termux-api ffmpeg >/dev/null 2>&1
 
-# Instalar wrapper arecord / pw-record desde dotfiles si existe, o generarlo
+# Instalar wrappers arecord / pw-record y aplay / paplay / pw-cat
 mkdir -p "$PREFIX/bin" "$HOME/.local/bin"
-DOTFILES_ARECORD=""
+DOTFILES_LOCAL_BIN=""
 for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
-  if [[ -f "$dir/local/.local/bin/arecord" ]]; then
-    DOTFILES_ARECORD="$dir/local/.local/bin/arecord"
+  if [[ -d "$dir/local/.local/bin" ]]; then
+    DOTFILES_LOCAL_BIN="$dir/local/.local/bin"
     break
   fi
 done
 
-if [[ -n "$DOTFILES_ARECORD" ]]; then
-  cp "$DOTFILES_ARECORD" "$PREFIX/bin/arecord"
-  cp "$DOTFILES_ARECORD" "$HOME/.local/bin/arecord"
-  chmod +x "$PREFIX/bin/arecord" "$HOME/.local/bin/arecord"
-  ln -sf arecord "$PREFIX/bin/pw-record"
-  ln -sf arecord "$HOME/.local/bin/pw-record"
-  print_success "Wrapper arecord/pw-record instalado desde dotfiles"
+if [[ -n "$DOTFILES_LOCAL_BIN" ]]; then
+  for tool in arecord pw-record aplay paplay pw-cat; do
+    if [[ -e "$DOTFILES_LOCAL_BIN/$tool" ]]; then
+      cp -P "$DOTFILES_LOCAL_BIN/$tool" "$PREFIX/bin/$tool"
+      cp -P "$DOTFILES_LOCAL_BIN/$tool" "$HOME/.local/bin/$tool"
+    fi
+  done
+  chmod +x "$PREFIX/bin/arecord" "$PREFIX/bin/aplay" "$HOME/.local/bin/arecord" "$HOME/.local/bin/aplay" 2>/dev/null || true
+  print_success "Bridges de audio (arecord + aplay) instalados desde dotfiles"
 else
   cat << 'ARECORD_EOF' > "$PREFIX/bin/arecord"
 #!/data/data/com.termux/files/usr/bin/python3
