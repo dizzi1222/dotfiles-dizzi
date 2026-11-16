@@ -940,7 +940,8 @@ if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22c: Atajos de Termux:Widget (OpenCode, Neovim y Antigravity)
+# PASO 22c: Atajos de Termux:Widget (OpenCode, Neovim, Antigravity, Codex,
+# Claude Code y OpenClaw)
 # ───────────────────────────────────────────────────────────
 # Termux:Widget lee los atajos dinámicos de ~/.termux/widget/dynamic_shortcuts.
 # En Android 10+ el permiso "Mostrar sobre otras apps" va en TERMUX (no en
@@ -949,7 +950,7 @@ fi
 # en segundo plano" y está en Ajustes → Apps → Termux → Otros permisos.
 # ═══════════════════════════════════════════════════════════
 print_step "22c/23: Atajos de Termux:Widget"
-read -p "¿Crear atajos de OpenCode y Neovim para Termux:Widget? [S/n]: " widget_ok
+read -p "¿Crear los atajos de OpenCode, Neovim, Antigravity, Codex, Claude Code y OpenClaw? [S/n]: " widget_ok
 if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   WIDGET_DIR="$HOME/.termux/widget/dynamic_shortcuts"
   ICONS_DIR="$HOME/.shortcuts/icons"
@@ -963,7 +964,7 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       break
     fi
   done
-  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude; do
+  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude openclaw:openclaw; do
     shortcut="${entry%%:*}"
     command="${entry#*:}"
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/$shortcut" ]]; then
@@ -993,9 +994,20 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   ln -sf "$LAUNCHER" "$PREFIX/bin/opencode"
   print_success "Launcher proot enlazado en \$PREFIX/bin/opencode"
 
+  # npm deja el shebang /usr/bin/env en openclaw.mjs, que no existe en Termux.
+  # El wrapper ejecuta node directamente para que `openclaw` funcione.
+  OPENCLAW_LAUNCHER="$HOME/.local/bin/openclaw"
+  if [[ -f "$PREFIX/lib/node_modules/openclaw/openclaw.mjs" ]]; then
+    printf '#!/data/data/com.termux/files/usr/bin/bash\nexec node "$PREFIX/lib/node_modules/openclaw/openclaw.mjs" "$@"\n' \
+      >"$OPENCLAW_LAUNCHER"
+    chmod +x "$OPENCLAW_LAUNCHER"
+    ln -sf "$OPENCLAW_LAUNCHER" "$PREFIX/bin/openclaw"
+    print_success "Launcher de OpenClaw enlazado en \$PREFIX/bin/openclaw"
+  fi
+
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
   # no en ~/.termux/widget/dynamic_shortcuts/icons.
-  for shortcut in opencode nvim agy codex claude-code; do
+  for shortcut in opencode nvim agy codex claude-code openclaw; do
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" ]]; then
       cp "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" "$ICONS_DIR/$shortcut.png"
       chmod 600 "$ICONS_DIR/$shortcut.png"
@@ -1025,6 +1037,18 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       else
         rm -f "$ICONS_DIR/agy.png.tmp"
         print_warning "No se pudo descargar el ícono: copiá un PNG a $ICONS_DIR/agy.png"
+      fi
+    elif [[ "$shortcut" == "claude-code" || "$shortcut" == "openclaw" ]]; then
+      # Iconos oficiales de LobeHub (claudecode-color / openclaw-color).
+      if curl -fLsS --max-time 30 \
+        "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@latest/light/${shortcut//-}-color.png" \
+        -o "$ICONS_DIR/$shortcut.png.tmp"; then
+        mv "$ICONS_DIR/$shortcut.png.tmp" "$ICONS_DIR/$shortcut.png"
+        chmod 600 "$ICONS_DIR/$shortcut.png"
+        print_success "Ícono de $shortcut descargado"
+      else
+        rm -f "$ICONS_DIR/$shortcut.png.tmp"
+        print_warning "No se pudo descargar el ícono: copiá un PNG a $ICONS_DIR/$shortcut.png"
       fi
     else
       print_info "Ícono opcional: poné un PNG en $ICONS_DIR/$shortcut.png y recreá los atajos."

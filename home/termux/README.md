@@ -3,7 +3,7 @@
 ## Atajos de OpenCode y Neovim
 
 El paso **22c** de `../termux-basic-setup.sh` instala los scripts `opencode`,
-`nvim`, `agy`, `codex` y `claude-code` en `~/.termux/widget/dynamic_shortcuts/`.
+`nvim`, `agy`, `codex`, `claude-code` y `openclaw` en `~/.termux/widget/dynamic_shortcuts/`.
 Ejecutan el comando tal cual. Los íconos se instalan en
 `~/.shortcuts/icons/<nombre-del-script>.png`.
 
@@ -20,8 +20,11 @@ recortado, reducido proporcionalmente y centrado en un PNG transparente de 192×
 `dynamic_shortcuts/icons/codex.png` usa el [isotipo oficial de OpenAI](https://chatgpt.com/cdn/assets/favicon-c80e01a96037.svg)
 (blanco) centrado en una tarjeta negra redondeada de 192×192.
 
-`dynamic_shortcuts/icons/claude-code.png` usa el [claw naranja de Claude de dashboard-icons](https://github.com/homarr-labs/dashboard-icons/blob/main/svg/claude-ai.svg)
-(`#D97757`), centrado en un PNG transparente de 192×192.
+`dynamic_shortcuts/icons/claude-code.png` usa el [icono oficial de Claude Code de LobeHub](https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@latest/light/claudecode-color.png),
+reducido a un PNG transparente de 192×192.
+
+`dynamic_shortcuts/icons/openclaw.png` usa el [icono oficial de OpenClaw de LobeHub](https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@latest/light/openclaw-color.png),
+reducido a un PNG transparente de 192×192.
 
 Licencia de los recursos de Neovim: [MIT](dynamic_shortcuts/icons/LICENSE.neovim).
 
