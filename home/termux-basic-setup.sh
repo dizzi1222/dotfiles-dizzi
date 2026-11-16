@@ -1082,6 +1082,92 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
+# PASO 22d: Voice/Dictación AGY CLI
+# ───────────────────────────────────────────────────────────
+# AGY tiene dictado de voz nativo (F5 o /voice dentro del TUI).
+# Funciona vía WebSocket al backend de Google — no depende de
+# ningún binario local de audio ni de la app Termux:API.
+# Lo que sí se necesita:
+#   • Permiso de MICRÓFONO en la app Termux (Android Settings)
+#   • voice-engine-addr = "default" en settings.json (ya incluido
+#     en dotfiles-dizzi/Antigravity/.gemini/antigravity-cli/settings.json)
+#   • Keybinding voice.start_dictation = F5 (ya en keybindings.json)
+# Para usar el micrófono de otra máquina vía SSH:
+#   En el host: agy mic-serve --addr 127.0.0.1:4713
+#   En Termux:  voice-engine-addr = "ws://HOST:4713"
+# ═══════════════════════════════════════════════════════════
+print_step "22d/23: Voice/Dictación AGY"
+AGY_SETTINGS_DIR="${HOME}/.gemini/antigravity-cli"
+AGY_SETTINGS="${AGY_SETTINGS_DIR}/settings.json"
+AGY_KEYBINDINGS="${AGY_SETTINGS_DIR}/keybindings.json"
+
+# Verificar si AGY está instalado
+if ! command -v agy &>/dev/null && [[ ! -f "${HOME}/.local/share/core-termux-data/antigravity-cli/agy.va39" ]]; then
+  print_warning "agy no encontrado; saltando configuración de voice (instala AGY primero)"
+else
+  mkdir -p "$AGY_SETTINGS_DIR"
+
+  # --- settings.json: agregar voice-engine-addr si no existe ---
+  if [[ -f "$AGY_SETTINGS" ]]; then
+    if ! grep -q '"voice-engine-addr"' "$AGY_SETTINGS"; then
+      # Insertar antes del último }
+      sed -i 's/^}$/  "voice-engine-addr": "default"\n}/' "$AGY_SETTINGS"
+      print_success "voice-engine-addr agregado a settings.json"
+    else
+      print_info "voice-engine-addr ya configurado en settings.json"
+    fi
+  else
+    # Crear settings mínimo con voice
+    cat >"$AGY_SETTINGS" <<'AGYSETTINGS'
+{
+  "agentMode": "accept-edits",
+  "allowNonWorkspaceAccess": true,
+  "voice-engine-addr": "default"
+}
+AGYSETTINGS
+    chmod 600 "$AGY_SETTINGS"
+    print_success "settings.json creado con voice habilitado"
+  fi
+
+  # --- keybindings.json: agregar voice.start_dictation = F5 ---
+  if [[ -f "$AGY_KEYBINDINGS" ]]; then
+    if ! grep -q '"voice.start_dictation"' "$AGY_KEYBINDINGS"; then
+      sed -i 's/^}$/  "voice.start_dictation": ["f5"]\n}/' "$AGY_KEYBINDINGS"
+      print_success "voice.start_dictation (F5) agregado a keybindings.json"
+    else
+      print_info "voice.start_dictation ya está en keybindings.json"
+    fi
+  fi
+
+  # --- Permiso de micrófono en Android ---
+  print_info "Voice/Dictación AGY configurado:"
+  print_info "  • F5 (o /voice en el TUI) → inicia/para el dictado"
+  print_info "  • El texto transcripto se inserta directo en el prompt"
+  print_info "  • Máx. 3m 30s por sesión (autostop automático)"
+  print_info ""
+  print_info "⚠️  PERMISO REQUERIDO: Ajustes → Apps → Termux → Permisos → Micrófono → Permitir"
+
+  # Intentar abrir los ajustes de permisos de Termux directamente
+  read -p "  ¿Abrir ajustes de permisos de Termux ahora? [S/n]: " mic_perm_ok
+  if [[ ! "$mic_perm_ok" =~ ^[Nn]$ ]]; then
+    if am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux >/dev/null 2>&1; then
+      print_success "Ajustes de Termux abiertos → tocá Permisos → Micrófono"
+    elif am start -n com.miui.securitycenter/com.miui.permcenter.permissions.PermissionsEditorActivity \
+        --es extra_pkgname com.termux >/dev/null 2>&1; then
+      print_success "Ajustes de permisos abiertos (MIUI)"
+    else
+      print_warning "Abrí manualmente: Ajustes → Apps → Termux → Permisos → Micrófono"
+    fi
+  fi
+
+  # mic-serve: modo avanzado para redirigir micrófono remoto
+  print_info ""
+  print_info "mic-serve (opcional, para Termux sobre SSH):"
+  print_info "  En la máquina CON micrófono: agy mic-serve --addr 127.0.0.1:4713"
+  print_info "  En settings.json de Termux:  \"voice-engine-addr\": \"ws://HOST:4713\""
+fi
+
+# ═══════════════════════════════════════════════════════════
 # PASO 23: Finalización
 # ═══════════════════════════════════════════════════════════
 print_step "23/23: Finalización"
@@ -1100,6 +1186,7 @@ cat <<'FINAL'
 ║  ✅ .gitignore seguro                                   ║
 ║  ✅ Workspace + Discord RPC                             ║
 ║  ✅ pyenv removido                                      ║
+║  ✅ Voice/Dictación AGY (F5 en el TUI)                 ║
 ╚══════════════════════════════════════════════════════════╝
 FINAL
 
@@ -1135,6 +1222,7 @@ if command -v core >/dev/null 2>&1; then
   echo -e "  ${CYAN}core pg start${NC}               Postgres"
   echo -e "  ${CYAN}core init next|react|nest|express${NC}  Configurar proyecto"
   echo -e "  ${CYAN}core voice opencode${NC}         Voz → opencode"
+  echo -e "  ${CYAN}agy voice (F5/${NC}/voice${CYAN})${NC}       Dictado voz → AGY CLI"
   echo ""
 fi
 
