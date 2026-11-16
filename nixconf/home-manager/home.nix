@@ -307,6 +307,10 @@ in
       ".claude/CLAUDE.md".source = link "home/.claude/CLAUDE.md";
       # Codex: mismas instrucciones que Claude, sin duplicar el contenido.
       ".codex/AGENTS.md".source = link "codex/.codex/AGENTS.md";
+      # Codex CLI: config.toml (variante Termux — rutas /data/data/com.termux/files/home).
+      ".codex/config.toml".source = link "codex/.codex/config.toml";
+      # Git: .gitconfig con helper gh multi-ruta (linuxbrew → /usr/bin → Termux $PREFIX).
+      ".gitconfig".source = link "home/.gitconfig";
 
       # Starship config
       #".config/starship.toml".source = link "starship/.config/starship/starship.toml";
