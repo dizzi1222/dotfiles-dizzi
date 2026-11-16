@@ -1,0 +1,95 @@
+#!/data/data/com.termux/files/usr/bin/python3
+"""
+arecord compatibility wrapper for Antigravity (AGY) CLI on Termux Android.
+Translates ALSA arecord calls into Termux:API microphone recording + ffmpeg PCM transcoding.
+"""
+
+import sys, os, time, signal, subprocess, argparse
+
+prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+tmp_dir = os.environ.get("TMPDIR", os.path.join(prefix, "tmp"))
+os.makedirs(tmp_dir, exist_ok=True)
+
+# Log arguments for debugging
+log_file = os.path.join(tmp_dir, "arecord_calls.log")
+try:
+    with open(log_file, "a") as f:
+        f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] arecord called: {' '.join(sys.argv[1:])}\n")
+except Exception:
+    pass
+
+# Parse typical arecord arguments
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument("-r", "--rate", type=int, default=16000)
+parser.add_argument("-c", "--channels", type=int, default=1)
+parser.add_argument("-f", "--format", type=str, default="S16_LE")
+parser.add_argument("-t", "--file-type", type=str, default="raw")
+parser.add_argument("-D", "--device", type=str, default=None)
+parser.add_argument("-q", "--quiet", action="store_true")
+parser.add_argument("-v", "--verbose", action="store_true")
+parser.add_argument("-N", "--nonblock", action="store_true")
+parser.add_argument("output", nargs="?", default="-")
+
+args, unknown = parser.parse_known_args()
+
+rec_file = os.path.join(tmp_dir, f"agy_mic_{os.getpid()}.m4a")
+if os.path.exists(rec_file):
+    try: os.remove(rec_file)
+    except: pass
+
+running = True
+
+def stop_and_transcode(signum=None, frame=None):
+    global running
+    if not running:
+        return
+    running = False
+
+    # Stop Android microphone recording
+    subprocess.run(["termux-microphone-record", "-q"], capture_output=True)
+    time.sleep(0.3)
+
+    if os.path.exists(rec_file) and os.path.getsize(rec_file) > 0:
+        cmd = [
+            "ffmpeg", "-loglevel", "quiet",
+            "-i", rec_file,
+            "-ar", str(args.rate),
+            "-ac", str(args.channels),
+            "-f", "s16le"
+        ]
+        if args.output and args.output != "-":
+            cmd.extend([args.output, "-y"])
+            subprocess.run(cmd, capture_output=True)
+        else:
+            cmd.append("pipe:1")
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            while True:
+                chunk = proc.stdout.read(4096)
+                if not chunk: break
+                try:
+                    sys.stdout.buffer.write(chunk)
+                    sys.stdout.buffer.flush()
+                except BrokenPipeError:
+                    break
+            proc.wait()
+
+    try:
+        if os.path.exists(rec_file):
+            os.remove(rec_file)
+    except: pass
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, stop_and_transcode)
+signal.signal(signal.SIGTERM, stop_and_transcode)
+signal.signal(signal.SIGHUP, stop_and_transcode)
+
+# Start recording via Termux:API
+subprocess.run(["termux-microphone-record", "-f", rec_file, "-l", "300"], capture_output=True)
+
+try:
+    while running:
+        time.sleep(0.5)
+except Exception:
+    pass
+
+stop_and_transcode()

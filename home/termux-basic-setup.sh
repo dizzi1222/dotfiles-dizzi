@@ -1082,90 +1082,166 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22d: Voice/Dictación AGY CLI
+# PASO 22d: Voice/Dictación AGY CLI (Bridge arecord + Termux:API)
 # ───────────────────────────────────────────────────────────
-# AGY tiene dictado de voz nativo (F5 o /voice dentro del TUI).
-# Funciona vía WebSocket al backend de Google — no depende de
-# ningún binario local de audio ni de la app Termux:API.
-# Lo que sí se necesita:
-#   • Permiso de MICRÓFONO en la app Termux (Android Settings)
-#   • voice-engine-addr = "default" en settings.json (ya incluido
-#     en dotfiles-dizzi/Antigravity/.gemini/antigravity-cli/settings.json)
-#   • Keybinding voice.start_dictation = F5 (ya en keybindings.json)
-# Para usar el micrófono de otra máquina vía SSH:
-#   En el host: agy mic-serve --addr 127.0.0.1:4713
-#   En Termux:  voice-engine-addr = "ws://HOST:4713"
+# AGY CLI busca las herramientas de grabación de Linux (arecord / pw-record)
+# y envía el audio transcrito a Google. En Android / Termux se implementa
+# mediante un wrapper inteligente de arecord que captura con Termux:API y
+# transcodifica con ffmpeg a PCM S16_LE en tiempo real.
+# Requisitos:
+#   • Paquete termux-api + ffmpeg
+#   • APK Termux:API (com.termux.api) instalada con permiso de Micrófono
+#   • Wrapper arecord / pw-record en $PREFIX/bin y ~/.local/bin
+#   • voice-engine-addr = "default" en ~/.gemini/antigravity-cli/settings.json
+#   • Keybinding voice.start_dictation = F5 en keybindings.json
 # ═══════════════════════════════════════════════════════════
 print_step "22d/23: Voice/Dictación AGY"
 AGY_SETTINGS_DIR="${HOME}/.gemini/antigravity-cli"
 AGY_SETTINGS="${AGY_SETTINGS_DIR}/settings.json"
 AGY_KEYBINDINGS="${AGY_SETTINGS_DIR}/keybindings.json"
 
-# Verificar si AGY está instalado
-if ! command -v agy &>/dev/null && [[ ! -f "${HOME}/.local/share/core-termux-data/antigravity-cli/agy.va39" ]]; then
-  print_warning "agy no encontrado; saltando configuración de voice (instala AGY primero)"
-else
-  mkdir -p "$AGY_SETTINGS_DIR"
+# Asegurar dependencias de sistema
+pkg install -y termux-api ffmpeg >/dev/null 2>&1
 
-  # --- settings.json: agregar voice-engine-addr si no existe ---
-  if [[ -f "$AGY_SETTINGS" ]]; then
-    if ! grep -q '"voice-engine-addr"' "$AGY_SETTINGS"; then
-      # Insertar antes del último }
-      sed -i 's/^}$/  "voice-engine-addr": "default"\n}/' "$AGY_SETTINGS"
-      print_success "voice-engine-addr agregado a settings.json"
-    else
-      print_info "voice-engine-addr ya configurado en settings.json"
-    fi
+# Instalar wrapper arecord / pw-record desde dotfiles si existe, o generarlo
+mkdir -p "$PREFIX/bin" "$HOME/.local/bin"
+DOTFILES_ARECORD=""
+for dir in ~/dotfiles-dizzi ~/dotfiles-termux ~/dotfiles; do
+  if [[ -f "$dir/local/.local/bin/arecord" ]]; then
+    DOTFILES_ARECORD="$dir/local/.local/bin/arecord"
+    break
+  fi
+done
+
+if [[ -n "$DOTFILES_ARECORD" ]]; then
+  cp "$DOTFILES_ARECORD" "$PREFIX/bin/arecord"
+  cp "$DOTFILES_ARECORD" "$HOME/.local/bin/arecord"
+  chmod +x "$PREFIX/bin/arecord" "$HOME/.local/bin/arecord"
+  ln -sf arecord "$PREFIX/bin/pw-record"
+  ln -sf arecord "$HOME/.local/bin/pw-record"
+  print_success "Wrapper arecord/pw-record instalado desde dotfiles"
+else
+  cat << 'ARECORD_EOF' > "$PREFIX/bin/arecord"
+#!/data/data/com.termux/files/usr/bin/python3
+import sys, os, time, signal, subprocess, argparse
+prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+tmp_dir = os.environ.get("TMPDIR", os.path.join(prefix, "tmp"))
+os.makedirs(tmp_dir, exist_ok=True)
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument("-r", "--rate", type=int, default=16000)
+parser.add_argument("-c", "--channels", type=int, default=1)
+parser.add_argument("-f", "--format", type=str, default="S16_LE")
+parser.add_argument("-t", "--file-type", type=str, default="raw")
+parser.add_argument("-D", "--device", type=str, default=None)
+parser.add_argument("-q", "--quiet", action="store_true")
+parser.add_argument("-v", "--verbose", action="store_true")
+parser.add_argument("-N", "--nonblock", action="store_true")
+parser.add_argument("output", nargs="?", default="-")
+args, unknown = parser.parse_known_args()
+rec_file = os.path.join(tmp_dir, f"agy_mic_{os.getpid()}.m4a")
+if os.path.exists(rec_file):
+    try: os.remove(rec_file)
+    except: pass
+running = True
+def stop_and_transcode(signum=None, frame=None):
+    global running
+    if not running: return
+    running = False
+    subprocess.run(["termux-microphone-record", "-q"], capture_output=True)
+    time.sleep(0.3)
+    if os.path.exists(rec_file) and os.path.getsize(rec_file) > 0:
+        cmd = ["ffmpeg", "-loglevel", "quiet", "-i", rec_file, "-ar", str(args.rate), "-ac", str(args.channels), "-f", "s16le"]
+        if args.output and args.output != "-":
+            cmd.extend([args.output, "-y"])
+            subprocess.run(cmd, capture_output=True)
+        else:
+            cmd.append("pipe:1")
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            while True:
+                chunk = proc.stdout.read(4096)
+                if not chunk: break
+                try: sys.stdout.buffer.write(chunk); sys.stdout.buffer.flush()
+                except BrokenPipeError: break
+            proc.wait()
+    try:
+        if os.path.exists(rec_file): os.remove(rec_file)
+    except: pass
+    sys.exit(0)
+signal.signal(signal.SIGINT, stop_and_transcode)
+signal.signal(signal.SIGTERM, stop_and_transcode)
+signal.signal(signal.SIGHUP, stop_and_transcode)
+subprocess.run(["termux-microphone-record", "-f", rec_file, "-l", "300"], capture_output=True)
+try:
+    while running: time.sleep(0.5)
+except Exception: pass
+stop_and_transcode()
+ARECORD_EOF
+  chmod +x "$PREFIX/bin/arecord"
+  cp "$PREFIX/bin/arecord" "$HOME/.local/bin/arecord"
+  chmod +x "$HOME/.local/bin/arecord"
+  ln -sf arecord "$PREFIX/bin/pw-record"
+  ln -sf arecord "$HOME/.local/bin/pw-record"
+  print_success "Wrapper arecord/pw-record generado e instalado"
+fi
+
+mkdir -p "$AGY_SETTINGS_DIR"
+
+# --- settings.json: agregar voice-engine-addr si no existe ---
+if [[ -f "$AGY_SETTINGS" ]]; then
+  if ! grep -q '"voice-engine-addr"' "$AGY_SETTINGS"; then
+    sed -i 's/^}$/  "voice-engine-addr": "default"\n}/' "$AGY_SETTINGS"
+    print_success "voice-engine-addr agregado a settings.json"
   else
-    # Crear settings mínimo con voice
-    cat >"$AGY_SETTINGS" <<'AGYSETTINGS'
+    print_info "voice-engine-addr ya configurado en settings.json"
+  fi
+else
+  cat >"$AGY_SETTINGS" <<'AGYSETTINGS'
 {
   "agentMode": "accept-edits",
   "allowNonWorkspaceAccess": true,
   "voice-engine-addr": "default"
 }
 AGYSETTINGS
-    chmod 600 "$AGY_SETTINGS"
-    print_success "settings.json creado con voice habilitado"
-  fi
-
-  # --- keybindings.json: agregar voice.start_dictation = F5 ---
-  if [[ -f "$AGY_KEYBINDINGS" ]]; then
-    if ! grep -q '"voice.start_dictation"' "$AGY_KEYBINDINGS"; then
-      sed -i 's/^}$/  "voice.start_dictation": ["f5"]\n}/' "$AGY_KEYBINDINGS"
-      print_success "voice.start_dictation (F5) agregado a keybindings.json"
-    else
-      print_info "voice.start_dictation ya está en keybindings.json"
-    fi
-  fi
-
-  # --- Permiso de micrófono en Android ---
-  print_info "Voice/Dictación AGY configurado:"
-  print_info "  • F5 (o /voice en el TUI) → inicia/para el dictado"
-  print_info "  • El texto transcripto se inserta directo en el prompt"
-  print_info "  • Máx. 3m 30s por sesión (autostop automático)"
-  print_info ""
-  print_info "⚠️  PERMISO REQUERIDO: Ajustes → Apps → Termux → Permisos → Micrófono → Permitir"
-
-  # Intentar abrir los ajustes de permisos de Termux directamente
-  read -p "  ¿Abrir ajustes de permisos de Termux ahora? [S/n]: " mic_perm_ok
-  if [[ ! "$mic_perm_ok" =~ ^[Nn]$ ]]; then
-    if am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux >/dev/null 2>&1; then
-      print_success "Ajustes de Termux abiertos → tocá Permisos → Micrófono"
-    elif am start -n com.miui.securitycenter/com.miui.permcenter.permissions.PermissionsEditorActivity \
-        --es extra_pkgname com.termux >/dev/null 2>&1; then
-      print_success "Ajustes de permisos abiertos (MIUI)"
-    else
-      print_warning "Abrí manualmente: Ajustes → Apps → Termux → Permisos → Micrófono"
-    fi
-  fi
-
-  # mic-serve: modo avanzado para redirigir micrófono remoto
-  print_info ""
-  print_info "mic-serve (opcional, para Termux sobre SSH):"
-  print_info "  En la máquina CON micrófono: agy mic-serve --addr 127.0.0.1:4713"
-  print_info "  En settings.json de Termux:  \"voice-engine-addr\": \"ws://HOST:4713\""
+  chmod 600 "$AGY_SETTINGS"
+  print_success "settings.json creado con voice habilitado"
 fi
+
+# --- keybindings.json: agregar voice.start_dictation = F5 ---
+if [[ -f "$AGY_KEYBINDINGS" ]]; then
+  if ! grep -q '"voice.start_dictation"' "$AGY_KEYBINDINGS"; then
+    sed -i 's/^}$/  "voice.start_dictation": ["f5"]\n}/' "$AGY_KEYBINDINGS"
+    print_success "voice.start_dictation (F5) agregado a keybindings.json"
+  else
+    print_info "voice.start_dictation ya está en keybindings.json"
+  fi
+fi
+
+# --- Verificar app Termux:API y permiso de micrófono ---
+if pm list packages 2>/dev/null | grep -q "com.termux.api" || cmd package list packages 2>/dev/null | grep -q "com.termux.api"; then
+  print_success "App Termux:API (com.termux.api) detectada"
+  # Probar si el micrófono responde
+  if termux-microphone-record -i 2>&1 | grep -q "RECORD_AUDIO"; then
+    print_warning "Falta conceder permiso de micrófono a Termux:API"
+    read -p "  ¿Abrir pantalla de permisos de Termux:API ahora? [S/n]: " perm_ask
+    if [[ ! "$perm_ask" =~ ^[Nn]$ ]]; then
+      am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux.api >/dev/null 2>&1 || true
+    fi
+  else
+    print_success "Permiso de micrófono verificado y operativo"
+  fi
+else
+  print_warning "Falta la app Termux:API (com.termux.api) en Android"
+  print_info "Instala Termux:API desde F-Droid o GitHub Releases para habilitar el micrófono:"
+  print_info "F-Droid: https://f-droid.org/packages/com.termux.api/"
+  read -p "  ¿Abrir descarga de Termux:API ahora? [S/n]: " dl_api
+  if [[ ! "$dl_api" =~ ^[Nn]$ ]]; then
+    termux-open-url "https://f-droid.org/packages/com.termux.api/" >/dev/null 2>&1 || true
+  fi
+fi
+
+print_info "Dictado por voz listo:"
+print_info "  • En AGY CLI: pulsa F5 o escribe /voice para iniciar y detener el dictado"
+print_info "  • Duración máxima: 3m 30s por sesión"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 23: Finalización
