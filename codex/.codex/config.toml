@@ -6,6 +6,7 @@ sandbox_mode = "danger-full-access"
 model = "gpt-6-luna"
 model_reasoning_effort = "xhigh"
 service_tier = "priority"
+plan_mode_reasoning_effort = "max"
 [mcp_servers.node_repl]
 args = []
 command = "/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl"
@@ -46,10 +47,44 @@ trust_level = "trusted"
 
 [projects."/home/diego/Documentos/ChatGPT/AI JOB COPILOT"]
 trust_level = "trusted"
+
+[projects."/var/home/diego/Documentos/ChatGPT/Bazzite"]
+trust_level = "trusted"
 # Variante Termux (Android): sin node_repl/cua_repl (bundle del app de escritorio
 # ChatGPT) ni codex-discord-presence (Rich Presence requiere Discord de escritorio).
 [tui]
 screen_reader_detection_done = true
+
 [tui.model_availability_nux]
-"gpt-6.1-sol" = 2
+"gpt-6.1-sol" = 3
+
+[hooks.state]
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:525d7875f06eb8df72c79c15c801c316ae131052886042fc1f03dd72021b1c84"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:6a40f62d31068e522ef8fd4de723ec61227d7392526aebdbe4168936343a70a5"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:570ce1357972fd4849e07f9884d53c6a0ce28453aade2eaa9a51e6845eabe463"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:6e0bfa36573ccb3c75aa003c9eedf3ce45976ba6710074a738003be1b9f6b574"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:6445f820fc4f17c11691f6e81a09707a720d5015877c49e4df7c833a88abf45b"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:994fd7a74f773e9dc52060965ea8ce4580a7f9a13b528d326e47c4eaae7fcf4e"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
+
+[hooks.state."codex-discord-presence@codex-presence:hooks/hooks.json:interrupt:0:0"]
+trusted_hash = "sha256:9c0f7cc3590c68777cd562ce651ff1877f589a75db255c811b1497a1303dfd0d"
+trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
 

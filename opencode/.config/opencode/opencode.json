@@ -1,9 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "compaction": {
-    "auto": false,
-    "prune": false,
-    "reserved": 10000
+    "auto": true,
+    "keep": {
+      "tokens": 15000
+    }
   },
   "mcp": {
     "engram": {
@@ -164,7 +165,8 @@
   },
   "plugins": [
     "opencode-gemini-auth@latest",
-    "/home/diego/workspace/opencode-discord-rpc"
+    "/home/diego/workspace/opencode-discord-rpc",
+    "/home/diego/.config/opencode/plugins/voice"
   ],
   "small_model": "opencode/deepseek-v4-flash-free",
   "provider": {
