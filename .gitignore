@@ -17,6 +17,9 @@ home/.claude/sessions/
 home/.claude/shell-snapshots/
 home/.claude/file-history/
 home/.claude/settings.local.json
+# Estado efímero del directorio de plugins
+home/.claude/plugins/.last_inuse_sweep
+home/.claude/plugins/plugin-directory-cache-*.json
 # Sunshine: logs, estado y credenciales del equipo (no portables)
 sunshine/.config/sunshine/sunshine.log*
 sunshine/.config/sunshine/sunshine_state.json

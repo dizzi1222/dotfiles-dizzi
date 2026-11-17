@@ -1013,14 +1013,29 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   print_success "Launcher proot enlazado en \$PREFIX/bin/opencode"
 
   # npm deja el shebang /usr/bin/env en openclaw.mjs, que no existe en Termux.
-  # El wrapper ejecuta node directamente para que `openclaw` funcione.
+  # Resolver npm root al ejecutar evita que una actualización use otra copia.
   OPENCLAW_LAUNCHER="$HOME/.local/bin/openclaw"
-  if [[ -f "$PREFIX/lib/node_modules/openclaw/openclaw.mjs" ]]; then
-    printf '#!/data/data/com.termux/files/usr/bin/bash\nexec node "$PREFIX/lib/node_modules/openclaw/openclaw.mjs" "$@"\n' \
-      >"$OPENCLAW_LAUNCHER"
+  OPENCLAW_NPM_ROOT="$(npm root -g 2>/dev/null)"
+  if [[ -f "$OPENCLAW_NPM_ROOT/openclaw/openclaw.mjs" ]]; then
+    cat >"$OPENCLAW_LAUNCHER" <<'OPENCLAW_WRAPPER'
+#!/data/data/com.termux/files/usr/bin/bash
+# core-termux managed OpenClaw launcher
+OPENCLAW_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+OPENCLAW_NPM="$OPENCLAW_PREFIX/bin/npm"
+OPENCLAW_NODE="$OPENCLAW_PREFIX/bin/node"
+[[ -x "$OPENCLAW_NPM" ]] || OPENCLAW_NPM="$(command -v npm)"
+[[ -x "$OPENCLAW_NODE" ]] || OPENCLAW_NODE="$(command -v node)"
+[[ -x "$OPENCLAW_NPM" && -x "$OPENCLAW_NODE" ]] || { echo "openclaw: npm and node are required" >&2; exit 127; }
+OPENCLAW_ROOT="$("$OPENCLAW_NPM" root -g)" || exit 1
+OPENCLAW_ENTRY="$OPENCLAW_ROOT/openclaw/openclaw.mjs"
+[[ -f "$OPENCLAW_ENTRY" ]] || { echo "openclaw: package not found at $OPENCLAW_ENTRY" >&2; exit 127; }
+exec "$OPENCLAW_NODE" "$OPENCLAW_ENTRY" "$@"
+OPENCLAW_WRAPPER
     chmod +x "$OPENCLAW_LAUNCHER"
     ln -sf "$OPENCLAW_LAUNCHER" "$PREFIX/bin/openclaw"
     print_success "Launcher de OpenClaw enlazado en \$PREFIX/bin/openclaw"
+  else
+    print_warning "OpenClaw no está instalado en el prefijo global de npm: $OPENCLAW_NPM_ROOT"
   fi
 
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,

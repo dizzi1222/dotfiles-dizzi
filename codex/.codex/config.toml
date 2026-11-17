@@ -6,7 +6,7 @@ approval_policy = "never"
 sandbox_mode = "danger-full-access"
 
 model = "gpt-6-luna"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "max"
 service_tier = "priority"
 
 [tui]

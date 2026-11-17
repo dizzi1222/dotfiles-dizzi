@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Claude Code URL Handler
+Comment=Handle claude-cli:// deep links for Claude Code
+Exec="/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1" --handle-uri %u
+Type=Application
+NoDisplay=true
+MimeType=x-scheme-handler/claude-cli;
