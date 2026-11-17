@@ -1,0 +1,13 @@
+{
+  "name": "opencode-voice",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Voz (dictado + conversación) para OpenCode TUI sobre Termux/Android",
+  "exports": {
+    "./tui": "./tui.tsx"
+  },
+  "dependencies": {
+    "@opencode/plugin": "latest"
+  }
+}

@@ -421,13 +421,13 @@ fi
 # PASO 11: Tmux + TPM + tmux-yank (portapapeles real en Termux)
 # ─────────────────────────────────────────────────────────────────────────────
 # Estrategia de clipboard en Termux (sin X11, sin Wayland):
-#   1. OSC52  — el terminal interpreta la secuencia y escribe al portapapeles
-#              del SO. Funciona en Termux nativo y la mayoría de emuladores.
+#   1. OSC52  — el terminal interpreta la secuencia y escribe texto al
+#              portapapeles del SO. Funciona en Termux nativo y la mayoría de emuladores.
 #              Requiere: tmux set-clipboard on + allow-passthrough all.
-#   2. termux-clipboard-set — API Android directa. Requiere la app Termux:API
+#   2. termux-clipboard-set — API Android para portapapeles de texto. Requiere la app Termux:API
 #              (com.termux.api). Si no está, el comando se cuelga → usar timeout.
-#   Los dos métodos se complementan: OSC52 cubre opencode/agy, termux-clipboard
-#   cubre copiar con y en copy-mode-vi cuando hay Termux:API instalada.
+#   Las imágenes del portapapeles no son accesibles desde el TUI de Termux;
+#   OpenCode ofrece /image para elegir y adjuntar una imagen desde Android.
 # ─────────────────────────────────────────────────────────────────────────────
 print_step "11/23: Tmux + Clipboard"
 pkg install -y tmux >/dev/null 2>&1
@@ -480,11 +480,12 @@ exec timeout 3 termux-clipboard-set "$@" 2>/dev/null || true
 TCSET
 chmod +x ~/.local/bin/tc-set
 
-print_success "Tmux + portapapeles configurado (OSC52 + termux-clipboard)"
+print_success "Tmux + portapapeles de texto configurado (OSC52 + termux-clipboard)"
 print_info "  • OSC52      → opencode/agy pueden copiar sin Termux:API"
 print_info "  • tmux-yank  → 'y' en copy-mode copia al portapapeles Android"
 print_info "  • tc-set     → wrapper seguro (timeout 3s si falta la app)"
-print_info "  Instala Termux:API para copiar/pegar nativo: https://f-droid.org/packages/com.termux.api/"
+print_info "  • Imágenes   → en OpenCode usa /image [instrucción] para abrir el selector Android"
+print_info "  Instala Termux:API para copiar/pegar texto nativo: https://f-droid.org/packages/com.termux.api/"
 
 print_step "12/23: Yazi"
 pkg install -y yazi >/dev/null 2>&1
@@ -502,7 +503,8 @@ pkg install -y termux-api >/dev/null 2>&1
 # OJO: el paquete termux-api NO alcanza. Sin la app Termux:API (com.termux.api)
 # termux-clipboard-get/set se cuelgan para siempre y opencode/agy quedan sin
 # portapapeles (agy prueba termux-clipboard-get ANTES que xclip/wl-copy).
-if pm list packages 2>/dev/null | grep -q "com.termux.api"; then
+ANDROID_PM="${ANDROID_PM:-/system/bin/pm}"
+if [[ -x "$ANDROID_PM" ]] && "$ANDROID_PM" list packages 2>/dev/null | grep -q "com.termux.api"; then
   print_success "termux-api + app Termux:API (portapapeles operativo)"
 else
   print_warning "termux-api instalado, pero falta la app Termux:API"
@@ -1117,7 +1119,11 @@ AGY_SETTINGS="${AGY_SETTINGS_DIR}/settings.json"
 AGY_KEYBINDINGS="${AGY_SETTINGS_DIR}/keybindings.json"
 
 # Asegurar dependencias de sistema
+#   termux-api  -> puente de comandos con la app Termux:API (micrófono)
+#   ffmpeg      -> transcodifica a PCM/WAV (sin indevs: el micrófono va por Termux:API)
+#   sox         -> solo necesario para el plugin upstream @renjfk/opencode-voice
 pkg install -y termux-api ffmpeg >/dev/null 2>&1
+pkg install -y sox >/dev/null 2>&1 || true
 
 # Instalar wrappers arecord / pw-record y aplay / paplay / pw-cat
 mkdir -p "$PREFIX/bin" "$HOME/.local/bin"
@@ -1234,32 +1240,68 @@ if [[ -f "$AGY_KEYBINDINGS" ]]; then
   fi
 fi
 
-# --- Verificar app Termux:API y permiso de micrófono ---
-if pm list packages 2>/dev/null | grep -q "com.termux.api" || cmd package list packages 2>/dev/null | grep -q "com.termux.api"; then
-  print_success "App Termux:API (com.termux.api) detectada"
-  # Probar si el micrófono responde
-  if termux-microphone-record -i 2>&1 | grep -q "RECORD_AUDIO"; then
-    print_warning "Falta conceder permiso de micrófono a Termux:API"
-    read -p "  ¿Abrir pantalla de permisos de Termux:API ahora? [S/n]: " perm_ask
-    if [[ ! "$perm_ask" =~ ^[Nn]$ ]]; then
-      am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux.api >/dev/null 2>&1 || true
+# --- Desplegar binarios de voz (opencode-voice + voice-doctor) ---
+if [[ -n "$DOTFILES_LOCAL_BIN" ]]; then
+  for tool in opencode-voice voice-doctor; do
+    if [[ -f "$DOTFILES_LOCAL_BIN/$tool" ]]; then
+      install -m 700 "$DOTFILES_LOCAL_BIN/$tool" "$HOME/.local/bin/$tool"
     fi
-  else
-    print_success "Permiso de micrófono verificado y operativo"
+  done
+  print_success "opencode-voice + voice-doctor instalados en ~/.local/bin"
+fi
+
+# --- Registrar el plugin voice en cli.json (JSON válido, sin duplicar) ---
+OC_CLI="$HOME/.config/opencode/cli.json"
+OC_PLUGIN_DIR="$HOME/.config/opencode/plugins/voice"
+mkdir -p "$HOME/.config/opencode"
+if command -v jq >/dev/null 2>&1; then
+  if [[ ! -f "$OC_CLI" ]]; then
+    echo '{"$schema":"https://opencode.ai/v2/cli.json","plugins":[]}' > "$OC_CLI"
   fi
-else
-  print_warning "Falta la app Termux:API (com.termux.api) en Android"
-  print_info "Instala Termux:API desde F-Droid o GitHub Releases para habilitar el micrófono:"
-  print_info "F-Droid: https://f-droid.org/packages/com.termux.api/"
-  read -p "  ¿Abrir descarga de Termux:API ahora? [S/n]: " dl_api
-  if [[ ! "$dl_api" =~ ^[Nn]$ ]]; then
-    termux-open-url "https://f-droid.org/packages/com.termux.api/" >/dev/null 2>&1 || true
+  if ! jq -e --arg p "$OC_PLUGIN_DIR" \
+    '(.plugins // []) | any(.[]; (type == "string" and . == $p) or (type == "object" and .package == $p))' \
+    "$OC_CLI" >/dev/null 2>&1; then
+    tmp_cli="${OC_CLI}.tmp.$$"
+    jq --arg p "$OC_PLUGIN_DIR" '
+      .plugins = (
+        (.plugins // [])
+        | map(if type == "string" and . == $p then {"package": $p} else . end)
+        | if any(.[]; type == "object" and .package == $p) then . else . + [{"package": $p}] end
+      )
+    ' "$OC_CLI" > "$tmp_cli" \
+      && mv "$tmp_cli" "$OC_CLI" \
+      && print_success "plugin voice registrado en cli.json ($OC_PLUGIN_DIR)"
+  else
+    print_info "plugin voice ya registrado en cli.json"
   fi
 fi
 
+# --- Verificar app Termux:API y permiso de micrófono ---
+if [[ -x "$HOME/.local/bin/voice-doctor" ]]; then
+  "$HOME/.local/bin/voice-doctor" || true
+else
+  print_warning "voice-doctor no disponible; revisa Termux:API manualmente"
+fi
 print_info "Dictado por voz listo:"
 print_info "  • En AGY CLI: pulsa F5 o escribe /voice para iniciar y detener el dictado"
+print_info "  • En OpenCode: /voice (F6) graba, transcribe y ENVÍA el prompt al agente"
+print_info "  • En OpenCode: /image [instrucción] abre el selector Android y adjunta una imagen"
 print_info "  • Duración máxima: 3m 30s por sesión"
+print_info ""
+print_info "JSON de referencia (ya aplicados por este paso):"
+cat <<'VOICEJSON'
+  # ~/.config/opencode/cli.json
+  {
+    "$schema": "https://opencode.ai/v2/cli.json",
+    "plugins": [{"package": "/data/data/com.termux/files/home/.config/opencode/plugins/voice"}]
+  }
+
+  # ~/.gemini/antigravity-cli/settings.json
+  { "voice-engine-addr": "default" }
+
+  # ~/.gemini/antigravity-cli/keybindings.json
+  { "voice.start_dictation": ["f5"] }
+VOICEJSON
 
 # ═══════════════════════════════════════════════════════════
 # PASO 23: Finalización

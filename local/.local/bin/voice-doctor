@@ -1,0 +1,165 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# voice-doctor — verifica TODO lo necesario para la voz en OpenCode y AGY (Termux).
+# Uso: voice-doctor [--json]
+# Salida: checklist con estado + bloques JSON listos para copiar.
+
+PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+HOME="${HOME:-/data/data/com.termux/files/home}"
+ANDROID_PM="${ANDROID_PM:-/system/bin/pm}"
+OK=0; FAIL=0
+
+green() { printf '\033[32m%s\033[0m' "$1"; }
+red()   { printf '\033[31m%s\033[0m' "$1"; }
+dim()   { printf '\033[2m%s\033[0m' "$1"; }
+
+pass() { green "  ✔ "; echo "$1"; OK=$((OK+1)); }
+fail() { red   "  ✘ "; echo "$1"; FAIL=$((FAIL+1)); }
+info() { dim   "    "; echo "$1"; }
+optional() { dim "  • "; echo "$1"; }
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+echo "== Voz en Termux =="
+echo
+
+# ---------------------------------------------------------------- 1. Termux:API
+echo "1) App Termux:API (APK)"
+if [ -x "$ANDROID_PM" ] && "$ANDROID_PM" list packages 2>/dev/null | grep -q 'package:com.termux.api'; then
+  pass "com.termux.api instalada"
+else
+  fail "com.termux.api NO instalada"
+  info "Instala Termux:API del MISMO origen que Termux:"
+  info "  F-Droid: https://f-droid.org/packages/com.termux.api/"
+  info "  GitHub : https://github.com/termux/termux-api/releases (misma firma que tu Termux)"
+  info "Después ábrela una vez (Android la deja en estado 'stopped' y los broadcasts se pierden)."
+fi
+
+# --------------------------------------------------------------- 2. termux-api
+echo
+echo "2) Paquete termux-api + comando"
+if have termux-microphone-record; then
+  pass "termux-microphone-record en PATH"
+else
+  fail "falta el paquete termux-api"
+  info "pkg install -y termux-api"
+fi
+have termux-storage-get && pass "selector de archivos Android disponible (/image)" \
+                         || { fail "falta termux-storage-get para adjuntar imágenes"; info "pkg install -y termux-api"; }
+
+# ------------------------------------------------------------- 3. Permiso micro
+echo
+echo "3) Permiso de micrófono (RECORD_AUDIO)"
+MIC_OUT="$(timeout 8 termux-microphone-record -i 2>&1)"
+if echo "$MIC_OUT" | grep -q 'RECORD_AUDIO'; then
+  fail "Termux:API sin permiso de micrófono"
+  info "Ajustes → Apps → Termux:API → Permisos → Micrófono → Permitir"
+  info "Atajo: am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux.api"
+elif [ -z "$MIC_OUT" ]; then
+  fail "Termux:API no responde (timeout)"
+  info "Abre la app Termux:API una vez y reintenta; revisa que la firma coincida con Termux."
+else
+  pass "micrófono accesible por Termux:API"
+fi
+
+# ------------------------------------------------------------- 4. herramientas
+echo
+echo "4) Audio, transcripción e imágenes"
+have ffmpeg && pass "ffmpeg ($(env -u LD_LIBRARY_PATH ffmpeg -version 2>/dev/null | head -1 | cut -d' ' -f1-3))" \
+             || { fail "falta ffmpeg"; info "pkg install -y ffmpeg"; }
+have arecord && pass "arecord (bridge AGY): $(command -v arecord)" \
+             || { fail "falta arecord (bridge)"; info "lo instala el PASO 22d del termux-basic-setup.sh"; }
+have pw-record && pass "pw-record (bridge AGY): $(command -v pw-record)" \
+             || { fail "falta pw-record (bridge)"; info "ln -sf arecord \$PREFIX/bin/pw-record"; }
+have aplay && pass "aplay (bridge salida AGY): $(command -v aplay)" \
+             || { fail "falta aplay (bridge)"; info "lo instala el PASO 22d"; }
+have opencode-voice && pass "opencode-voice: $(command -v opencode-voice)" \
+             || { fail "falta opencode-voice"; info "cp local/.local/bin/opencode-voice ~/.local/bin/ && chmod +x"; }
+have bun && pass "bun $(bun --version)" || { fail "falta bun (runtime del plugin)"; info "pkg install -y bun"; }
+
+# ----------------------------------------------- 5. dependencias plugin upstream
+echo
+echo "5) Plugin upstream @renjfk/opencode-voice (opcional)"
+have sox && pass "sox $(sox --version 2>&1 | head -1)" \
+        || { optional "sox no instalado (no requerido por el bridge Termux/Gemini)"; info "pkg install -y sox  (disponible: 14.8.1)"; }
+have whisper-cli && pass "whisper-cli $(command -v whisper-cli)" \
+                 || { optional "whisper-cli no instalado (el bridge usa Gemini)"; info "Termux no lo empaqueta: compilar whisper.cpp o usar sttEndpoint (API OpenAI-compatible)"; }
+have piper && pass "piper (TTS)" \
+           || { optional "piper no instalado (AGY usa su propio motor de salida)"; info "piper-tts necesita onnxruntime; en Termux usa TTS del sistema o el plugin propio"; }
+if have sox; then
+  if sox -d /dev/null trim 0 0.1 >/dev/null 2>&1; then
+    pass "sox puede abrir el dispositivo por defecto (-d)"
+  else
+    optional "sox no tiene driver de micrófono en Termux (sin ALSA/PulseAudio)"
+    info "El plugin upstream graba con 'sox -d'; en Android no existe /dev/snd."
+    info "Ruta soportada: bridge arecord (Termux:API) o sttEndpoint remoto."
+  fi
+fi
+
+# ------------------------------------------------------------------- 6. configs
+echo
+echo "6) Configuración"
+
+OC_CLI="$HOME/.config/opencode/cli.json"
+if [ -f "$OC_CLI" ] && grep -q 'voice' "$OC_CLI"; then
+  pass "cli.json registra el plugin voice"
+else
+  fail "cli.json NO registra el plugin voice"
+fi
+
+AGY_SETTINGS="$HOME/.gemini/antigravity-cli/settings.json"
+if [ -f "$AGY_SETTINGS" ] && grep -q '"voice-engine-addr"' "$AGY_SETTINGS"; then
+  pass "AGY settings.json tiene voice-engine-addr"
+else
+  fail "AGY settings.json sin voice-engine-addr"
+fi
+
+AGY_KEYS="$HOME/.gemini/antigravity-cli/keybindings.json"
+if [ -f "$AGY_KEYS" ] && grep -q '"voice.start_dictation"' "$AGY_KEYS"; then
+  pass "AGY keybindings.json tiene voice.start_dictation"
+else
+  fail "AGY keybindings.json sin voice.start_dictation"
+fi
+
+echo
+echo "== Resultado: $OK ok / $FAIL pendientes =="
+
+if [ "$1" = "--json" ]; then
+  cat <<'JSON'
+
+--- ~/.config/opencode/cli.json (plugin propio) ---
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "plugins": [{"package": "/data/data/com.termux/files/home/.config/opencode/plugins/voice"}]
+}
+
+--- ~/.config/opencode/cli.json (plugin upstream @renjfk/opencode-voice) ---
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "keybinds": { "session_rename": "none" },
+  "plugins": [
+    {
+      "package": "@renjfk/opencode-voice",
+      "options": {
+        "endpoint": "https://api.anthropic.com/v1",
+        "model": "claude-haiku-4-5",
+        "apiKeyEnv": "ANTHROPIC_API_KEY",
+        "sttEndpoint": "http://127.0.0.1:8000/v1",
+        "sttModel": "whisper-large-v3-turbo"
+      }
+    }
+  ]
+}
+
+--- ~/.gemini/antigravity-cli/settings.json ---
+{
+  "voice-engine-addr": "default"
+}
+
+--- ~/.gemini/antigravity-cli/keybindings.json ---
+{
+  "voice.start_dictation": ["f5"]
+}
+JSON
+fi
+
+[ "$FAIL" -eq 0 ]

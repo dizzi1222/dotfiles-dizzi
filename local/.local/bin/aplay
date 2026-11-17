@@ -1,72 +1,230 @@
 #!/data/data/com.termux/files/usr/bin/python3
 """
-aplay compatibility wrapper for Antigravity (AGY) CLI on Termux Android.
-Translates ALSA aplay calls into Termux:API audio playback via ffmpeg.
+aplay / paplay / pw-cat compatibility shim for Antigravity CLI (AGY) on Termux.
+
+AGY writes TTS audio to a player's stdin and keeps the pipe open while it
+speaks. The old shim called `sys.stdin.buffer.read()`, which waits for EOF —
+so nothing was ever played during a conversation.
+
+This shim reads PCM in small chunks, wraps each one in a WAV container and
+plays it with `termux-media-player` while the next chunk is still arriving.
+Playback starts after the first chunk (~0.5 s) and continues until stdin
+closes or SIGINT.
+
+Env knobs:
+  APLAY_CHUNK_MS   audio per playback chunk (default 500)
+  APLAY_DEBUG=1    verbose diagnostics on stderr
 """
 
-import sys, os, time, signal, subprocess, argparse
+import argparse
+import os
+import queue
+import signal
+import struct
+import subprocess
+import sys
+import threading
+import time
 
-prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
-tmp_dir = os.environ.get("TMPDIR", os.path.join(prefix, "tmp"))
-os.makedirs(tmp_dir, exist_ok=True)
+PREFIX = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+TMPDIR = os.environ.get("TMPDIR", os.path.join(PREFIX, "tmp"))
+os.makedirs(TMPDIR, exist_ok=True)
 
-# Parse typical aplay arguments
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument("-r", "--rate", type=int, default=24000)
-parser.add_argument("-c", "--channels", type=int, default=1)
-parser.add_argument("-f", "--format", type=str, default="S16_LE")
-parser.add_argument("-t", "--file-type", type=str, default="raw")
-parser.add_argument("-D", "--device", type=str, default=None)
-parser.add_argument("-q", "--quiet", action="store_true")
-parser.add_argument("-v", "--verbose", action="store_true")
-parser.add_argument("-N", "--nonblock", action="store_true")
-parser.add_argument("input", nargs="?", default="-")
+DEBUG = os.environ.get("APLAY_DEBUG") == "1"
+AUDIO_ENV = os.environ.copy()
+AUDIO_ENV.pop("LD_LIBRARY_PATH", None)
 
-args, unknown = parser.parse_known_args()
 
-wav_file = os.path.join(tmp_dir, f"agy_play_{os.getpid()}.wav")
+def log(msg):
+    if DEBUG:
+        sys.stderr.write("[aplay] %s\n" % msg)
+        sys.stderr.flush()
 
-def cleanup(signum=None, frame=None):
-    subprocess.run(["termux-media-player", "stop"], capture_output=True)
-    if os.path.exists(wav_file):
-        try: os.remove(wav_file)
-        except: pass
-    sys.exit(0)
 
-signal.signal(signal.SIGINT, cleanup)
-signal.signal(signal.SIGTERM, cleanup)
-signal.signal(signal.SIGHUP, cleanup)
+def parse_args(argv):
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-r", "--rate", type=int, default=24000)
+    parser.add_argument("-c", "--channels", type=int, default=1)
+    parser.add_argument("-f", "--format", type=str, default="S16_LE")
+    parser.add_argument("-t", "--file-type", type=str, default="raw")
+    parser.add_argument("-D", "--device", type=str, default=None)
+    parser.add_argument("-q", "--quiet", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-N", "--nonblock", action="store_true")
+    parser.add_argument("-l", "--list-devices", action="store_true")
+    parser.add_argument("--version", action="store_true")
+    parser.add_argument("input", nargs="?", default="-")
+    args, _unknown = parser.parse_known_args(argv)
+    return args
 
-# If reading from stdin or file
-if args.input and args.input != "-":
-    in_file = args.input
-    subprocess.run([
-        "ffmpeg", "-loglevel", "quiet",
-        "-i", in_file,
-        wav_file, "-y"
-    ])
-else:
-    pcm_data = sys.stdin.buffer.read()
-    if pcm_data:
-        ff = subprocess.Popen([
-            "ffmpeg", "-loglevel", "quiet",
-            "-f", "s16le",
-            "-ar", str(args.rate),
-            "-ac", str(args.channels),
-            "-i", "pipe:0",
-            wav_file, "-y"
-        ], stdin=subprocess.PIPE)
-        ff.communicate(input=pcm_data)
 
-# Play audio via Android MediaPlayer
-if os.path.exists(wav_file) and os.path.getsize(wav_file) > 0:
-    subprocess.run(["termux-media-player", "play", wav_file], capture_output=True)
-    # Give MediaPlayer a moment to start
-    time.sleep(0.3)
-    for _ in range(600): # max 3 minutes
-        res = subprocess.run(["termux-media-player", "info"], capture_output=True, text=True)
-        if "No track" in res.stdout or "not playing" in res.stdout or "Paused" in res.stdout:
-            break
-        time.sleep(0.3)
+def wav_header(data_len, rate, channels):
+    block = channels * 2
+    return (
+        b"RIFF" + struct.pack("<I", 36 + data_len) + b"WAVEfmt "
+        + struct.pack("<IHHIIHH", 16, 1, channels, rate, rate * block, block, 16)
+        + b"data" + struct.pack("<I", data_len)
+    )
 
-cleanup()
+
+def media_play(path):
+    try:
+        subprocess.run(
+            ["termux-media-player", "play", path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=10,
+        )
+        return True
+    except Exception as exc:
+        log("play failed: %r" % (exc,))
+        return False
+
+
+def media_stop():
+    try:
+        subprocess.run(
+            ["termux-media-player", "stop"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        pass
+
+
+def play_file(path, rate, channels):
+    """Play a whole audio file (already decodable by ffmpeg)."""
+    wav = os.path.join(TMPDIR, "agy_play_%d.wav" % os.getpid())
+    try:
+        subprocess.run(
+            ["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
+             "-i", path, "-ar", str(rate), "-ac", str(channels), wav, "-y"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            env=AUDIO_ENV,
+            timeout=120,
+        )
+        if os.path.exists(wav) and os.path.getsize(wav) > 44:
+            media_play(wav)
+            duration = (os.path.getsize(wav) - 44) / float(rate * channels * 2)
+            time.sleep(max(0.1, duration))
+    finally:
+        try:
+            os.remove(wav)
+        except OSError:
+            pass
+
+
+def main(argv):
+    args = parse_args(argv)
+
+    if args.list_devices:
+        sys.stdout.write(
+            "**** List of PLAYBACK Hardware Devices ****\n"
+            "card 0: termuxapi [Termux:API Player], device 0: speaker [Speaker]\n"
+            "  Subdevices: 1/1\n  Subdevice #0: subdevice #0\n"
+        )
+        return 0
+    if args.version:
+        sys.stdout.write("aplay 1.2.11 (termux bridge)\n")
+        return 0
+
+    rate = max(8000, args.rate)
+    channels = max(1, args.channels)
+
+    if args.input not in (None, "-"):
+        play_file(args.input, rate, channels)
+        return 0
+
+    bytes_per_sec = rate * channels * 2
+    chunk_sec = max(0.2, float(os.environ.get("APLAY_CHUNK_MS", "500")) / 1000.0)
+    chunk_bytes = max(1024, int(bytes_per_sec * chunk_sec))
+
+    chunks = queue.Queue(maxsize=16)
+    finished = threading.Event()
+    stop_evt = threading.Event()
+    stats = {"chunks": 0, "first_at": None, "errors": 0}
+    t0 = time.time()
+
+    def reader():
+        buf = bytearray()
+        chunk_id = 0
+        stream = sys.stdin.buffer
+        while not stop_evt.is_set():
+            try:
+                data = stream.read(chunk_bytes)
+            except Exception:
+                break
+            if not data:
+                break
+            buf += data
+            while len(buf) >= chunk_bytes:
+                payload = bytes(buf[:chunk_bytes])
+                del buf[:chunk_bytes]
+                path = os.path.join(TMPDIR, "agy_chunk_%d_%d.wav" % (os.getpid(), chunk_id))
+                chunk_id += 1
+                with open(path, "wb") as fh:
+                    fh.write(wav_header(len(payload), rate, channels))
+                    fh.write(payload)
+                chunks.put(path)
+        if buf:
+            path = os.path.join(TMPDIR, "agy_chunk_%d_%d.wav" % (os.getpid(), chunk_id))
+            with open(path, "wb") as fh:
+                fh.write(wav_header(len(buf), rate, channels))
+                fh.write(bytes(buf))
+            chunks.put(path)
+        chunks.put(None)
+        finished.set()
+
+    def player():
+        while not stop_evt.is_set():
+            try:
+                path = chunks.get(timeout=0.2)
+            except queue.Empty:
+                if finished.is_set():
+                    break
+                continue
+            if path is None:
+                break
+            media_play(path)
+            if stats["first_at"] is None:
+                stats["first_at"] = time.time() - t0
+                log("first playback after %.2fs" % stats["first_at"])
+            stats["chunks"] += 1
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+            # Approximate real-time pacing so chunks queue instead of overlapping.
+            time.sleep(chunk_sec * 0.92)
+
+    def handle_signal(_signum, _frame):
+        stop_evt.set()
+        media_stop()
+
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        try:
+            signal.signal(sig, handle_signal)
+        except Exception:
+            pass
+
+    rt = threading.Thread(target=reader, daemon=True)
+    pt = threading.Thread(target=player, daemon=True)
+    rt.start()
+    pt.start()
+
+    while pt.is_alive() and not stop_evt.is_set():
+        pt.join(timeout=0.2)
+
+    stop_evt.set()
+    media_stop()
+    log("played %d chunks" % stats["chunks"])
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except KeyboardInterrupt:
+        sys.exit(0)

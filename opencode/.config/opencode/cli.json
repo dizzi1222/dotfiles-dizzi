@@ -8,6 +8,11 @@
     "theme.switch": "<leader>t",
     "variant.list": "<leader>v"
   },
+  "plugins": [
+    {
+      "package": "/data/data/com.termux/files/home/.config/opencode/plugins/voice"
+    }
+  ],
   "diffs": {
     "wrap": "word"
   },
@@ -16,6 +21,5 @@
     "scrollbar": false,
     "thinking": "show"
   },
-  "animations": true,
-  "plugins": ["/var/home/diego/dotfiles-dizzi/opencode/.config/opencode/plugins/voice"]
+  "animations": true
 }

@@ -1,95 +1,299 @@
 #!/data/data/com.termux/files/usr/bin/python3
 """
-arecord compatibility wrapper for Antigravity (AGY) CLI on Termux Android.
-Translates ALSA arecord calls into Termux:API microphone recording + ffmpeg PCM transcoding.
+arecord / pw-record compatibility shim for Antigravity CLI (AGY) on Termux.
+
+AGY opens a recorder and expects *continuous* PCM on stdout while the user
+talks (it runs a voice-activity detector on the stream). Termux has no
+/dev/snd, so the only microphone route is the Termux:API app, which records to
+a file and has no stdout mode.
+
+This shim starts `termux-microphone-record` once (AMR-NB, 8 kHz mono), follows
+the growing file and decodes each newly written frame to s16le PCM immediately.
+Result: AGY receives audio ~0.3 s after it happens instead of only at SIGINT.
+
+Env knobs:
+  ARECORD_SEGMENT   unused (kept for backwards compat)
+  ARECORD_DEBUG=1   verbose diagnostics on stderr
 """
 
-import sys, os, time, signal, subprocess, argparse
+import argparse
+import os
+import signal
+import struct
+import subprocess
+import sys
+import time
 
-prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
-tmp_dir = os.environ.get("TMPDIR", os.path.join(prefix, "tmp"))
-os.makedirs(tmp_dir, exist_ok=True)
+PREFIX = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+TMPDIR = os.environ.get("TMPDIR", os.path.join(PREFIX, "tmp"))
+os.makedirs(TMPDIR, exist_ok=True)
 
-# Log arguments for debugging
-log_file = os.path.join(tmp_dir, "arecord_calls.log")
-try:
-    with open(log_file, "a") as f:
-        f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] arecord called: {' '.join(sys.argv[1:])}\n")
-except Exception:
-    pass
+DEBUG = os.environ.get("ARECORD_DEBUG") == "1"
+LOG = os.path.join(TMPDIR, "arecord_calls.log")
+AUDIO_ENV = os.environ.copy()
+AUDIO_ENV.pop("LD_LIBRARY_PATH", None)
+AMR_HEADER = b"#!AMR\n"
 
-# Parse typical arecord arguments
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument("-r", "--rate", type=int, default=16000)
-parser.add_argument("-c", "--channels", type=int, default=1)
-parser.add_argument("-f", "--format", type=str, default="S16_LE")
-parser.add_argument("-t", "--file-type", type=str, default="raw")
-parser.add_argument("-D", "--device", type=str, default=None)
-parser.add_argument("-q", "--quiet", action="store_true")
-parser.add_argument("-v", "--verbose", action="store_true")
-parser.add_argument("-N", "--nonblock", action="store_true")
-parser.add_argument("output", nargs="?", default="-")
 
-args, unknown = parser.parse_known_args()
-
-rec_file = os.path.join(tmp_dir, f"agy_mic_{os.getpid()}.m4a")
-if os.path.exists(rec_file):
-    try: os.remove(rec_file)
-    except: pass
-
-running = True
-
-def stop_and_transcode(signum=None, frame=None):
-    global running
-    if not running:
+def log(msg):
+    if not DEBUG:
         return
-    running = False
-
-    # Stop Android microphone recording
-    subprocess.run(["termux-microphone-record", "-q"], capture_output=True)
-    time.sleep(0.3)
-
-    if os.path.exists(rec_file) and os.path.getsize(rec_file) > 0:
-        cmd = [
-            "ffmpeg", "-loglevel", "quiet",
-            "-i", rec_file,
-            "-ar", str(args.rate),
-            "-ac", str(args.channels),
-            "-f", "s16le"
-        ]
-        if args.output and args.output != "-":
-            cmd.extend([args.output, "-y"])
-            subprocess.run(cmd, capture_output=True)
-        else:
-            cmd.append("pipe:1")
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            while True:
-                chunk = proc.stdout.read(4096)
-                if not chunk: break
-                try:
-                    sys.stdout.buffer.write(chunk)
-                    sys.stdout.buffer.flush()
-                except BrokenPipeError:
-                    break
-            proc.wait()
-
     try:
-        if os.path.exists(rec_file):
-            os.remove(rec_file)
-    except: pass
-    sys.exit(0)
+        with open(LOG, "a") as fh:
+            fh.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    except Exception:
+        pass
 
-signal.signal(signal.SIGINT, stop_and_transcode)
-signal.signal(signal.SIGTERM, stop_and_transcode)
-signal.signal(signal.SIGHUP, stop_and_transcode)
 
-# Start recording via Termux:API
-subprocess.run(["termux-microphone-record", "-f", rec_file, "-l", "300"], capture_output=True)
+def parse_args(argv):
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-r", "--rate", type=int, default=16000)
+    parser.add_argument("-c", "--channels", type=int, default=1)
+    parser.add_argument("-f", "--format", type=str, default="S16_LE")
+    parser.add_argument("-t", "--file-type", type=str, default="raw")
+    parser.add_argument("-d", "--duration", type=int, default=0)
+    parser.add_argument("-D", "--device", type=str, default=None)
+    parser.add_argument("-q", "--quiet", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-N", "--nonblock", action="store_true")
+    parser.add_argument("-l", "--list-devices", action="store_true")
+    parser.add_argument("--version", action="store_true")
+    parser.add_argument("output", nargs="?", default="-")
+    args, _unknown = parser.parse_known_args(argv)
+    return args
 
-try:
-    while running:
-        time.sleep(0.5)
-except Exception:
-    pass
 
-stop_and_transcode()
+# AMR-NB frame size in bytes (header included) by frame-type index.
+AMR_FRAME_BYTES = {0: 13, 1: 14, 2: 16, 3: 18, 4: 20, 5: 21, 6: 27, 7: 32, 8: 6}
+AMR_SILENCE_BYTES = {9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+
+
+def amr_frame_len(header_byte):
+    ft = (header_byte >> 3) & 0x0F
+    return AMR_FRAME_BYTES.get(ft) or AMR_SILENCE_BYTES.get(ft, 1)
+
+
+def read_new(amr_path, pos):
+    try:
+        with open(amr_path, "rb") as fh:
+            fh.seek(pos)
+            return fh.read()
+    except FileNotFoundError:
+        return b""
+
+
+def decode_chunk(frames, rate, channels):
+    """Decode complete AMR frames to raw s16le on stdout."""
+    chunk_path = os.path.join(TMPDIR, "arecord_chunk_%d.amr" % os.getpid())
+    with open(chunk_path, "wb") as fh:
+        fh.write(b"#!AMR\n")
+        fh.write(frames)
+    try:
+        proc = subprocess.run(
+            [
+                "ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
+                "-f", "amr", "-i", chunk_path,
+                "-ar", str(rate), "-ac", str(channels), "-f", "s16le", "-",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            env=AUDIO_ENV,
+            timeout=15,
+        )
+        return proc.stdout or b""
+    except Exception as exc:  # pragma: no cover - defensive
+        log("ffmpeg failed: %r" % (exc,))
+        return b""
+    finally:
+        try:
+            os.remove(chunk_path)
+        except OSError:
+            pass
+
+
+def wav_header(data_len, rate, channels):
+    block = channels * 2
+    return (
+        b"RIFF" + struct.pack("<I", 36 + data_len) + b"WAVEfmt "
+        + struct.pack("<IHHIIHH", 16, 1, channels, rate, rate * block, block, 16)
+        + b"data" + struct.pack("<I", data_len)
+    )
+
+
+def main(argv):
+    args = parse_args(argv)
+
+    if args.list_devices:
+        sys.stdout.write(
+            "**** List of CAPTURE Hardware Devices ****\n"
+            "card 0: termuxapi [Termux:API Microphone], device 0: mic [Mic]\n"
+            "  Subdevices: 1/1\n  Subdevice #0: subdevice #0\n"
+        )
+        return 0
+    if args.version:
+        sys.stdout.write("arecord 1.2.11 (termux bridge)\n")
+        return 0
+
+    rate = max(8000, args.rate)
+    channels = max(1, args.channels)
+    amr_path = os.path.join(TMPDIR, "agy_mic_%d.amr" % os.getpid())
+    try:
+        if os.path.exists(amr_path):
+            os.remove(amr_path)
+    except OSError:
+        pass
+
+    out_path = None if args.output in (None, "-") else args.output
+    want_wav = args.file_type.lower() == "wav" or (out_path or "").lower().endswith(".wav")
+
+    sink = sys.stdout.buffer
+    if out_path:
+        sink = open(out_path, "wb")
+        if want_wav:
+            sink.write(wav_header(0, rate, channels))
+            sink.flush()
+
+    total_pcm = 0
+
+    def emit(pcm):
+        nonlocal total_pcm
+        if not pcm:
+            return
+        try:
+            sink.write(pcm)
+            sink.flush()
+            total_pcm += len(pcm)
+        except (BrokenPipeError, ValueError):
+            pass
+
+    max_seconds = args.duration if args.duration and args.duration > 0 else 350
+    recorder = subprocess.Popen(
+        [
+            "termux-microphone-record", "-f", amr_path,
+            "-e", "amr_nb", "-r", "8000", "-c", "1", "-l", str(max_seconds),
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    stop = {"now": False}
+
+    def handle_signal(_signum, _frame):
+        stop["now"] = True
+
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        try:
+            signal.signal(sig, handle_signal)
+        except Exception:
+            pass
+
+    started = time.time()
+    pos = 0
+    pending = b""
+    header_consumed = False
+    saw_file = False
+    first_bytes_at = None
+
+    def drain():
+        nonlocal pos, pending, header_consumed, first_bytes_at
+        new = read_new(amr_path, pos)
+        if not new:
+            return
+        pos += len(new)
+        pending += new
+        if not header_consumed:
+            if len(pending) < len(AMR_HEADER):
+                return
+            if pending.startswith(AMR_HEADER):
+                pending = pending[len(AMR_HEADER):]
+            else:
+                log("AMR header ausente; intentando decodificar como flujo crudo")
+            header_consumed = True
+        frames = bytearray()
+        while len(pending) >= 1:
+            need = amr_frame_len(pending[0])
+            if len(pending) < need:
+                break
+            frames += pending[:need]
+            pending = pending[need:]
+        if frames:
+            pcm = decode_chunk(bytes(frames), rate, channels)
+            if pcm and first_bytes_at is None:
+                first_bytes_at = time.time() - started
+                log("first PCM after %.2fs" % first_bytes_at)
+            emit(pcm)
+
+    # Give Termux:API a moment to create the file; fail fast instead of hanging.
+    deadline = time.time() + 8.0
+    while not stop["now"]:
+        if os.path.exists(amr_path):
+            saw_file = True
+            break
+        if recorder.poll() is not None:
+            break
+        if time.time() > deadline:
+            break
+        time.sleep(0.1)
+
+    if not saw_file:
+        err = (
+            "arecord: Termux:API no creó el archivo de audio.\n"
+            "  Causa típica: permiso RECORD_AUDIO denegado o app Termux:API cerrada.\n"
+            "  Arréglalo: Ajustes > Apps > Termux:API > Permisos > Micrófono > Permitir\n"
+        )
+        sys.stderr.write(err)
+        try:
+            recorder.terminate()
+        except Exception:
+            pass
+        return 2
+
+    # Stream until the recorder is asked to stop (SIGINT/SIGTERM from AGY).
+    while not stop["now"]:
+        drain()
+        if recorder.poll() is not None and not read_new(amr_path, pos):
+            break
+        if args.duration and (time.time() - started) >= args.duration:
+            break
+        time.sleep(0.08)
+
+    # Final drain: flush frames written before stop.
+    try:
+        subprocess.run(
+            ["termux-microphone-record", "-q"], capture_output=True, timeout=5
+        )
+    except Exception:
+        pass
+    try:
+        recorder.wait(timeout=5)
+    except Exception:
+        try:
+            recorder.kill()
+        except Exception:
+            pass
+    for _ in range(5):
+        drain()
+        time.sleep(0.05)
+
+    if out_path and want_wav:
+        try:
+            sink.seek(0)
+            sink.write(wav_header(total_pcm, rate, channels))
+            sink.seek(0, os.SEEK_END)
+        except Exception:
+            pass
+    if out_path:
+        try:
+            sink.close()
+        except Exception:
+            pass
+
+    log("done: %d bytes pcm, first at %s" % (total_pcm, first_bytes_at))
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except KeyboardInterrupt:
+        sys.exit(0)
