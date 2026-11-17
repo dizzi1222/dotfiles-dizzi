@@ -189,22 +189,38 @@ print_step "6/23: CLI Modernas"
 pkg install -y bat eza fd ripgrep fzf jq tree htop ncdu duf dust zoxide >/dev/null 2>&1
 print_success "CLI modernas"
 
-# btop: no está en los repos de Termux → instala el binario musl estático (aarch64)
-# desde GitHub Releases (aristocratos/btop). Binario fully-static, no necesita glibc.
-print_installing "btop (monitor interactivo - GitHub Releases)..."
-BTOP_VER=$(curl -s https://api.github.com/repos/aristocratos/btop/releases/latest \
-  | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
-[[ -z "$BTOP_VER" ]] && BTOP_VER="v1.4.8"
-BTOP_TMP=$(mktemp -d)
-if curl -fsSL --retry 3 -o "$BTOP_TMP/btop.tar.gz" \
-  "https://github.com/aristocratos/btop/releases/download/$BTOP_VER/btop-aarch64-unknown-linux-musl.tar.gz" \
-  && tar -xzf "$BTOP_TMP/btop.tar.gz" -C "$BTOP_TMP" \
-  && install -m 755 "$BTOP_TMP/btop/bin/btop" "$PREFIX/bin/btop"; then
-  print_success "btop $BTOP_VER instalado (\$PREFIX/bin/btop)"
+# btop oficial requiere leer /proc/stat, que Android bloquea para apps sin root.
+# En dispositivos no rooteados usamos el fork Termux non-root, que degrada las
+# métricas bloqueadas y conserva memoria, procesos y red sin lanzar excepciones.
+print_installing "btop (monitor interactivo)..."
+if [ "$(id -u)" -eq 0 ] || head -n 1 /proc/stat >/dev/null 2>&1; then
+  pkg remove -y btop-termux-noroot >/dev/null 2>&1 || true
+  if pkg install -y root-repo >/dev/null 2>&1 \
+    && pkg install -y btop >/dev/null 2>&1; then
+    print_success "btop oficial instalado (\$PREFIX/bin/btop)"
+  else
+    print_warning "btop: no se pudo instalar desde root-repo (revisa repositorios)"
+  fi
 else
-  print_warning "btop: descarga falló (revisa red)"
+  BTOP_NOROOT_VERSION="1.4.7-termux-noroot.3"
+  BTOP_NOROOT_SHA256="c39bd19140063df09ecd34d117e2ad8f852fc117e70dd049d49348a74d267407"
+  BTOP_NOROOT_TMP=$(mktemp -d)
+  BTOP_NOROOT_DEB="$BTOP_NOROOT_TMP/btop-termux-noroot_1.4.7_aarch64.deb"
+  if curl -fsSL --retry 3 -o "$BTOP_NOROOT_DEB" \
+    "https://github.com/kml93/btop-termux-no_root/releases/download/v$BTOP_NOROOT_VERSION/btop-termux-noroot_1.4.7_aarch64.deb" \
+    && printf '%s  %s\n' "$BTOP_NOROOT_SHA256" "$BTOP_NOROOT_DEB" \
+      | sha256sum -c - >/dev/null 2>&1; then
+    pkg remove -y btop >/dev/null 2>&1 || true
+    if pkg install -y "$BTOP_NOROOT_DEB" >/dev/null 2>&1; then
+      print_success "btop $BTOP_NOROOT_VERSION instalado (sin root)"
+    else
+      print_warning "btop: no se pudo instalar el paquete Termux non-root"
+    fi
+  else
+    print_warning "btop: descarga o checksum falló (revisa red)"
+  fi
+  rm -rf "$BTOP_NOROOT_TMP"
 fi
-rm -rf "$BTOP_TMP"
 
 # ═══════════════════════════════════════════════════════════
 # PASO 7: GitHub CLI
