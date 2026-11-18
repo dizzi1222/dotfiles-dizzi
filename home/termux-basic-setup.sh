@@ -1472,6 +1472,65 @@ cat <<'VOICEJSON'
 VOICEJSON
 
 # ═══════════════════════════════════════════════════════════
+# PASO 22e: Bitwarden como proveedor de credenciales (passkeys)
+# ═══════════════════════════════════════════════════════════
+print_step "22e/23: Bitwarden — Proveedor de credenciales y passkeys"
+
+setup_bitwarden_credential_provider() {
+  print_info "Configurando Bitwarden como proveedor de credenciales principal..."
+
+  # Verificar que Bitwarden esté instalado
+  if ! cmd package list packages 2>/dev/null | grep -q "com.x8bit.bitwarden"; then
+    print_warning "Bitwarden no está instalado — omitiendo este paso"
+    return 0
+  fi
+
+  # Verificar si ADB está disponible y conectado
+  local ADB_OK=0
+  if command -v adb &>/dev/null; then
+    # Intentar conectar por localhost (ADB wireless sobre loopback)
+    adb connect localhost:5555 &>/dev/null || true
+    sleep 1
+    if adb devices 2>/dev/null | grep -q "localhost:5555.*device"; then
+      ADB_OK=1
+    fi
+  fi
+
+  if [[ "$ADB_OK" == "1" ]]; then
+    # Autofill service
+    adb -s localhost:5555 shell settings put secure autofill_service \
+      "com.x8bit.bitwarden/com.x8bit.bitwarden.Autofill.AutofillService" 2>/dev/null && \
+      print_success "Autofill service → Bitwarden" || \
+      print_warning "No se pudo configurar autofill_service"
+
+    # Credential provider principal (passkeys)
+    adb -s localhost:5555 shell settings put secure credential_service_primary \
+      "com.x8bit.bitwarden/com.x8bit.bitwarden.Autofill.CredentialProviderService" 2>/dev/null && \
+      print_success "Credential provider primario → Bitwarden" || \
+      print_warning "No se pudo configurar credential_service_primary"
+
+    # Lista de proveedores (Bitwarden primero, Google como fallback)
+    adb -s localhost:5555 shell settings put secure credential_service \
+      "com.x8bit.bitwarden/com.x8bit.bitwarden.Autofill.CredentialProviderService:com.google.android.gms/com.google.android.gms.auth.api.credentials.credman.service.PasswordAndPasskeyService" 2>/dev/null && \
+      print_success "Credential provider list configurada (Bitwarden + Google fallback)" || \
+      print_warning "No se pudo configurar credential_service"
+
+    print_info "Verificando configuración:"
+    print_info "  autofill_service      = $(adb -s localhost:5555 shell settings get secure autofill_service 2>/dev/null)"
+    print_info "  credential_service_primary = $(adb -s localhost:5555 shell settings get secure credential_service_primary 2>/dev/null)"
+  else
+    print_warning "ADB no conectado — para aplicar manualmente:"
+    print_info "  1. Activa Depuración inalámbrica en Ajustes > Opciones de desarrollador"
+    print_info "  2. Ejecuta: adb connect localhost:5555"
+    print_info "  3. Vuelve a correr este script o ejecuta:"
+    print_info "     adb shell settings put secure autofill_service com.x8bit.bitwarden/com.x8bit.bitwarden.Autofill.AutofillService"
+    print_info "     adb shell settings put secure credential_service_primary com.x8bit.bitwarden/com.x8bit.bitwarden.Autofill.CredentialProviderService"
+  fi
+}
+
+setup_bitwarden_credential_provider
+
+# ═══════════════════════════════════════════════════════════
 # PASO 23: Finalización
 # ═══════════════════════════════════════════════════════════
 print_step "23/23: Finalización"
