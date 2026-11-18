@@ -141,3 +141,5 @@ x-scheme-handler/tonsite=org.telegram.desktop.desktop
 x-scheme-handler/unknown=io.github.zen_browser.zen.desktop
 x-scheme-handler/discord-1570203948462247956=discord-1570203948462247956.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/grokbot=grok-bot.desktop
+x-scheme-handler/sand=grok-bot.desktop
