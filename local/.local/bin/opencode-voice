@@ -20,10 +20,13 @@
  *   VOICE_THRESHOLD  umbral RMS 0..1 forzado (si se omite, adaptativo)
  *   VOICE_DEVICE     dispositivo PipeWire/Pulse (def. @DEFAULT_SOURCE@)
  */
-import { spawn } from "node:child_process"
-import { accessSync, constants, readFileSync, writeFileSync, existsSync } from "node:fs"
-import { delimiter, join } from "node:path"
+import { spawn, spawnSync } from "node:child_process"
+import { accessSync, constants, readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from "node:fs"
+import { delimiter, dirname, join } from "node:path"
 
+import { tmpdir } from "node:os"
+import { fileURLToPath } from "node:url"
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const RATE = 16000
 const CHANNELS = 1
 const FRAME_MS = 20
@@ -34,7 +37,7 @@ const MIN_UTTERANCE_MS = 350
 const START_FRAMES = 5
 
 type Config = {
-  provider: "gemini" | "openai"
+  provider: "gemini" | "openai" | "faster-whisper"
   model: string
   language: string
   silenceMs: number
@@ -44,10 +47,10 @@ type Config = {
 
 const env = process.env
 const config: Config = {
-  provider: (env.VOICE_PROVIDER as Config["provider"]) ?? "gemini",
+  provider: (env.VOICE_PROVIDER as Config["provider"]) ?? (env.PREFIX?.includes("com.termux") ? "gemini" : "faster-whisper"),
   model:
     env.VOICE_MODEL ??
-    ((env.VOICE_PROVIDER as string) === "openai" ? "gpt-4o-mini-transcribe" : "gemini-2.5-flash"),
+    (env.VOICE_PROVIDER === "openai" ? "gpt-4o-mini-transcribe" : (env.VOICE_PROVIDER === "gemini" || (!env.VOICE_PROVIDER && env.PREFIX?.includes("com.termux"))) ? "gemini-2.5-flash" : "small"),
   language: env.VOICE_LANGUAGE ?? "es",
   silenceMs: Number(env.VOICE_SILENCE_MS ?? 700),
   threshold: env.VOICE_THRESHOLD ? Number(env.VOICE_THRESHOLD) : undefined,
@@ -74,6 +77,112 @@ function apiKey(): string {
   if (key) return key
   throw new Error("GOOGLE_API_KEY no está definida")
 }
+
+function pythonCommand() {
+  if (env.OPENCODE_VOICE_PYTHON) return { executable: env.OPENCODE_VOICE_PYTHON, args: [] }
+  if (process.platform === "win32") return { executable: "py", args: ["-3.12"] }
+  return { executable: "python3", args: [] }
+}
+
+let fasterWhisperInstalled
+function fasterWhisperReady() {
+  if (fasterWhisperInstalled !== undefined) return fasterWhisperInstalled
+  const python = pythonCommand()
+  const result = spawnSync(python.executable, [...python.args, "-c", "import faster_whisper"], {
+    encoding: "utf8",
+    windowsHide: true,
+    timeout: 10000,
+  })
+  fasterWhisperInstalled = result.status === 0
+  return fasterWhisperInstalled
+}
+
+let whisperServer = null
+let whisperServerBuffer = ""
+let whisperServerReady = null
+const whisperPending = []
+
+function rejectWhisperServer(error) {
+  whisperServerReady?.reject?.(error)
+  whisperServerReady = null
+  whisperServer = null
+  while (whisperPending.length) whisperPending.shift().reject(error)
+}
+
+function ensureWhisperServer() {
+  if (whisperServer && whisperServer.exitCode === null) return whisperServerReady.promise
+  const helper = join(SCRIPT_DIR, "voice-stt-faster-whisper.py")
+  const python = pythonCommand()
+  whisperServer = spawn(python.executable, [...python.args, helper, "--server", config.model, config.language], {
+    stdio: ["pipe", "pipe", "pipe"],
+    windowsHide: true,
+    env,
+  })
+  whisperServerReady = {}
+  whisperServerReady.promise = new Promise((resolve, reject) => {
+    whisperServerReady.resolve = resolve
+    whisperServerReady.reject = reject
+  })
+  whisperServer.stdout.on("data", (chunk) => {
+    whisperServerBuffer += chunk.toString()
+    const lines = whisperServerBuffer.split(/\r?\n/)
+    whisperServerBuffer = lines.pop() ?? ""
+    for (const line of lines) {
+      if (!line.trim()) continue
+      try {
+        const result = JSON.parse(line)
+        if (result.ready) {
+          whisperServerReady.resolve()
+          continue
+        }
+        const pending = whisperPending.shift()
+        if (!pending) continue
+        if (result.error) pending.reject(new Error(result.error))
+        else pending.resolve(clean(String(result.text ?? "")))
+      } catch (error) {
+        const pending = whisperPending.shift()
+        pending?.reject(error)
+      }
+    }
+  })
+  whisperServer.stderr.on("data", (chunk) => {
+    if (env.VOICE_DEBUG) emit({ type: "debug", message: chunk.toString().trim() })
+  })
+  whisperServer.on("error", rejectWhisperServer)
+  whisperServer.on("close", (code) => {
+    if (code !== 0) rejectWhisperServer(new Error(`faster-whisper terminó con code=${code}`))
+  })
+  return whisperServerReady.promise
+}
+
+function shutdownWhisperServer() {
+  if (whisperServer && whisperServer.exitCode === null) whisperServer.kill()
+  whisperServer = null
+  whisperServerReady = null
+  whisperServerBuffer = ""
+}
+
+
+async function transcribeFasterWhisper(wav) {
+  if (!fasterWhisperReady()) {
+    throw new Error("faster-whisper no está instalado; ejecuta: py -3.12 -m pip install faster-whisper")
+  }
+  const directory = mkdtempSync(join(tmpdir(), "opencode-voice-whisper-"))
+  const path = join(directory, "speech.wav")
+  writeFileSync(path, wav)
+  try {
+    await ensureWhisperServer()
+    return await new Promise((resolve, reject) => {
+      whisperPending.push({ resolve, reject })
+      whisperServer.stdin.write(`${path}\n`)
+    })
+  } finally {
+    // El servidor ya leyó el WAV cuando resuelve la petición; el directorio se
+    // elimina después en la cola para no borrar el archivo mientras se procesa.
+    setTimeout(() => rmSync(directory, { recursive: true, force: true }), 0).unref?.()
+  }
+}
+
 
 /* ---------------------------------- audio --------------------------------- */
 
@@ -112,6 +221,7 @@ function rms(frame: Buffer): number {
 
 async function transcribe(pcm: Buffer, durationMs: number): Promise<string> {
   const wav = toWav(pcm)
+  if (config.provider === "faster-whisper") return transcribeFasterWhisper(wav)
   if (config.provider === "openai") {
     const form = new FormData()
     form.append("file", new Blob([wav], { type: "audio/wav" }), "speech.wav")
@@ -491,7 +601,7 @@ async function doctor() {
   }
   push(`provider=${config.provider} model=${config.model} language=${config.language}`)
 
-  const hasKey = config.provider === "openai" ? Boolean(env.OPENAI_API_KEY) : Boolean(env.GOOGLE_API_KEY || env.GEMINI_API_KEY)
+  const hasKey = config.provider === "faster-whisper" ? fasterWhisperReady() : config.provider === "openai" ? Boolean(env.OPENAI_API_KEY) : Boolean(env.GOOGLE_API_KEY || env.GEMINI_API_KEY)
   push(`api_key=${hasKey ? "ok" : "MISSING"}`)
 
   // 4 s de captura para medir el ruido de fondo
@@ -559,11 +669,11 @@ switch (command) {
       console.error("uso: opencode-voice transcribe <fichero.wav|pcm>")
       process.exit(2)
     }
-    await transcribeFile(argument)
+    try { await transcribeFile(argument) } finally { shutdownWhisperServer() }
     break
   }
   case "doctor": {
-    await doctor()
+    try { await doctor() } finally { shutdownWhisperServer() }
     break
   }
   default: {
@@ -579,3 +689,5 @@ process.on("SIGTERM", () => {
 process.on("SIGINT", () => {
   void shutdown(0)
 })
+
+process.on("exit", () => { if (whisperServer) whisperServer.kill() })
