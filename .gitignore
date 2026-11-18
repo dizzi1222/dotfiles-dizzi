@@ -92,6 +92,31 @@ codex/.codex/log/
 codex/.codex/plugins/
 codex/.codex/vendor_imports/
 
+# ═══════════════════════════════════════════════════════════
+# GROK CLI - credenciales y estado local NUNCA al repo
+# Solo se versiona grok/.grok/config.toml
+# ═══════════════════════════════════════════════════════════
+grok/.grok/auth.json
+grok/.grok/auth.json.lock
+grok/.grok/auth.json.commit.lock
+grok/.grok/mcp_credentials.json
+grok/.grok/agent_id
+grok/.grok/sessions/
+grok/.grok/logs/
+grok/.grok/memory-v2/
+grok/.grok/memtrace/
+grok/.grok/process-records/
+grok/.grok/worktrees.db
+grok/.grok/*.lock
+grok/.grok/*cache*
+grok/.grok/active_sessions.json
+grok/.grok/settings_cache.json
+grok/.grok/models_cache.json
+grok/.grok/experiments_remote.json
+grok/.grok/version.json
+grok/.grok/slash-mru.json
+grok/.grok/tip_cursor.json
+
 # MCP específico
 .mcp-global.json.local
 mcp-config.local.json

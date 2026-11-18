@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=DeepSeek Harness
+Comment=Start the local DeepSeek Harness web interface
+Exec=/home/diego/.npm-global/bin/dsh web
+TryExec=/home/diego/.npm-global/bin/dsh
+Terminal=false
+Type=Application
+Icon=internet-web-browser
+Categories=Development;
+StartupNotify=true

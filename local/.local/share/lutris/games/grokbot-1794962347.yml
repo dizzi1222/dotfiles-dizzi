@@ -1,0 +1,4 @@
+game:
+  args: -e /home/diego/.npm-global/bin/grokbot
+  exe: /home/diego/.local/bin/kitty
+  working_dir: /home/diego
