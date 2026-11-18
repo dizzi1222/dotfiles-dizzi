@@ -61,6 +61,23 @@ reducido a PNG de 192×192. Termux:Widget requiere que el archivo se llame `<scr
 
 Licencia de los recursos de Neovim: [MIT](dynamic_shortcuts/icons/LICENSE.neovim).
 
+## Hermes Agent: dotfiles, workspace y estado privado
+
+- La carpeta completa `HERMES AI/` vive en este directorio de Termux y `~/HERMES AI` apunta a ella mediante un symlink.
+  El atajo crea el enlace si falta, pero no reemplaza una carpeta existente que apunte a otra ubicación. Inicia
+  el agente en ese workspace y, sin argumentos, abre el TUI con `--continue`: retoma la sesión de ese terminal
+  cuando existe y, si no, la sesión reciente del TUI o de CLI.
+- La configuración versionada está en `hermes/`: `config.yaml`, `SOUL.md` y `profiles/*/config.yaml`.
+  `hermes/link-configs.sh` enlaza esos archivos dentro de `/root/hermes-user/.hermes`; cualquier configuración
+  previa que no estuviera enlazada se conserva con el sufijo `.pre-dotfiles-*`.
+- `hermes/patch-gateway-startup.sh` corrige el timeout fijo del TUI: inicio y recuperación usan la espera
+  adaptativa del gateway (60 s iniciales, hasta 300 s mientras el proceso progresa) y el proceso Node espera
+  hasta 360 s. El atajo solo recompila si faltan los artefactos corregidos y revierte los cambios de fuentes
+  al salir para no dejar Hermes permanentemente modificado ni frenar futuras actualizaciones.
+- Las credenciales y los datos mutables permanecen fuera del repositorio en `/root/hermes-user/.hermes`:
+  `.env`, `auth.json`, sesiones/base de datos y memoria dinámica. No copiar ni commitear esos archivos.
+- El setup de Termux copia el atajo `dynamic_shortcuts/hermes` desde dotfiles a Termux:Widget y `~/.shortcuts`.
+
 ## Control de volumen por aplicación en Xiaomi
 
 **Probado en el dispositivo del propietario, quien confirmó que funciona:**

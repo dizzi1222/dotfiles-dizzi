@@ -1,0 +1,47 @@
+TU EQUIPO EN HERMES · Julio Barroeta (@julio.tomoko)
+
+Cuatro agentes ya hechos para tu negocio y una Configuradora que los adapta a ti en unos minutos:
+  · presupuestos: contesta a quien pide precio y prepara el presupuesto con tus tarifas
+  · cobros: revisa tus facturas pendientes y prepara los recordatorios, de más suave a más firme
+  · agenda: cada lunes te resume la semana y lo que falta por cerrar
+  · contenido: de una nota de voz saca tus publicaciones para Instagram, LinkedIn y Google, y contesta reseñas
+
+Todos preparan borradores: lo que sale hacia un cliente lo apruebas tú.
+
+
+ANTES DE EMPEZAR
+  1. Hermes instalado y con cerebro (el modelo local o una clave de OpenRouter). Si aún no lo tienes, sigue la guía del
+     curso, capítulos 2 y 3.
+  2. Mac con chip de Apple o Windows, con la app de escritorio de Hermes.
+
+
+CÓMO SE USA (unos 10 minutos)
+  1. Arrastra esta carpeta, «Tu equipo en Hermes», a tu carpeta de Descargas.
+  2. Abre Hermes y, en el chat del agente principal, escribe:
+
+       Lee el archivo ~/Downloads/Tu equipo en Hermes/EMPEZAR.md y sigue sus instrucciones.
+
+  3. La Configuradora te hará unas preguntas sobre tu negocio, de una en una. Si prefieres probar antes, dile que
+     quieres el ejemplo (un catering inventado).
+  4. Al final te pedirá permiso para instalar el equipo. Hermes te enseñará la orden antes de ejecutarla: apruébala.
+  5. Abre la pestaña Bots (si no los ves, cierra y abre la app) y prueba un encargo con cada uno.
+
+Tus datos se quedan en tu ordenador, en la carpeta ~/Mi negocio. Si cambian tus precios o tu forma de trabajar, edita
+esa carpeta o vuelve a abrir la Configuradora.
+
+
+QUÉ HACE EL INSTALADOR (instalar-equipo.sh)
+Crea los cuatro agentes como lo hace el botón «New Agent» de la app: copia el cerebro y la clave del agente principal
+(nunca los envía a ningún sitio), les pone sus instrucciones y sus skills y les quita la terminal y el navegador, que no
+necesitan. No toca tu agente principal ni los agentes que ya tengas. Puedes leerlo antes: es un archivo de texto.
+
+
+SEGURIDAD
+  · Nunca pegues una clave en el chat. Las claves van en Settings → Providers.
+  · Empieza con el ejemplo o con datos inventados. Los datos reales de clientes, cuando ya sepas cómo trabajan.
+  · Si un agente te propone enviar, pagar o borrar algo, revísalo tú.
+
+Si te atascas, pregunta en el grupo de WhatsApp con una captura de pantalla.
+
+Hermes Agent es de Nous Research (licencia MIT). Este pack no está hecho ni revisado por Nous Research.
+Probado con Hermes 0.22 (octubre de 2026).

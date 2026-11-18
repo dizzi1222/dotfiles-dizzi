@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curso Hermes Agent desde cero · Guía</title>
+<style>
+  :root { --bg:#0e1117; --card:#171c26; --line:#2a3242; --text:#eef1f6; --muted:#a8b3c7; --blue:#5aa2ff;
+          --amber:#ffbe4d; --green:#4fd18b; --coral:#ff7a6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:21px/1.55 Inter, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:40px 24px 80px; }
+  h1 { font-size:46px; line-height:1.15; margin:0 0 8px; }
+  h2 { font-size:32px; margin:56px 0 14px; padding-top:18px; border-top:2px solid var(--line); }
+  h2 .n { color:var(--blue); margin-right:10px; }
+  h3 { font-size:24px; margin:26px 0 10px; color:var(--blue); }
+  p, li { color:var(--text); }
+  .sub { color:var(--muted); font-size:20px; }
+  .tag { display:inline-block; font-size:15px; font-weight:700; letter-spacing:.04em; padding:3px 10px; border-radius:999px;
+         background:#22304a; color:var(--blue); margin-right:6px; }
+  .ok { color:var(--green); } .money { color:var(--amber); } .warn { color:var(--coral); }
+  ol li, ul li { margin:6px 0; }
+  .prompt { position:relative; background:var(--card); border:1px solid var(--line); border-left:5px solid var(--blue);
+            border-radius:10px; padding:18px 20px 18px 20px; margin:14px 0; white-space:pre-wrap;
+            font:20px/1.5 "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  .prompt b { font-family:Inter, sans-serif; display:block; color:var(--muted); font-size:15px; letter-spacing:.06em;
+              text-transform:uppercase; margin-bottom:8px; }
+  button.copy { position:absolute; top:12px; right:12px; background:#22304a; color:var(--text); border:0; border-radius:8px;
+                padding:6px 12px; font-size:15px; cursor:pointer; }
+  button.copy:hover { background:#2f4366; }
+  .res { background:#13241b; border:1px solid #1f4a33; border-radius:10px; padding:12px 16px; margin:8px 0 18px; }
+  .res::before { content:"Resultado: "; font-weight:700; color:var(--green); }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 22px; margin:16px 0; }
+  table { border-collapse:collapse; width:100%; font-size:18px; margin:10px 0; }
+  th, td { border-bottom:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  code { font-family:"JetBrains Mono", ui-monospace, Menlo, monospace; background:#1f2533; padding:1px 6px; border-radius:5px; }
+  a { color:var(--blue); }
+  nav.toc { columns:2; font-size:19px; }
+  nav.toc a { text-decoration:none; }
+  @media (max-width:700px) { body { font-size:18px; } h1 { font-size:34px; } nav.toc { columns:1; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Hermes Agent desde cero</h1>
+<p class="sub">La guía del curso de Julio Barroeta · Grabado con Hermes Agent 0.22 (octubre de 2026) · Mac con chip de
+Apple (M1 o posterior) o Windows 10/11. El negocio de los ejemplos, <b>Catering Olivo</b>, es inventado.</p>
+
+<div class="box">
+<span class="tag">LO QUE VAS A TENER</span> Hermes instalado sin terminal, un cerebro gratis o de pago que no dispara la
+factura, y Sofía, una asistente con su ficha, su libreta (memoria), su manual (skill), su teléfono (Telegram) y una tarea
+que se hace sola cada lunes. Con los permisos bien puestos.
+</div>
+
+<nav class="toc">
+<a href="#c1">1 · Qué es Hermes</a><br><a href="#c2">2 · Instalarlo y primer chat</a><br>
+<a href="#c3">3 · El cerebro (modelo)</a><br><a href="#c4">4 · Por qué gasta tantos tokens</a><br>
+<a href="#c5">5 · La ficha de Sofía</a><br><a href="#c6">6 · La memoria</a><br><a href="#c7">7 · Skills y plugins</a><br>
+<a href="#c8">8 · Telegram</a><br><a href="#c9">9 · Tareas programadas</a><br><a href="#c10">10 · Seguridad en 9 puntos</a><br>
+<a href="#c11">11 · Lo que todavía hace mal</a><br><a href="#xa">Extra A · Gmail y otras apps</a><br>
+<a href="#xb">Extra B · Encendido 24 horas</a><br><a href="#datos">Datos de ejemplo</a>
+</nav>
+
+<h2 id="c1"><span class="n">1</span>Qué es Hermes y la idea que lo explica todo</h2>
+<ul>
+<li>Un <b>agente</b> de código abierto (licencia MIT) de Nous Research. ChatGPT te dice cómo hacer algo; un agente
+<b>lo hace</b>: abre archivos, usa herramientas, recuerda y te escribe al móvil.</li>
+<li>Hermes es gratis. <b>El cerebro (el modelo de IA) va aparte</b>: uno gratis en tu ordenador o uno de pago por uso.</li>
+<li>Para un proceso que siempre es igual (pasar datos de un formulario a una hoja), una automatización tipo n8n es más
+barata y fiable. El agente vale cuando hay que entender, redactar o decidir.</li>
+</ul>
+<div class="box"><span class="tag">LA IDEA</span> Hermes es un <b>empleado nuevo en su primer día</b>. Necesita un
+<b>cerebro</b> (capítulo 3), una <b>ficha</b> con quién es y qué puede tocar (5), una <b>libreta</b> (6), sus
+<b>manuales</b> (7), un <b>teléfono</b> (8) y una <b>agenda</b> (9). Y tú eres el <b>jefe que firma lo peligroso</b> (10).</div>
+
+<h2 id="c2"><span class="n">2</span>Instalarlo sin terminal y el primer chat</h2>
+<ol>
+<li>Recomendado: crea un <b>usuario de macOS solo para Hermes</b> (Ajustes → Usuarios y grupos). Así el agente no ve tus
+archivos de siempre (capítulo 10).</li>
+<li>Entra en <a href="https://hermes-agent.nousresearch.com/">hermes-agent.nousresearch.com</a> → Desktop → descarga.</li>
+<li>Abre el DMG y arrastra <b>Hermes</b> a Aplicaciones. Ábrelo.</li>
+<li>El arranque guiado no pide clave: funciona con un modelo de prueba. Te pregunta tu nombre, un color y el diseño
+(<b>Basic</b> = modo Simple), qué apps conectar (sáltalo), qué plugins (ninguno de momento) y te enseña la app.</li>
+<li>Para repetirlo: Settings → Run onboarding again. Sale una vez por usuario del ordenador.</li>
+</ol>
+<div class="prompt"><b>Encargo 1</b><button class="copy">Copiar</button>Hola. Tengo un catering de eventos con 4 empleados en Valencia. Explícame en 5 líneas qué podrías hacer por mi negocio y qué necesitarías de mí para empezar.</div>
+<ul>
+<li>El modelo de prueba (<code>nous/welcome</code>) es solo para empezar. En el capítulo 3 le das un cerebro de verdad.</li>
+<li>Idioma de la app: el selector de idioma de Settings. El agente te contesta en español aunque la app esté en inglés.</li>
+</ul>
+<p class="sub">En Windows: el instalador de la misma web o la Microsoft Store. En Linux: con la terminal.</p>
+
+<h2 id="c3"><span class="n">3</span>El cerebro: gratis en tu ordenador o de pago por uso</h2>
+<h3>A · Local (gratis y privado, más lento)</h3>
+<ol>
+<li>Settings → Providers → <b>Local Models</b> → Install runtime.</li>
+<li>Elige el modelo recomendado (★): <span class="ok">verde</span> = cabe en tu ordenador; <span class="money">ámbar</span>
+= cabe justo, más lento; <span class="warn">rojo</span> = no cabe.</li>
+<li>Download → <b>Use</b>. Nada sale de tu ordenador.</li>
+<li><b>Ojo:</b> el más pequeño del catálogo pesa 15 GB, así que en un ordenador de 16 GB de memoria no cabe ninguno. Entonces, el camino B.</li>
+</ol>
+<h3>B · De pago por uso (OpenRouter)</h3>
+<ol>
+<li><a href="https://openrouter.ai">openrouter.ai</a> → crea cuenta → añade unos dólares de saldo.</li>
+<li>Keys → crea una clave nueva <b>solo para Hermes</b> (ponle límite de gasto si te deja). No la enseñes a nadie.</li>
+<li>En Hermes: Settings → Providers → OpenRouter → pega la clave → elige modelo. El modelo por defecto, en Settings → Model.</li>
+</ol>
+<table>
+<tr><th>Modelo (OpenRouter)</th><th>Entrada · salida, por millón de tokens</th><th>Para qué</th></tr>
+<tr><td>DeepSeek V4.1 Flash 1017</td><td class="money">0,15 $ · 0,60 $</td><td>El día a día, barato</td></tr>
+<tr><td>GPT-6 Luna</td><td class="money">0,10 $ · 0,50 $</td><td>El día a día</td></tr>
+<tr><td>Claude Sonnet 5.5</td><td class="money">2 $ · 10 $</td><td>Lo que requiere criterio</td></tr>
+</table>
+<p class="sub">Precios de OpenRouter del 29-10-2026: cambian, míralos en su web. Hermes pide modelos con 64.000 tokens de
+contexto como mínimo.</p>
+<div class="prompt"><b>Encargo 2 · el mismo con los dos cerebros</b><button class="copy">Copiar</button>Lee el archivo ~/Catering Olivo/tarifas-catering-olivo.md y calcula el presupuesto para esta petición: comunión el sábado 14 de noviembre, 60 invitados, menú de picoteo con refrescos, en Paterna. Dame el desglose y el total.</div>
+<div class="res">2.340 € (1.680 de menú + 360 de refrescos + 300 de camareros).</div>
+
+<h2 id="c4"><span class="n">4</span>Por qué gasta tantos tokens (y cómo no arruinarte)</h2>
+<ul>
+<li>Un <b>token</b> es el trozo de palabra por el que te cobran: más o menos, tres cuartos de palabra.</li>
+<li>El cerebro no recuerda la conversación: en <b>cada mensaje</b> Hermes le vuelve a mandar sus instrucciones, sus
+herramientas, sus skills y todo lo que lleváis hablado. Cuanto más largo el chat y más cosas activadas, más cuesta
+cada mensaje.</li>
+<li>Para verlo: <code>/usage</code> (lo de esta conversación) e <code>/insights</code> (el resumen).</li>
+</ul>
+<div class="box"><span class="tag">4 REGLAS</span>
+<ol>
+<li><b>Un chat nuevo para cada tarea</b> (Cmd+N).</li>
+<li><b>No cambies de modelo a mitad de un chat largo</b>: el nuevo lo relee todo a precio completo.</li>
+<li><b>Activa solo las herramientas y skills que uses</b>: cada una viaja en cada mensaje.</li>
+<li><b>Modelo barato para el día a día</b> y <b>límite de gasto</b> en la clave de OpenRouter.</li>
+</ol></div>
+
+<h2 id="c5"><span class="n">5</span>La ficha de Sofía</h2>
+<ol>
+<li>Pestaña <b>Bots</b> → <b>New Agent</b>.</li>
+<li><b>Name:</b> Sofía · <b>Title:</b> Atención al cliente y presupuestos · <b>Description:</b> Contesta a los clientes de
+Catering Olivo y prepara sus presupuestos con nuestras tarifas.</li>
+<li><b>Advanced:</b> modelo (el que mejor te haya ido en el capítulo 3) · pega el SOUL.md de abajo · herramientas: deja
+<b>archivos</b> y <b>búsqueda web</b>; quita terminal, navegador y ejecución de código · «Copy API keys from the main
+profile», activado.</li>
+</ol>
+<div class="prompt"><b>SOUL.md de Sofía (sus instrucciones)</b><button class="copy">Copiar</button>Eres Sofía, la asistente de atención al cliente y presupuestos de Catering Olivo, un catering de eventos de Valencia con 4 empleados. El dueño es Andrés.
+
+Qué haces:
+- Contestas a los clientes que piden información o presupuesto.
+- Calculas los presupuestos con las tarifas de ~/Catering Olivo/tarifas-catering-olivo.md (o con tu skill de presupuestos).
+- Preparas el resumen de los eventos de la semana.
+
+Cómo lo haces:
+- Tuteas al cliente, con un tono cercano y profesional, sin emojis.
+- Das el desglose (menú, bebida, camareros, desplazamiento) y el total con el IVA incluido.
+- Recuerdas la señal del 30 % para reservar la fecha y la validez de 15 días.
+- Preguntas siempre por alergias e intolerancias.
+
+Lo que nunca haces:
+- Confirmar una fecha, dar un descuento o prometer algo que no esté en las tarifas: eso lo decide Andrés.
+- Enviar correos: solo preparas borradores.
+- Inventarte un precio: si falta un dato (invitados, lugar, menú), lo preguntas.</div>
+<div class="prompt"><b>Encargo 3</b><button class="copy">Copiar</button>Prepara la respuesta a este cliente: bautizo el domingo 8 de noviembre, 35 invitados, picoteo con refrescos, en Valencia.</div>
+<div class="res">1.390 € y señal de 417 €; pregunta por alergias.</div>
+
+<h2 id="c6"><span class="n">6</span>La memoria: su libreta</h2>
+<div class="prompt"><b>Encargo 4 · se lo dices una vez</b><button class="copy">Copiar</button>Recuerda esto para todas las conversaciones: 1) firma siempre como «Equipo de Catering Olivo»; 2) nuestro horario de atención es de lunes a viernes de 9:00 a 18:00 y lo pones al final de cada respuesta; 3) en las bodas, la prueba de menú para dos personas va incluida.</div>
+<div class="prompt"><b>Encargo 5 · en un chat nuevo (Cmd+N)</b><button class="copy">Copiar</button>Prepara la respuesta a esta empresa: presentación de producto el jueves 19 de noviembre, 50 invitados, menú cóctel con barra libre de dos horas, en Xàtiva (a 60 km de Valencia).</div>
+<div class="res">3.222 € (incluye 72 € de desplazamiento), firmado por el equipo y con el horario al final.</div>
+<ul>
+<li><code>/journey</code> abre el mapa de lo que ha aprendido: ahí lo revisas y lo borras.</li>
+<li>La memoria es pequeña a propósito (2.200 caracteres de notas y 1.375 de tu perfil). Los documentos largos, en archivos o skills.</li>
+</ul>
+
+<h2 id="c7"><span class="n">7</span>Skills y plugins: sus manuales y sus herramientas</h2>
+<ul><li><b>Memoria</b> = datos. <b>Skill</b> = un procedimiento («cómo hacemos los presupuestos»). <b>Plugin</b> = una capacidad nueva.</li></ul>
+<div class="prompt"><b>Encargo 6 · Sofía escribe su propia skill</b><button class="copy">Copiar</button>/learn cómo hacemos los presupuestos en Catering Olivo, a partir de ~/Catering Olivo/tarifas-catering-olivo.md</div>
+<div class="prompt"><b>Encargo 6 bis · probar la skill</b><button class="copy">Copiar</button>Usa tu skill de presupuestos: aniversario de una empresa, 60 invitados, cóctel con refrescos, en Valencia.</div>
+<div class="res">3.180 €.</div>
+<ul>
+<li>Skills de serie y para instalar: pestaña Skills. Plugins: el catálogo de 600 revisados (Capabilities → Plugins).</li>
+<li>Menos es más: cada skill y herramienta activa se envía en cada mensaje y cuesta. Desactiva lo que no uses (capítulo 4).</li>
+</ul>
+
+<h2 id="c8"><span class="n">8</span>Su teléfono: Telegram (y WhatsApp)</h2>
+<ol>
+<li>Messaging → Telegram → <b>Create with QR</b> → escanéalo con el móvil. Hermes crea el bot y pone tu ID en la lista.</li>
+<li>Solo te contesta a ti. Nunca actives «permitir a todos».</li>
+</ol>
+<div class="prompt"><b>Encargo 7 · por audio desde el móvil</b><button class="copy">Copiar</button>Sofía, me acaba de llamar Marta Ruiz: boda el sábado 5 de diciembre, 80 invitados, menú cóctel y barra libre de dos horas, en Valencia. Prepárame el presupuesto y la respuesta para mandársela.</div>
+<div class="res">4.960 €, señal de 1.488 € y la prueba de menú incluida.</div>
+<p><span class="warn">WhatsApp:</span> el puente que trae Hermes no es oficial (imita WhatsApp Web) y puede acabar en un
+bloqueo del número. Si lo usas, con un número aparte. Para clientes de verdad, la API oficial de WhatsApp Business.</p>
+
+<h2 id="c9"><span class="n">9</span>Su agenda: tareas que se hacen solas</h2>
+<ol>
+<li>Bots → Sofía → <b>Routines</b> → nueva → cada lunes a las 8:00 → entrega en Telegram.</li>
+<li>Ejecútala ahora para comprobarla.</li>
+<li>Ojo: las ejecuta el gateway de Hermes. Si el ordenador duerme, no salen (Settings → Advanced → Keep computer awake, o el extra B).</li>
+</ol>
+<div class="prompt"><b>Encargo 8 · la rutina del lunes</b><button class="copy">Copiar</button>Lee ~/Catering Olivo/eventos-semana.md y mándame un resumen de todos los eventos que hay en el archivo: para cada uno, qué falta por confirmar (señal del 30 %, número de invitados, alergias). Primero lo urgente. Máximo 10 líneas.</div>
+
+<h2 id="c10"><span class="n">10</span>Seguridad en 9 puntos</h2>
+<ol>
+<li><b>Usuario o máquina aparte.</b> Con el motor local, el agente tiene el mismo acceso que tu usuario: los perfiles no lo aíslan.</li>
+<li><b>Aprobaciones en manual:</b> Settings → Safety → <code>manual</code>. Nunca <code>off</code> (YOLO) en un negocio.</li>
+<li><b>Cada agente, solo sus herramientas.</b> Sofía no tiene terminal ni navegador porque no los necesita.</li>
+<li><b>Telegram solo con tu ID.</b> Sin lista, no contesta a nadie; nunca «permitir a todos».</li>
+<li><b>Conectores primero con cuentas de prueba</b> y leyendo los permisos que piden.</li>
+<li><b>Nada de datos reales de clientes</b> hasta que conozcas cómo trabaja.</li>
+<li><b>Claves temporales y con límite de gasto</b>, una por herramienta. Bórralas si no las usas.</li>
+<li><b>Lo sensible, con el modelo local:</b> no sale de tu ordenador.</li>
+<li><b>Revisa lo que entrega.</b> «Hecho» no siempre es hecho, y lo que manda a un cliente lo apruebas tú.</li>
+</ol>
+<p class="sub">De serie: una lista negra de órdenes que no se salta ni con YOLO, no escribe en <code>.ssh</code> ni en los
+<code>.env</code>, tapa las claves que lee y una aprobación sin respuesta en 5 minutos se deniega.</p>
+
+<h2 id="c11"><span class="n">11</span>Lo que todavía hace mal</h2>
+<ul>
+<li>El coste real: OpenRouter → Activity, y en Hermes <code>/usage</code> e <code>/insights</code>. El modelo local, 0 €.</li>
+<li>La memoria es pequeña; el modelo local es lento; WhatsApp no es oficial; cambia rapidísimo (actualiza la app cuando te lo pida).</li>
+<li>Hermes no sustituye lo que ya usas: se suma.</li>
+</ul>
+
+<h2 id="xa"><span class="n">Extra A</span>Gmail y otras apps (conectores)</h2>
+<ol>
+<li>Página <b>Connectors</b> → elige la app → inicia sesión una vez. Hermes te ofrece entrar con una cuenta gratuita de Nous
+Research.</li>
+<li>Prueba con una cuenta <b>de prueba</b>, nunca con la de tu empresa. Lee qué permisos pide antes de aceptar.</li>
+</ol>
+<div class="prompt"><b>Encargo 9</b><button class="copy">Copiar</button>Mira en el Gmail los correos de hoy que pidan presupuesto. Para cada uno, prepara un borrador de respuesta con nuestras tarifas. Ignora lo que no sea de clientes. No envíes nada: solo borradores.</div>
+<p class="sub">Los conectores pasan por la pasarela de Nous Research: tus correos viajan por ahí.</p>
+
+<h2 id="xb"><span class="n">Extra B</span>Encendido 24 horas en un servidor (VPS)</h2>
+<ul>
+<li>Las tareas programadas solo salen si Hermes está encendido. Si quieres que trabaje con el portátil cerrado, el motor va en un servidor y la app es solo la ventana.</li>
+<li>App → Settings → Gateways → conectar por SSH. Con «Create on» eliges en qué máquina vive cada agente.</li>
+<li>Ejemplo: Hostinger KVM 2, <span class="money">7,99 €/mes</span> con dos años (renueva a 14,99 €/mes; precio del 17-10-2026).</li>
+</ul>
+
+<h2 id="datos">Datos de ejemplo (Catering Olivo, inventado)</h2>
+<p>Crea la carpeta <code>~/Catering Olivo/</code> con dos archivos de texto: <b>tarifas-catering-olivo.md</b> y
+<b>eventos-semana.md</b>. Los tienes junto a esta guía.</p>
+
+<p class="sub" style="margin-top:48px">Julio Barroeta · @julio.tomoko · Hermes Agent es de Nous Research (MIT). Esta guía
+no está hecha ni revisada por Nous Research.</p>
+</main>
+<script>
+document.querySelectorAll('button.copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var box = b.parentElement.cloneNode(true);
+    box.querySelectorAll('b, button').forEach(function (n) { n.remove(); });
+    var text = box.textContent.trim();
+    try { navigator.clipboard.writeText(text); b.textContent = 'Copiado'; } catch (e) { b.textContent = 'Selecciona y copia'; }
+    setTimeout(function () { b.textContent = 'Copiar'; }, 1500);
+  });
+});
+</script>
+</body>
+</html>

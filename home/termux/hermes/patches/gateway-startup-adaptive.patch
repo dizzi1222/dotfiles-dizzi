@@ -1,0 +1,35 @@
+diff --git a/hermes_cli/gateway_runtime_attach.py b/hermes_cli/gateway_runtime_attach.py
+--- a/hermes_cli/gateway_runtime_attach.py
++++ b/hermes_cli/gateway_runtime_attach.py
+@@ -92,1 +92,2 @@
+-def attach_gateway(home: str | Path, *, start: bool, recover: bool = False, timeout: float) -> GatewayAttach:
++def attach_gateway(home: str | Path, *, start: bool, recover: bool = False,
++                   timeout: float | None = None) -> GatewayAttach:
+@@ -105,3 +106,6 @@
+     home = gateway_profile_home(home)
+-    receipt = (ensure_gateway_runtime(home, timeout=timeout, idle_exit=True) if start
+-               else discover_gateway_endpoint(home, timeout=min(timeout, DISCOVER_TIMEOUT)))
++    if start:
++        receipt = ensure_gateway_runtime(home, timeout=timeout, idle_exit=True)
++    else:
++        discover_timeout = DISCOVER_TIMEOUT if timeout is None else min(timeout, DISCOVER_TIMEOUT)
++        receipt = discover_gateway_endpoint(home, timeout=discover_timeout)
+diff --git a/ui-tui/scripts/gateway_bootstrap.py b/ui-tui/scripts/gateway_bootstrap.py
+--- a/ui-tui/scripts/gateway_bootstrap.py
++++ b/ui-tui/scripts/gateway_bootstrap.py
+@@ -51,3 +51,4 @@
+-    # The same attach `hermes gateway attach` runs; Ink keeps its own 30 s start budget.
++    # Let gateway start/recovery use the adaptive ensure deadline; discovery-only reconnects stay bounded.
+     try:
+-        attached = attach_gateway(get_hermes_home().resolve(), start=start, recover=recover, timeout=30)
++        attached = attach_gateway(get_hermes_home().resolve(), start=start, recover=recover,
++                                  timeout=None if start or recover else 30)
+diff --git a/ui-tui/src/localGatewayBootstrap.ts b/ui-tui/src/localGatewayBootstrap.ts
+--- a/ui-tui/src/localGatewayBootstrap.ts
++++ b/ui-tui/src/localGatewayBootstrap.ts
+@@ -37,1 +37,2 @@
+   const root = process.env.HERMES_PYTHON_SRC_ROOT ?? resolve(import.meta.dirname, '../../')
++  const timeout = start || recover ? 360_000 : 40_000
+@@ -41,1 +42,1 @@
+-    { cwd: root, env: { ...process.env, PYTHONPATH: root, HERMES_PYTHON_SRC_ROOT: root }, timeout: 40_000, maxBuffer: 1024 * 1024 })
++    { cwd: root, env: { ...process.env, PYTHONPATH: root, HERMES_PYTHON_SRC_ROOT: root }, timeout, maxBuffer: 1024 * 1024 })

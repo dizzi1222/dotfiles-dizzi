@@ -4,10 +4,43 @@ HERMES_LINUX_HOME="/root/hermes-user"
 HERMES_STATE_DIR="$HERMES_LINUX_HOME/.hermes"
 HERMES_BIN="$HERMES_LINUX_HOME/.local/bin/hermes"
 HERMES_PATH="$HERMES_LINUX_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+DOTFILES_ROOT=""
+for DOTFILES_CANDIDATE in "$HOME/dotfiles-dizzi" "$HOME/dotfiles-termux" "$HOME/dotfiles"; do
+  if [[ -f "$DOTFILES_CANDIDATE/home/termux/hermes/link-configs.sh" && -d "$DOTFILES_CANDIDATE/home/termux/HERMES AI" ]]; then
+    DOTFILES_ROOT="$DOTFILES_CANDIDATE"
+    break
+  fi
+done
+
+if [[ -z "$DOTFILES_ROOT" ]]; then
+  printf '%s\n' 'No se encontró la configuración de Hermes dentro de los dotfiles.' >&2
+  exit 1
+fi
+
+HERMES_DOTFILES_DIR="$DOTFILES_ROOT/home/termux/hermes"
+HERMES_WORKSPACE_SOURCE="$DOTFILES_ROOT/home/termux/HERMES AI"
+HERMES_WORKSPACE="$HOME/HERMES AI"
 
 if ! command -v proot-distro >/dev/null 2>&1; then
   printf '%s\n' 'Hermes Agent requiere proot-distro con Ubuntu instalado.' >&2
   exit 127
+fi
+
+if [[ -L "$HERMES_WORKSPACE" ]]; then
+  if [[ "$(readlink -f -- "$HERMES_WORKSPACE")" != "$(readlink -f -- "$HERMES_WORKSPACE_SOURCE")" ]]; then
+    printf 'El enlace de workspace existente apunta a otra ubicación; lo preservé: %s\n' "$HERMES_WORKSPACE" >&2
+    exit 1
+  fi
+elif [[ -e "$HERMES_WORKSPACE" ]]; then
+  printf 'Ya existe una carpeta de workspace no administrada por dotfiles; la preservé: %s\n' "$HERMES_WORKSPACE" >&2
+  exit 1
+else
+  ln -s -- "$HERMES_WORKSPACE_SOURCE" "$HERMES_WORKSPACE"
+fi
+
+if [[ ! -f "$HERMES_DOTFILES_DIR/link-configs.sh" ]]; then
+  printf 'No se encontró el configurador de Hermes: %s\n' "$HERMES_DOTFILES_DIR/link-configs.sh" >&2
+  exit 1
 fi
 
 export PROOT_NO_SECCOMP=1
@@ -17,9 +50,28 @@ if ! proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_
   exit 127
 fi
 
-# Open the TUI and resume the latest session unless explicit arguments were given.
-if [[ $# -eq 0 ]]; then
-  set -- --tui --resume latest
+if ! proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" /bin/bash "$HERMES_DOTFILES_DIR/link-configs.sh"; then
+  printf '%s\n' 'No se pudieron enlazar las configuraciones de Hermes desde dotfiles.' >&2
+  exit 1
 fi
 
-exec proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" "$@"
+restore_hermes_gateway_patch() {
+  if ! bash "$HERMES_DOTFILES_DIR/patch-gateway-startup.sh" restore; then
+    printf '%s\n' 'No se pudo restaurar automáticamente el checkout de Hermes; ejecuta patch-gateway-startup.sh restore.' >&2
+  fi
+}
+
+trap restore_hermes_gateway_patch EXIT
+if ! bash "$HERMES_DOTFILES_DIR/patch-gateway-startup.sh" apply; then
+  printf '%s\n' 'No se pudo preparar el arreglo de arranque del gateway de Hermes.' >&2
+  exit 1
+fi
+
+# Continue this terminal's session, falling back to the latest TUI/CLI session.
+if [[ $# -eq 0 ]]; then
+  set -- --tui --continue
+fi
+
+proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" HERMES_TUI_CWD="$HERMES_WORKSPACE" PATH="$HERMES_PATH" /bin/bash -c 'cd -- "$1" || exit 1; shift; exec "$@"' hermes "$HERMES_WORKSPACE" "$HERMES_BIN" "$@"
+HERMES_EXIT_CODE=$?
+exit "$HERMES_EXIT_CODE"
