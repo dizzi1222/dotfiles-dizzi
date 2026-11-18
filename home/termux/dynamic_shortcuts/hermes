@@ -1,0 +1,20 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+HERMES_LINUX_HOME="/root/hermes-user"
+HERMES_STATE_DIR="$HERMES_LINUX_HOME/.hermes"
+HERMES_BIN="$HERMES_LINUX_HOME/.local/bin/hermes"
+HERMES_PATH="$HERMES_LINUX_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+if ! command -v proot-distro >/dev/null 2>&1; then
+  printf '%s\n' 'Hermes Agent requiere proot-distro con Ubuntu instalado.' >&2
+  exit 127
+fi
+
+export PROOT_NO_SECCOMP=1
+
+if ! proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" --version >/dev/null 2>&1; then
+  printf '%s\n' 'Hermes Agent no está instalado en Ubuntu (proot).' >&2
+  exit 127
+fi
+
+exec proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" "$@"

@@ -772,7 +772,10 @@ if [[ ! "$stow_install" =~ ^[Nn]$ ]]; then
     # Stow desde la raíz: cada paquete del repo tiene estructura .config/.
     # No enlazar zsh/.zshrc: Termux mantiene su propio archivo y el PASO 9
     # selecciona un solo prompt; solo se comparte la configuración .p10k.zsh.
-    for pkg in nvim nixconf assets home Antigravity codex starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
+    # ~/.grok tiene que existir como directorio: si Stow pliega el paquete,
+    # auth.json y las sesiones quedarían dentro del repo.
+    mkdir -p "$HOME/.grok"
+    for pkg in nvim nixconf assets home Antigravity codex grok starship tmux opencode fastfetch bottom htop neofetch yazi zellij kew fish font fonts icons local mcphub etc; do
       [[ -d "$pkg" ]] && stow "$pkg" --adopt 2>/dev/null | grep -v "BUG" || true
     done
     [[ -f "zsh/.zshenv" ]] && ln -sfn "$DOTFILES/zsh/.zshenv" ~/.zshenv
@@ -941,10 +944,117 @@ if [[ ! "$ct_install" =~ ^[Nn]$ ]]; then
 fi
 
 # ═══════════════════════════════════════════════════════════
-# PASO 22b: Módulos Core (complemento)
+install_proot_agents() {
+# PASO 22b: Hermes Agent y Grok Build en Ubuntu/proot
+# ───────────────────────────────────────────────────────────
+# Ambos son builds Linux/glibc. Se mantienen dentro de Ubuntu y no se mezclan
+# con binarios nativos de Termux; Hermes usa un HOME aislado dentro del proot.
+# ═══════════════════════════════════════════════════════════
+print_step "22b/23: Hermes Agent + Grok Build (Ubuntu/proot)"
+read -p "¿Configurar Hermes Agent y Grok Build en Ubuntu/proot? [S/n]: " proot_agents_ok
+if [[ ! "$proot_agents_ok" =~ ^[Nn]$ ]]; then
+  read -p "¿Instalar Hermes Agent oficial? [S/n]: " hermes_install
+  read -p "¿Instalar Grok Build oficial? [S/n]: " grok_install
+
+  if [[ ! "$hermes_install" =~ ^[Nn]$ || ! "$grok_install" =~ ^[Nn]$ ]]; then
+    if ! command -v proot-distro >/dev/null 2>&1; then
+      print_installing "proot-distro"
+      pkg install -y proot-distro || print_warning "No se pudo instalar proot-distro"
+    fi
+
+    PROOT_READY=0
+    if command -v proot-distro >/dev/null 2>&1; then
+      if ! proot-distro list 2>/dev/null | grep -Eq '^[[:space:]]*\*[[:space:]]+ubuntu$'; then
+        print_installing "Ubuntu para proot-distro"
+        proot-distro install ubuntu || print_warning "No se pudo instalar Ubuntu"
+      fi
+
+      ubuntu_proot() {
+        PROOT_NO_SECCOMP=1 proot-distro login ubuntu -- "$@"
+      }
+
+      if ubuntu_proot /usr/bin/env true >/dev/null 2>&1; then
+        PROOT_READY=1
+        print_success "Ubuntu/proot disponible"
+      else
+        print_warning "Ubuntu/proot no está disponible; se omite la instalación de agentes"
+      fi
+    else
+      print_warning "proot-distro no está disponible; se omite la instalación de agentes"
+    fi
+
+    if [[ "$PROOT_READY" == "1" ]]; then
+      HERMES_LINUX_HOME="/root/hermes-user"
+      HERMES_STATE_DIR="$HERMES_LINUX_HOME/.hermes"
+      HERMES_BIN="$HERMES_LINUX_HOME/.local/bin/hermes"
+      HERMES_PATH="$HERMES_LINUX_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      GROK_BIN="/root/.grok/bin/grok"
+      HERMES_NEEDED=0
+      GROK_NEEDED=0
+
+      if [[ ! "$hermes_install" =~ ^[Nn]$ ]]; then
+        if ubuntu_proot /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" --version >/dev/null 2>&1; then
+          print_success "Hermes Agent ya está instalado en Ubuntu"
+        else
+          HERMES_NEEDED=1
+        fi
+      fi
+
+      if [[ ! "$grok_install" =~ ^[Nn]$ ]]; then
+        if ubuntu_proot "$GROK_BIN" --version >/dev/null 2>&1; then
+          print_success "Grok Build ya está instalado en Ubuntu"
+        else
+          GROK_NEEDED=1
+        fi
+      fi
+
+      if [[ "$HERMES_NEEDED" == "1" || "$GROK_NEEDED" == "1" ]]; then
+        UBUNTU_PACKAGES=(ca-certificates curl)
+        if [[ "$HERMES_NEEDED" == "1" ]]; then
+          UBUNTU_PACKAGES+=(git python3 python-is-python3 python3-venv python3-dev build-essential pkg-config libffi-dev libssl-dev)
+        fi
+
+        if ubuntu_proot /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get update && \
+          ubuntu_proot /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get install -y "${UBUNTU_PACKAGES[@]}"; then
+          print_success "Dependencias Linux/glibc instaladas en Ubuntu"
+
+          if [[ "$HERMES_NEEDED" == "1" ]]; then
+            print_installing "Hermes Agent (instalador oficial Linux)"
+            if ubuntu_proot /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" \
+              /bin/bash --noprofile --norc -c 'set -o pipefail; curl -fsSL https://hermes-agent.nousresearch.com/install.sh | /bin/bash -s -- --skip-browser --skip-computer-use' && \
+              ubuntu_proot /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" --version; then
+              print_success "Hermes Agent instalado en Ubuntu/proot"
+            else
+              print_warning "Falló Hermes Agent; revisá red y espacio libre dentro de /data"
+            fi
+          fi
+
+          if [[ "$GROK_NEEDED" == "1" ]]; then
+            print_installing "Grok Build (instalador oficial Linux de xAI)"
+            if ubuntu_proot /usr/bin/env HOME=/root PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+              /bin/bash --noprofile --norc -c 'set -o pipefail; curl -fsSL https://x.ai/cli/install.sh | /bin/bash' && \
+              ubuntu_proot "$GROK_BIN" --version; then
+              print_success "Grok Build instalado en Ubuntu/proot"
+            else
+              print_warning "Falló Grok Build; revisá red y espacio libre dentro de /data"
+            fi
+          fi
+        else
+          print_warning "No se pudieron preparar las dependencias de Ubuntu"
+        fi
+      fi
+    fi
+  else
+    print_info "Se omitieron Hermes Agent y Grok Build"
+  fi
+fi
+}
+
+# ═══════════════════════════════════════════════════════════
+# PASO 22a: Módulos Core (complemento)
 # ───────────────────────────────────────────────────────────
 # Instala los módulos restantes del framework. Editor se omite (se usa nvim).
-print_step "22b/23: Módulos Core"
+print_step "22a/23: Módulos Core"
 read -p "¿Instalar módulos de core (lang, db, ai, dev, npm, shell, ui, auto)? [S/n]: " core_mods
 if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
   for m in lang db ai dev npm shell ui auto; do
@@ -957,22 +1067,27 @@ if [[ ! "$core_mods" =~ ^[Nn]$ ]]; then
   done
 fi
 
+install_proot_agents
+
 # ═══════════════════════════════════════════════════════════
 # PASO 22c: Atajos de Termux:Widget (OpenCode, Neovim, Antigravity, Codex,
-# Claude Code y OpenClaw)
+# Claude Code, OpenClaw, Hermes Agent y Grok Bot)
 # ───────────────────────────────────────────────────────────
-# Termux:Widget lee los atajos dinámicos de ~/.termux/widget/dynamic_shortcuts.
+# Termux:Widget lee atajos dinámicos de ~/.termux/widget/dynamic_shortcuts;
+# TermuxCreateShortcutActivity crea accesos de inicio desde ~/.shortcuts.
 # En Android 10+ el permiso "Mostrar sobre otras apps" va en TERMUX (no en
 # Termux:Widget): sin él, el widget no puede abrir la terminal en foreground.
 # En MIUI/HyperOS se llama "Mostrar ventanas emergentes mientras se ejecuta
 # en segundo plano" y está en Ajustes → Apps → Termux → Otros permisos.
 # ═══════════════════════════════════════════════════════════
 print_step "22c/23: Atajos de Termux:Widget"
-read -p "¿Crear los atajos de OpenCode, Neovim, Antigravity, Codex, Claude Code y OpenClaw? [S/n]: " widget_ok
+read -p "¿Crear los ocho atajos de OpenCode, Neovim, Antigravity, Codex, Claude Code, OpenClaw, Hermes Agent y Grok Bot? [S/n]: " widget_ok
 if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
   WIDGET_DIR="$HOME/.termux/widget/dynamic_shortcuts"
+  SHORTCUTS_DIR="$HOME/.shortcuts"
   ICONS_DIR="$HOME/.shortcuts/icons"
-  mkdir -p "$WIDGET_DIR" "$ICONS_DIR"
+  WIDGET_SHORTCUTS=(opencode nvim agy codex claude-code openclaw hermes grokbot)
+  mkdir -p "$WIDGET_DIR" "$SHORTCUTS_DIR" "$ICONS_DIR"
 
   # Copia las versiones guardadas en dotfiles; si faltan, genera los comandos.
   WIDGET_SRC=""
@@ -982,15 +1097,47 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       break
     fi
   done
-  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude openclaw:openclaw; do
+  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude openclaw:openclaw hermes:hermes grokbot:grokbot; do
     shortcut="${entry%%:*}"
     command="${entry#*:}"
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/$shortcut" ]]; then
       cp "$(dirname "$WIDGET_SRC")/$shortcut" "$WIDGET_DIR/$shortcut"
+    elif [[ "$shortcut" == "grokbot" ]]; then
+      printf '%s\n' \
+        '#!/data/data/com.termux/files/usr/bin/bash' \
+        'export PROOT_NO_SECCOMP=1' \
+        'if ! command -v proot-distro >/dev/null 2>&1; then' \
+        '  printf "%s\\n" "Grok Build requiere proot-distro con Ubuntu instalado." >&2' \
+        '  exit 127' \
+        'fi' \
+        'if ! proot-distro login ubuntu -- /root/.grok/bin/grok --version >/dev/null 2>&1; then' \
+        '  printf "%s\\n" "Grok Build no está instalado en Ubuntu (proot)." >&2' \
+        '  exit 127' \
+        'fi' \
+        'exec proot-distro login ubuntu -- /root/.grok/bin/grok "$@"' >"$WIDGET_DIR/$shortcut"
+    elif [[ "$shortcut" == "hermes" ]]; then
+      printf '%s\n' \
+        '#!/data/data/com.termux/files/usr/bin/bash' \
+        'HERMES_LINUX_HOME="/root/hermes-user"' \
+        'HERMES_STATE_DIR="$HERMES_LINUX_HOME/.hermes"' \
+        'HERMES_BIN="$HERMES_LINUX_HOME/.local/bin/hermes"' \
+        'HERMES_PATH="$HERMES_LINUX_HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' \
+        'export PROOT_NO_SECCOMP=1' \
+        'if ! command -v proot-distro >/dev/null 2>&1; then' \
+        '  printf "%s\\n" "Hermes Agent requiere proot-distro con Ubuntu instalado." >&2' \
+        '  exit 127' \
+        'fi' \
+        'if ! proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" --version >/dev/null 2>&1; then' \
+        '  printf "%s\\n" "Hermes Agent no está instalado en Ubuntu (proot)." >&2' \
+        '  exit 127' \
+        'fi' \
+        'exec proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" "$@"' >"$WIDGET_DIR/$shortcut"
     else
       printf '#!/data/data/com.termux/files/usr/bin/bash\n%s\n' "$command" >"$WIDGET_DIR/$shortcut"
     fi
     chmod +x "$WIDGET_DIR/$shortcut"
+    cp "$WIDGET_DIR/$shortcut" "$SHORTCUTS_DIR/$shortcut"
+    chmod +x "$SHORTCUTS_DIR/$shortcut"
     print_success "Atajo creado: $WIDGET_DIR/$shortcut"
   done
 
@@ -1040,7 +1187,7 @@ OPENCLAW_WRAPPER
 
   # OJO: el ícono se busca SIEMPRE en ~/.shortcuts/icons/<script>.png,
   # no en ~/.termux/widget/dynamic_shortcuts/icons.
-  for shortcut in opencode nvim agy codex claude-code openclaw; do
+  for shortcut in "${WIDGET_SHORTCUTS[@]}"; do
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" ]]; then
       cp "$(dirname "$WIDGET_SRC")/icons/$shortcut.png" "$ICONS_DIR/$shortcut.png"
       chmod 600 "$ICONS_DIR/$shortcut.png"
@@ -1104,14 +1251,20 @@ OPENCLAW_WRAPPER
     print_info "En MIUI el permiso se llama 'Mostrar ventanas emergentes mientras se ejecuta en segundo plano'."
   fi
 
-  # Abre Termux:Widget para que solo quede tocar CREATE SHORTCUTS.
-  read -p "¿Abrir Termux:Widget para crear los atajos? [S/n]: " tw_ok
-  if [[ ! "$tw_ok" =~ ^[Nn]$ ]]; then
-    am start -n com.termux.widget/.activities.TermuxWidgetMainActivity >/dev/null 2>&1 ||
-      print_warning "No se pudo abrir Termux:Widget (¿está instalado?)"
+  # El selector crea un acceso fijado por invocación y no acepta un nombre de script.
+  read -p "¿Crear ahora los ocho accesos directos de inicio, uno por uno? [S/n]: " pin_ok
+  if [[ ! "$pin_ok" =~ ^[Nn]$ ]]; then
+    for shortcut in "${WIDGET_SHORTCUTS[@]}"; do
+      print_info "En el selector, elegí '$shortcut' y completá la confirmación de Android."
+      if ! am start -a android.intent.action.CREATE_SHORTCUT \
+        -n com.termux.widget/.TermuxCreateShortcutActivity >/dev/null 2>&1; then
+        print_warning "No se pudo abrir el selector de Termux:Widget (¿está instalado?)"
+        break
+      fi
+      read -r -p "Cuando hayas agregado '$shortcut', presioná Enter para continuar... " _
+    done
   fi
-  print_info "En Termux:Widget tocá CREATE SHORTCUTS para publicar opencode y nvim con sus íconos."
-  print_info "Después: mantené presionado el ícono de Termux:Widget en el launcher y añadí el atajo al inicio."
+  print_info "Grok Bot ejecuta Grok Build en Ubuntu/proot. Autenticá con: proot-distro login ubuntu -- /root/.grok/bin/grok login --device-auth"
 fi
 
 # ═══════════════════════════════════════════════════════════

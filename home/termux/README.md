@@ -1,15 +1,42 @@
 # Herramientas para Termux
 
-## Atajos de OpenCode y Neovim
+## Atajos de Termux:Widget
 
-El paso **22c** de `../termux-basic-setup.sh` instala los scripts `opencode`,
-`nvim`, `agy`, `codex`, `claude-code` y `openclaw` en `~/.termux/widget/dynamic_shortcuts/`.
-Ejecutan el comando tal cual. Los íconos se instalan en
+El paso **22b** de `../termux-basic-setup.sh` instala Hermes Agent y Grok Build
+con sus instaladores oficiales Linux dentro de Ubuntu/proot, separados del
+entorno nativo de Termux. Hermes conserva sus datos en `/root/hermes-user`; Grok
+Build en `/root/.grok`. Consulta la [guía de Hermes para Termux](https://hermes-agent.nousresearch.com/docs/getting-started/termux)
+y la [documentación oficial de Grok Build](https://docs.x.ai/build/overview).
+
+El paso **22c** instala ocho scripts (`opencode`,
+`nvim`, `agy`, `codex`, `claude-code`, `openclaw`, `hermes` y `grokbot`) en
+`~/.termux/widget/dynamic_shortcuts/` y `~/.shortcuts/`. Ejecutan el comando
+correspondiente; `grokbot` inicia Grok Build, el agente oficial de terminal de
+xAI, y `hermes` inicia Hermes Agent dentro de Ubuntu/proot. Ninguno abre una app
+Android. Los íconos se instalan en
 `~/.shortcuts/icons/<nombre-del-script>.png`.
 
-Abrí **Termux:Widget → CREATE SHORTCUTS**. Luego mantené presionado el ícono de
-Termux:Widget en el launcher y añadí `nvim` al inicio. Si ya había un atajo con
-el ícono viejo, quitá ese acceso del inicio y agregalo otra vez.
+El instalador ejecuta `am start -a android.intent.action.CREATE_SHORTCUT -n
+com.termux.widget/.TermuxCreateShortcutActivity` una vez por agente: ocho veces en
+total, esperando entre cada invocación. En el selector, elegí el script indicado
+y confirmá el acceso de inicio antes de continuar con el siguiente.
+
+El instalador de Hermes deja pendiente el primer setup si no hay una terminal
+interactiva. Para completarlo manualmente, ejecutá:
+
+```bash
+proot-distro login ubuntu -- /usr/bin/env \
+  HOME=/root/hermes-user \
+  HERMES_HOME=/root/hermes-user/.hermes \
+  PATH=/root/hermes-user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  /root/hermes-user/.local/bin/hermes setup
+```
+
+Para iniciar sesión en Grok Build desde Termux, ejecutá:
+
+```bash
+proot-distro login ubuntu -- /root/.grok/bin/grok login --device-auth
+```
 
 `dynamic_shortcuts/icons/nvim.png` usa la [marca oficial de Neovim](https://github.com/neovim/neovim.github.io/blob/6568b9011ddb2965dc5118d28f17d5b7ce7dd8da/static/logos/neovim-mark.png),
 reducida proporcionalmente y centrada en un PNG transparente de 192×192.
@@ -25,6 +52,12 @@ reducido a un PNG transparente de 192×192.
 
 `dynamic_shortcuts/icons/openclaw.png` usa el [icono oficial de OpenClaw de LobeHub](https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@latest/light/openclaw-color.png),
 reducido a un PNG transparente de 192×192.
+
+`dynamic_shortcuts/icons/hermes.png` usa el [icono Hermes de Homarr Dashboard Icons](https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/hermes.webp),
+convertido de WebP y reducido a PNG de 192×192.
+
+`dynamic_shortcuts/icons/grokbot.png` usa el [icono oscuro de Grok Bot de LobeHub](https://cdn.jsdelivr.net/npm/@lobehub/icons-static-png@latest/dark/grokbot.png),
+reducido a PNG de 192×192. Termux:Widget requiere que el archivo se llame `<script_name>.png`.
 
 Licencia de los recursos de Neovim: [MIT](dynamic_shortcuts/icons/LICENSE.neovim).
 

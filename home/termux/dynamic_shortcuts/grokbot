@@ -1,0 +1,15 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+export PROOT_NO_SECCOMP=1
+
+if ! command -v proot-distro >/dev/null 2>&1; then
+  printf '%s\n' 'Grok Build requiere proot-distro con Ubuntu instalado.' >&2
+  exit 127
+fi
+
+if ! proot-distro login ubuntu -- /root/.grok/bin/grok --version >/dev/null 2>&1; then
+  printf '%s\n' 'Grok Build no está instalado en Ubuntu (proot).' >&2
+  exit 127
+fi
+
+exec proot-distro login ubuntu -- /root/.grok/bin/grok "$@"
