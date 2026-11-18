@@ -6,6 +6,9 @@
       "tokens": 15000
     }
   },
+  "experimental": {
+    "todo": true 
+  },
   "mcp": {
     "engram": {
       "type": "local",
@@ -46,7 +49,7 @@
       "environment": {
                 "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": true
+      "enabled": true 
     },
     "webshare-es": {
       "type": "local",
@@ -58,7 +61,7 @@
       "environment": {
                 "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "enabled": true
+      "enabled": true 
     },
     "webshare-us": {
       "type": "local",

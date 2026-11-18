@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=btop
+GenericName=System Monitor
+Comment=Resource monitor that shows usage and stats for processor, memory, disks, network and processes
+Icon=btop
+Exec=/home/diego/.local/bin/kitty --class btop-monitor -e /usr/bin/btop
+TryExec=/home/diego/.local/bin/kitty
+Terminal=false
+Categories=System;Monitor;
+Keywords=system;process;task;btop;
+StartupNotify=true
+X-KDE-GlobalAccel-CommandShortcut=true
