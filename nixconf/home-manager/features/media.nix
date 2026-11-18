@@ -14,7 +14,6 @@
     spotube       # GUI — OK (login y descargas funcionando)
     spotdl        # CLI — OK; interfaz web: `spotdl web` (NO --web)
     ffmpeg        # Base de conversión (spotdl/streamrip la usan)
-    espeak-ng     # TTS local para leer las respuestas de OpenCode Live
     #streamrip    # bin=`rip`, lossless Qobuz/Tidal/Deezer; `stream` es ImageMagick
     #yt-dlp       # ERROR visible: HTTP 403 Forbidden en YouTube (2026-09-16)
     #soundbound   # Requiere Sign Up; forgot-password buggy (ClassCastException)

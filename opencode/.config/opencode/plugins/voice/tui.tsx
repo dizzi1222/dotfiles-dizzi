@@ -168,19 +168,21 @@ function resolveExecutable(command: string): string | null {
   return null
 }
 
-/** Encuentra el grabador disponible, priorizando PulseAudio en WSLg. */
+/** Selecciona ALSA en Termux y prioriza PulseAudio en WSLg. */
 function findRecorder(): IRecorderCommand | null {
-  const candidates = PREFER_PULSE_AUDIO
-    ? [
-        { command: "parecord", backend: "pulse" as const },
-        { command: "pw-record", backend: "pipewire" as const },
-        { command: "arecord", backend: "alsa" as const },
-      ]
-    : [
-        { command: "pw-record", backend: "pipewire" as const },
-        { command: "arecord", backend: "alsa" as const },
-        { command: "parecord", backend: "pulse" as const },
-      ]
+  const candidates = IS_TERMUX
+    ? [{ command: "arecord", backend: "alsa" as const }]
+    : PREFER_PULSE_AUDIO
+      ? [
+          { command: "parecord", backend: "pulse" as const },
+          { command: "pw-record", backend: "pipewire" as const },
+          { command: "arecord", backend: "alsa" as const },
+        ]
+      : [
+          { command: "pw-record", backend: "pipewire" as const },
+          { command: "arecord", backend: "alsa" as const },
+          { command: "parecord", backend: "pulse" as const },
+        ]
 
   for (const candidate of candidates) {
     const command = IS_TERMUX && PREFIX ? join(PREFIX, "bin", candidate.command) : candidate.command
@@ -191,7 +193,7 @@ function findRecorder(): IRecorderCommand | null {
   return null
 }
 
-/** Construye los argumentos de captura para PipeWire, PulseAudio, ALSA o Termux. */
+/** Construye los argumentos de captura para PipeWire, PulseAudio o ALSA. */
 function recorderArguments(recorder: IRecorderCommand, rawPath: string): string[] {
   if (recorder.backend === "pulse") {
     const device = process.env.VOICE_DEVICE
@@ -207,10 +209,6 @@ function recorderArguments(recorder: IRecorderCommand, rawPath: string): string[
 
   if (recorder.backend === "alsa") {
     return ["-q", "-f", "S16_LE", "-r", "16000", "-c", "1", "-t", "raw", rawPath]
-  }
-
-  if (IS_TERMUX) {
-    return ["--format=s16le", "--rate=16000", "--channels=1", rawPath]
   }
 
   return ["--raw", "--format=s16", "--rate=16000", "--channels=1", rawPath]
@@ -382,7 +380,7 @@ async function restoreLiveModel(sessionID: string): Promise<void> {
 }
 
 //Capture
-/** Espera el cierre del grabador y lo fuerza a terminar si se queda bloqueado. */
+/** Espera el cierre limpio del grabador y lo fuerza a terminar si se queda bloqueado. */
 function stopRecorder(child: ChildProcess, signal: NodeJS.Signals = "SIGINT"): Promise<void> {
   return new Promise((resolve) => {
     let stopped = false
@@ -396,9 +394,13 @@ function stopRecorder(child: ChildProcess, signal: NodeJS.Signals = "SIGINT"): P
     }
 
     const timeout = setTimeout(() => {
+      if (child.exitCode !== null || child.signalCode !== null) {
+        finish()
+        return
+      }
+
       child.kill("SIGKILL")
-      finish()
-    }, 5000)
+    }, 30000)
 
     child.once("close", finish)
     if (child.exitCode !== null || child.signalCode !== null) {
@@ -446,6 +448,11 @@ function startRecording(context: any): void {
     wavPath,
   }
   state.recording = recording
+  let recorderError = ""
+
+  recording.child.stderr?.on("data", (chunk: Buffer) => {
+    recorderError = `${recorderError}${chunk.toString()}`.slice(-2000)
+  })
 
   recording.child.once("error", (error) => {
     if (state.recording?.child !== recording.child) return
@@ -457,7 +464,8 @@ function startRecording(context: any): void {
     if (state.recording?.child !== recording.child) return
     state.recording = null
     removeRecordingFiles(recording)
-    toast(context, `El grabador terminó inesperadamente (code=${code})`, "error", "Voz", 6000)
+    const errorMessage = recorderError.trim() || `El grabador terminó inesperadamente (code=${code})`
+    toast(context, errorMessage, "error", "Voz", 6000)
   })
 
   toast(context, "🎙️ Grabando… pulsa F5 o /voice-ask para enviar la transcripción", "info", "Voz", 3000)
@@ -1373,8 +1381,11 @@ export default Plugin.define({
       const recording = state.recording
       state.recording = null
       if (recording) {
-        await stopRecorder(recording.child, "SIGKILL")
-        removeRecordingFiles(recording)
+        try {
+          await stopRecorder(recording.child)
+        } finally {
+          removeRecordingFiles(recording)
+        }
       }
     }
   },

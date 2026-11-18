@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 # Lazygit shell wrapper — portable shebang works on Linux & Termux (Android)
 # On Termux: pkg install bash → /data/data/com.termux/files/usr/bin/bash is in $PATH
 # lazygit ejecuta los comandos del prompt ':' con "$SHELL -c <cmd>" (p.ej:

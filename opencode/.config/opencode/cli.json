@@ -21,10 +21,5 @@
     "scrollbar": false,
     "thinking": "show"
   },
-  "animations": true,
-  "plugins": [
-    {
-      "package": "/var/home/diego/dotfiles-dizzi/opencode/.config/opencode/plugins/voice"
-    }
-  ]
+  "animations": true
 }

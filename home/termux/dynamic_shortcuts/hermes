@@ -17,4 +17,9 @@ if ! proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_
   exit 127
 fi
 
+# Open the TUI and resume the latest session unless explicit arguments were given.
+if [[ $# -eq 0 ]]; then
+  set -- --tui --resume latest
+fi
+
 exec proot-distro login ubuntu -- /usr/bin/env HOME="$HERMES_LINUX_HOME" HERMES_HOME="$HERMES_STATE_DIR" PATH="$HERMES_PATH" "$HERMES_BIN" "$@"

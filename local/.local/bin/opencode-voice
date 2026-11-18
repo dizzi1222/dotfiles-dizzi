@@ -224,9 +224,13 @@ function findExecutable(command: string): string | null {
 /** Elige el capturador y los argumentos compatibles con el entorno actual. */
 function findCaptureCommand(): ICaptureCommand | null {
   const preferPulse = Boolean(env.WSL_DISTRO_NAME || env.WSL_INTEROP || env.PULSE_SERVER)
-  const candidates = preferPulse
-    ? ["parec", "pw-record", "arecord"]
-    : ["pw-record", "arecord", "parec"]
+  // Termux's pw-record is a compatibility symlink to arecord, not PipeWire.
+  const isTermux = env.PREFIX?.includes("com.termux/files/usr") ?? false
+  const candidates = isTermux
+    ? ["arecord"]
+    : preferPulse
+      ? ["parec", "pw-record", "arecord"]
+      : ["pw-record", "arecord", "parec"]
 
   for (const command of candidates) {
     const executable = findExecutable(command)

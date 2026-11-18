@@ -62,7 +62,7 @@
         "environment": {
           "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
         },
-        "disabled": true
+        "disabled": false
       },
       "webshare-us": {
         "type": "local",
@@ -73,7 +73,8 @@
         ],
         "environment": {
           "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
-        }
+        },
+        "disabled": true
       },
       "webshare-us-2": {
         "type": "local",

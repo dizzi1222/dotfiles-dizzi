@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/data/data/com.termux/files/usr/bin/bun
 /**
  * opencode-voice — dictado por voz para OpenCode.
  *
@@ -43,6 +43,8 @@ type Config = {
 }
 
 const env = process.env
+const AUDIO_ENV = { ...env }
+delete AUDIO_ENV.LD_LIBRARY_PATH
 const config: Config = {
   provider: (env.VOICE_PROVIDER as Config["provider"]) ?? "gemini",
   model:
@@ -222,9 +224,13 @@ function findExecutable(command: string): string | null {
 /** Elige el capturador y los argumentos compatibles con el entorno actual. */
 function findCaptureCommand(): ICaptureCommand | null {
   const preferPulse = Boolean(env.WSL_DISTRO_NAME || env.WSL_INTEROP || env.PULSE_SERVER)
-  const candidates = preferPulse
-    ? ["parec", "pw-record", "arecord"]
-    : ["pw-record", "arecord", "parec"]
+  // Termux's pw-record is a compatibility symlink to arecord, not PipeWire.
+  const isTermux = env.PREFIX?.includes("com.termux/files/usr") ?? false
+  const candidates = isTermux
+    ? ["arecord"]
+    : preferPulse
+      ? ["parec", "pw-record", "arecord"]
+      : ["pw-record", "arecord", "parec"]
 
   for (const command of candidates) {
     const executable = findExecutable(command)
@@ -475,7 +481,7 @@ async function transcribeFile(path: string) {
 
 function convertToPcm(path: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const child = spawn("ffmpeg", ["-v", "error", "-i", path, "-ar", String(RATE), "-ac", "1", "-f", "s16le", "pipe:1"], { env: { ...process.env, USERMOTDSOURCED: "Y" } })
+    const child = spawn("ffmpeg", ["-v", "error", "-i", path, "-ar", String(RATE), "-ac", "1", "-f", "s16le", "pipe:1"], { env: { ...AUDIO_ENV, USERMOTDSOURCED: "Y" } })
     const chunks: Buffer[] = []
     child.stdout.on("data", (chunk: Buffer) => chunks.push(chunk))
     child.on("error", reject)
@@ -527,7 +533,8 @@ async function doctor() {
   }
   const pcm = Buffer.concat(frames)
   const wav = toWav(pcm)
-  const path = "/tmp/opencode-voice-doctor.wav"
+  const tmpDir = env.TMPDIR || join(env.PREFIX || "/data/data/com.termux/files/usr", "tmp")
+  const path = join(tmpDir, "opencode-voice-doctor.wav")
   writeFileSync(path, wav)
   push(`muestra_guardada=${path}`)
   if (!hasKey) return

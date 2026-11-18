@@ -1,6 +1,7 @@
 {
   "agentMode": "accept-edits",
   "allowNonWorkspaceAccess": true,
+  "voice-engine-addr": "default",
   "model": "Claude Sonnet 4.6 (Thinking)",
   "permissions": {
     "allow": [
@@ -13,6 +14,5 @@
     "/home/diego",
     "/var/home/diego",
     "/var/home/diego/Documentos/ChatGPT/Bazzite"
-  ],
-  "voice-engine-addr": "default"
+  ]
 }
