@@ -399,12 +399,110 @@ if gum confirm "¿Instalar OpenAI Codex (codex)?"; then
   fi
 fi
 
+# Hermes Agent CLI/TUI (instalador oficial, canal estable).
+if gum confirm "¿Instalar Hermes Agent (CLI/TUI)?"; then
+  HERMES_AVAILABLE_KB=$(df -Pk /var/home | awk 'NR == 2 { print $4 }') || HERMES_AVAILABLE_KB=0
+  if [ "$HERMES_AVAILABLE_KB" -lt $((5 * 1024 * 1024)) ]; then
+    echo "⚠️  Hermes necesita al menos 5 GiB libres para completar su runtime sin interrumpirse."
+    echo "  Espacio actual: $((HERMES_AVAILABLE_KB / 1024 / 1024)) GiB. Libera espacio y vuelve a ejecutar esta opción."
+  elif curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --channel stable; then
+    echo "✓ Hermes Agent instalado desde el canal estable oficial."
+    echo "  Ejecuta 'hermes setup' para configurar el proveedor y la autenticación."
+  else
+    echo "⚠️  Falló la instalación oficial de Hermes; revisa ~/.hermes/logs/install.log."
+  fi
+fi
+
+# Grok Build CLI oficial de xAI (comando `grok`).
+if gum confirm "¿Instalar Grok Build CLI oficial de xAI (grok)?"; then
+  if curl -fsSL https://x.ai/cli/install.sh | bash; then
+    echo "✓ Grok Build instalado. Ejecuta 'grok' para iniciar sesión y abrir el agente."
+  else
+    echo "⚠️  Falló la instalación de Grok Build; visita https://x.ai/build para instrucciones."
+  fi
+fi
+
+# Grok Bot de escritorio oficial: RPM nativo firmado y actualizable por rpm-ostree.
+if gum confirm "¿Instalar Grok Bot oficial (aplicación nativa RPM)?"; then
+  GROK_BOT_FEED_PLATFORM=""
+  GROK_BOT_PACKAGE_ARCH=""
+  case "$(uname -m)" in
+    x86_64)
+      GROK_BOT_FEED_PLATFORM="linux-x64"
+      GROK_BOT_PACKAGE_ARCH="x64"
+      ;;
+    aarch64)
+      GROK_BOT_FEED_PLATFORM="linux-arm64"
+      GROK_BOT_PACKAGE_ARCH="arm64"
+      ;;
+    *)
+      echo "⚠️  Grok Bot no publica un RPM para la arquitectura $(uname -m)."
+      ;;
+  esac
+
+  if [ -n "$GROK_BOT_FEED_PLATFORM" ]; then
+    GROK_BOT_FEED_URL="https://api2.cursor.sh/updates/api/download/stable/${GROK_BOT_FEED_PLATFORM}/sand"
+    if ! GROK_BOT_FEED_JSON=$(curl -fsSL --proto '=https' "$GROK_BOT_FEED_URL"); then
+      echo "⚠️  No se pudo consultar el feed oficial de Grok Bot."
+    elif ! GROK_BOT_RPM_URL=$(printf '%s' "$GROK_BOT_FEED_JSON" | jq -er '.rpmUrl'); then
+      echo "⚠️  El feed oficial no proporcionó la URL del RPM."
+    else
+      case "$GROK_BOT_RPM_URL" in
+        https://downloads.cursor.com/grokbot/stable/*/linux/"$GROK_BOT_PACKAGE_ARCH"/grok-bot-*.rpm)
+          GROK_BOT_AVAILABLE_KB=$(df -Pk /var/home | awk 'NR == 2 { print $4 }') || GROK_BOT_AVAILABLE_KB=0
+          if [ "$GROK_BOT_AVAILABLE_KB" -lt $((5 * 1024 * 1024)) ]; then
+            echo "⚠️  La capa RPM de Grok Bot requiere al menos 5 GiB libres para descargar y preparar el deployment."
+            echo "  Espacio actual: $((GROK_BOT_AVAILABLE_KB / 1024 / 1024)) GiB."
+          else
+            GROK_BOT_TMP_DIR=$(mktemp -d) || GROK_BOT_TMP_DIR=""
+            if [ -z "$GROK_BOT_TMP_DIR" ]; then
+              echo "⚠️  No se pudo crear un directorio temporal para el RPM de Grok Bot."
+            elif curl -fL --proto '=https' --proto-redir '=https' --retry 3 \
+              "$GROK_BOT_RPM_URL" -o "$GROK_BOT_TMP_DIR/grok-bot.rpm" &&
+              sudo rpm-ostree install --idempotent "$GROK_BOT_TMP_DIR/grok-bot.rpm"; then
+              echo "✓ Grok Bot instalado desde el RPM oficial."
+              echo "  El RPM configura su repositorio firmado para actualizaciones. Reinicia Bazzite para aplicar la capa."
+            else
+              echo "⚠️  Falló la descarga o instalación del RPM oficial de Grok Bot."
+            fi
+            if [ -n "$GROK_BOT_TMP_DIR" ]; then
+              find "$GROK_BOT_TMP_DIR" -mindepth 1 -maxdepth 1 -delete && rmdir "$GROK_BOT_TMP_DIR"
+            fi
+          fi
+          ;;
+        *)
+          echo "⚠️  El feed oficial devolvió una URL RPM inesperada; no se descargó: $GROK_BOT_RPM_URL"
+          ;;
+      esac
+    fi
+  fi
+fi
+
 if gum confirm "¿Instalar opencommit (oco) para commits con IA?"; then
   if command -v npm >/dev/null; then
     npm install -g opencommit
     echo "  ✓ opencommit instalado (usa 'oco' o 'opencommit')"
   else
     echo "⚠️  Requiere npm; instala npm primero"
+  fi
+fi
+
+# DeepSeek Harness CLI oficial (@deepseek-ai/dsh); requiere Node.js 24.9 o superior.
+if gum confirm "¿Instalar DeepSeek Harness (DSH, interfaz web local)?"; then
+  if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "⚠️  DSH requiere Node.js >=24.9 y npm."
+  elif ! node -e 'const [major, minor] = process.versions.node.split(".").map(Number); process.exit(major > 24 || (major === 24 && minor >= 9) ? 0 : 1)'; then
+    echo "⚠️  DSH requiere Node.js >=24.9; versión actual: $(node --version)."
+  elif (
+    cd /tmp &&
+    npm install --global --no-audit --no-fund \
+      --allow-scripts='@deepseek-ai/dsh-subprocess-local,koffi,node-pty,@google/genai,protobufjs' \
+      @deepseek-ai/dsh
+  ); then
+    echo "✓ DeepSeek Harness instalado desde npm oficial (@deepseek-ai/dsh)."
+    echo "  Ejecuta 'dsh web' para iniciar la interfaz local en http://127.0.0.1:3080."
+  else
+    echo "⚠️  Falló la instalación de DSH; comprueba npm, la conexión y el espacio disponible."
   fi
 fi
 

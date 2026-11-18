@@ -1,4 +1,4 @@
 game:
-  exe: /home/diego/.local/kitty.app/bin/kitty
   args: -e /home/diego/.local/bin/juegos/openclaw.sh
+  exe: /home/diego/.local/kitty.app/bin/kitty
   working_dir: /home/diego

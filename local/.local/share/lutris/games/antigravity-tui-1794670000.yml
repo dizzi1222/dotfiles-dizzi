@@ -1,4 +1,4 @@
 game:
-  exe: /home/diego/.local/kitty.app/bin/kitty
   args: -e agy --dangerously-skip-permissions --mode accept-edits
+  exe: /home/diego/.local/kitty.app/bin/kitty
   working_dir: /home/diego

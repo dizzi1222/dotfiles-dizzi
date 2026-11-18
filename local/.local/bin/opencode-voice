@@ -2,7 +2,7 @@
 /**
  * opencode-voice — dictado por voz para OpenCode.
  *
- * Graba del micrófono con pw-record, segmenta por silencio (VAD por RMS
+ * Graba con PipeWire, PulseAudio o ALSA, segmenta por silencio (VAD por RMS
  * adaptativo) y transcribe cada frase con Gemini (o OpenAI Whisper), emitiendo
  * NDJSON por stdout para que el plugin TUI lo consuma.
  *
@@ -21,7 +21,8 @@
  *   VOICE_DEVICE     dispositivo PipeWire/Pulse (def. @DEFAULT_SOURCE@)
  */
 import { spawn } from "node:child_process"
-import { readFileSync, writeFileSync, existsSync } from "node:fs"
+import { accessSync, constants, readFileSync, writeFileSync, existsSync } from "node:fs"
+import { delimiter, join } from "node:path"
 
 const RATE = 16000
 const CHANNELS = 1
@@ -194,20 +195,98 @@ async function transcribeWithRetry(pcm: Buffer, durationMs: number): Promise<str
 /* --------------------------------- captura -------------------------------- */
 
 type Listener = {
-  stop: () => void
+  stop: () => Promise<void>
 }
 
+interface ICaptureCommand {
+  executable: string
+  args: string[]
+}
+
+/** Resuelve un ejecutable usando PATH sin invocar un shell. */
+function findExecutable(command: string): string | null {
+  const candidates = command.includes("/")
+    ? [command]
+    : (process.env.PATH ?? "").split(delimiter).map((directory) => join(directory, command))
+
+  for (const candidate of candidates) {
+    try {
+      accessSync(candidate, constants.X_OK)
+      return candidate
+    } catch {}
+  }
+
+  return null
+}
+
+/** Elige el capturador y los argumentos compatibles con el entorno actual. */
+function findCaptureCommand(): ICaptureCommand | null {
+  const preferPulse = Boolean(env.WSL_DISTRO_NAME || env.WSL_INTEROP || env.PULSE_SERVER)
+  const candidates = preferPulse
+    ? ["parec", "pw-record", "arecord"]
+    : ["pw-record", "arecord", "parec"]
+
+  for (const command of candidates) {
+    const executable = findExecutable(command)
+    if (!executable) continue
+
+    if (command === "parec") {
+      const args = ["--raw", "--format=s16le", "--rate=16000", "--channels=1"]
+      if (env.VOICE_DEVICE && env.VOICE_DEVICE !== "@DEFAULT_SOURCE@") {
+        args.push(`--device=${env.VOICE_DEVICE}`)
+      }
+      return { executable, args }
+    }
+
+    if (command === "arecord") {
+      return {
+        executable,
+        args: ["-q", "-f", "S16_LE", "-r", String(RATE), "-c", String(CHANNELS), "-t", "raw", "-"],
+      }
+    }
+
+    return {
+      executable,
+      args: ["--rate", String(RATE), "--channels", String(CHANNELS), "--format", "s16", "--latency", "20ms", "-"],
+    }
+  }
+
+  return null
+}
+
+let activeCapture: Listener | null = null
+let shuttingDown = false
+
+/** Detiene la captura activa antes de salir del proceso auxiliar. */
+async function shutdown(exitCode = 0): Promise<void> {
+  if (shuttingDown) return
+  shuttingDown = true
+  await activeCapture?.stop()
+  process.exit(exitCode)
+}
+
+/** Inicia un stream PCM y lo separa en frames para el detector de voz. */
 function startCapture(
   onFrame: (frame: Buffer) => void,
   onEnd: (reason: string) => void,
 ): Listener {
-  const child = spawn(
-    "pw-record",
-    ["--rate", String(RATE), "--channels", String(CHANNELS), "--format", "s16", "--latency", "20ms", "-"],
-    { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, USERMOTDSOURCED: "Y" } },
-  )
+  const command = findCaptureCommand()
+  if (!command) {
+    queueMicrotask(() => onEnd("No encontré parec, pw-record ni arecord"))
+    return { stop: () => Promise.resolve() }
+  }
+
+  const child = spawn(command.executable, command.args, {
+    stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, USERMOTDSOURCED: "Y" },
+  })
   let pending = Buffer.alloc(0)
   let stopped = false
+  let killTimer: ReturnType<typeof setTimeout> | null = null
+  let resolveClose: () => void = () => {}
+  const closed = new Promise<void>((resolve) => {
+    resolveClose = resolve
+  })
 
   child.stdout.on("data", (chunk: Buffer) => {
     pending = pending.length ? Buffer.concat([pending, chunk]) : chunk
@@ -223,16 +302,27 @@ function startCapture(
   })
   child.on("error", (error) => onEnd(`spawn: ${error.message}`))
   child.on("exit", (code, signal) => {
-    if (!stopped) onEnd(`pw-record salió (code=${code} signal=${signal})`)
+    if (!stopped) onEnd(`${command.executable} salió (code=${code} signal=${signal})`)
+  })
+  child.once("close", () => {
+    if (killTimer) clearTimeout(killTimer)
+    if (activeCapture === capture) activeCapture = null
+    resolveClose()
   })
 
-  return {
+  const capture: Listener = {
     stop() {
-      stopped = true
-      child.kill("SIGINT")
-      setTimeout(() => child.kill("SIGKILL"), 400)
+      if (!stopped) {
+        stopped = true
+        child.kill("SIGINT")
+        killTimer = setTimeout(() => child.kill("SIGKILL"), 1000)
+      }
+      return closed
     },
   }
+
+  activeCapture = capture
+  return capture
 }
 
 /* ---------------------------------- motor --------------------------------- */
@@ -254,14 +344,12 @@ function runEngine(options: EngineOptions) {
   let lastLevelAt = 0
   const startedAt = Date.now()
 
-  // Threshold adaptativo: usa config.threshold si se pasa, sino calcula relativo al noiseFloor
-  // Para noiseFloor alto (>0.3): margen fijo pequeño (0.1)
-  // Para noiseFloor bajo: margen = max(0.15, noiseFloor * 0.5)
+  // Threshold adaptativo: usa config.threshold si se pasa; si no, escala con el ruido medido.
+  // En ruido bajo coincide con el umbral sugerido por `doctor` (max(0.01, mediana * 2.5)).
   const thresholdFor = () => {
     if (config.threshold !== undefined) return config.threshold
     if (noiseFloor > 0.3) return noiseFloor + 0.1
-    const margin = Math.max(0.15, noiseFloor * 0.5)
-    return noiseFloor + margin
+    return Math.max(0.01, noiseFloor * 2.5)
   }
 
   const flush = async (reason: string) => {
@@ -289,7 +377,7 @@ function runEngine(options: EngineOptions) {
     } finally {
       busy = false
       if (options.once) {
-        process.exit(0)
+        void listener.stop().finally(() => process.exit(0))
       }
     }
   }
@@ -350,7 +438,7 @@ function runEngine(options: EngineOptions) {
     },
     (reason) => {
       fail(reason)
-      process.exit(1)
+      void shutdown(1)
     },
   )
 
@@ -409,13 +497,21 @@ async function doctor() {
   // 4 s de captura para medir el ruido de fondo
   const frames: Buffer[] = []
   await new Promise<void>((resolve) => {
-    const capture = startCapture(
-      (frame) => frames.push(frame),
-      () => resolve(),
-    )
-    setTimeout(() => {
-      capture.stop()
+    let capture: Listener
+    let stopTimer: ReturnType<typeof setTimeout> | null = null
+    const finish = () => {
+      if (stopTimer) clearTimeout(stopTimer)
       resolve()
+    }
+    capture = startCapture(
+      (frame) => frames.push(frame),
+      (reason) => {
+        fail(reason)
+        void capture.stop().finally(finish)
+      },
+    )
+    stopTimer = setTimeout(() => {
+      void capture.stop().finally(finish)
     }, 4000)
   })
   const levels = frames.map(rms)
@@ -477,5 +573,9 @@ switch (command) {
   }
 }
 
-process.on("SIGTERM", () => process.exit(0))
-process.on("SIGINT", () => process.exit(0))
+process.on("SIGTERM", () => {
+  void shutdown(0)
+})
+process.on("SIGINT", () => {
+  void shutdown(0)
+})

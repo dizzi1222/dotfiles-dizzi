@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Grokbot Agent TUI
+Comment=Open the Grok coding agent in a terminal
+TryExec=/home/diego/.npm-global/bin/grokbot
+Exec=/home/diego/.local/bin/kitty -e /home/diego/.npm-global/bin/grokbot
+Terminal=false
+Type=Application
+Icon=grokbot
+Categories=Development;
+StartupNotify=true
