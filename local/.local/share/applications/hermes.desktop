@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Hermes Agent
+Comment=Open Hermes Agent CLI
+Exec=/home/diego/.local/bin/kitty -e /home/diego/.local/bin/juegos/hermes.sh %F
+Terminal=false
+Type=Application
+Icon=hermes
+Categories=Development;
+StartupNotify=true
+StartupWMClass=Hermes

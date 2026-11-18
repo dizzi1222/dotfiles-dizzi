@@ -17,5 +17,9 @@
     "thinking": "show"
   },
   "animations": true,
-  "plugins": ["/var/home/diego/dotfiles-dizzi/opencode/.config/opencode/plugins/voice"]
+  "plugins": [
+    {
+      "package": "/var/home/diego/dotfiles-dizzi/opencode/.config/opencode/plugins/voice"
+    }
+  ]
 }
