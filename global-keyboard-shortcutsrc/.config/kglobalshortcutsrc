@@ -208,34 +208,34 @@ view_zoom_in=Meta++\tMeta+=,Meta++\tMeta+=,Ampliar
 view_zoom_out=Meta+-,Meta+-,Reducir
 
 [kwin][$InverseAction]
-Cycle Overview=Cycle Overview Opposite
-Decrease Opacity=Increase Opacity
-MoveZoomLeft=MoveZoomRight
+Cycle Overview Opposite=Cycle Overview
+Increase Opacity=Decrease Opacity
+MoveZoomRight=MoveZoomLeft
 MoveZoomUp=MoveZoomDown
-Switch One Desktop Down=Switch One Desktop Up
-Switch One Desktop to the Left=Switch One Desktop to the Right
-Switch Window Down=Switch Window Up
-Switch Window Right=Switch Window Left
-Switch to Previous Desktop=Switch to Next Desktop
+Switch One Desktop Up=Switch One Desktop Down
+Switch One Desktop to the Right=Switch One Desktop to the Left
+Switch Window Left=Switch Window Right
+Switch Window Up=Switch Window Down
+Switch to Next Desktop=Switch to Previous Desktop
 Switch to Previous Screen=Switch to Next Screen
-Switch to Screen Above=Switch to Screen Below
-Switch to Screen to the Left=Switch to Screen to the Right
-Walk Through Windows=Walk Through Windows (Reverse)
+Switch to Screen Below=Switch to Screen Above
+Switch to Screen to the Right=Switch to Screen to the Left
+Walk Through Windows (Reverse)=Walk Through Windows
 Walk Through Windows Alternative (Reverse)=Walk Through Windows Alternative
 Walk Through Windows of Current Application=Walk Through Windows of Current Application (Reverse)
-Walk Through Windows of Current Application Alternative (Reverse)=Walk Through Windows of Current Application Alternative
-Window One Desktop Up=Window One Desktop Down
+Walk Through Windows of Current Application Alternative=Walk Through Windows of Current Application Alternative (Reverse)
+Window One Desktop Down=Window One Desktop Up
 Window One Desktop to the Right=Window One Desktop to the Left
 Window One Screen Down=Window One Screen Up
-Window One Screen to the Left=Window One Screen to the Right
+Window One Screen to the Right=Window One Screen to the Left
 Window Pack Right=Window Pack Left
 Window Pack Up=Window Pack Down
 Window Raise=Window Lower
 Window Shrink Horizontal=Window Grow Horizontal
 Window Shrink Vertical=Window Grow Vertical
-Window to Next Desktop=Window to Previous Desktop
-Window to Previous Screen=Window to Next Screen
-view_zoom_in=view_zoom_out
+Window to Next Screen=Window to Previous Screen
+Window to Previous Desktop=Window to Next Desktop
+view_zoom_out=view_zoom_in
 
 [kwin][Window Move, Resize & Rotate]
 Move & Resize Window=Meta+Alt+Left,Meta+Alt+Left,Mover y redimensionar ventana
