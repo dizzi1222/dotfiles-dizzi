@@ -27,7 +27,7 @@ env -u LD_LIBRARY_PATH PROOT_NO_SECCOMP=1 proot-distro login ubuntu -- \
       /opt/opencode-voice-bootstrap/bin/uv venv --python 3.12 /opt/opencode-voice
     fi
     # PyAV 19 elimina metadata_errors, todavía usado por faster-whisper 1.2.1.
-    /opt/opencode-voice-bootstrap/bin/uv pip install --python /opt/opencode-voice/bin/python faster-whisper==1.2.1 av==13.1.0
+    /opt/opencode-voice-bootstrap/bin/uv pip install --python /opt/opencode-voice/bin/python "faster-whisper==1.2.1" "ctranslate2>=4,<5" "av==13.1.0"
     /opt/opencode-voice/bin/python -c "
 import io, wave, ctranslate2, av
 from faster_whisper.audio import decode_audio
