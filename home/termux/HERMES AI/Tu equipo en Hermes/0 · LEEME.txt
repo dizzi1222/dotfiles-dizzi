@@ -10,30 +10,27 @@ Todos preparan borradores: lo que sale hacia un cliente lo apruebas tú.
 
 
 ANTES DE EMPEZAR
-  1. Hermes instalado y con cerebro (el modelo local o una clave de OpenRouter). Si aún no lo tienes, sigue la guía del
-     curso, capítulos 2 y 3.
-  2. Mac con chip de Apple o Windows, con la app de escritorio de Hermes.
+  1. Hermes instalado y con un proveedor/modelo configurado. Si aún no lo tienes, sigue la guía del curso, capítulos 2 y 3.
+  2. Un terminal con Hermes TUI; este equipo está preparado para Linux (Bazzite, CachyOS y NixOS).
 
 
 CÓMO SE USA (unos 10 minutos)
-  1. Arrastra esta carpeta, «Tu equipo en Hermes», a tu carpeta de Descargas.
-  2. Abre Hermes y, en el chat del agente principal, escribe:
+  1. El pack queda enlazado en `~/HERMES AI/Tu equipo en Hermes/`.
+  2. Abre Hermes TUI con el agente principal y escribe:
 
-       Lee el archivo ~/Downloads/Tu equipo en Hermes/EMPEZAR.md y sigue sus instrucciones.
+       Lee el archivo ~/HERMES AI/Tu equipo en Hermes/EMPEZAR.md y sigue sus instrucciones.
 
   3. La Configuradora te hará unas preguntas sobre tu negocio, de una en una. Si prefieres probar antes, dile que
      quieres el ejemplo (un catering inventado).
   4. Al final te pedirá permiso para instalar el equipo. Hermes te enseñará la orden antes de ejecutarla: apruébala.
-  5. Abre la pestaña Bots (si no los ves, cierra y abre la app) y prueba un encargo con cada uno.
+  5. Comprueba `hermes profile list` y prueba cada perfil en su TUI: `hermes -p presupuestos --tui --resume latest` (cambia el nombre por cobros, agenda o contenido).
 
 Tus datos se quedan en tu ordenador, en la carpeta ~/Mi negocio. Si cambian tus precios o tu forma de trabajar, edita
 esa carpeta o vuelve a abrir la Configuradora.
 
 
 QUÉ HACE EL INSTALADOR (instalar-equipo.sh)
-Crea los cuatro agentes como lo hace el botón «New Agent» de la app: copia el cerebro y la clave del agente principal
-(nunca los envía a ningún sitio), les pone sus instrucciones y sus skills y les quita la terminal y el navegador, que no
-necesitan. No toca tu agente principal ni los agentes que ya tengas. Puedes leerlo antes: es un archivo de texto.
+Crea cuatro perfiles con `hermes profile create --clone-from default`: comparten el login local del agente principal, reciben sus instrucciones y skills, y tienen desactivados los toolsets que no necesitan. No copia sesiones ni canales de mensajería, y no toca el perfil default ni otros perfiles. Puedes leer el instalador antes: es un archivo de texto.
 
 
 SEGURIDAD
@@ -44,4 +41,4 @@ SEGURIDAD
 Si te atascas, pregunta en el grupo de WhatsApp con una captura de pantalla.
 
 Hermes Agent es de Nous Research (licencia MIT). Este pack no está hecho ni revisado por Nous Research.
-Probado con Hermes 0.22 (octubre de 2026).
+Portado desde el pack de Hermes Agent 0.22 (octubre de 2026); usa perfiles creados con la CLI de Hermes.

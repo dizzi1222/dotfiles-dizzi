@@ -67,6 +67,9 @@ attachments:
 # Plugin Installation
 # =============================================================================
 plugins:
+  enabled:
+  - agent-importers
+  - advanced-delegation
   # Deadline for each Git clone, fetch or checkout during plugin install. Default: 300
   # seconds. Subdirectory installs download only that folder.
   # Raise this for large repositories or slow connections. Maximum: 3600.
@@ -76,6 +79,8 @@ plugins:
 # Model Configuration
 # =============================================================================
 model:
+  aliases:
+    nemotron: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
   # Default model to use (can be overridden with --model flag)
   # Both "default" and "model" work as the key name here.
   default: "gpt-6-luna"
@@ -1950,6 +1955,20 @@ code_execution:
 # The delegate_task tool spawns child agents with isolated context.
 # Supports single tasks and batch mode (default 3 parallel, configurable).
 delegation:
+  backend: profile_routes
+  backends:
+    profile_routes:
+      profiles:
+      - name: agenda
+        description: Secuencia y próximos pasos
+      - name: cobros
+        description: Riesgos y obligaciones
+      - name: presupuestos
+        description: Opciones y criterios
+      - name: contenido
+        description: Comunicación y claridad
+  max_concurrent_children: 5
+  reasoning_effort: max
   # backend: "default"                        # Strategy routing each delegate_task task: "default" = the keys below,
                                               # else the parent's route. model_map / profile_routes come from the
                                               # advanced-delegation plugin; a backend that is missing, disabled or

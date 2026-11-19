@@ -1,42 +1,51 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Tu equipo en Hermes · Julio Barroeta (@julio.tomoko)
-# Crea los cuatro agentes (presupuestos, cobros, agenda, contenido) copiando el cerebro y las claves del agente
-# principal, como hace el botón «New Agent» de la app. No toca el agente principal ni los agentes que ya existan.
-set -u
-PACK="$(cd "$(dirname "$0")" && pwd)"
-HH="${EQUIPO_HERMES_HOME:-$HOME/.hermes}"
+# Crea cuatro perfiles desde default, comparte sus credenciales y agrega sus
+# instrucciones/skills. No toca default ni perfiles que ya existan.
+set -euo pipefail
 
+PACK="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+HH="${EQUIPO_HERMES_HOME:-${HOME:?}/.hermes}"
 HERMES="$(command -v hermes || true)"
-for c in "$HOME/.local/bin/hermes" "$HH/hermes-agent/.hermes/bin/hermes" "$HH/hermes-agent/venv/bin/hermes"; do
-  [ -z "$HERMES" ] && [ -x "$c" ] && HERMES="$c"
+for candidate in "$HOME/.local/bin/hermes" "$HH/hermes-agent/.hermes/bin/hermes" "$HH/hermes-agent/venv/bin/hermes"; do
+  if [[ -z "$HERMES" && -x "$candidate" ]]; then
+    HERMES="$candidate"
+  fi
 done
-if [ -z "$HERMES" ]; then
-  echo "No encuentro el programa de Hermes en este ordenador. ¿Está instalado y abierto al menos una vez?"
+if [[ -z "$HERMES" ]]; then
+  printf 'No encuentro Hermes. Instálalo y ábrelo al menos una vez antes de crear perfiles.\n' >&2
   exit 1
 fi
 
-crear() {  # nombre · descripción
-  local n="$1" d="$2" dir="$HH/profiles/$1"
-  if [ -e "$dir" ]; then
-    echo "· $n: ya existía, no lo toco."
-    return
+create_agent() {
+  local name="$1" description="$2" profile_dir="$HH/profiles/$1"
+  if [[ -e "$profile_dir" ]]; then
+    printf '· %s: ya existe; se conserva.\n' "$name"
+    return 0
   fi
-  if ! HERMES_HOME="$HH" "$HERMES" profile create "$n" --clone-from default --no-alias --description "$d" >/dev/null 2>&1; then
-    echo "· $n: no se ha podido crear (prueba a crearlo desde Bots → New Agent)."
-    return
+  if ! HERMES_HOME="$HH" "$HERMES" profile create "$name" \
+    --clone-from default --no-alias --description "$description"; then
+    printf '· %s: Hermes no pudo crear el perfil.\n' "$name" >&2
+    return 1
   fi
-  cp "$PACK/agentes/$n/SOUL.md" "$dir/SOUL.md"
-  rm -rf "$dir/skills" && mkdir -p "$dir/skills/negocio"
-  cp -R "$PACK/agentes/$n/skills/." "$dir/skills/negocio/"
-  HERMES_HOME="$dir" "$HERMES" config set agent.disabled_toolsets \
-    '["terminal","browser","code_execution","computer_use","delegation","image_gen","video","video_gen","kanban"]' >/dev/null 2>&1 \
-    || echo "  (aviso: quítale a mano la terminal y el navegador en Bots → $n → herramientas)"
-  echo "· $n: creado."
+  cp -- "$PACK/agentes/$name/SOUL.md" "$profile_dir/SOUL.md"
+  mkdir -p -- "$profile_dir/skills/negocio"
+  cp -R -- "$PACK/agentes/$name/skills/." "$profile_dir/skills/negocio/"
+  if ! HERMES_HOME="$profile_dir" "$HERMES" config set agent.disabled_toolsets \
+    '["terminal","browser","code_execution","computer_use","delegation","image_gen","video","video_gen","kanban"]' >/dev/null; then
+    printf '  Aviso: no se pudieron fijar los toolsets para %s; Home Manager/enlace local aplicará el config del repo.\n' "$name" >&2
+  fi
+  printf '· %s: creado.\n' "$name"
 }
 
-echo "Creando tu equipo en $HH ..."
-crear presupuestos "Presupuestos y atención al cliente"
-crear cobros "Facturas pendientes y recordatorios de cobro"
-crear agenda "Resumen de la semana y lo que falta por cerrar"
-crear contenido "Publicaciones para redes y respuestas a reseñas"
-echo "Listo. Abre la pestaña Bots de Hermes (o recarga la app) para verlos."
+printf 'Creando perfiles Hermes en %s ...\n' "$HH"
+failed=0
+create_agent presupuestos 'Presupuestos y atención al cliente' || failed=1
+create_agent cobros 'Facturas pendientes y recordatorios de cobro' || failed=1
+create_agent agenda 'Resumen de la semana y lo que falta por cerrar' || failed=1
+create_agent contenido 'Publicaciones para redes y respuestas a reseñas' || failed=1
+if (( failed )); then
+  printf 'Uno o más perfiles fallaron; revisa el mensaje de Hermes y vuelve a ejecutar el instalador.\n' >&2
+  exit 1
+fi
+printf 'Listo. Revisa los perfiles con: hermes profile list\n'

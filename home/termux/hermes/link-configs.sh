@@ -41,9 +41,20 @@ link_hermes_config() {
 
 link_hermes_config "$DOTFILES_HERMES_DIR/config.yaml" "$HERMES_HOME/config.yaml"
 link_hermes_config "$DOTFILES_HERMES_DIR/SOUL.md" "$HERMES_HOME/SOUL.md"
+link_hermes_config "$DOTFILES_HERMES_DIR/skills/agent/SKILL.md" "$HERMES_HOME/skills/agent/SKILL.md"
 
 for profile_config in "$DOTFILES_HERMES_DIR"/profiles/*/config.yaml; do
   [[ -f "$profile_config" ]] || continue
   profile_name="$(basename -- "$(dirname -- "$profile_config")")"
-  link_hermes_config "$profile_config" "$HERMES_HOME/profiles/$profile_name/config.yaml"
+  profile_dir="$HERMES_HOME/profiles/$profile_name"
+  pack_agent="$DOTFILES_HERMES_DIR/../HERMES AI/Tu equipo en Hermes/agentes/$profile_name"
+  link_hermes_config "$profile_config" "$profile_dir/config.yaml"
+  if [[ -f "$pack_agent/SOUL.md" ]]; then
+    link_hermes_config "$pack_agent/SOUL.md" "$profile_dir/SOUL.md"
+    for skill in "$pack_agent"/skills/*/SKILL.md; do
+      [[ -f "$skill" ]] || continue
+      relative_skill="${skill#"$pack_agent/skills/"}"
+      link_hermes_config "$skill" "$profile_dir/skills/negocio/$relative_skill"
+    done
+  fi
 done

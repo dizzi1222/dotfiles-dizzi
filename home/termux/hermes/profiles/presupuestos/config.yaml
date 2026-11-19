@@ -67,6 +67,8 @@ attachments:
 # Plugin Installation
 # =============================================================================
 plugins:
+  enabled:
+  - agent-importers
   # Deadline for each Git clone, fetch or checkout during plugin install. Default: 300
   # seconds. Subdirectory installs download only that folder.
   # Raise this for large repositories or slow connections. Maximum: 3600.
@@ -76,6 +78,8 @@ plugins:
 # Model Configuration
 # =============================================================================
 model:
+  aliases:
+    nemotron: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
   # Default model to use (can be overridden with --model flag)
   # Both "default" and "model" work as the key name here.
   default: "gpt-6-luna"
@@ -1232,6 +1236,7 @@ skills:
 # Agent Behavior
 # =============================================================================
 agent:
+  reasoning_effort: medium
   # Maximum tool-calling iterations per conversation (default: 500)
   # Higher = more room for complex tasks, but costs more tokens
   # Recommended: 20-30 for focused tasks, 50-100 for open exploration
@@ -1369,7 +1374,6 @@ agent:
   #   reasoning_effort:
   #     enabled: true
   #     effort: thinking
-  reasoning_effort: "max"
 
   # Per-model reasoning effort overrides (optional dict)
   # Key: any sensible model spelling works (exact, dots↔dashes interchangeable,
