@@ -1,0 +1,9 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Ejecuta Python glibc para STT conservando los argumentos y rutas de Termux.
+set -euo pipefail
+if [[ -x /opt/opencode-voice/bin/python ]]; then
+  exec /opt/opencode-voice/bin/python "$@"
+fi
+exec env -u LD_LIBRARY_PATH PROOT_NO_SECCOMP=1 proot-distro login ubuntu -- \
+  /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  HF_HUB_DISABLE_XET=1 /opt/opencode-voice/bin/python "$@"

@@ -8,7 +8,7 @@ The response selector lists every provider and chat model reported by OpenCode. 
 
 Linux defaults to local faster-whisper (`small`, Spanish). Install with `python3 -m pip install 'faster-whisper>=1.1.1' 'av<14'` in your Python environment. Keep `voice-stt-faster-whisper.py` next to `~/.local/bin/opencode-voice`. Set `OPENCODE_VOICE_PYTHON` if using a virtual environment.
 
-Termux preserves ALSA capture, `termux-tts-speak`, its Bun shebang and Gemini STT default. Configure the Gemini API key or choose OpenAI STT with its API key. Local faster-whisper is optional and requires a compatible CTranslate2/Python installation; it is not assumed available on Android.
+Termux preserves ALSA capture, `termux-tts-speak`, its Bun shebang and Gemini STT default. Install local STT from the host shell with `bash home/termux-basic-setup.sh --voice-only` (also included in the full setup). This creates an isolated Python 3.12 environment in Ubuntu/proot at `/opt/opencode-voice`, installs faster-whisper 1.2.1 with PyAV 13.1.0, deploys the transcriber and helper, and checks imports. PyAV is pinned because version 19 removes an argument used by this faster-whisper release. `voice-python-termux` selects this glibc runtime automatically; `OPENCODE_VOICE_PYTHON` remains an explicit override. Select Faster Whisper in `/voice-config`. The first transcription downloads the selected model; microphone capture and Android TTS stay in Termux. Gemini/OpenAI remain available with their API keys.
 
 The saved STT preference wins over shell variables, including `VOICE_PROVIDER=gemini`. If you already have a copy in `~/.local/bin`, update it together with the helper. From the root of the checked-out dotfiles branch:
 

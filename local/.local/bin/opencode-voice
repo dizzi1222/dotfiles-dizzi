@@ -80,8 +80,13 @@ function apiKey(): string {
   throw new Error("GOOGLE_API_KEY no está definida")
 }
 
+/** Selecciona el runtime explícito o el Python glibc aislado de Termux. */
 function pythonCommand() {
   if (env.OPENCODE_VOICE_PYTHON) return { executable: env.OPENCODE_VOICE_PYTHON, args: [] }
+  const termuxPython = join(SCRIPT_DIR, "voice-python-termux")
+  if (env.PREFIX?.includes("com.termux") && existsSync(termuxPython)) {
+    return { executable: termuxPython, args: [] }
+  }
   if (process.platform === "win32") return { executable: "py", args: ["-3.12"] }
   return { executable: "python3", args: [] }
 }
@@ -158,7 +163,11 @@ function ensureWhisperServer() {
 }
 
 function shutdownWhisperServer() {
-  if (whisperServer && whisperServer.exitCode === null) whisperServer.kill()
+  if (whisperServer && whisperServer.exitCode === null) {
+    // EOF permite cerrar Python dentro de proot, que no siempre reenvía SIGTERM.
+    whisperServer.stdin.end()
+    whisperServer.kill()
+  }
   whisperServer = null
   whisperServerReady = null
   whisperServerBuffer = ""

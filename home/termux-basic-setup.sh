@@ -22,6 +22,10 @@ print_info() { echo -e "${CYAN}  ℹ️  $1${NC}"; }
 
 [[ ! -d /data/data/com.termux ]] && echo "❌ Ejecutar en Termux" && exit 1
 
+if [[ "${1:-}" == "--voice-only" ]]; then
+  exec bash "$(dirname -- "${BASH_SOURCE[0]}")/termux-voice-setup.sh"
+fi
+
 clear
 cat <<'BANNER'
   ████████╗███████╗██████╗ ███╗   ███╗██╗   ██╗██╗  ██╗
@@ -1419,6 +1423,11 @@ if [[ -n "$DOTFILES_LOCAL_BIN" ]]; then
     install -m 644 "$DOTFILES_LOCAL_BIN/voice-stt-faster-whisper.py" "$HOME/.local/bin/voice-stt-faster-whisper.py"
   fi
   print_success "Archivos de voz instalados en ~/.local/bin"
+  if bash "$(dirname -- "${BASH_SOURCE[0]}")/termux-voice-setup.sh"; then
+    print_success "Runtime local Faster Whisper instalado y comprobado"
+  else
+    print_warning "Falló STT local; reintenta: bash home/termux-basic-setup.sh --voice-only"
+  fi
 fi
 
 # --- Registrar el plugin voice en cli.json (JSON válido, sin duplicar) ---
