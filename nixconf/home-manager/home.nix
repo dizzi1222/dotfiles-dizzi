@@ -35,6 +35,23 @@
       link = path: config.lib.file.mkOutOfStoreSymlink "${df}/${path}";
     in
     {
+      # Hermes Agent: mantener sesiones, auth, .env y memoria fuera de los enlaces.
+      # Crea primero los perfiles con hermes profile create / instalar-equipo.sh.
+      ".hermes/config.yaml".source = link "hermes/config.yaml";
+      ".hermes/SOUL.md".source = link "hermes/SOUL.md";
+      "HERMES AI".source = link "hermes/workspace";
+      ".hermes/profiles/presupuestos/config.yaml".source = link "hermes/profiles/presupuestos/config.yaml";
+      ".hermes/profiles/presupuestos/SOUL.md".source = link "hermes/workspace/Tu equipo en Hermes/agentes/presupuestos/SOUL.md";
+      ".hermes/profiles/presupuestos/skills/negocio".source = link "hermes/workspace/Tu equipo en Hermes/agentes/presupuestos/skills";
+      ".hermes/profiles/cobros/config.yaml".source = link "hermes/profiles/cobros/config.yaml";
+      ".hermes/profiles/cobros/SOUL.md".source = link "hermes/workspace/Tu equipo en Hermes/agentes/cobros/SOUL.md";
+      ".hermes/profiles/cobros/skills/negocio".source = link "hermes/workspace/Tu equipo en Hermes/agentes/cobros/skills";
+      ".hermes/profiles/agenda/config.yaml".source = link "hermes/profiles/agenda/config.yaml";
+      ".hermes/profiles/agenda/SOUL.md".source = link "hermes/workspace/Tu equipo en Hermes/agentes/agenda/SOUL.md";
+      ".hermes/profiles/agenda/skills/negocio".source = link "hermes/workspace/Tu equipo en Hermes/agentes/agenda/skills";
+      ".hermes/profiles/contenido/config.yaml".source = link "hermes/profiles/contenido/config.yaml";
+      ".hermes/profiles/contenido/SOUL.md".source = link "hermes/workspace/Tu equipo en Hermes/agentes/contenido/SOUL.md";
+      ".hermes/profiles/contenido/skills/negocio".source = link "hermes/workspace/Tu equipo en Hermes/agentes/contenido/skills";
       # Hyprland
       ".config/hypr".source = link "hypr/.config/hypr";
       # Waybar

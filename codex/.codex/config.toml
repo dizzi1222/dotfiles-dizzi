@@ -3,8 +3,8 @@
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 
-model = "gpt-6-luna"
-model_reasoning_effort = "max"
+model = "gpt-6-sol"
+model_reasoning_effort = "medium"
 service_tier = "priority"
 plan_mode_reasoning_effort = "max"
 [mcp_servers.node_repl]
