@@ -252,29 +252,55 @@ async function voiceChatModels(context: any): Promise<VoiceChatModel[]> {
   const result = await context.client.model.list()
   const models = result?.data ?? result
   if (!Array.isArray(models)) throw new Error("No pude cargar los modelos de OpenCode")
-  return models.filter(model => model.type === "chat" && model.enabled !== false)
+  return models.filter(model => model.type === "chat")
+}
+
+async function voiceProviderNames(context: any): Promise<Map<string, string>> {
+  const result = await context.client.provider?.list?.()
+  const providers = result?.data ?? result
+  if (!Array.isArray(providers)) return new Map()
+  return new Map(providers.map(provider => [provider.id, provider.name ?? provider.id]))
 }
 
 async function selectOpenCodeVoiceProfile(context: any): Promise<IVoiceRouteProfile | undefined> {
   try {
-    const models = await voiceChatModels(context)
-    if (!models.length) throw new Error("No hay modelos de chat habilitados en OpenCode")
+    const [models, names] = await Promise.all([
+      voiceChatModels(context),
+      voiceProviderNames(context).catch(() => new Map<string, string>()),
+    ])
     const saved = voicePreferences.routes.oauth
-    const providers = [...new Set(models.map(model => model.providerID))].sort()
+    const providers = [...new Set([...names.keys(), ...models.map(model => model.providerID)])].sort()
+    if (!providers.length) throw new Error("El catálogo de OpenCode no devolvió providers")
     const provider = await context.ui.dialog.select({
       title: "Respuesta OpenCode · Provider",
       current: saved.provider,
-      options: providers.map(value => ({ title: value, value })),
+      options: providers.map(value => ({
+        title: names.get(value) ?? value,
+        value,
+        description: value,
+      })),
     })
     if (!providers.includes(provider)) return
+    const available = models.filter(model => model.providerID === provider)
+    if (!available.length) {
+      toast(context, provider + " no tiene modelos de chat en el catálogo de OpenCode.", "info", "Voz", 5000)
+      return
+    }
     const id = await context.ui.dialog.select({
       title: "Respuesta OpenCode · Modelo",
       current: provider === saved.provider ? saved.model : undefined,
-      options: models.filter(model => model.providerID === provider)
-        .map(model => ({ title: model.name ?? model.id, value: model.id })),
+      options: available.map(model => ({
+        title: model.name ?? model.id,
+        value: model.id,
+        description: model.enabled === false ? model.id + " · Deshabilitado en OpenCode" : model.id,
+      })),
     })
-    const model = models.find(entry => entry.id === id && entry.providerID === provider)
+    const model = available.find(entry => entry.id === id)
     if (!model) return
+    if (model.enabled === false) {
+      toast(context, "Habilita " + provider + "/" + model.id + " en OpenCode antes de usarlo en Live.", "info", "Voz", 6000)
+      return
+    }
     const variants = (model.variants ?? []).map(entry => entry.id)
     if (!variants.length) return { provider, model: model.id }
     const variant = await context.ui.dialog.select({
@@ -740,6 +766,7 @@ async function selectLiveOpenCodeModel(context: any, sessionID: string): Promise
   const currentModel = (sessionResult?.data ?? sessionResult)?.model
   const model = models.find(candidate => candidate.id === configured.model && candidate.providerID === configured.provider)
   if (!model) throw new Error("Modelo no disponible: " + configured.provider + "/" + configured.model + ". Revisa /voice-config.")
+  if (model.enabled === false) throw new Error("Habilita " + configured.provider + "/" + configured.model + " en OpenCode para usarlo en Live.")
   if (configured.variant && !model.variants?.some(entry => entry.id === configured.variant)) {
     throw new Error("Variant no disponible: " + configured.variant + ". Revisa /voice-config.")
   }

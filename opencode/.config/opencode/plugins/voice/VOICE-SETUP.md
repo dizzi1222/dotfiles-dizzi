@@ -4,6 +4,8 @@
 
 Live transcribes full speech segments and plays the model response when the turn ends. A lower response variant reduces model effort, while transcription and playback have their own latency.
 
+The response selector lists every provider and chat model reported by OpenCode. Disabled models are visible and must be enabled in OpenCode before use.
+
 Linux defaults to local faster-whisper (`small`, Spanish). Install with `python3 -m pip install 'faster-whisper>=1.1.1' 'av<14'` in your Python environment. Keep `voice-stt-faster-whisper.py` next to `~/.local/bin/opencode-voice`. Set `OPENCODE_VOICE_PYTHON` if using a virtual environment.
 
 Termux preserves ALSA capture, `termux-tts-speak`, its Bun shebang and Gemini STT default. Configure the Gemini API key or choose OpenAI STT with its API key. Local faster-whisper is optional and requires a compatible CTranslate2/Python installation; it is not assumed available on Android.
