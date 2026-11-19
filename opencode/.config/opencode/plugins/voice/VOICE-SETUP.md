@@ -6,7 +6,7 @@ Live transcribes full speech segments and plays the model response when the turn
 
 The response selector lists every provider and chat model reported by OpenCode. Disabled models are visible and must be enabled in OpenCode before use.
 
-Linux defaults to local faster-whisper (`small`, Spanish). Install the pinned Python 3.12 runtime with `bash home/install-opencode-voice-runtime.sh`; it writes `OPENCODE_VOICE_PYTHON` to `~/.config/environment.d/80-opencode-voice.conf`. The helper must stay next to `~/.local/bin/opencode-voice`. The command also detects this runtime directly if the current session has not reloaded the environment file.
+Linux defaults to local faster-whisper (`small`, Spanish). NixOS supplies a Python 3.12 environment with `faster-whisper` and sets `OPENCODE_VOICE_PYTHON` from Home Manager. On Bazzite/CachyOS, install the pinned runtime with `bash home/install-opencode-voice-runtime.sh`; it writes the same variable to `~/.config/environment.d/80-opencode-voice.conf`. The helper must stay next to `~/.local/bin/opencode-voice`, which also detects the venv before the session reloads that environment file.
 
 Termux preserves ALSA capture, `termux-tts-speak`, its Bun shebang and Gemini STT default. Configure the Gemini API key or choose OpenAI STT with its API key. The Termux branch adds optional local STT through its Ubuntu `proot` runtime: run `bash home/termux-basic-setup.sh --voice-only` from that branch. It pins faster-whisper 1.2.1 with PyAV 13.1.0 and checks the runtime. `voice-python-termux` is selected automatically; `OPENCODE_VOICE_PYTHON` can override it. Android microphone and TTS still need a device test.
 
