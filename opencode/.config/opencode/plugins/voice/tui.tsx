@@ -29,7 +29,7 @@ interface IVoicePreferences {
 const DEFAULT_VOICE_PREFERENCES: IVoicePreferences = {
   backend: "oauth",
   routes: {
-    oauth: { provider: "openai", model: "gpt-5.6-luna", variant: "max" },
+    oauth: { provider: "openai", model: "gpt-5.6-luna", variant: "low" },
     agy: { provider: "antigravity", model: "gemini-3.8-flash-medium" },
     codex: { provider: "codex-app-server", model: "gpt-5.6-luna", variant: "max" },
   },
@@ -162,7 +162,7 @@ let updateLiveStatusView: (view: ILiveStatusView) => void = () => {}
 function voiceBackendLabel(backend: TVoiceBackend): string {
   if (backend === "agy") return "AGY ACP"
   if (backend === "codex") return "Codex app-server"
-  return "ChatGPT OAuth"
+  return "OpenCode"
 }
 
 function cloneVoicePreferences(): IVoicePreferences {
@@ -175,31 +175,25 @@ async function configureVoiceRoute(context: any): Promise<void> {
     title: "Motor de respuestas de voz",
     current: state.voiceBackend,
     options: [
-      { title: "ChatGPT OAuth", value: "oauth", description: "Cuenta de ChatGPT mediante OpenCode OAuth." },
+      { title: "OpenCode", value: "oauth", description: "Providers y modelos configurados en OpenCode." },
       { title: "AGY ACP", value: "agy", description: "Sesión persistente de Antigravity ACP." },
       { title: "Codex app-server", value: "codex", description: "Codex oficial por JSON-RPC; no usa codex-acp." },
     ],
   }) as TVoiceBackend | undefined
   if (!backend) return
 
-  const providers: Record<TVoiceBackend, Array<{ title: string; value: string; description: string }>> = {
-    oauth: [{ title: "OpenAI ChatGPT OAuth", value: "openai", description: "Usa la sesión OAuth guardada en OpenCode." }],
-    agy: [{ title: "Antigravity ACP", value: "antigravity", description: "Usa el transporte ACP de agy." }],
-    codex: [{ title: "Codex app-server", value: "codex-app-server", description: "Usa initialize/thread/start/turn/start." }],
+  if (backend === "oauth") {
+    const response = await selectOpenCodeVoiceProfile(context)
+    if (!response) return
+    const next = cloneVoicePreferences()
+    next.backend = "oauth"
+    next.routes.oauth = response
+    await saveVoiceConfiguration(context, next)
+    return
   }
-  const provider = await context.ui.dialog.select({
-    title: `${voiceBackendLabel(backend)} · Provider`,
-    current: voicePreferences.routes[backend].provider,
-    options: providers[backend],
-  }) as string | undefined
-  if (!provider) return
 
-  const modelOptions: Record<TVoiceBackend, Array<{ title: string; value: string }>> = {
-    oauth: [
-      { title: "GPT-5.6 Luna", value: "gpt-5.6-luna" },
-      { title: "GPT-5.6 Sol", value: "gpt-5.6-sol" },
-      { title: "GPT-6 Luna", value: "gpt-6-luna" },
-    ],
+  const provider = backend === "agy" ? "antigravity" : "codex-app-server"
+  const modelOptions = {
     agy: [
       { title: "Gemini 3.8 Flash Medium", value: "gemini-3.8-flash-medium" },
       { title: "Gemini 3.8 Flash High", value: "gemini-3.8-flash-high" },
@@ -245,6 +239,70 @@ async function configureVoiceRoute(context: any): Promise<void> {
   )
 }
 
+type VoiceChatModel = {
+  id: string
+  providerID: string
+  name?: string
+  type: string
+  enabled?: boolean
+  variants?: Array<{ id: string }>
+}
+
+async function voiceChatModels(context: any): Promise<VoiceChatModel[]> {
+  const result = await context.client.model.list()
+  const models = result?.data ?? result
+  if (!Array.isArray(models)) throw new Error("No pude cargar los modelos de OpenCode")
+  return models.filter(model => model.type === "chat" && model.enabled !== false)
+}
+
+async function selectOpenCodeVoiceProfile(context: any): Promise<IVoiceRouteProfile | undefined> {
+  try {
+    const models = await voiceChatModels(context)
+    if (!models.length) throw new Error("No hay modelos de chat habilitados en OpenCode")
+    const saved = voicePreferences.routes.oauth
+    const providers = [...new Set(models.map(model => model.providerID))].sort()
+    const provider = await context.ui.dialog.select({
+      title: "Respuesta OpenCode · Provider",
+      current: saved.provider,
+      options: providers.map(value => ({ title: value, value })),
+    })
+    if (!providers.includes(provider)) return
+    const id = await context.ui.dialog.select({
+      title: "Respuesta OpenCode · Modelo",
+      current: provider === saved.provider ? saved.model : undefined,
+      options: models.filter(model => model.providerID === provider)
+        .map(model => ({ title: model.name ?? model.id, value: model.id })),
+    })
+    const model = models.find(entry => entry.id === id && entry.providerID === provider)
+    if (!model) return
+    const variants = (model.variants ?? []).map(entry => entry.id)
+    if (!variants.length) return { provider, model: model.id }
+    const variant = await context.ui.dialog.select({
+      title: "Respuesta OpenCode · Variant",
+      current: saved.model === id && saved.provider === provider && variants.includes(saved.variant ?? "")
+        ? saved.variant : "__default__",
+      options: [
+        { title: "Predeterminada del modelo", value: "__default__" },
+        ...variants.map(value => ({ title: value, value })),
+      ],
+    })
+    if (variant === "__default__") return { provider, model: model.id }
+    if (variants.includes(variant)) return { provider, model: model.id, variant }
+  } catch (error) {
+    toast(context, "Configuración de respuesta: " + (error as Error).message, "error", "Voz", 6000)
+  }
+}
+
+async function saveVoiceConfiguration(context: any, next: IVoicePreferences): Promise<void> {
+  await persistVoicePreferences(next)
+  voicePreferences = next
+  state.voiceBackend = next.backend
+  const response = next.routes[next.backend]
+  const summary = [response.provider, response.model, response.variant].filter(Boolean).join("/")
+  const restart = state.live.active ? " Reinicia Live para aplicar." : ""
+  toast(context, "STT " + next.stt.provider + "/" + next.stt.model + " · Respuesta " + summary + "." + restart, "success", "Voz", 6000)
+}
+
 /** Configura provider, modelo e idioma del reconocimiento de voz. */
 async function configureVoiceStt(context: any): Promise<void> {
   const provider = await context.ui.dialog.select({
@@ -279,11 +337,13 @@ async function configureVoiceStt(context: any): Promise<void> {
   }) as string | undefined
   if (!model) return
 
+  const response = await selectOpenCodeVoiceProfile(context)
+  if (!response) return
   const next = cloneVoicePreferences()
   next.stt = { provider, model, language: next.stt.language || "es" }
-  voicePreferences = next
-  await persistVoicePreferences(next)
-  toast(context, `STT: ${provider} · ${model} · idioma ${next.stt.language}`, "success", "Voz", 5000)
+  next.backend = "oauth"
+  next.routes.oauth = response
+  await saveVoiceConfiguration(context, next)
 }
 
 /** Abre el selector de ruta o el selector de STT. */
@@ -292,7 +352,7 @@ async function configureVoiceBackend(context: any): Promise<void> {
     title: "Configuración de voz",
     options: [
       { title: "Ruta de respuestas", value: "route", description: "Motor -> Provider -> Modelo -> Variante." },
-      { title: "Transcripción STT", value: "stt", description: "Provider -> Modelo -> idioma." },
+      { title: "Transcripción STT", value: "stt", description: "Motor y modelo STT, luego provider, modelo y variant de respuesta." },
     ],
   }) as "route" | "stt" | undefined
   if (area === "route") await configureVoiceRoute(context)
@@ -532,10 +592,11 @@ function resolveVoiceCommand(commandArgs: string[]): IVoiceCommand | null {
 }
 
 /** Inyecta la configuración STT persistida en cada proceso de captura. */
-function voiceEnvironment(): NodeJS.ProcessEnv {
+function voiceEnvironment(overrides?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const stt = voicePreferences.stt
   const environment: NodeJS.ProcessEnv = {
     ...AUDIO_ENV,
+    ...overrides,
     VOICE_PROVIDER: stt.provider,
     VOICE_MODEL: stt.model,
     VOICE_LANGUAGE: stt.language,
@@ -553,7 +614,7 @@ function voiceEnvironment(): NodeJS.ProcessEnv {
 function spawnVoice(commandArgs: string[], options: Parameters<typeof spawn>[2]): ChildProcess {
   const voice = resolveVoiceCommand(commandArgs)
   if (!voice) throw new Error("Falta ~/.local/bin/opencode-voice")
-  const merged = { ...options, env: { ...voiceEnvironment(), ...(options?.env ?? {}) } }
+  const merged = { ...options, env: voiceEnvironment(options?.env) }
   return spawn(voice.executable, voice.args, IS_WINDOWS ? { ...merged, windowsHide: true } : merged)
 }
 
@@ -564,8 +625,31 @@ function runVoice(commandArgs: string[], options: Parameters<typeof execFile>[2]
   return run(
     voice.executable,
     voice.args,
-    IS_WINDOWS ? { ...options, env: { ...voiceEnvironment(), ...(options?.env ?? {}) }, windowsHide: true } : { ...options, env: { ...voiceEnvironment(), ...(options?.env ?? {}) } },
+    IS_WINDOWS ? { ...options, env: voiceEnvironment(options?.env), windowsHide: true } : { ...options, env: voiceEnvironment(options?.env) },
   ) as Promise<{ stdout: string; stderr: string }>
+}
+
+async function checkVoiceStt(): Promise<void> {
+  if (voicePreferences.stt.provider !== "faster-whisper") return
+  try {
+    await runVoice(["check-stt"], { timeout: 25000 })
+  } catch (error) {
+    const detail = String((error as { stderr?: string }).stderr ?? "").trim()
+    const hasDiagnostic = detail.startsWith("STT faster-whisper:")
+    throw new Error(hasDiagnostic ? detail : "Actualiza opencode-voice y su helper juntos. El transcriptor instalado no pudo comprobar faster-whisper.")
+  }
+}
+
+function initialVoiceStt(): IVoicePreferences["stt"] {
+  const defaults = DEFAULT_VOICE_PREFERENCES.stt
+  const provider = process.env.VOICE_PROVIDER
+  if (provider !== "faster-whisper" && provider !== "gemini" && provider !== "openai" &&
+    !(provider === "windows" && IS_WINDOWS)) return defaults
+  const models = {
+    "faster-whisper": "small", gemini: "gemini-2.5-flash",
+    openai: "gpt-4o-mini-transcribe", windows: "local",
+  }
+  return { provider, model: process.env.VOICE_MODEL || models[provider], language: process.env.VOICE_LANGUAGE || defaults.language }
 }
 
 /** Encuentra el sintetizador disponible en Linux, Termux o Windows. */
@@ -642,55 +726,32 @@ async function submitTranscript(context: any, text: string, targetSessionID: str
   await client.session.prompt({ sessionID: targetSessionID, text })
 }
 
-/** Selecciona el modelo OAuth configurado para Live; nunca elige un modelo Fast implícito. */
-async function selectLiveOpenAIModel(context: any, sessionID: string): Promise<void> {
+/** Aplica el perfil de respuesta de OpenCode a la sesión Live. */
+async function selectLiveOpenCodeModel(context: any, sessionID: string): Promise<void> {
   const client = context?.client
-  if (!client?.session?.get || !client?.session?.switchModel || !client?.model?.list || !client?.integration?.list) {
+  if (!client?.session?.get || !client?.session?.switchModel || !client?.model?.list) {
     throw new Error("Esta versión de OpenCode no permite cambiar el modelo de la sesión desde el plugin")
   }
-
-  const [sessionResult, modelResult, integrationResult] = await Promise.all([
-    client.session.get({ sessionID }),
-    client.model.list(),
-    client.integration.list(),
-  ])
-  const session = sessionResult?.data ?? sessionResult
-  const availableModels = modelResult?.data ?? modelResult
-  const integrations = integrationResult?.data ?? integrationResult
-  const openAIIntegration = Array.isArray(integrations)
-    ? integrations.find((integration: any) => integration?.id === "openai")
-    : null
-  const hasOAuth = openAIIntegration?.connections?.some(
-    (connection: any) => connection?.type === "credential" && connection?.method === "oauth",
-  )
-  if (!hasOAuth) throw new Error("No hay una sesión OAuth de ChatGPT guardada en OpenCode")
-  const currentModel = session?.model
-  const candidates = Array.isArray(availableModels)
-    ? availableModels.filter((model: any) => model?.providerID === "openai" && model?.type === "chat")
-    : []
   const configured = voicePreferences.routes.oauth
-  const preferred = process.env.OPENCODE_VOICE_MODEL ?? configured.model
-  const model = candidates.find((candidate: any) => candidate.id === preferred)
-    ?? candidates.find((candidate: any) => candidate.id === "gpt-5.6-luna")
-
-  if (!model) throw new Error("No hay modelos ChatGPT disponibles en el catálogo OAuth de OpenAI")
-
+  const [sessionResult, models] = await Promise.all([
+    client.session.get({ sessionID }),
+    voiceChatModels(context),
+  ])
+  const currentModel = (sessionResult?.data ?? sessionResult)?.model
+  const model = models.find(candidate => candidate.id === configured.model && candidate.providerID === configured.provider)
+  if (!model) throw new Error("Modelo no disponible: " + configured.provider + "/" + configured.model + ". Revisa /voice-config.")
+  if (configured.variant && !model.variants?.some(entry => entry.id === configured.variant)) {
+    throw new Error("Variant no disponible: " + configured.variant + ". Revisa /voice-config.")
+  }
+  const selected = { id: model.id, providerID: model.providerID, variant: configured.variant }
+  await client.session.switchModel({ sessionID, model: selected })
   liveModelRefs.set(sessionID, {
     id: currentModel?.id,
     providerID: currentModel?.providerID,
     variant: currentModel?.variant,
-    selected: { id: model.id, providerID: model.providerID, variant: configured.variant ?? "max" },
+    selected,
   })
-  await client.session.switchModel({
-    sessionID,
-    model: { id: model.id, providerID: model.providerID, variant: configured.variant ?? "max" },
-  })
-  voiceLog("oauth_model_selected", {
-    sessionID,
-    provider: model.providerID,
-    model: model.id,
-    variant: configured.variant ?? "max",
-  })
+  voiceLog("opencode_model_selected", { sessionID, ...selected })
 }
 
 const liveModelRefs = new Map<string, {
@@ -848,6 +909,7 @@ async function stopAndTranscribe(context: any): Promise<void> {
       return
     }
 
+    await checkVoiceStt()
     const { stdout } = await runVoice(["transcribe", recording.wavPath], {
       timeout: 90000,
       env: AUDIO_ENV,
@@ -1604,6 +1666,19 @@ async function startLive(context: any): Promise<void> {
   live.sessionID = sessionID
   live.context = context
   live.voiceBackend = state.voiceBackend
+  const sttCheck = checkVoiceStt()
+  live.modelSelection = sttCheck
+  try {
+    await sttCheck
+  } catch (error) {
+    if (live.starting && live.modelSelection === sttCheck) {
+      await stopLive()
+      toast(context, (error as Error).message, "error", "Live", 7000)
+    }
+    return
+  }
+  if (!live.starting || live.modelSelection !== sttCheck) return
+  live.modelSelection = null
   const selectedProfile = voicePreferences.routes[live.voiceBackend]
   voiceLog("live_start", {
     route: live.voiceBackend,
@@ -1621,7 +1696,7 @@ async function startLive(context: any): Promise<void> {
     5000,
   )
   if (live.voiceBackend === "oauth") {
-    const modelSelection = selectLiveOpenAIModel(context, sessionID)
+    const modelSelection = selectLiveOpenCodeModel(context, sessionID)
     live.modelSelection = modelSelection
     try {
       await modelSelection
@@ -1648,12 +1723,12 @@ async function startLive(context: any): Promise<void> {
         live.sessionID = null
         live.modelSelection = null
         live.context = null
-        toast(context, `ChatGPT OAuth no pudo activarse y el fallback está deshabilitado: ${(error as Error).message}`, "error", "Live", 7000)
+        toast(context, `La ruta OpenCode no pudo activarse y el fallback está deshabilitado: ${(error as Error).message}`, "error", "Live", 7000)
         return
       }
       toast(
         context,
-        `ChatGPT OAuth no pudo activarse (${(error as Error).message}); Live usará ${startupFallbackAgent === "agy" ? "AGY ACP" : "Codex app-server"}`,
+        `La ruta OpenCode no pudo activarse (${(error as Error).message}); Live usará ${startupFallbackAgent === "agy" ? "AGY ACP" : "Codex app-server"}`,
         "warning",
         "Live",
         8000,
@@ -1763,7 +1838,7 @@ export default Plugin.define({
     if (!context?.keymap?.layer) return
 
     const [savedPreferences, updateVoicePreferences] = context.storage.store("voice-preferences", {
-      initial: structuredClone(DEFAULT_VOICE_PREFERENCES),
+      initial: { ...structuredClone(DEFAULT_VOICE_PREFERENCES), stt: initialVoiceStt() },
     })
     const saved = savedPreferences as Partial<IVoicePreferences>
     voicePreferences = {
@@ -1783,7 +1858,7 @@ export default Plugin.define({
       active: false,
       muted: false,
       phase: "listening",
-      route: "ChatGPT OAuth",
+      route: "OpenCode",
       startedAt: 0,
       updatedAt: 0,
     })
