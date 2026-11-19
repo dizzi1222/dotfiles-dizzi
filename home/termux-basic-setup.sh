@@ -1415,7 +1415,10 @@ if [[ -n "$DOTFILES_LOCAL_BIN" ]]; then
       install -m 700 "$DOTFILES_LOCAL_BIN/$tool" "$HOME/.local/bin/$tool"
     fi
   done
-  print_success "opencode-voice + voice-doctor instalados en ~/.local/bin"
+  if [[ -f "$DOTFILES_LOCAL_BIN/voice-stt-faster-whisper.py" ]]; then
+    install -m 644 "$DOTFILES_LOCAL_BIN/voice-stt-faster-whisper.py" "$HOME/.local/bin/voice-stt-faster-whisper.py"
+  fi
+  print_success "Archivos de voz instalados en ~/.local/bin"
 fi
 
 # --- Registrar el plugin voice en cli.json (JSON válido, sin duplicar) ---
