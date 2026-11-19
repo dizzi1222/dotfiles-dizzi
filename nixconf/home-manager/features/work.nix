@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
-
+let
+  opencodeVoicePython = pkgs.python312.withPackages (ps: [ ps.faster-whisper ]);
+in
 {
+  home.sessionVariables.OPENCODE_VOICE_PYTHON = "${opencodeVoicePython}/bin/python3.12";
+
   # ── Development Tools ──────────────────────────────────────
   home.packages = with pkgs; [
     # cursor-cli
@@ -28,6 +32,8 @@
       ps.fastapi
       ps.uvicorn
     ]))
+    # OpenCode Live STT: Python 3.12 separado del Python general del sistema.
+    opencodeVoicePython
     pyenv
     nodejs
     pnpm #  pnpm add -D jest
