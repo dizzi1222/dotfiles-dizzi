@@ -91,7 +91,7 @@ function fasterWhisperReady() {
   const result = spawnSync(python.executable, [...python.args, "-c", "import faster_whisper"], {
     encoding: "utf8",
     windowsHide: true,
-    timeout: 10000,
+    timeout: 20000,
   })
   fasterWhisperInstalled = result.status === 0
   return fasterWhisperInstalled
@@ -656,6 +656,14 @@ async function doctor() {
 const [command = "listen", argument] = process.argv.slice(2)
 
 switch (command) {
+  case "check-stt": {
+    const helper = join(SCRIPT_DIR, "voice-stt-faster-whisper.py")
+    if (!existsSync(helper) || !fasterWhisperReady()) {
+      console.error("STT faster-whisper: falta el helper o Python con faster-whisper/CTranslate2 compatible. Actualiza ambos archivos y comprueba OPENCODE_VOICE_PYTHON.")
+      process.exitCode = 2
+    }
+    break
+  }
   case "listen": {
     runEngine({})
     break
