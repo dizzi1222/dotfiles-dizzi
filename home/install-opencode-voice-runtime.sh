@@ -41,11 +41,26 @@ export UV_CACHE_DIR
 
 mkdir -p "$VOICE_HOME"
 uv python install 3.12
-uv venv --python 3.12 "$VOICE_VENV"
+if [[ ! -x "$VOICE_PYTHON" ]] || ! "$VOICE_PYTHON" -c 'import sys; raise SystemExit(sys.version_info[:2] != (3, 12))'; then
+  uv venv --python 3.12 --clear "$VOICE_VENV"
+fi
 uv pip install --python "$VOICE_PYTHON" \
   "faster-whisper==1.2.1" \
   "ctranslate2>=4,<5" \
   "av==13.1.0"
+
+VOICE_HELPER="$HOME/.local/bin/voice-stt-faster-whisper.py"
+mkdir -p "$HOME/.local/bin"
+if [[ -L "$VOICE_HELPER" ]]; then
+  if [[ ! -e "$VOICE_HELPER" ]]; then
+    echo "El enlace del helper STT está roto: $VOICE_HELPER" >&2
+    exit 1
+  fi
+elif [[ -e "$VOICE_HELPER" ]]; then
+  install -m 644 "$VOICE_REPO/local/.local/bin/voice-stt-faster-whisper.py" "$VOICE_HELPER"
+else
+  ln -s "$VOICE_REPO/local/.local/bin/voice-stt-faster-whisper.py" "$VOICE_HELPER"
+fi
 
 mkdir -p "$HOME/.config/environment.d"
 printf 'OPENCODE_VOICE_PYTHON="%s"\n' "$VOICE_PYTHON" \
