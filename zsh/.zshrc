@@ -826,8 +826,8 @@ gitflow() {
     16)
       cd /home/diego/dotfiles-dizzi
       git add .
-      git commit --fixup a2455f6c
-      GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash a2455f6c^
+      git commit --fixup 33d27f86 
+      GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash 33d27f86^
       ;;
     17) echo "❌ Cancelado" ;;
     *) echo "❌ Opción inválida" ;;

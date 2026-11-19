@@ -410,3 +410,11 @@ local/.local/bin/juegos/GLCache/
 
 # opencode password xd
 opencode/.config/opencode/service.json
+
+# Hermes: credenciales y estado privado; versionar solo los ajustes y el pack.
+/hermes/**/.env*
+/hermes/**/auth.json*
+/hermes/**/.hermes_history*
+/hermes/**/sessions/
+/hermes/**/memories/
+/hermes/**/*.pre-dotfiles-*
