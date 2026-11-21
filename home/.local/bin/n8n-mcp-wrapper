@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# n8n-mcp-wrapper — Wrapper para el servidor MCP oficial n8n-mcp
+# Carga node@22, librerías y credenciales de la instancia n8n local
+set -euo pipefail
+
+export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export PATH="/home/linuxbrew/.linuxbrew/opt/node@22/bin:$PATH"
+
+# Cargar variables de n8n si existen
+set +u
+if [[ -f "$HOME/.n8n/config" ]]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.n8n/config"
+fi
+
+if [[ -f "$HOME/.api-keys.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.api-keys.sh"
+fi
+set -u
+
+export N8N_API_URL="${N8N_API_URL:-http://localhost:5678}"
+export N8N_API_KEY="${N8N_API_KEY:?Error: N8N_API_KEY no configurada. Define la variable en ~/.api-keys.sh}"
+
+# Deshabilitar telemetría
+export N8N_MCP_TELEMETRY_DISABLED=true
+
+exec /home/linuxbrew/.linuxbrew/opt/node@22/bin/node \
+  "$HOME/.npm-global/lib/node_modules/n8n-mcp/dist/mcp/stdio-wrapper.js" "$@"

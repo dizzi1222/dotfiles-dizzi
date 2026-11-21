@@ -7,7 +7,7 @@
     }
   },
   "experimental": {
-    "todo": true 
+    "todo": true
   },
   "notes": {
     "engram": {
@@ -48,11 +48,7 @@
         "disabled": false
       },
       "engram": {
-        "command": [
-          "/home/diego/.local/bin/engram",
-          "mcp",
-          "--tools=agent"
-        ],
+        "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
         "type": "local",
         "disabled": false
       },
@@ -68,9 +64,7 @@
       },
       "swissdevjobs": {
         "type": "local",
-        "command": [
-          "swissdevjobs-mcp"
-        ],
+        "command": ["swissdevjobs-mcp"],
         "environment": {
           "SDJ_NAME": "Diego Samuel Hardi Santana",
           "SDJ_EMAIL": "diegosamuel042@gmail.com",
@@ -79,6 +73,7 @@
         "disabled": false
       },
       "webshare-es": {
+        "_comment": "Referencia dataimpulse-mcp: cambiar WS_HOST_*/WS_PORT_* para otra IP. Gestión via proxy-manager skill + webshare CLI.",
         "type": "local",
         "command": [
           "bash",
@@ -88,121 +83,13 @@
         "environment": {
           "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
         },
-        "disabled": false
-      },
-      "webshare-pl": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_PL\" DI_PROXY_PORT=\"$WS_PORT_PL\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
         "disabled": true
       },
-      "webshare-uk": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_UK\" DI_PROXY_PORT=\"$WS_PORT_UK\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": false
-      },
-      "webshare-us": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US\" DI_PROXY_PORT=\"$WS_PORT_US\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-2": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_2\" DI_PROXY_PORT=\"$WS_PORT_US_2\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-3": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_3\" DI_PROXY_PORT=\"$WS_PORT_US_3\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-4": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_4\" DI_PROXY_PORT=\"$WS_PORT_US_4\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-5": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_5\" DI_PROXY_PORT=\"$WS_PORT_US_5\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-6": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_6\" DI_PROXY_PORT=\"$WS_PORT_US_6\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
-      "webshare-us-7": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_7\" DI_PROXY_PORT=\"$WS_PORT_US_7\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      }      ,
       "todoist": {
         "type": "remote",
         "url": "https://ai.todoist.net/mcp",
         "headers": {
-          "Authorization": "Bearer b65cd36702e95b17db59270794edd59ab41fe30c"
+          "Authorization": "Bearer {env:TODOIST_TOKEN}"
         },
         "disabled": false
       },
@@ -210,7 +97,7 @@
         "type": "remote",
         "url": "https://gitlab.com/api/v4/mcp",
         "headers": {
-          "Authorization": "Bearer 56e4ae1dcac3c82f5f94aae132aff167fa011b68557b0cb4784ad09eae2f5283"
+          "Authorization": "Bearer {env:GITLAB_TOKEN}"
         },
         "disabled": false
       },
@@ -218,7 +105,7 @@
         "type": "remote",
         "url": "https://mcp.postman.com/minimal",
         "headers": {
-          "Authorization": "Bearer a06821a3-f748-422a-8573-8ae9ab6380f4:5cdb9832e0e27fed5311e26eef628345ca1b7f5b553195e58a84a4cc13725af90ea726ac8789ed5d2bacf44c4ae3d215e319c842ccdf6677ac174873496bd99172c058fab71c647e84cc4cecb0d5a19ac3f5040d657d5b32c0a3d0bded076ebc852b86e2898e26971ec5c99235879bc9e21d2c1fe77fb2b850d9ddbc8f20176bec40f1c6dfa2872ce8c5e85e6c5363420acd411fb808207d147067514a04c6dffa77c434a9f318a2e8f7c845b00724df512399698da22ce1ae9d95deab9b651965eb399c22:960f18a2722d487b7a50c94f"
+          "Authorization": "Bearer {env:POSTMAN_API_KEY}"
         },
         "disabled": false
       },
@@ -226,7 +113,7 @@
         "type": "remote",
         "url": "https://mcp.prisma.io/mcp",
         "headers": {
-          "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IlRrSEQ3WW05Q1pDbERIdjBrMTJMQWFaOTg1N0Y4TXp1bFhNckEwWmptZWsifQ.eyJjbGllbnRfaWQiOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SW1SamNpdHFkM1FpTENKcmFXUWlPaUpVYTBoRU4xbHRPVU5hUTJ4RVNIWXdhekV5VEVGaFdqazROVGRHT0UxNmRXeFlUWEpCTUZwcWJXVnJJbjAuZXlKcWRHa2lPaUp5Y0hZNFl6SjNaVGR6WXpjM016Um5kVEF6WTI1Nk4yc2lMQ0p5WldScGNtVmpkRjkxY21seklqcGJJbWgwZEhBNkx5OHhNamN1TUM0d0xqRTZOREExTnpNdlkyRnNiR0poWTJzaVhTd2lZMnhwWlc1MFgyNWhiV1VpT2lKSVpYSnRaWE1nUVdkbGJuUWlMQ0p6WldOeVpYUmZhR0Z6YUNJNklpSXNJblJ2YTJWdVgyVnVaSEJ2YVc1MFgyRjFkR2hmYldWMGFHOWtJam9pYm05dVpTSXNJbWx6Y3lJNkltaDBkSEJ6T2k4dllYVjBhQzV3Y21semJXRXVhVzhpTENKcFlYUWlPakUzT1RVeU16VTFNVEI5LkVQQTJNOUJwRGFBSWxwNXdoN1dVQWMxTGlQUEcxV194YS05XzNTSzFjY3BwcURaU20xU1Z2WVB6V3k3SkhiaHduUVBWQTR5VDdVbk1NUE9TemJ1a3JVWVIzN2NPOEJFS0NHSEpZb0ZJZjhteWpCTmpQdWNtU1pJdDFwUy15Tm9odTYycFlrSEUyYVE4b3drbkJ5dC1zYmZUcWJMQjdVSkV3M0U1RkozTWlDSGJUZzRzWks5QzNCMVhsUjJuemh4d25KUGluMVJvS3k4STlWendrOEJOVUNzNGJDVWpBTkYyQXpoYkpMWUZpTjVza1ZTOXRxa29iZXJtdVJ6OEdSd2Z2Qk01YTVtclhKQ1pvYTNEZ2Nub3htV1haUXFyUDFQTWxBY0NNRVpBNmFFaENSOE14YTZpUDRYZUlrZldmR3lkVVYxalV0aFJTME9FejFOcXNuQnN6dyIsInNjb3BlIjoid29ya3NwYWNlOmFkbWluIG9mZmxpbmVfYWNjZXNzIiwidG9rZW5fdHlwZSI6ImFjY2Vzc190b2tlbiIsIndvcmtzcGFjZV9pZCI6InNmbDU3dWhteXVjanJ3dWljMG55MzM5byIsImF1ZCI6Imh0dHBzOi8vbWNwLnByaXNtYS5pby9tY3AiLCJleHAiOjE3OTUyNzQyMTcsImlhdCI6MTc5NTI3MDYxNywiaXNzIjoiaHR0cHM6Ly9hdXRoLnByaXNtYS5pbyIsImp0aSI6Ink3N2NzZ2VmeW85d2w0NHc0MTFnc25mYSIsInN1YiI6InVzZXI6dWR4eTU2Nm43Mmd2ajZsazN3MGFybnRuIn0.NKHmNotmW5swI53DWW3FSbSpCQNPvwT4LRSZxqfhKCEaUWGgVxH1lFBQyUUCvCM9HjBNnsJZNhAoqVlD4EHemwLiK501EBYhv4zRLNiPj91NXopidLq_mtJTOBHkEDIs1dh-v5a2MbTzguEocfiTM-m6C2A2qR9Ek6wm07a5CVtHh-HihA4fo8zRSkKjTmymOvnRpiq397lnIYPFh2Fhhmfv6-J-56LGOUBy_Z4ryFJKYu71a3W9TOF7MtaE41CvlB75fqXLTY4fbSUQmAG4ww4w9u5JeNNz2rkgf9iRrjp11Yf9mnJd9FZmd8gSynZ-lZTDsHR4oKkv8FY37YuSNw"
+          "Authorization": "Bearer {env:PRISMA_TOKEN}"
         },
         "disabled": false
       },
@@ -234,7 +121,7 @@
         "type": "remote",
         "url": "https://rentahuman.ai/api/mcp",
         "headers": {
-          "Authorization": "Bearer f0yEu7HfR8lUET2MR6eBj1FlisIAiVYHtFUi9adyWeo"
+          "x-api-key": "{env:RENTAHUMAN_API_KEY}"
         },
         "disabled": false
       },
@@ -250,23 +137,15 @@
       },
       "n8n": {
         "type": "local",
-        "command": ["bash", "-c",
-          "source ~/.n8n/config && node ~/.n8n-node22/lib/node_modules/@n8n/mcp-server/index.js"],
-        "environment": {
-          "LD_LIBRARY_PATH": "/home/linuxbrew/.linuxbrew/lib",
-          "PATH": "/home/linuxbrew/.linuxbrew/opt/node@22/bin:/home/diego/.local/bin:/usr/bin:/bin"
-        },
+        "command": ["/home/diego/.local/bin/n8n-mcp-wrapper"],
         "disabled": false
       },
       "shopify": {
         "type": "local",
-        "command": ["bash", "-c",
-          "source ~/.api-keys.sh && node /home/diego/.n8n-node22/lib/node_modules/@shopify/dev-mcp/dist/index.js"],
+        "command": ["/home/diego/.local/bin/shopify-mcp"],
         "environment": {
-          "SHOPIFY_ACCESS_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
-          "SHOP": "hermesabogados.myshopify.com",
-          "LD_LIBRARY_PATH": "/home/linuxbrew/.linuxbrew/lib",
-          "PATH": "/home/linuxbrew/.linuxbrew/opt/node@22/bin:/home/diego/.local/bin:/usr/bin:/bin"
+          "SHOPIFY_ADMIN_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
+          "SHOPIFY_SHOP": "hermesabogados.myshopify.com"
         },
         "disabled": false
       }
