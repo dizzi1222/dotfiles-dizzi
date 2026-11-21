@@ -655,6 +655,12 @@ case "$ICON" in
     kitty --hold -e bash ~/scripts/cinnamon-satty-region.sh
   fi
   ;;
+"󰸉")
+  # Waywallen – forzar plugin de fondo y relanzar si está caído
+  systemctl --user restart waywallen.service 2>/dev/null || \
+    bash ~/.local/bin/waywallen-preset
+  notify-send "Waywallen" "Reiniciado y plugin de fondo restaurado" --icon=video-display 2>/dev/null || true
+  ;;
 "󰊭")
   kitty --hold -e bash -c '~/scripts/antigravity-wipe-nuclear.sh'
   ;;

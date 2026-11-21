@@ -197,6 +197,78 @@
           "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
         },
         "disabled": true
+      }      ,
+      "todoist": {
+        "type": "remote",
+        "url": "https://ai.todoist.net/mcp",
+        "headers": {
+          "Authorization": "Bearer b65cd36702e95b17db59270794edd59ab41fe30c"
+        },
+        "disabled": false
+      },
+      "gitlab": {
+        "type": "remote",
+        "url": "https://gitlab.com/api/v4/mcp",
+        "headers": {
+          "Authorization": "Bearer 56e4ae1dcac3c82f5f94aae132aff167fa011b68557b0cb4784ad09eae2f5283"
+        },
+        "disabled": false
+      },
+      "postman": {
+        "type": "remote",
+        "url": "https://mcp.postman.com/minimal",
+        "headers": {
+          "Authorization": "Bearer a06821a3-f748-422a-8573-8ae9ab6380f4:5cdb9832e0e27fed5311e26eef628345ca1b7f5b553195e58a84a4cc13725af90ea726ac8789ed5d2bacf44c4ae3d215e319c842ccdf6677ac174873496bd99172c058fab71c647e84cc4cecb0d5a19ac3f5040d657d5b32c0a3d0bded076ebc852b86e2898e26971ec5c99235879bc9e21d2c1fe77fb2b850d9ddbc8f20176bec40f1c6dfa2872ce8c5e85e6c5363420acd411fb808207d147067514a04c6dffa77c434a9f318a2e8f7c845b00724df512399698da22ce1ae9d95deab9b651965eb399c22:960f18a2722d487b7a50c94f"
+        },
+        "disabled": false
+      },
+      "prisma-postgres": {
+        "type": "remote",
+        "url": "https://mcp.prisma.io/mcp",
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IlRrSEQ3WW05Q1pDbERIdjBrMTJMQWFaOTg1N0Y4TXp1bFhNckEwWmptZWsifQ.eyJjbGllbnRfaWQiOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SW1SamNpdHFkM1FpTENKcmFXUWlPaUpVYTBoRU4xbHRPVU5hUTJ4RVNIWXdhekV5VEVGaFdqazROVGRHT0UxNmRXeFlUWEpCTUZwcWJXVnJJbjAuZXlKcWRHa2lPaUp5Y0hZNFl6SjNaVGR6WXpjM016Um5kVEF6WTI1Nk4yc2lMQ0p5WldScGNtVmpkRjkxY21seklqcGJJbWgwZEhBNkx5OHhNamN1TUM0d0xqRTZOREExTnpNdlkyRnNiR0poWTJzaVhTd2lZMnhwWlc1MFgyNWhiV1VpT2lKSVpYSnRaWE1nUVdkbGJuUWlMQ0p6WldOeVpYUmZhR0Z6YUNJNklpSXNJblJ2YTJWdVgyVnVaSEJ2YVc1MFgyRjFkR2hmYldWMGFHOWtJam9pYm05dVpTSXNJbWx6Y3lJNkltaDBkSEJ6T2k4dllYVjBhQzV3Y21semJXRXVhVzhpTENKcFlYUWlPakUzT1RVeU16VTFNVEI5LkVQQTJNOUJwRGFBSWxwNXdoN1dVQWMxTGlQUEcxV194YS05XzNTSzFjY3BwcURaU20xU1Z2WVB6V3k3SkhiaHduUVBWQTR5VDdVbk1NUE9TemJ1a3JVWVIzN2NPOEJFS0NHSEpZb0ZJZjhteWpCTmpQdWNtU1pJdDFwUy15Tm9odTYycFlrSEUyYVE4b3drbkJ5dC1zYmZUcWJMQjdVSkV3M0U1RkozTWlDSGJUZzRzWks5QzNCMVhsUjJuemh4d25KUGluMVJvS3k4STlWendrOEJOVUNzNGJDVWpBTkYyQXpoYkpMWUZpTjVza1ZTOXRxa29iZXJtdVJ6OEdSd2Z2Qk01YTVtclhKQ1pvYTNEZ2Nub3htV1haUXFyUDFQTWxBY0NNRVpBNmFFaENSOE14YTZpUDRYZUlrZldmR3lkVVYxalV0aFJTME9FejFOcXNuQnN6dyIsInNjb3BlIjoid29ya3NwYWNlOmFkbWluIG9mZmxpbmVfYWNjZXNzIiwidG9rZW5fdHlwZSI6ImFjY2Vzc190b2tlbiIsIndvcmtzcGFjZV9pZCI6InNmbDU3dWhteXVjanJ3dWljMG55MzM5byIsImF1ZCI6Imh0dHBzOi8vbWNwLnByaXNtYS5pby9tY3AiLCJleHAiOjE3OTUyNzQyMTcsImlhdCI6MTc5NTI3MDYxNywiaXNzIjoiaHR0cHM6Ly9hdXRoLnByaXNtYS5pbyIsImp0aSI6Ink3N2NzZ2VmeW85d2w0NHc0MTFnc25mYSIsInN1YiI6InVzZXI6dWR4eTU2Nm43Mmd2ajZsazN3MGFybnRuIn0.NKHmNotmW5swI53DWW3FSbSpCQNPvwT4LRSZxqfhKCEaUWGgVxH1lFBQyUUCvCM9HjBNnsJZNhAoqVlD4EHemwLiK501EBYhv4zRLNiPj91NXopidLq_mtJTOBHkEDIs1dh-v5a2MbTzguEocfiTM-m6C2A2qR9Ek6wm07a5CVtHh-HihA4fo8zRSkKjTmymOvnRpiq397lnIYPFh2Fhhmfv6-J-56LGOUBy_Z4ryFJKYu71a3W9TOF7MtaE41CvlB75fqXLTY4fbSUQmAG4ww4w9u5JeNNz2rkgf9iRrjp11Yf9mnJd9FZmd8gSynZ-lZTDsHR4oKkv8FY37YuSNw"
+        },
+        "disabled": false
+      },
+      "rentahuman": {
+        "type": "remote",
+        "url": "https://rentahuman.ai/api/mcp",
+        "headers": {
+          "Authorization": "Bearer f0yEu7HfR8lUET2MR6eBj1FlisIAiVYHtFUi9adyWeo"
+        },
+        "disabled": false
+      },
+      "microsoft-learn": {
+        "type": "remote",
+        "url": "https://learn.microsoft.com/api/mcp",
+        "disabled": false
+      },
+      "twilio-docs": {
+        "type": "remote",
+        "url": "https://mcp.twilio.com/docs",
+        "disabled": false
+      },
+      "n8n": {
+        "type": "local",
+        "command": ["bash", "-c",
+          "source ~/.n8n/config && node ~/.n8n-node22/lib/node_modules/@n8n/mcp-server/index.js"],
+        "environment": {
+          "LD_LIBRARY_PATH": "/home/linuxbrew/.linuxbrew/lib",
+          "PATH": "/home/linuxbrew/.linuxbrew/opt/node@22/bin:/home/diego/.local/bin:/usr/bin:/bin"
+        },
+        "disabled": false
+      },
+      "shopify": {
+        "type": "local",
+        "command": ["bash", "-c",
+          "source ~/.api-keys.sh && node /home/diego/.n8n-node22/lib/node_modules/@shopify/dev-mcp/dist/index.js"],
+        "environment": {
+          "SHOPIFY_ACCESS_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
+          "SHOP": "hermesabogados.myshopify.com",
+          "LD_LIBRARY_PATH": "/home/linuxbrew/.linuxbrew/lib",
+          "PATH": "/home/linuxbrew/.linuxbrew/opt/node@22/bin:/home/diego/.local/bin:/usr/bin:/bin"
+        },
+        "disabled": false
       }
     }
   },

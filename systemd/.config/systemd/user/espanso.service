@@ -1,11 +1,15 @@
 [Unit]
-Description=espanso text expander (Wayland via distrobox)
+Description=espanso text expander (Wayland nativo)
+Documentation=https://espanso.org/docs/
+After=graphical-session.target
+PartOf=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/distrobox enter espanso-box -- /usr/bin/espanso service start --unmanaged
-ExecStop=/usr/bin/distrobox enter espanso-box -- /usr/bin/espanso service stop
-Restart=on-failure
-RestartSec=5
+Type=simple
+ExecStart=%h/.local/bin/espanso daemon
+ExecStop=%h/.local/bin/espanso cmd kill
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=default.target
