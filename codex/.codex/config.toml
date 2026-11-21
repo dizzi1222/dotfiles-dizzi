@@ -88,3 +88,11 @@ trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65
 trusted_hash = "sha256:9c0f7cc3590c68777cd562ce651ff1877f589a75db255c811b1497a1303dfd0d"
 trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65f20557494693c3e"
 
+
+[mcp_servers.n8n]
+command = "/home/diego/.local/bin/n8n-mcp-wrapper"
+enabled = true
+
+[mcp_servers.shopify]
+command = "/home/diego/.local/bin/shopify-mcp"
+enabled = true

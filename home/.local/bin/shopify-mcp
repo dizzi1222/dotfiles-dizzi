@@ -1,0 +1,197 @@
+#!/usr/bin/env python3
+"""Shopify Admin API MCP Server (stdio JSON-RPC).
+
+Provides Shopify store management tools for OpenCode and Hermes agents.
+Uses SHOPIFY_ADMIN_TOKEN and SHOPIFY_SHOP from environment.
+"""
+
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+
+TOKEN = os.environ.get("SHOPIFY_ADMIN_TOKEN") or os.environ.get("SHOPIFY_ACCESS_TOKEN", "")
+SHOP = os.environ.get("SHOPIFY_SHOP", "hermesabogados.myshopify.com")
+API_VERSION = "2024-10"
+
+TOOLS = [
+  {
+    "name": "shopify_get_shop",
+    "description": "Obtiene los detalles generales y configuración de la tienda Shopify.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "shopify_list_products",
+    "description": "Lista los productos de la tienda con sus variantes, precios y stock.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {"type": "integer", "description": "Número máximo de productos (default: 50)"}
+      }
+    }
+  },
+  {
+    "name": "shopify_create_product",
+    "description": "Crea un nuevo producto en la tienda Shopify.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string", "description": "Título del producto"},
+        "body_html": {"type": "string", "description": "Descripción en formato HTML"},
+        "vendor": {"type": "string", "description": "Proveedor o marca"},
+        "product_type": {"type": "string", "description": "Tipo de producto o categoría"},
+        "price": {"type": "string", "description": "Precio (ej: '1500.00')"}
+      },
+      "required": ["title"]
+    }
+  },
+  {
+    "name": "shopify_list_orders",
+    "description": "Lista los pedidos recientes de la tienda.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "status": {"type": "string", "description": "Estado del pedido: open, closed, cancelled, any (default: any)"},
+        "limit": {"type": "integer", "description": "Número máximo de pedidos (default: 50)"}
+      }
+    }
+  },
+  {
+    "name": "shopify_list_customers",
+    "description": "Lista los clientes registrados en la tienda.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {"type": "integer", "description": "Número máximo de clientes (default: 50)"}
+      }
+    }
+  },
+  {
+    "name": "shopify_graphql",
+    "description": "Ejecuta una consulta o mutación GraphQL contra la Shopify Admin API.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "Query o mutation GraphQL"},
+        "variables": {"type": "object", "description": "Variables opcionales para la query"}
+      },
+      "required": ["query"]
+    }
+  }
+]
+
+def make_request(path: str, method: str = "GET", data: dict = None) -> dict:
+  """Realiza una petición HTTP contra la API Admin de Shopify."""
+  url = f"https://{SHOP}/admin/api/{API_VERSION}/{path}"
+  headers = {
+    "X-Shopify-Access-Token": TOKEN,
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  }
+  body = json.dumps(data).encode("utf-8") if data else None
+  req = urllib.request.Request(url, data=body, headers=headers, method=method)
+  try:
+    with urllib.request.urlopen(req) as resp:
+      return json.loads(resp.read().decode("utf-8"))
+  except urllib.error.HTTPError as e:
+    err_body = e.read().decode("utf-8", errors="replace")
+    return {"error": f"HTTP {e.code}: {e.reason}", "details": err_body}
+  except Exception as e:
+    return {"error": str(e)}
+
+def execute_tool(name: str, args: dict) -> dict:
+  """Ejecuta una herramienta según el nombre solicitado."""
+  if name == "shopify_get_shop":
+    return make_request("shop.json")
+  elif name == "shopify_list_products":
+    limit = args.get("limit", 50)
+    return make_request(f"products.json?limit={limit}")
+  elif name == "shopify_create_product":
+    payload = {
+      "product": {
+        "title": args["title"],
+        "body_html": args.get("body_html", ""),
+        "vendor": args.get("vendor", "Hermes Abogados"),
+        "product_type": args.get("product_type", "Servicio"),
+        "variants": [{"price": args["price"]}] if "price" in args else []
+      }
+    }
+    return make_request("products.json", method="POST", data=payload)
+  elif name == "shopify_list_orders":
+    status = args.get("status", "any")
+    limit = args.get("limit", 50)
+    return make_request(f"orders.json?status={status}&limit={limit}")
+  elif name == "shopify_list_customers":
+    limit = args.get("limit", 50)
+    return make_request(f"customers.json?limit={limit}")
+  elif name == "shopify_graphql":
+    query = args.get("query", "")
+    variables = args.get("variables", {})
+    return make_request("graphql.json", method="POST", data={"query": query, "variables": variables})
+  else:
+    return {"error": f"Herramienta desconocida: {name}"}
+
+def main():
+  """Bucle principal JSON-RPC sobre stdio."""
+  for line in sys.stdin:
+    line = line.strip()
+    if not line:
+      continue
+    try:
+      msg = json.loads(line)
+    except Exception:
+      continue
+
+    req_id = msg.get("id")
+    method = msg.get("method")
+
+    if method == "initialize":
+      resp = {
+        "jsonrpc": "2.0",
+        "id": req_id,
+        "result": {
+          "protocolVersion": "2024-11-05",
+          "capabilities": {"tools": {}},
+          "serverInfo": {"name": "shopify-admin-mcp", "version": "1.0.0"}
+        }
+      }
+      sys.stdout.write(json.dumps(resp) + "\n")
+      sys.stdout.flush()
+    elif method == "notifications/initialized":
+      pass
+    elif method == "tools/list":
+      resp = {
+        "jsonrpc": "2.0",
+        "id": req_id,
+        "result": {"tools": TOOLS}
+      }
+      sys.stdout.write(json.dumps(resp) + "\n")
+      sys.stdout.flush()
+    elif method == "tools/call":
+      params = msg.get("params", {})
+      t_name = params.get("name")
+      t_args = params.get("arguments", {})
+      result_data = execute_tool(t_name, t_args)
+      resp = {
+        "jsonrpc": "2.0",
+        "id": req_id,
+        "result": {
+          "content": [
+            {"type": "text", "text": json.dumps(result_data, ensure_ascii=False, indent=2)}
+          ]
+        }
+      }
+      sys.stdout.write(json.dumps(resp) + "\n")
+      sys.stdout.flush()
+    elif method == "ping":
+      resp = {"jsonrpc": "2.0", "id": req_id, "result": {}}
+      sys.stdout.write(json.dumps(resp) + "\n")
+      sys.stdout.flush()
+
+if __name__ == "__main__":
+  main()
