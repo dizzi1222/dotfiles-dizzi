@@ -1,0 +1,17 @@
+[Unit]
+Description=Waywallen – preset plugin fondo Plasma + lanzar wallpaper engine
+Documentation=https://github.com/waywallen/waywallen
+After=plasma-plasmashell.service graphical-session.target
+Wants=plasma-plasmashell.service
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/waywallen-preset
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=30
+
+[Install]
+WantedBy=graphical-session.target

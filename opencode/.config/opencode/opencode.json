@@ -1,23 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "experimental": {
-    "todo": true
-  },
   "compaction": {
     "auto": true,
     "keep": {
       "tokens": 15000
     }
   },
-  "watcher": {
-    "ignore": [
-      ".git",
-      "node_modules",
-      ".cache",
-      ".local/share",
-      ".local/state",
-      "storage"
-    ]
+  "experimental": {
+    "todo": true
   },
   "notes": {
     "engram": {
@@ -54,153 +44,222 @@
         "url": "https://connect.composio.dev/mcp",
         "headers": {
           "x-api-key": "{env:COMPOSIO_API_KEY}"
-        }
-      },
-      "engram": {
-        "type": "local",
-        "command": [
-          "/data/data/com.termux/files/home/.local/bin/engram",
-          "mcp",
-          "--tools=agent"
-        ]
-      },
-      "figma": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && exec node /data/data/com.termux/files/home/.npm-global/lib/node_modules/figma-developer-mcp/dist/bin.js --stdio"
-        ]
-      },
-      "webshare-uk": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_UK\" DI_PROXY_PORT=\"$WS_PORT_UK\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
-        }
-      },
-      "webshare-es": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
         },
         "disabled": false
       },
-      "webshare-us": {
+      "engram": {
+        "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
+        "type": "local",
+        "disabled": false
+      },
+      "figma": {
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && exec /home/diego/.npm-global/bin/figma-developer-mcp --stdio"
+        ],
+        "cwd": "/var/home/diego/workspace",
+        "type": "local",
+        "disabled": false
+      },
+      "swissdevjobs": {
+        "type": "local",
+        "command": ["swissdevjobs-mcp"],
+        "environment": {
+          "SDJ_NAME": "Diego Samuel Hardi Santana",
+          "SDJ_EMAIL": "diegosamuel042@gmail.com",
+          "SDJ_CV": "/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
+        },
+        "disabled": false
+      },
+      "webshare-es": {
+        "_comment": "Referencia dataimpulse-mcp: cambiar WS_HOST_*/WS_PORT_* para otra IP. Gestión via proxy-manager skill + webshare CLI.",
         "type": "local",
         "command": [
           "bash",
           "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US\" DI_PROXY_PORT=\"$WS_PORT_US\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
         ],
         "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
         },
         "disabled": true
       },
-      "webshare-us-2": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_2\" DI_PROXY_PORT=\"$WS_PORT_US_2\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+      "todoist": {
+        "type": "remote",
+        "url": "https://ai.todoist.net/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:TODOIST_TOKEN}"
         },
-        "disabled": true
+        "disabled": false
       },
-      "webshare-us-3": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_3\" DI_PROXY_PORT=\"$WS_PORT_US_3\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+      "gitlab": {
+        "type": "remote",
+        "url": "https://gitlab.com/api/v4/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:GITLAB_TOKEN}"
         },
-        "disabled": true
+        "disabled": false
       },
-      "webshare-us-4": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_4\" DI_PROXY_PORT=\"$WS_PORT_US_4\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+      "postman": {
+        "type": "remote",
+        "url": "https://mcp.postman.com/minimal",
+        "headers": {
+          "Authorization": "Bearer {env:POSTMAN_API_KEY}"
         },
-        "disabled": true
+        "disabled": false
       },
-      "webshare-us-5": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_5\" DI_PROXY_PORT=\"$WS_PORT_US_5\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+      "prisma-postgres": {
+        "type": "remote",
+        "url": "https://mcp.prisma.io/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:PRISMA_TOKEN}"
         },
-        "disabled": true
+        "disabled": false
       },
-      "webshare-us-6": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_6\" DI_PROXY_PORT=\"$WS_PORT_US_6\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+      "rentahuman": {
+        "type": "remote",
+        "url": "https://rentahuman.ai/api/mcp",
+        "headers": {
+          "x-api-key": "{env:RENTAHUMAN_API_KEY}"
         },
-        "disabled": true
+        "disabled": false
       },
-      "webshare-us-7": {
-        "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_7\" DI_PROXY_PORT=\"$WS_PORT_US_7\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
-        "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
-        },
-        "disabled": true
+      "microsoft-learn": {
+        "type": "remote",
+        "url": "https://learn.microsoft.com/api/mcp",
+        "disabled": false
       },
-      "webshare-pl": {
+      "twilio-docs": {
+        "type": "remote",
+        "url": "https://mcp.twilio.com/docs",
+        "disabled": false
+      },
+      "n8n": {
         "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_PL\" DI_PROXY_PORT=\"$WS_PORT_PL\" && exec node /data/data/com.termux/files/home/workspace/dataimpulse-mcp/index.js"
-        ],
+        "command": ["/home/diego/.local/bin/n8n-mcp-wrapper"],
+        "disabled": false
+      },
+      "shopify": {
+        "type": "local",
+        "command": ["/home/diego/.local/bin/shopify-mcp"],
         "environment": {
-          "PATH": "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+          "SHOPIFY_ADMIN_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
+          "SHOPIFY_SHOP": "hermesabogados.myshopify.com"
         },
-        "disabled": true
+        "disabled": false
       }
     }
   },
-  "model": "anthropic/claude-sonnet-4-20250514",
-  "server": {
-    "port": 4096,
-    "hostname": "0.0.0.0",
-    "mdns": true,
-    "cors": [
-      "http://localhost:5170"
-    ]
-  },
-  "theme": "opencode"
+  "plugins": [
+    "opencode-gemini-auth@latest",
+    "/home/diego/workspace/opencode-discord-rpc",
+    "/home/diego/.config/opencode/plugins/voice"
+  ],
+  "small_model": "opencode/deepseek-v4-flash-free",
+  "provider": {
+    "google": {
+      "whitelist": [
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-3-flash-preview",
+        "gemini-3-pro-preview"
+      ],
+      "options": {
+        "projectId": "cic-ptd-dev"
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      },
+      "models": {
+        "gemini-2.5-flash": {
+          "options": {
+            // "reasoning": {
+            //   "disabled":  true
+            // }
+          }
+        },
+        "gemini-2.5-pro": {
+          "options": {
+            // "reasoning": {
+            //   "disabled":  true
+            // }
+          }
+        },
+        "gemini-3-flash-preview": {
+          "options": {
+            // "reasoning": {
+            //   "disabled":  true
+            // }
+          }
+        },
+        "gemini-3-pro-preview": {
+          "options": {
+            // "reasoning": {
+            //   "disabled":  true
+            // }
+          }
+        }
+      }
+    },
+    "ollama": {
+      "models": {
+        "nemotron-3-super:cloud": {
+          "name": "nemotron-3-super:cloud",
+          "options": {
+            // "reasoning": {
+            //   "disabled":  true
+            // }
+          }
+        }
+      },
+      "name": "Ollama (local)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1"
+      }
+    },
+    "opencode": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    },
+    "openai": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    },
+    "anthropic": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    },
+    "openrouter": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    },
+    "deepseek": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    },
+    "copilot": {
+      "options": {
+        // "reasoning": {
+        //   "disabled":  true
+        // }
+      }
+    }
+  }
 }
