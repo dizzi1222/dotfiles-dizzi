@@ -1,0 +1,38 @@
+#!/bin/bash
+# agy-resume — Abre agy TUI e inyecta Escape + /resume dentro de kitty
+set -euo pipefail
+
+export PATH="$HOME/.gemini/antigravity-cli/bin:$HOME/.local/bin:$HOME/.npm-global/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+
+KITTY_BIN="$(command -v kitty 2>/dev/null || echo "/home/diego/.local/bin/kitty")"
+AGY_BIN="$(command -v agy 2>/dev/null || echo "$HOME/.local/bin/agy")"
+
+# Si ya estamos dentro de un terminal con TTY, ejecutar directamente con agy
+if [ -t 0 ] && [ -t 1 ]; then
+    exec "$AGY_BIN" --dangerously-skip-permissions --mode accept-edits
+fi
+
+SOCKET="/tmp/kitty-agy-$$.sock"
+
+# Lanzar kitty con control remoto habilitado
+"$KITTY_BIN" -o allow_remote_control=yes --listen-on="unix:$SOCKET" \
+    "$AGY_BIN" --dangerously-skip-permissions --mode accept-edits &
+KITTY_PID=$!
+
+# Esperar a que el socket de control de kitty esté activo
+for i in {1..30}; do
+    [ -S "$SOCKET" ] && break
+    sleep 0.1
+done
+
+# Delay para dar tiempo a que agy cargue e inicialice el TUI
+sleep 2.5
+
+# Enviar Escape para descartar cualquier modal inicial y luego /resume + Enter
+"$KITTY_BIN" @ --to="unix:$SOCKET" send-text --match=all "\x1b" 2>/dev/null || true
+sleep 0.4
+"$KITTY_BIN" @ --to="unix:$SOCKET" send-text --match=all "/resume\r" 2>/dev/null || true
+
+# Esperar a que termine la ventana de kitty
+wait "$KITTY_PID" 2>/dev/null || true
+rm -f "$SOCKET"

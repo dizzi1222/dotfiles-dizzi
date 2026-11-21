@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Name=Codex TUI
-Comment=Open ChatGPT Codex TUI in a terminal
-Exec=kitty -e codex
+Comment=Open ChatGPT Codex TUI session picker
+Exec=codex-resume
 Terminal=false
 Type=Application
 Icon=codex

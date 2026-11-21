@@ -19,6 +19,34 @@
       "storage"
     ]
   },
+  "notes": {
+    "engram": {
+      "project": "dotfiles-dizzi",
+      "master_memory": {
+        "topic_key": "profile/diego-consolidated",
+        "observation_id": 164,
+        "sync_id": "obs-80f5b12cc0401d89",
+        "description": "Perfil maestro Diego: hardware, OS, agentes, IAs, Neovim IA, workspace, aprendizaje, reglas, OBSOLETO"
+      },
+      "index_file": "~/dotfiles-dizzi/ENGRAM_INDEX.md",
+      "cli_commands": {
+        "search": "engram search \"profile/diego-consolidated\" --project dotfiles-dizzi",
+        "get": "engram get 164",
+        "context": "engram context --project dotfiles-dizzi"
+      },
+      "mcp_tools": {
+        "search": "mem_search({ query: \"profile diego\", project: \"dotfiles-dizzi\" })",
+        "get": "mem_get_observation({ id: 164 })",
+        "context": "mem_context({ project: \"dotfiles-dizzi\" })"
+      },
+      "synced_sources": [
+        "~/.hermes/memories/USER.md",
+        "~/.hermes/memories/MEMORY.md",
+        "~/dotfiles-dizzi/home/memoria_diego.zip"
+      ],
+      "last_sync": "2026-11-20"
+    }
+  },
   "mcp": {
     "servers": {
       "composio-connect": {
