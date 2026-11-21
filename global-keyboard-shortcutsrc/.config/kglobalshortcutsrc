@@ -11,6 +11,10 @@ _k_friendly_name=Keyboard Layout Switcher
 Toggle Screen Reader On and Off=Meta+Alt+S,Meta+Alt+S,Toggle Screen Reader On and Off
 _k_friendly_name=Accessibility
 
+[com.nousresearch.hermes]
+4A89D73BED52DC506138E32FD1915D77-Ctrl+Shift+Space=none,Ctrl+Shift+Space,Hermes shortcut: Ctrl+Shift+Space
+_k_friendly_name=Hermes
+
 [kmix]
 _k_friendly_name=Audio Volume
 decrease_microphone_volume=Microphone Volume Down,Microphone Volume Down,Decrease Microphone Volume

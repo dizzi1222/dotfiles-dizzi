@@ -1,0 +1,26 @@
+#!/bin/bash
+# claude-resume — Abre Claude Code con el selector interactivo de sesiones (--resume)
+set -euo pipefail
+
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+
+CLAUDE_BIN=""
+for _p in "$HOME/.npm-global/bin/claude" "$HOME/.local/bin/claude" "$(command -v claude 2>/dev/null || true)"; do
+    if [ -x "$_p" ]; then
+        CLAUDE_BIN="$_p"
+        break
+    fi
+done
+
+if [ -z "$CLAUDE_BIN" ]; then
+    echo "ERROR: claude no encontrado en PATH" >&2
+    sleep 3
+    exit 1
+fi
+
+if [ -t 0 ] && [ -t 1 ]; then
+    exec "$CLAUDE_BIN" --resume "$@"
+else
+    KITTY_BIN="$(command -v kitty 2>/dev/null || echo "/home/diego/.local/bin/kitty")"
+    exec "$KITTY_BIN" "$CLAUDE_BIN" --resume "$@"
+fi
