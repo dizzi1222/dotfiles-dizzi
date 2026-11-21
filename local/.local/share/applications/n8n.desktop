@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=n8n
+GenericName=Workflow Automation
+Comment=Automatización de flujos de trabajo e integraciones (n8n)
+Exec=/home/diego/.local/bin/n8n-launcher
+Icon=/home/diego/.local/share/icons/n8n.png
+Terminal=false
+Categories=Development;Office;Utility;
+StartupNotify=true
+StartupWMClass=n8n

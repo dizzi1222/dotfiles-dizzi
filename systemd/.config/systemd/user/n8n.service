@@ -7,9 +7,7 @@ Wants=network-online.target
 Type=simple
 WorkingDirectory=%h
 EnvironmentFile=-%h/.n8n/config
-Environment="LD_LIBRARY_PATH=/home/linuxbrew/.linuxbrew/lib"
-Environment="PATH=/home/linuxbrew/.linuxbrew/opt/node@22/bin:/home/diego/.local/bin:/usr/local/bin:/usr/bin:/bin"
-ExecStart=/home/linuxbrew/.linuxbrew/opt/node@22/bin/node %h/.n8n-node22/lib/node_modules/n8n/bin/n8n start
+ExecStart=%h/.local/bin/n8n start
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
