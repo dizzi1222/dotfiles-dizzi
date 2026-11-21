@@ -32,13 +32,16 @@ def check_runtime():
         }
 
 
-def load_model(model_name):
+def load_model(model_name, prefer_cuda=True):
+    """Load faster-whisper in CUDA mode or explicitly on CPU."""
     WhisperModel = import_module("faster_whisper").WhisperModel
 
-    try:
-        return WhisperModel(model_name, device="cuda", compute_type="float16")
-    except Exception:
-        return WhisperModel(model_name, device="cpu", compute_type="int8")
+    if prefer_cuda:
+        try:
+            return WhisperModel(model_name, device="cuda", compute_type="float16")
+        except Exception:
+            pass
+    return WhisperModel(model_name, device="cpu", compute_type="int8")
 
 
 def transcribe_file(model, model_name, wav_path, language):
@@ -59,7 +62,7 @@ def transcribe_file(model, model_name, wav_path, language):
     except Exception:
         # CUDA puede estar instalado pero no tener cuBLAS compatible. Reintenta
         # en CPU en el mismo proceso para que Live no pierda la transcripción.
-        active_model = load_model(model_name)
+        active_model = load_model(model_name, prefer_cuda=False)
         segments = transcribe_with(active_model)
     text = " ".join(segment.text.strip() for segment in segments if segment.text.strip()).strip()
     return text, active_model

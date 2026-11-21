@@ -1,0 +1,6 @@
+name: limpieza
+version: 1.0.0
+description: "Comando /limpieza para ejecutar la rutina de limpieza de Bazzite/Fedora"
+author: Diego Härdi
+requires_hermes: ">=0.22.0"
+tags: [slash-command, cleanup, bazzite, fedora]

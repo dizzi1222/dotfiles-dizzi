@@ -725,6 +725,60 @@ python3 -m http.server 8083
 # → http://localhost:8083/empleos.html
 ```
 
+---
+
+## Engram Index & Memoria #164 — Referencia Rápida
+
+> **Archivo índice:** `~/dotfiles-dizzi/ENGRAM_INDEX.md`  
+> **Memoria consolidada Diego:** Engram project `dotfiles-dizzi`, topic_key `profile/diego-consolidated`, observación **#164** (última upsert, `sync_id: obs-80f5b12cc0401d89`).
+
+### Consultar desde CLI
+
+```bash
+# Ver índice completo
+cat ~/dotfiles-dizzi/ENGRAM_INDEX.md
+
+# Buscar memoria maestra
+engram search "profile/diego-consolidated" --project dotfiles-dizzi
+# → topic_key: profile/diego-consolidated (obs #164)
+
+# Ver contenido completo obs #164
+engram get 164
+
+# Contexto reciente proyecto
+engram context --project dotfiles-dizzi
+```
+
+### Consultar desde OpenCode (MCP tools)
+
+```javascript
+// Buscar
+await mem_search({ query: "profile diego", project: "dotfiles-dizzi" })
+
+// Ver observación completa
+await mem_get_observation({ id: 164 })
+
+// Contexto sesión
+await mem_context({ project: "dotfiles-dizzi" })
+```
+
+### Qué contiene la #164 (versión final sincronizada 2026-11-20)
+
+- **Perfil completo Diego**: hardware (ThinkPad X1E2, eGPU Vega 56, RTX 4060 evaluada NO comprada), triple boot (Bazzite/KDE + Win11 FSE + Arch/Plasma+Hyprland), dotfiles home-manager.
+- **Agentes (5) ≠ IAs chat (2 + descartadas)**: OpenCode, Hermes, Agy, Codex, Claude Code **separados** de Deepseek/Gemini web + tgpt terminal; descartadas gemini-cli, Warp.
+- **Neovim IA**: neocursor.nvim = backend Cursor + Antigravity (`sidecar_antigravity.py`) **solo completions**; Avante = modo visual `<leader>ae` (Edit) verificado en `lua/plugins/avante-cursor.lua:65` `mode="x"`.
+- **Workspace**: 29 proyectos en `~/workspace` + `AGENT-records/` (6 .md + 2 subcarpetas).
+- **Aprendizaje**: Developer Pro 3 niveles (JSCAMP → Exercism → Mimo), meta MERN-Stack.
+- **Regla dura**: responder **SIEMPRE en español**, breve/conciso/documentado/correcto, secuencial, **NO Canvas**.
+- **OBSOLETO explícito**: máquina vieja (Win10/i7-2.20/16GB/Iris540/Dell/476GB), theming viejo (Zenities/Vanzuh/NotwaitaBlack), herramientas descartadas.
+
+### Sincronización
+
+| Engram | Fuente Externa | Estado |
+|--------|----------------|--------|
+| `profile/diego-consolidated` (obs #164) | `~/.hermes/memories/USER.md` + `MEMORY.md` + `~/dotfiles-dizzi/home/memoria_diego.zip` | ✅ Sync 2026-11-20 |
+| `hermes/termux-to-bazzite` (obs #153) | Commit Termux `7a125fd35fa9` | ✅ Sync 2026-11-18 |
+
 ## Cuentas de Google (login 3ra opción)
 
 1. `sanakyds@gmail.com` → `authuser=0` (default)

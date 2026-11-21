@@ -301,6 +301,16 @@ case "$ICON" in
 "")
   kitty -e ~/scripts/limpiar_cache.sh
   ;;
+"󱄓")
+  wm_spawn "600 300" kitty --title "Desktop Cache" -- sh -c '
+    echo "→ update-desktop-database..."
+    update-desktop-database ~/.local/share/applications/ && echo "  ✓ desktop-database OK"
+    echo "→ kbuildsycoca6 --noincremental..."
+    kbuildsycoca6 --noincremental 2>&1 | tail -5 && echo "  ✓ kbuildsycoca6 OK"
+    notify-send "Desktop Cache" "Caché de .desktop actualizada" --icon=system-restart
+    read -p "Presiona Enter para cerrar..."
+  '
+  ;;
 "󰍉")
   # WinBoot removido del menú wofi: ahora es automático vía systemd
   # alternar-a-windows.service (se ejecuta al apagar/reiniciar)
