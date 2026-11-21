@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Re-extrae el AppImage de QtScrcpy y re-aplica el parche de QTSCRCPY_CONFIG_PATH.
+# Ver: ~/dotfiles-dizzi/qtscrcpy/README.md
+set -euo pipefail
+
+APPIMAGE="${1:-$HOME/Applications/QtScrcpy.AppImage}"
+DEST="$HOME/Applications/QtScrcpy"
+TMP="$(mktemp -d)"
+
+if [[ ! -x "$APPIMAGE" ]]; then
+  echo "No existe el AppImage: $APPIMAGE" >&2
+  exit 1
+fi
+
+echo "Extrayendo $APPIMAGE ..."
+( cd "$TMP" && "$APPIMAGE" --appimage-extract >/dev/null )
+
+# Parche: respetar QTSCRCPY_CONFIG_PATH si ya viene definido (si no, valor del bundle).
+sed -i 's|^export QTSCRCPY_CONFIG_PATH="\$HERE/usr/share/config"$|export QTSCRCPY_CONFIG_PATH="${QTSCRCPY_CONFIG_PATH:-$HERE/usr/share/config}"|' \
+  "$TMP/squashfs-root/AppRun.wrapped"
+
+if ! grep -q 'QTSCRCPY_CONFIG_PATH="\${QTSCRCPY_CONFIG_PATH' "$TMP/squashfs-root/AppRun.wrapped"; then
+  echo "ERROR: el parche no se aplicó (¿cambió el AppRun del AppImage?)" >&2
+  rm -rf "$TMP"
+  exit 1
+fi
+
+rm -rf "$DEST.old"
+[[ -d "$DEST" ]] && mv "$DEST" "$DEST.old"
+mv "$TMP/squashfs-root" "$DEST"
+rm -rf "$TMP" "$DEST.old"
+
+echo "Listo: $DEST (parche aplicado)"
+echo "Config en: $HOME/dotfiles-dizzi/qtscrcpy/.config/QtScrcpy"

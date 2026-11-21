@@ -17,3 +17,10 @@ screen_reader_detection_done = true
 
 [projects."/var/home/diego/dotfiles-dizzi"]
 trust_level = "trusted"
+[mcp_servers.n8n]
+command = "/home/diego/.local/bin/n8n-mcp-wrapper"
+enabled = true
+
+[mcp_servers.shopify]
+command = "/home/diego/.local/bin/shopify-mcp"
+enabled = true
