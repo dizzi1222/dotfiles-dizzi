@@ -238,6 +238,12 @@ onboarding:
   seen:
     busy_input_prompt: true
 mcp_servers:
+  n8n:
+    command: /home/diego/.local/bin/n8n-mcp-wrapper
+    enabled: true
+  shopify:
+    command: /home/diego/.local/bin/shopify-mcp
+    enabled: true
   node_repl:
     command: /var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl
     env:
@@ -257,6 +263,11 @@ mcp_servers:
       CODEX_CLI_PATH: /var/home/diego/.local/opt/chatgpt/resources/codex
   cua_repl:
     command: /var/home/diego/.local/opt/chatgpt/ChatGPT
+  rentahuman:
+    url: https://rentahuman.ai/api/mcp
+    headers:
+      X-API-Key: ${env:RENTAHUMAN_API_KEY}
+    enabled: true
 web:
   backend: exa
   provider_tier:
