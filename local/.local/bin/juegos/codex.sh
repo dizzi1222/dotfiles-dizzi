@@ -1,13 +1,20 @@
 #!/bin/sh
-# Abre Codex (ChatGPT) TUI
+# Abre Codex (ChatGPT) TUI en modo resume picker
 set -u
+
+# Cargar entorno de usuario si no está en PATH
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
+
+if [ $# -eq 0 ]; then
+  set -- resume --no-daemon
+fi
 
 if command -v codex >/dev/null 2>&1; then
   exec codex "$@"
 fi
 
 # Fallbacks habituales
-for c in "$HOME/.local/bin/codex" "$HOME/.npm-global/bin/codex" "/usr/local/bin/codex"; do
+for c in "$HOME/.npm-global/bin/codex" "$HOME/.local/bin/codex" "/usr/local/bin/codex"; do
   if [ -x "$c" ]; then
     exec "$c" "$@"
   fi

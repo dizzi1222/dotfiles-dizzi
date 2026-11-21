@@ -12,7 +12,8 @@
     "/var/home/diego/dotfiles-dizzi",
     "/home/diego",
     "/var/home/diego",
-    "/var/home/diego/Documentos/ChatGPT/Bazzite"
+    "/var/home/diego/Documentos/ChatGPT/Bazzite",
+    "/home/diego/dotfiles-dizzi"
   ],
   "voice-engine-addr": "default"
 }
