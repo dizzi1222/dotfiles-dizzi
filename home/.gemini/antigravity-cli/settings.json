@@ -1,7 +1,7 @@
 {
   "agentMode": "accept-edits",
   "allowNonWorkspaceAccess": true,
-  "model": "Claude Sonnet 4.6 (Thinking)",
+  "model": "Claude Opus 4.6 (Thinking)",
   "permissions": {
     "allow": [
       "command(*)"
