@@ -2,9 +2,14 @@
 # n8n wrapper – usa node@22 vía linuxbrew (compatible con n8n)
 export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export PATH="/home/linuxbrew/.linuxbrew/opt/node@22/bin:$PATH"
-# Cargar env vars de n8n
+
 if [[ -f "$HOME/.n8n/config" ]]; then
   source "$HOME/.n8n/config"
 fi
-exec /home/linuxbrew/.linuxbrew/opt/node@22/bin/node \
-  "$HOME/.n8n-node22/lib/node_modules/n8n/bin/n8n" "$@"
+
+N8N_BIN="$HOME/.npm-global/lib/node_modules/n8n/bin/n8n"
+if [[ ! -f "$N8N_BIN" ]]; then
+  N8N_BIN="$HOME/.n8n-node22/lib/node_modules/n8n/bin/n8n"
+fi
+
+exec /home/linuxbrew/.linuxbrew/opt/node@22/bin/node "$N8N_BIN" "$@"
