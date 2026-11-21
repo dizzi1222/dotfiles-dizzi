@@ -7,7 +7,7 @@
     }
   },
   "experimental": {
-    "todo": true 
+    "todo": true
   },
   "notes": {
     "engram": {
@@ -38,166 +38,116 @@
     }
   },
   "mcp": {
-    "engram": {
-      "type": "local",
-      "command": [
-        "/lib64/ld-linux-x86-64.so.2",
-        "/home/diego/.local/bin/engram",
-        "mcp",
-        "--tools=agent"
-      ],
-      "enabled": true
-    },
-    "figma": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "figma-developer-mcp",
-        "--figma-api-key={env:FIGMA_API_KEY}",
-        "--stdio"
-      ],
-      "enabled": true
-    },
-    "composio-connect": {
-      "type": "remote",
-      "url": "https://connect.composio.dev/mcp",
-      "enabled": true,
-      "headers": {
-        "x-api-key": "{env:COMPOSIO_API_KEY}"
-      }
-    },
-    "webshare-uk": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_UK\" DI_PROXY_PORT=\"$WS_PORT_UK\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "enabled": true 
-    },
-    "webshare-es": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "enabled": true 
-    },
-    "webshare-us": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US\" DI_PROXY_PORT=\"$WS_PORT_US\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-2": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_2\" DI_PROXY_PORT=\"$WS_PORT_US_2\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-3": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_3\" DI_PROXY_PORT=\"$WS_PORT_US_3\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-pl": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_PL\" DI_PROXY_PORT=\"$WS_PORT_PL\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-4": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_4\" DI_PROXY_PORT=\"$WS_PORT_US_4\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-5": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_5\" DI_PROXY_PORT=\"$WS_PORT_US_5\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-6": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_6\" DI_PROXY_PORT=\"$WS_PORT_US_6\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
-    "webshare-us-7": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_US_7\" DI_PROXY_PORT=\"$WS_PORT_US_7\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-      ],
-      "environment": {
-                "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-      },
-      "disabled":  true
-    },
     "servers": {
+      "composio-connect": {
+        "type": "remote",
+        "url": "https://connect.composio.dev/mcp",
+        "headers": {
+          "x-api-key": "{env:COMPOSIO_API_KEY}"
+        },
+        "disabled": false
+      },
+      "engram": {
+        "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
+        "type": "local",
+        "disabled": false
+      },
+      "figma": {
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && exec /home/diego/.npm-global/bin/figma-developer-mcp --stdio"
+        ],
+        "cwd": "/var/home/diego/workspace",
+        "type": "local",
+        "disabled": false
+      },
       "swissdevjobs": {
         "type": "local",
-        "command": [
-          "swissdevjobs-mcp"
-        ],
+        "command": ["swissdevjobs-mcp"],
         "environment": {
           "SDJ_NAME": "Diego Samuel Hardi Santana",
           "SDJ_EMAIL": "diegosamuel042@gmail.com",
           "SDJ_CV": "/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
-        }
+        },
+        "disabled": false
+      },
+      "webshare-es": {
+        "_comment": "Referencia dataimpulse-mcp: cambiar WS_HOST_*/WS_PORT_* para otra IP. Gestión via proxy-manager skill + webshare CLI.",
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
+        ],
+        "environment": {
+          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+        },
+        "disabled": true
+      },
+      "todoist": {
+        "type": "remote",
+        "url": "https://ai.todoist.net/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:TODOIST_TOKEN}"
+        },
+        "disabled": false
+      },
+      "gitlab": {
+        "type": "remote",
+        "url": "https://gitlab.com/api/v4/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:GITLAB_TOKEN}"
+        },
+        "disabled": false
+      },
+      "postman": {
+        "type": "remote",
+        "url": "https://mcp.postman.com/minimal",
+        "headers": {
+          "Authorization": "Bearer {env:POSTMAN_API_KEY}"
+        },
+        "disabled": false
+      },
+      "prisma-postgres": {
+        "type": "remote",
+        "url": "https://mcp.prisma.io/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:PRISMA_TOKEN}"
+        },
+        "disabled": false
+      },
+      "rentahuman": {
+        "type": "remote",
+        "url": "https://rentahuman.ai/api/mcp",
+        "headers": {
+          "x-api-key": "{env:RENTAHUMAN_API_KEY}"
+        },
+        "disabled": false
+      },
+      "microsoft-learn": {
+        "type": "remote",
+        "url": "https://learn.microsoft.com/api/mcp",
+        "disabled": false
+      },
+      "twilio-docs": {
+        "type": "remote",
+        "url": "https://mcp.twilio.com/docs",
+        "disabled": false
+      },
+      "n8n": {
+        "type": "local",
+        "command": ["/home/diego/.local/bin/n8n-mcp-wrapper"],
+        "disabled": false
+      },
+      "shopify": {
+        "type": "local",
+        "command": ["/home/diego/.local/bin/shopify-mcp"],
+        "environment": {
+          "SHOPIFY_ADMIN_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
+          "SHOPIFY_SHOP": "hermesabogados.myshopify.com"
+        },
+        "disabled": false
       }
     }
   },
