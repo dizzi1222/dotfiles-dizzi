@@ -45,24 +45,34 @@ check_libhoudini() {
 # ─── Setup repo/venv (reutilizable) ─────────────────────────────────
 setup_venv() {
   if [ ! -d "$SCRIPT_DIR" ]; then
-    echo -e "${CYAN}Clonando repositorio...${RESET}"
+    echo -e "${CYAN}Clonando repositorio waydroid_script...${RESET}"
     git clone https://github.com/casualsnek/waydroid_script.git "$SCRIPT_DIR" || {
       echo -e "${RED}Error al clonar.${RESET}"
-      exit 1
+      return 1
     }
   fi
 
-  cd "$SCRIPT_DIR" || exit 1
+  cd "$SCRIPT_DIR" || return 1
 
-  if [ ! -d "$VENV_DIR" ]; then
-    echo -e "${CYAN}Creando entorno virtual...${RESET}"
-    python -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip -q
-    pip install inquirerpy requests tqdm -q
-    [ -f "requirements.txt" ] && pip install -r requirements.txt -q
-  else
-    source venv/bin/activate
+  # Detectar python disponible (preferir python3)
+  local PYTHON_BIN="python3"
+  if ! command -v "$PYTHON_BIN" &>/dev/null; then
+    PYTHON_BIN="python"
+  fi
+
+  # Validar que el venv exista y no esté corrupto
+  if [ ! -f "$VENV_DIR/bin/activate" ] || [ ! -f "$VENV_DIR/bin/python" ]; then
+    echo -e "${CYAN}Creando o reparando entorno virtual en $VENV_DIR...${RESET}"
+    rm -rf "$VENV_DIR"
+    "$PYTHON_BIN" -m venv "$VENV_DIR" || {
+      echo -e "${RED}Error al crear entorno virtual con $PYTHON_BIN.${RESET}"
+      return 1
+    }
+    "$VENV_DIR/bin/pip" install --upgrade pip -q
+    "$VENV_DIR/bin/pip" install inquirerpy requests tqdm -q
+    if [ -f "$SCRIPT_DIR/requirements.txt" ]; then
+      "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/requirements.txt" -q
+    fi
   fi
 }
 
@@ -84,12 +94,11 @@ install_libhoudini_auto() {
   echo ""
   read -rp "Presiona Enter para abrir el menú..."
 
-  setup_venv
+  setup_venv || return 1
 
   echo -e "${CYAN}Ejecutando waydroid_script...${RESET}"
   echo "=========================================="
-  sudo venv/bin/python main.py
-  deactivate
+  sudo "$VENV_DIR/bin/python" "$SCRIPT_DIR/main.py"
 
   echo ""
   echo -e "${YELLOW}Reiniciando Waydroid...${RESET}"
@@ -164,12 +173,11 @@ case "$option" in
     echo ""
   fi
 
-  setup_venv
+  setup_venv || exit 1
 
   echo -e "${CYAN}Ejecutando waydroid_script...${RESET}"
   echo "=========================================="
-  sudo venv/bin/python main.py
-  deactivate
+  sudo "$VENV_DIR/bin/python" "$SCRIPT_DIR/main.py"
   ;;
 
 2)
