@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# n8n-launcher — inicia el servicio n8n si no está activo y abre la UI web
+set -euo pipefail
+
+if ! systemctl --user is-active --quiet n8n.service; then
+  systemctl --user start n8n.service
+fi
+
+# Esperar a que el servidor n8n responda en el puerto 5678 (máx 15 segundos)
+for _ in {1..30}; do
+  if curl -sf http://localhost:5678/ >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.5
+done
+
+if command -v brave-app >/dev/null 2>&1; then
+  exec brave-app --app="http://localhost:5678"
+else
+  exec xdg-open "http://localhost:5678"
+fi
