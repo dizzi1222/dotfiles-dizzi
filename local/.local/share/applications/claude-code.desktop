@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Name=Claude Code
-Comment=Open Claude Code TUI
-Exec=kitty -e /home/diego/.local/bin/juegos/claude-code.sh
+Comment=Open Claude Code TUI session picker
+Exec=claude-resume
 Terminal=false
 Type=Application
 Icon=claude-code

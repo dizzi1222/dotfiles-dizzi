@@ -1,0 +1,25 @@
+#!/bin/bash
+# codex-resume — Abre codex TUI en modo picker dentro de kitty
+set -euo pipefail
+
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+
+CODEX_BIN=""
+for _p in "$HOME/.npm-global/bin/codex" "$HOME/.local/bin/codex" "$(command -v codex 2>/dev/null || true)"; do
+    if [ -x "$_p" ]; then
+        CODEX_BIN="$_p"
+        break
+    fi
+done
+
+if [ -z "$CODEX_BIN" ]; then
+    echo "ERROR: codex no encontrado." >&2
+    exit 1
+fi
+
+if [ -t 0 ] && [ -t 1 ]; then
+    exec "$CODEX_BIN" resume --no-daemon "$@"
+else
+    KITTY_BIN="$(command -v kitty 2>/dev/null || echo "/home/diego/.local/bin/kitty")"
+    exec "$KITTY_BIN" "$CODEX_BIN" resume --no-daemon "$@"
+fi

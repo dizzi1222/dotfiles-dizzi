@@ -420,6 +420,27 @@ rm -rf ~/JobCopilot-Free/CLIs/ai-job-copilot
 Para quitar el MCP de OpenCode, borrá la entrada `swissdevjobs` de
 `mcp.servers` en `~/.config/opencode/opencode.json` (o usá `/mcps`).
 
+## Desktop Cache (󰑓)
+
+`Herramientas → 󰑓 Desktop Cache` regenera la caché local de `.desktop` y el índice
+de KDE Plasma. Útil cuando un lanzador no aparece o sigue mostrando la versión vieja
+tras editar un archivo `.desktop`.
+
+Ejecuta en Kitty con `--hold`:
+
+```bash
+update-desktop-database ~/.local/share/applications/
+kbuildsycoca6 --noincremental
+```
+
+- `update-desktop-database` reconstruye el índice MIME/apps de freedesktop en `~/.local/share/applications/`.
+- `kbuildsycoca6 --noincremental` fuerza la reconstrucción completa del índice binario de KDE (KSycoca) sin reutilizar la caché anterior — el lanzador actualizado aparece de inmediato en KRunner y en el menú de KDE.
+- Al terminar lanza `notify-send` con confirmación.
+
+| Archivo TSV | Categoría | Ícono | Label |
+|---|---|---|---|
+| `system-menu-manifest.tsv` | `Herramientas` | `󰑓` | `Desktop Cache` |
+
 ## Atajos
 - `Super+Z` → abre el menú
 

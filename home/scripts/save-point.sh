@@ -4,7 +4,7 @@
 # ================================================================================
 
 SAVE_BRANCH="main"
-SAVE_COMMIT="5a48e39d" # Bazzite es clave
+SAVE_COMMIT="b3ea81b0" # Bazzite es clave
 # NixOS last commit: 977d536a
 # CachyOS was the last savepoint commit: 6998fed
 SAVE_MSG="

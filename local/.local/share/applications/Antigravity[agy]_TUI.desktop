@@ -1,11 +1,11 @@
 [Desktop Entry]
 Version=1.0
 Name=Antigravity TUI
-Comment=Open Antigravity [agy] TUI
-Exec=kitty -e agy --dangerously-skip-permissions --mode accept-edits
+Comment=Open Antigravity [agy] TUI with session picker
+Exec=/home/diego/.local/bin/agy-resume
 Terminal=false
 Type=Application
 Icon=antigravity
-Categories=Network;
+Categories=Development;
 StartupNotify=true
 StartupWMClass=Antigravity[agy]_TUI

@@ -176,6 +176,9 @@ cleanup_user_cache() {
   do
     clear_cache "~/.cache/$p" "$HOME/.cache/$p"
   done
+  # Indexador de Vicinae: se hincha hasta ~450 MB y se reconstruye solo.
+  clear_cache "vicinae/file-indexer" "$HOME/.cache/vicinae/file-indexer"
+  clear_cache "vicinae/images" "$HOME/.cache/vicinae/images"
   [ "$DRY_RUN" -eq 1 ] || rm -f "$HOME/.cache"/ksycoca6_* "$HOME"/.cache/*.kcache 2>/dev/null
   [ "$DRY_RUN" -eq 1 ] || rm -f "$HOME/.cache/ibus/bus/registry" 2>/dev/null
 }

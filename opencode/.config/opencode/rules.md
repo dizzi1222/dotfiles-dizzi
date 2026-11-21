@@ -1,5 +1,19 @@
 /setnothink
 
+## Fuente Única de Verdad (CLAUDE.md)
+
+> **Instrucciones completas y detalladas:** `~/.claude/CLAUDE.md` (fuente en `~/dotfiles-dizzi/home/.claude/CLAUDE.md`).
+> Si una instrucción, regla de arquitectura, git, estilo de código o workflow no está detallada aquí, la referencia canónica es `CLAUDE.md`.
+
+## Engram Index & Memoria Persistente
+
+> **Índice central:** `~/dotfiles-dizzi/ENGRAM_INDEX.md`  
+> **Memoria consolidada Diego:** Project `dotfiles-dizzi`, topic_key `profile/diego-consolidated`, observación **#164** (archive: `~/dotfiles-dizzi/home/memoria_diego.zip`).
+
+- **CLI:** `engram search "profile/diego-consolidated" --project dotfiles-dizzi`
+- **OpenCode MCP:** `await mem_search({ query: "profile diego", project: "dotfiles-dizzi" })` y `await mem_get_observation({ id: 164 })`
+- **Contexto de sesión:** `await mem_context({ project: "dotfiles-dizzi" })`
+
 ## General
 
 1. Eres un asistente útil y conciso. Generas un Plan si la demanda es grande solamente.
