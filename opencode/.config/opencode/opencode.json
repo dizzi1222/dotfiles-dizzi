@@ -42,9 +42,6 @@
       "composio-connect": {
         "type": "remote",
         "url": "https://connect.composio.dev/mcp",
-        "headers": {
-          "x-api-key": "{env:COMPOSIO_API_KEY}"
-        },
         "disabled": false
       },
       "engram": {
@@ -93,9 +90,6 @@
       "todoist": {
         "type": "remote",
         "url": "https://ai.todoist.net/mcp",
-        "headers": {
-          "Authorization": "Bearer {env:TODOIST_TOKEN}"
-        },
         "disabled": false
       },
       "gitlab": {
@@ -117,9 +111,6 @@
       "prisma-postgres": {
         "type": "remote",
         "url": "https://mcp.prisma.io/mcp",
-        "headers": {
-          "Authorization": "Bearer {env:PRISMA_TOKEN}"
-        },
         "disabled": false
       },
       "rentahuman": {
@@ -157,7 +148,7 @@
     }
   },
   "plugins": [
-    "opencode-gemini-auth@latest"
+    "opencode-gemini-auth@2.0.1"
   ],
   "small_model": "opencode/deepseek-v4-flash-free",
   "provider": {

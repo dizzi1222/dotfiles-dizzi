@@ -741,6 +741,16 @@ function getSessionID(context: any): string | null {
   return route?.type === "session" && typeof route.sessionID === "string" ? route.sessionID : null
 }
 
+/** Instrucción que convierte la respuesta de Live en habla natural (OPENCODE_LIVE_STYLE=0 la desactiva). */
+const LIVE_SPOKEN_STYLE = "[modo voz: tu respuesta se leerá en voz alta. Responde como en una conversación hablada: " +
+  "frases cortas y naturales, sin Markdown, listas, tablas, código, rutas ni URLs. Si hay detalles técnicos, " +
+  "resume la idea en dos o tres frases y ofrece dar más detalle. Igual puedes usar herramientas si hace falta.]"
+
+/** Antepone el estilo hablado al texto dictado en Live. */
+function withLiveSpokenStyle(text: string): string {
+  return process.env.OPENCODE_LIVE_STYLE === "0" ? text : `${LIVE_SPOKEN_STYLE}\n\n${text}`
+}
+
 /** Envía una transcripción a la conversación activa de OpenCode. */
 async function submitTranscript(context: any, text: string, targetSessionID: string | null = getSessionID(context)): Promise<void> {
   const client = context?.client
@@ -1171,7 +1181,7 @@ async function handleLiveTranscript(
   if (!live.active || live.sessionID !== sessionID) return
 
   try {
-    await submitTranscript(context, text, sessionID)
+    await submitTranscript(context, withLiveSpokenStyle(text), sessionID)
   } catch (error) {
     live.awaitingResponse = false
     live.hasObservedBusy = false
