@@ -1,12 +1,16 @@
+# git config --global user.name "dizzi1222"
+# git config --global user.email "diegosamuel042@gmail.com"
+[user]
+	name = dizzi1222
+	email = diegosamuel042@gmail.com
+
 [push]
 	autoSetupRemote = true
 [init]
 	defaultBranch = main
 [pull]
 	rebase = false
-[user]
-	name = dizzi1222
-	email = diegosamuel042@gmail.com
+
 # gh vive en linuxbrew (Bazzite), en /usr/bin (CachyOS/NixOS) o en el prefijo
 # de Termux. El helper prueba las 3 rutas y usa la primera que exista; si
 # ninguna existe cae al gh del PATH.
@@ -16,9 +20,16 @@
 [credential "https://gist.github.com"]
 	helper =
 	helper = "!f() { for g in /home/linuxbrew/.linuxbrew/bin/gh /usr/bin/gh /data/data/com.termux/files/usr/bin/gh; do [ -x \"$g\" ] && exec \"$g\" auth git-credential \"$@\"; done; exec gh auth git-credential \"$@\"; }; f"
+
 [core]
+	editor = nvim
+	filemode = true
 	quotepath = false
 	precomposeunicode = true
 [i18n]
 	commitencoding = utf-8
 	logoutputencoding = utf-8
+
+# Author: dhardi007 | Committer: dizzi1222
+[alias]
+    commitd = "!f() { GIT_AUTHOR_NAME=\"dhardi007\" GIT_AUTHOR_EMAIL=\"dhardi@cinnnatus.edu.do\" git commit \"$@\"; }; f"

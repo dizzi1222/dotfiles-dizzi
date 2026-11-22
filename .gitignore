@@ -422,3 +422,13 @@ local/.local/bin/juegos/GLCache/
 
 # opencode password xd
 opencode/.config/opencode/service.json
+
+# Hermes: credenciales y estado privado; versionar solo los ajustes y el pack.
+/hermes/**/.env*
+/hermes/**/auth.json*
+/hermes/**/.hermes_history*
+/hermes/**/sessions/
+# /hermes/**/memories/  # Descomentado: USER.md y MEMORY.md sí se versionan para portabilidad
+/hermes/**/*.pre-dotfiles-*
+# Para que no joda Termux:
+local/.local/bin/lazygit-shell

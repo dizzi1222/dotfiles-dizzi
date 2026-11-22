@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# webshare-proxy-wrapper: Dynamic rotating proxy via webshare CLI (Termux)
+# Usage: webshare-proxy-wrapper [--country CODE] [--rotate] <command> [args...]
+
+set -euo pipefail
+
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+TERMUX_HOME="/data/data/com.termux/files/home"
+
+COUNTRY="us"
+ROTATE=true
+SHOW_URL=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --country)
+      COUNTRY="$2"
+      shift 2
+      ;;
+    --rotate)
+      ROTATE=true
+      shift
+      ;;
+    --no-rotate)
+      ROTATE=false
+      shift
+      ;;
+    --show-url)
+      SHOW_URL=true
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: webshare-proxy-wrapper [--country CODE] [--rotate|--no-rotate] [--show-url] <command> [args...]" >&2
+  exit 1
+fi
+
+# Load API keys if available (ignore unbound vars)
+[[ -f "${TERMUX_HOME}/.api-keys.sh" ]] && set +u && source "${TERMUX_HOME}/.api-keys.sh" && set -u
+
+# Try webshare CLI first (requires WEBSHARE_API_KEY or webshare login)
+if command -v webshare &>/dev/null && { [[ -n "${WEBSHARE_API_KEY:-}" ]] || webshare whoami &>/dev/null; }; then
+  # Build webshare proxy-url command
+  WS_CMD=(webshare proxy-url --country "$COUNTRY")
+  if [[ "$ROTATE" == "true" ]]; then
+    WS_CMD+=(--rotate)
+  fi
+  WS_CMD+=(--json)
+
+  # Get proxy URL from webshare CLI
+  PROXY_JSON=$("${WS_CMD[@]}" 2>/dev/null) || PROXY_JSON=""
+  PROXY_URL=$(echo "$PROXY_JSON" | jq -r '.url // empty' 2>/dev/null) || PROXY_URL=""
+
+  if [[ -n "$PROXY_URL" && "$PROXY_URL" != "null" ]]; then
+    if [[ "$SHOW_URL" == "true" ]]; then
+      echo "$PROXY_URL"
+      exit 0
+    fi
+    export HTTP_PROXY="$PROXY_URL"
+    export HTTPS_PROXY="$PROXY_URL"
+    export ALL_PROXY="$PROXY_URL"
+    export http_proxy="$PROXY_URL"
+    export https_proxy="$PROXY_URL"
+    export all_proxy="$PROXY_URL"
+    exec "$@"
+  fi
+fi
+
+# Fallback: use individual configured proxies from ~/.api-keys.sh
+# WS_PROXIES array with WS_PROXY_* variables
+if [[ -n "${WS_PROXY_ES_MADRID:-}" ]]; then
+  # Pick random proxy from configured array
+  PROXY_LIST=(
+    "${WS_PROXY_UK:-}"
+    "${WS_PROXY_ES_MADRID:-}"
+    "${WS_PROXY_US_LA:-}"
+    "${WS_PROXY_US_PISCATAWAY:-}"
+    "${WS_PROXY_US_LA_2:-}"
+    "${WS_PROXY_PL_WARSAW:-}"
+    "${WS_PROXY_US_3:-}"
+    "${WS_PROXY_US_4:-}"
+    "${WS_PROXY_US_5:-}"
+    "${WS_PROXY_US_6:-}"
+  )
+  # Filter empty
+  PROXY_LIST=("${PROXY_LIST[@]// /}")
+  PROXY_LIST=($(printf '%s\n' "${PROXY_LIST[@]}" | grep -v '^$'))
+  
+  if [[ ${#PROXY_LIST[@]} -gt 0 ]]; then
+    PROXY_URL="${PROXY_LIST[RANDOM % ${#PROXY_LIST[@]}]}"
+    if [[ "$SHOW_URL" == "true" ]]; then
+      echo "$PROXY_URL"
+      exit 0
+    fi
+    export HTTP_PROXY="$PROXY_URL"
+    export HTTPS_PROXY="$PROXY_URL"
+    export ALL_PROXY="$PROXY_URL"
+    export http_proxy="$PROXY_URL"
+    export https_proxy="$PROXY_URL"
+    export all_proxy="$PROXY_URL"
+    exec "$@"
+  fi
+fi
+
+echo "ERROR: No proxy available. Configure WEBSHARE_API_KEY or run 'webshare login', or ensure WS_PROXY_* vars in ~/.api-keys.sh" >&2
+exit 1

@@ -2437,6 +2437,28 @@ updates:
 #   # This runs ONCE per process at startup, so it cannot replace a credential
 #   # that expires mid-session. For a single provider whose token needs
 #   # re-minting during a session, use `providers.<name>.key_cmd` instead.
+
+mcp_servers:
+  n8n:
+    command: "bash"
+    args: ["/data/data/com.termux/files/home/.local/bin/n8n-mcp-wrapper"]
+    enabled: true
+  shopify:
+    command: "python3"
+    args: ["/data/data/com.termux/files/home/.local/bin/shopify-mcp"]
+    enabled: true
+  webshare:
+    command: "/data/data/com.termux/files/home/.local/bin/webshare-proxy-wrapper"
+    args: ["--show-url", "--country", "us", "--rotate"]
+    env:
+      PATH: "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/bin:/data/data/com.termux/files/home/.npm-global/bin"
+    enabled: true
+  rentahuman:
+    url: https://rentahuman.ai/api/mcp
+    headers:
+      X-API-Key: ${env:RENTAHUMAN_API_KEY}
+    enabled: true
+
 sessions:
   auto_prune: true
 onboarding:

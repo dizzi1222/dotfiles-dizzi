@@ -933,11 +933,13 @@ if [ -f '/tmp/google-cloud-sdk/completion.zsh.inc' ]; then . '/tmp/google-cloud-
 export PATH="$HOME/Descargas/google-cloud-sdk/bin:$PATH"
 
 # pnpm
-export PNPM_HOME="/home/diego/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
 # Added by core-termux bun installer
-export PATH="/data/data/com.termux/files/home/.cache/.bun/bin:$PATH"
+if [[ -d "/data/data/com.termux/files/home/.cache/.bun/bin" ]]; then
+  export PATH="/data/data/com.termux/files/home/.cache/.bun/bin:$PATH"
+fi

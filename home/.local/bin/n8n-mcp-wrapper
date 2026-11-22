@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# n8n-mcp-wrapper — Wrapper para el servidor MCP oficial n8n-mcp (Termux)
+# Carga Node.js y credenciales de la instancia n8n
+set -euo pipefail
+
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+TERMUX_HOME="/data/data/com.termux/files/home"
+NPM_GLOBAL="${TERMUX_HOME}/.npm-global"
+
+LINUXBREW_NODE="/home/linuxbrew/.linuxbrew/opt/node@22/bin/node"
+NODE_BIN="${N8N_MCP_NODE:-}"
+
+if [[ -z "$NODE_BIN" ]]; then
+  if [[ -x "$LINUXBREW_NODE" ]]; then
+    NODE_BIN="$LINUXBREW_NODE"
+    export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  elif [[ -x "${TERMUX_PREFIX}/bin/node" ]]; then
+    NODE_BIN="${TERMUX_PREFIX}/bin/node"
+  else
+    NODE_BIN="$(command -v node || true)"
+  fi
+fi
+
+if [[ -z "$NODE_BIN" || ! -x "$NODE_BIN" ]]; then
+  echo "Error: Node.js no está disponible para ejecutar n8n-mcp." >&2
+  exit 127
+fi
+
+export PATH="$(dirname "$NODE_BIN"):${TERMUX_HOME}/.local/bin:${PATH}"
+
+# Cargar variables de n8n si existen
+set +u
+if [[ -f "${TERMUX_HOME}/.n8n/config" ]]; then
+  # shellcheck source=/dev/null
+  source "${TERMUX_HOME}/.n8n/config"
+fi
+
+if [[ -f "${TERMUX_HOME}/.api-keys.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "${TERMUX_HOME}/.api-keys.sh"
+fi
+set -u
+
+export N8N_API_URL="${N8N_API_URL:-http://localhost:5678}"
+export N8N_API_KEY="${N8N_API_KEY:?Error: N8N_API_KEY no configurada. Define la variable en ~/.api-keys.sh}"
+
+# Deshabilitar telemetría
+export N8N_MCP_TELEMETRY_DISABLED=true
+
+NPM_ROOT="$(npm root -g 2>/dev/null || true)"
+N8N_MCP_ENTRY="${N8N_MCP_ENTRY:-${NPM_ROOT:-${NPM_GLOBAL}/lib/node_modules}/n8n-mcp/dist/mcp/stdio-wrapper.js}"
+if [[ ! -f "$N8N_MCP_ENTRY" ]]; then
+  echo "Error: no se encontró n8n-mcp en el prefijo npm global." >&2
+  exit 127
+fi
+
+exec "$NODE_BIN" "$N8N_MCP_ENTRY" "$@"
