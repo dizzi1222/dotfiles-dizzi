@@ -658,11 +658,13 @@ function runVoice(commandArgs: string[], options: Parameters<typeof execFile>[2]
 async function checkVoiceStt(): Promise<void> {
   if (voicePreferences.stt.provider !== "faster-whisper") return
   try {
-    await runVoice(["check-stt"], { timeout: 25000 })
+    await runVoice(["check-stt"], { timeout: 70000 })
   } catch (error) {
-    const detail = String((error as { stderr?: string }).stderr ?? "").trim()
-    const hasDiagnostic = detail.startsWith("STT faster-whisper:")
-    throw new Error(hasDiagnostic ? detail : "Actualiza opencode-voice y su helper juntos. El transcriptor instalado no pudo comprobar faster-whisper.")
+    const failure = error as { stderr?: string; message?: string; killed?: boolean }
+    const detail = String(failure.stderr ?? "").trim()
+    if (detail.startsWith("STT faster-whisper")) throw new Error(detail)
+    const reason = failure.killed ? "timeout del check-stt" : detail || failure.message || "sin detalle"
+    throw new Error(`No pude comprobar faster-whisper: ${reason}`)
   }
 }
 
@@ -739,6 +741,16 @@ function voiceLog(event: string, details: Record<string, unknown> = {}): void {
 function getSessionID(context: any): string | null {
   const route = context?.ui?.router?.current?.()
   return route?.type === "session" && typeof route.sessionID === "string" ? route.sessionID : null
+}
+
+/** Instrucción que convierte la respuesta de Live en habla natural (OPENCODE_LIVE_STYLE=0 la desactiva). */
+const LIVE_SPOKEN_STYLE = "[modo voz: tu respuesta se leerá en voz alta. Responde como en una conversación hablada: " +
+  "frases cortas y naturales, sin Markdown, listas, tablas, código, rutas ni URLs. Si hay detalles técnicos, " +
+  "resume la idea en dos o tres frases y ofrece dar más detalle. Igual puedes usar herramientas si hace falta.]"
+
+/** Antepone el estilo hablado al texto dictado en Live. */
+function withLiveSpokenStyle(text: string): string {
+  return process.env.OPENCODE_LIVE_STYLE === "0" ? text : `${LIVE_SPOKEN_STYLE}\n\n${text}`
 }
 
 /** Envía una transcripción a la conversación activa de OpenCode. */
@@ -1161,7 +1173,7 @@ async function handleLiveTranscript(
   if (!live.active || live.sessionID !== sessionID) return
 
   try {
-    await submitTranscript(context, text, sessionID)
+    await submitTranscript(context, withLiveSpokenStyle(text), sessionID)
   } catch (error) {
     live.awaitingResponse = false
     live.hasObservedBusy = false
