@@ -1,4 +1,4 @@
-_config_version: 53
+_config_version: 54
 database:
   journal_mode: wal
 runtime:

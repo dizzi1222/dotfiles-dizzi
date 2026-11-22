@@ -1,4 +1,4 @@
-_config_version: 53
+_config_version: 54
 database:
   journal_mode: wal
 runtime:
@@ -9,7 +9,7 @@ attachments:
 plugins:
   clone_timeout_seconds: 300
   enabled:
-  - agent-importers
+    - agent-importers
   disabled: []
 model:
   default: gpt-6-luna
@@ -61,7 +61,7 @@ compression:
   max_attempts: 3
   codex_app_server_auto: native
   codex_responses_native: false
-  codex_responses_compact_threshold: null
+  codex_responses_compact_threshold:
   protect_first_n: 3
   idle_compact_after_seconds: 0
   hygiene_max_turn_hold_seconds: 10
@@ -77,7 +77,7 @@ memory:
   memory_char_limit: 2200
   user_char_limit: 1375
   nudge_interval: 10
-max_concurrent_sessions: null
+max_concurrent_sessions:
 group_sessions_per_user: true
 hosted_rooms:
   discussion:
@@ -95,15 +95,15 @@ agent:
   daybreak: false
   personalities: {}
   disabled_toolsets:
-  - terminal
-  - browser
-  - code_execution
-  - computer_use
-  - delegation
-  - image_gen
-  - video
-  - video_gen
-  - kanban
+    - terminal
+    - browser
+    - code_execution
+    - computer_use
+    - delegation
+    - image_gen
+    - video
+    - video_gen
+    - kanban
 gateway:
   unmanaged_idle_exit_seconds: 600
   signal_interrupt_grace_timeout: 1
@@ -151,56 +151,56 @@ gateway:
     history_tool_output_max_chars: 0
 platform_toolsets:
   cli:
-  - a2a
-  - browser
-  - clarify
-  - code_execution
-  - computer_use
-  - connections
-  - context_engine
-  - cronjob
-  - delegation
-  - file
-  - image_gen
-  - memory
-  - session_search
-  - skills
-  - terminal
-  - todo
-  - tts
-  - video
-  - video_gen
-  - vision
-  - web
-  - x_search
+    - a2a
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - file
+    - image_gen
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - tts
+    - video
+    - video_gen
+    - vision
+    - web
+    - x_search
   telegram:
-  - browser
-  - clarify
-  - code_execution
-  - computer_use
-  - connections
-  - cronjob
-  - delegation
-  - file
-  - image_gen
-  - memory
-  - session_search
-  - skills
-  - terminal
-  - todo
-  - tts
-  - vision
-  - web
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - connections
+    - cronjob
+    - delegation
+    - file
+    - image_gen
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - tts
+    - vision
+    - web
   discord:
-  - hermes-discord
+    - hermes-discord
   whatsapp:
-  - hermes-whatsapp
+    - hermes-whatsapp
   slack:
-  - hermes-slack
+    - hermes-slack
   signal:
-  - hermes-signal
+    - hermes-signal
   qqbot:
-  - hermes-qqbot
+    - hermes-qqbot
 stt:
   enabled: true
   local:
@@ -259,8 +259,7 @@ mcp_servers:
       BROWSER_USE_AVAILABLE_BACKENDS: chrome,iab,mcpapps
       BROWSER_USE_TINYSKY_ENABLED: '1'
       NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER: Control the in-app browser in conjunction with the Browser Plugin.
-      NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME: Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this
-        method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative.
+      NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME: Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative.
       BROWSER_USE_CODEX_APP_BUILD_FLAVOR: prod
       BROWSER_USE_CODEX_APP_VERSION: 26.1029.61003
       NODE_REPL_TRUSTED_SERVICES: '{"browser":"/home/diego/.codex/plugins/cache/openai-bundled/browser/26.1029.61003/scripts/browser-service.mjs"}'
@@ -278,66 +277,66 @@ image_gen:
   model: gpt-image-2-high
 known_plugin_toolsets:
   cli:
-  - a2a
+    - a2a
   telegram:
-  - a2a
+    - a2a
 known_builtin_toolsets:
   cli:
-  - browser
-  - clarify
-  - code_execution
-  - computer_use
-  - connections
-  - context_engine
-  - cronjob
-  - delegation
-  - discord
-  - discord_admin
-  - file
-  - image_gen
-  - kanban
-  - memory
-  - session_search
-  - skills
-  - stt
-  - terminal
-  - todo
-  - tts
-  - video
-  - video_gen
-  - vision
-  - web
-  - x_search
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - discord
+    - discord_admin
+    - file
+    - image_gen
+    - kanban
+    - memory
+    - session_search
+    - skills
+    - stt
+    - terminal
+    - todo
+    - tts
+    - video
+    - video_gen
+    - vision
+    - web
+    - x_search
   telegram:
-  - browser
-  - clarify
-  - code_execution
-  - computer_use
-  - connections
-  - context_engine
-  - cronjob
-  - delegation
-  - discord
-  - discord_admin
-  - file
-  - image_gen
-  - kanban
-  - memory
-  - session_search
-  - skills
-  - stt
-  - terminal
-  - todo
-  - tts
-  - video
-  - video_gen
-  - vision
-  - web
-  - x_search
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - discord
+    - discord_admin
+    - file
+    - image_gen
+    - kanban
+    - memory
+    - session_search
+    - skills
+    - stt
+    - terminal
+    - todo
+    - tts
+    - video
+    - video_gen
+    - vision
+    - web
+    - x_search
 _left_core_installed:
-- agent-importers
+  - agent-importers
 fallback_providers:
-- provider: openrouter
-  model: nvidia/nemotron-3-ultra-550b-a55b:free
-  base_url: https://openrouter.ai/api/v1
-  api_mode: chat_completions
+  - provider: openrouter
+    model: nvidia/nemotron-3-ultra-550b-a55b:free
+    base_url: https://openrouter.ai/api/v1
+    api_mode: chat_completions
