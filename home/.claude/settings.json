@@ -7,5 +7,24 @@
   },
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
-  "model": "haiku"
+  "model": "haiku",
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "language": "spanish",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.local/bin/claude-tts 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
 }
