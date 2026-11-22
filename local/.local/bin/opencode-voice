@@ -366,9 +366,14 @@ function findCaptureCommand(): ICaptureCommand | null {
       }
     }
 
+    const args = ["--raw", "--rate", String(RATE), "--channels", String(CHANNELS), "--format", "s16", "--latency", "20ms"]
+    if (env.VOICE_DEVICE && env.VOICE_DEVICE !== "@DEFAULT_SOURCE@") {
+      args.push("--target", env.VOICE_DEVICE)
+    }
+    args.push("-")
     return {
       executable,
-      args: ["--rate", String(RATE), "--channels", String(CHANNELS), "--format", "s16", "--latency", "20ms", "-"],
+      args,
     }
   }
 

@@ -664,6 +664,7 @@ mkdir -p %{buildroot}/usr/bin
 mv %{buildroot}/usr/local/bin/iriunwebcam %{buildroot}/usr/bin/iriunwebcam
 rmdir %{buildroot}/usr/local/bin %{buildroot}/usr/local 2>/dev/null || true
 sed -i 's|/usr/local/bin/iriunwebcam|/usr/bin/iriunwebcam|' %{buildroot}/usr/share/applications/iriunwebcam.desktop
+sed -i 's|Categories=Utility|Categories=AudioVideo;Video;|' %{buildroot}/usr/share/applications/iriunwebcam.desktop
 
 %files
 %attr(0755,root,root) /usr/bin/iriunwebcam

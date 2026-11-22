@@ -50,7 +50,7 @@ def transcribe_file(model, model_name, wav_path, language):
             wav_path,
             language=language,
             beam_size=5,
-            vad_filter=True,
+            vad_filter=False,
             condition_on_previous_text=False,
             temperature=0.0,
         )

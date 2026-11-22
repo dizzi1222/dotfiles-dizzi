@@ -1,7 +1,2 @@
 #!/bin/bash
-APP="${1#--appname=}"
-if [ -n "$APP" ]; then
-  exec "/home/diego/Applications/StreamingServiceLauncher.AppImage" --appname="$APP" --no-sandbox "${@:2}"
-else
-  exec "/home/diego/Applications/StreamingServiceLauncher.AppImage" --no-sandbox
-fi
+"/var/home/diego/Applications/StreamingServiceLauncher.AppImage" --appname=$1 --no-sandbox

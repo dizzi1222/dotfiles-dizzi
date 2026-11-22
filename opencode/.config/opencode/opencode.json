@@ -48,7 +48,7 @@
         "disabled": false
       },
       "engram": {
-        "command": ["/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
+        "command": ["/var/home/diego/.local/bin/engram", "mcp", "--tools=agent"],
         "type": "local",
         "disabled": false
       },
@@ -56,7 +56,7 @@
         "command": [
           "bash",
           "-c",
-          "source ~/.api-keys.sh && exec /home/diego/.npm-global/bin/figma-developer-mcp --stdio"
+          "source ~/.api-keys.sh && exec /var/home/diego/.npm-global/bin/figma-developer-mcp --stdio"
         ],
         "cwd": "/var/home/diego/workspace",
         "type": "local",
@@ -68,20 +68,16 @@
         "environment": {
           "SDJ_NAME": "Diego Samuel Hardi Santana",
           "SDJ_EMAIL": "diegosamuel042@gmail.com",
-          "SDJ_CV": "/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
+          "SDJ_CV": "/var/home/diego/mi_gdrive/Mi unidad/[Clase]/- Curriculum copium [+Certificados]/cv.pdf"
         },
         "disabled": false
       },
-      "webshare-es": {
-        "_comment": "Referencia dataimpulse-mcp: cambiar WS_HOST_*/WS_PORT_* para otra IP. Gestión via proxy-manager skill + webshare CLI.",
+      "webshare": {
+        "_comment": "Rotating residential proxies via webshare CLI wrapper. Requires: webshare login OR export WEBSHARE_API_KEY. Fallback: WS_PROXY_* vars from ~/.api-keys.sh. Usage: set HTTP_PROXY/HTTPS_PROXY via wrapper or call webshare-proxy-wrapper --show-url",
         "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
+        "command": ["/var/home/diego/.local/bin/webshare-proxy-wrapper", "--show-url", "--country", "us", "--rotate"],
         "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+          "PATH": "/var/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/var/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
         },
         "disabled": true
       },
@@ -137,12 +133,12 @@
       },
       "n8n": {
         "type": "local",
-        "command": ["/home/diego/.local/bin/n8n-mcp-wrapper"],
+        "command": ["/var/home/diego/.local/bin/n8n-mcp-wrapper"],
         "disabled": false
       },
       "shopify": {
         "type": "local",
-        "command": ["/home/diego/.local/bin/shopify-mcp"],
+        "command": ["/var/home/diego/.local/bin/shopify-mcp"],
         "environment": {
           "SHOPIFY_ADMIN_TOKEN": "{env:SHOPIFY_ADMIN_TOKEN}",
           "SHOPIFY_SHOP": "hermesabogados.myshopify.com"
@@ -153,8 +149,7 @@
   },
   "plugins": [
     "opencode-gemini-auth@latest",
-    "/home/diego/workspace/opencode-discord-rpc",
-    "/home/diego/.config/opencode/plugins/voice"
+    "/var/home/diego/workspace/opencode-discord-rpc"
   ],
   "small_model": "opencode/deepseek-v4-flash-free",
   "provider": {
@@ -167,38 +162,19 @@
       ],
       "options": {
         "projectId": "cic-ptd-dev"
-        // "reasoning": {
-        //   "disabled":  true
-        // }
       },
       "models": {
         "gemini-2.5-flash": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-2.5-pro": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-3-flash-preview": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-3-pro-preview": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         }
       }
     },
@@ -206,11 +182,7 @@
       "models": {
         "nemotron-3-super:cloud": {
           "name": "nemotron-3-super:cloud",
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         }
       },
       "name": "Ollama (local)",
@@ -220,46 +192,22 @@
       }
     },
     "opencode": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "openai": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "anthropic": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "openrouter": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "deepseek": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "copilot": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     }
   }
 }

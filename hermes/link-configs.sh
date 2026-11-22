@@ -45,6 +45,7 @@ done
 link_path "$HERMES_DIR/config.yaml" "$HERMES_HOME/config.yaml"
 link_path "$HERMES_DIR/SOUL.md" "$HERMES_HOME/SOUL.md"
 link_path "$HERMES_DIR/workspace" "$WORKSPACE_TARGET"
+link_path "$DOTFILES_ROOT/local/.local/bin/webshare-proxy-wrapper" "$HOME/.local/bin/webshare-proxy-wrapper"
 
 for agent in "${agents[@]}"; do
   profile_dir="$HERMES_HOME/profiles/$agent"
