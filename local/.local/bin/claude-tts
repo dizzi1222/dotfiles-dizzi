@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# claude-tts: lee en voz alta (Piper) la última respuesta de Claude Code.
+# Uso como hook Stop (lee el JSON del hook por stdin) o manual:
+#   echo "Hola" | claude-tts --text      # decir un texto
+#   claude-tts --stop                    # cortar la voz actual
+#   claude-tts --off | --on              # desactivar / activar (archivo ~/.claude/tts-live; sin él el hook no habla)
+#   claude-tts --live [off]              # lo usa /live: activa (o apaga) y reporta el backend
+#   claude-tts --backend                 # muestra qué motor de voz se usaría
+# Motores (en orden): piper + aplay/paplay (Linux) → termux-tts-speak (Android) → espeak-ng.
+# Config por env: CLAUDE_TTS_VOICE (default es_MX-claude-high), CLAUDE_TTS_MAX (chars, 220 ≈ 2 frases),
+#                 CLAUDE_TTS_SPEED (length-scale Piper; <1 más rápido, default 0.95)
+set -uo pipefail
+
+VOICES="${PIPER_VOICES_DIR:-$HOME/.local/share/piper-voices}"
+VOICE="${CLAUDE_TTS_VOICE:-es_MX-claude-high}"
+MAX="${CLAUDE_TTS_MAX:-220}"
+SPEED="${CLAUDE_TTS_SPEED:-0.95}"
+ON_FLAG="$HOME/.claude/tts-live"   # existe = /live activo (por defecto callado)
+PIDFILE="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/claude-tts.pid"
+LOG="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/claude-tts.log"
+log() { printf '%s %s\n' "$(date +%T)" "$*" >> "$LOG" 2>/dev/null; }
+MODEL="$VOICES/$VOICE.onnx"
+
+stop_playback() {
+  [[ -f "$PIDFILE" ]] && { kill -- -"$(cat "$PIDFILE")" 2>/dev/null || kill "$(cat "$PIDFILE")" 2>/dev/null; }
+  command -v termux-tts-speak >/dev/null && pkill -f termux-tts-speak 2>/dev/null
+  rm -f "$PIDFILE"
+}
+
+# Elige el motor de voz disponible en esta máquina.
+pick_backend() {
+  if command -v piper >/dev/null && [[ -f "$MODEL" ]]; then
+    command -v aplay  >/dev/null && { echo "piper+aplay";  return; }
+    command -v paplay >/dev/null && { echo "piper+paplay"; return; }
+  fi
+  command -v termux-tts-speak >/dev/null && { echo "termux-tts"; return; }
+  command -v espeak-ng        >/dev/null && { echo "espeak-ng";  return; }
+  echo "ninguno"
+}
+
+case "${1:-}" in
+  --stop)    stop_playback; exit 0 ;;
+  --off)     rm -f "$ON_FLAG"; stop_playback; echo "TTS desactivado"; exit 0 ;;
+  --on)      touch "$ON_FLAG"; echo "TTS activado ($(pick_backend), voz $VOICE)"; exit 0 ;;
+  --backend) pick_backend; exit 0 ;;
+  --live)
+    if [[ "${2:-}" =~ ^(off|stop|salir|apagar)$ ]]; then
+      rm -f "$ON_FLAG"; stop_playback; echo "LIVE=off"
+    else
+      touch "$ON_FLAG"; echo "LIVE=on backend=$(pick_backend) voz=$VOICE"
+    fi
+    exit 0 ;;
+esac
+
+log "llamado: ${1:-hook}"
+[[ "${1:-}" == "--text" || -f "$ON_FLAG" ]] || { log "omitido: /live apagado"; exit 0; }
+
+if [[ "${1:-}" == "--text" ]]; then
+  raw="$(cat)"
+else
+  # Hook Stop: usar last_assistant_message; si no viene, sacarlo del transcript.
+  payload="$(cat)"
+  raw="$(jq -r '.last_assistant_message // empty' <<<"$payload" 2>/dev/null)"
+  if [[ -z "$raw" ]]; then
+    tp="$(jq -r '.transcript_path // empty' <<<"$payload" 2>/dev/null)"
+    [[ -f "$tp" ]] && raw="$(tac "$tp" | jq -r 'select(.type=="assistant") | [.message.content[]? | select(.type=="text") | .text] | join("\n") | select(length>0) | @json' 2>/dev/null | head -n1 | jq -r .)"
+  fi
+fi
+[[ -z "${raw// }" ]] && { log "omitido: sin texto"; exit 0; }
+
+# Limpieza de markdown → prosa hablable
+text="$(CLAUDE_TTS_RAW="$raw" python3 -c "$(cat <<'PY'
+
+import re, sys
+import os
+mx = int(sys.argv[1]); t = os.environ['CLAUDE_TTS_RAW']
+t = re.sub(r"```.*?```", " ", t, flags=re.S)                 # bloques de código
+t = "\n".join(l for l in t.splitlines() if not l.lstrip().startswith("|"))  # tablas
+t = re.sub(r"!\[[^\]]*\]\([^)]*\)", " ", t)                  # imágenes
+t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", t)                # links → texto
+t = re.sub(r"https?://\S+", " ", t)                          # URLs sueltas
+t = re.sub(r"`([^`]*)`", r"\1", t)                            # código inline
+t = re.sub(r"^\s{0,3}#{1,6}\s*", "", t, flags=re.M)           # títulos
+t = re.sub(r"^\s*[-*•]\s+", "", t, flags=re.M)                # viñetas
+t = re.sub(r"[*_~>#]+", "", t)                                # énfasis
+t = re.sub(r"[⚠️✔✘✓○🙂]", "", t)
+t = re.sub(r"\s*\n\s*\n\s*", "\n\n", t).strip()
+t = " ".join(t.split())
+sents = re.split(r"(?<=[.!?¿¡])\s+", t)
+out = ""
+for s in sents:
+    if out and (len(out) + len(s) > mx or out.count(". ") + out.count("? ") + out.count("! ") >= 1): break
+    out += (" " if out else "") + s
+if len(out) > mx:
+    out = out[:mx].rsplit(" ", 1)[0] + "."
+print(out)
+PY
+)" "$MAX")"
+[[ -z "${text// }" ]] && exit 0
+
+backend="$(pick_backend)"
+[[ "$backend" == "ninguno" ]] && { echo "claude-tts: sin motor de voz (instala piper o espeak-ng)" >&2; exit 0; }
+rate="$(jq -r '.audio.sample_rate // 22050' "$MODEL.json" 2>/dev/null || echo 22050)"
+
+stop_playback
+# Proceso desacoplado (grupo propio si hay setsid): el hook vuelve al instante y --stop lo corta.
+launcher=(nohup); command -v setsid >/dev/null && launcher=(setsid)
+"${launcher[@]}" bash -c '
+  case "$1" in
+    piper+aplay)  printf "%s" "$2" | piper -m "$3" --length-scale "$4" --output-raw 2>/dev/null \
+                    | aplay -q -r "$5" -f S16_LE -c 1 -t raw - ;;
+    piper+paplay) printf "%s" "$2" | piper -m "$3" --length-scale "$4" --output-raw 2>/dev/null \
+                    | paplay --raw --rate="$5" --channels=1 --format=s16le ;;
+    termux-tts)   printf "%s" "$2" | termux-tts-speak -l es -r 1.0 ;;
+    espeak-ng)    espeak-ng -v es-419 -s 165 "$2" ;;
+  esac
+' _ "$backend" "$text" "$MODEL" "$SPEED" "$rate" </dev/null >/dev/null 2>&1 &
+echo $! > "$PIDFILE"
+log "hablando: backend=$backend chars=${#text}"
+exit 0
