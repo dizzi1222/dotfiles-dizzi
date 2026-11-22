@@ -12,9 +12,9 @@ plugins:
   - agent-importers
   disabled: []
 model:
-  default: gpt-6-luna
-  provider: openai-codex
-  base_url: https://chatgpt.com/backend-api/codex
+  default: nvidia/nemotron-3-ultra-550b-a55b:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
   aliases:
     nemotron: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
 kanban:
@@ -349,7 +349,10 @@ known_builtin_toolsets:
 _left_core_installed:
 - agent-importers
 fallback_providers:
-- provider: openrouter
-  model: nvidia/nemotron-3-ultra-550b-a55b:free
-  base_url: https://openrouter.ai/api/v1
-  api_mode: chat_completions
+  - provider: openai-codex
+    model: gpt-6-luna
+    base_url: https://chatgpt.com/backend-api/codex
+  - provider: opencode-free-acp
+    model: opencode/glm-5.3-flash-free
+  - provider: opencode-go
+    model: gpt-6-luna

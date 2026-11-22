@@ -32,6 +32,26 @@ home/.claude/policy-limits.json.*
 # estado de sincronizacion remota (marcador de tiempo, no configuracion)
 home/.claude/remote-settings.json
 home/.claude/remote-settings.json.*
+# Runtime: daemon, jobs, locks, marcas del updater y planes de sesión.
+home/.claude/.last-cleanup
+home/.claude/.last-update-result.json
+home/.claude/.update.lock
+home/.claude/daemon/
+home/.claude/daemon.*
+home/.claude/jobs/
+home/.claude/state/
+home/.claude/session-env/
+home/.claude/plans/
+# Cuenta + cachés (oauthAccount, userID, feature flags). Vive dentro de
+# ~/.claude porque Hermes DirectSDK lanza claude con CLAUDE_CONFIG_DIR=~/.claude.
+home/.claude/.claude.json*
+# Flag on/off de /live (claude-tts): estado por máquina, no config.
+home/.claude/tts-live
+# Skills/plugins que claude.ai sincroniza desde la cuenta.
+home/.claude/skills/synced/
+# Plugins: clon del marketplace oficial, registros con rutas absolutas y
+# cachés. Lo declarativo vive en settings.json → enabledPlugins.
+home/.claude/plugins/
 
 # Antigravity - ignorar todo EXCEPTO settings y keybindings
 Antigravity/.config/Antigravity/*
