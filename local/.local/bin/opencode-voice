@@ -91,6 +91,7 @@ function pythonCommand() {
 }
 
 let fasterWhisperInstalled
+let fasterWhisperFailure = ""
 function fasterWhisperReady() {
   if (fasterWhisperInstalled !== undefined) return fasterWhisperInstalled
   const helper = join(SCRIPT_DIR, "voice-stt-faster-whisper.py")
@@ -102,9 +103,14 @@ function fasterWhisperReady() {
   const result = spawnSync(python.executable, [...python.args, helper, "--check"], {
     encoding: "utf8",
     windowsHide: true,
-    timeout: 20000,
+    timeout: 60000,
   })
   fasterWhisperInstalled = result.status === 0
+  if (!fasterWhisperInstalled) {
+    let reason = result.error?.message || (result.signal ? `terminado por ${result.signal} (¿timeout?)` : "")
+    try { reason = JSON.parse(result.stdout.trim().split(/\r?\n/).pop() ?? "").error || reason } catch {}
+    fasterWhisperFailure = reason || String(result.stderr ?? "").trim().split(/\r?\n/).pop() || `exit ${result.status}`
+  }
   return fasterWhisperInstalled
 }
 
@@ -676,7 +682,7 @@ switch (command) {
     const helper = join(SCRIPT_DIR, "voice-stt-faster-whisper.py")
     if (!existsSync(helper) || !fasterWhisperReady()) {
       const python = pythonCommand()
-      console.error(`STT faster-whisper no disponible. Python detectado: ${python.executable}. Comprueba el helper, CTranslate2 y OPENCODE_VOICE_PYTHON.`)
+      console.error(`STT faster-whisper: no disponible (${existsSync(helper) ? fasterWhisperFailure : "falta el helper"}). Python: ${python.executable}`)
       process.exitCode = 2
     }
     break
