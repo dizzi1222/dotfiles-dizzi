@@ -78,11 +78,12 @@ plugins:
 # Model Configuration
 # =============================================================================
 model:
+  default: gemini-3.8-flash-low
+  provider: antigravity-subscription-directsdk
   aliases:
     nemotron: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
   # Default model to use (can be overridden with --model flag)
   # Both "default" and "model" work as the key name here.
-  default: "gpt-6-luna"
 
   # Inference provider selection:
   #   "auto"         - Auto-detect from credentials (default)
@@ -114,11 +115,9 @@ model:
   #   It works with both no-auth and auth-enabled server modes.
   #
   # Can also be overridden for a single invocation with the --provider flag.
-  provider: "openai-codex"
 
   # API configuration (falls back to OPENROUTER_API_KEY env var)
   # api_key: "your-key-here"  # Uncomment to set here instead of .env
-  base_url: "https://chatgpt.com/backend-api/codex"
 
   # Stream API responses from the provider (default: true). The agent core
   # prefers streaming for every turn — subagents included — for liveness
@@ -2466,7 +2465,14 @@ onboarding:
     busy_input_prompt: true
     tool_progress_prompt: true
 fallback_providers:
+  - provider: openai-codex
+    model: gpt-6-luna
+    base_url: https://chatgpt.com/backend-api/codex
   - provider: openrouter
     model: nvidia/nemotron-3-ultra-550b-a55b:free
     base_url: https://openrouter.ai/api/v1
     api_mode: chat_completions
+  - provider: opencode-free-acp
+    model: opencode/glm-5.3-flash-free
+  - provider: opencode-go
+    model: gpt-6-luna
