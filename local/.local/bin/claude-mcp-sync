@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# claude-mcp-sync: registra en Claude Code (scope user) los MCPs de
+# ~/dotfiles-dizzi/home/.claude/mcp-servers.json. Idempotente.
+# - Sustituye $HOME por la ruta real (Bazzite /var/home, NixOS/CachyOS /home, Termux $PREFIX/..).
+# - Omite servidores stdio cuyo binario no existe en esta máquina.
+# - Los ${VAR} se dejan literales: Claude los expande al arrancar (desde ~/.api-keys.sh).
+# Uso: claude-mcp-sync [--dry-run]
+set -euo pipefail
+
+MANIFEST="${CLAUDE_MCP_MANIFEST:-$HOME/dotfiles-dizzi/home/.claude/mcp-servers.json}"
+DRY=false; [[ "${1:-}" == "--dry-run" ]] && DRY=true
+
+command -v claude >/dev/null || { echo "claude no está en PATH" >&2; exit 1; }
+[[ -f "$MANIFEST" ]] || { echo "No existe $MANIFEST" >&2; exit 1; }
+
+python3 - "$MANIFEST" "$HOME" <<'EOF' | while IFS=$'\t' read -r name kind cmd json; do
+import json, sys
+manifest, home = sys.argv[1], sys.argv[2]
+for name, cfg in json.load(open(manifest))["servers"].items():
+    raw = json.dumps(cfg).replace("$HOME", home)
+    cfg = json.loads(raw)
+    print(name, cfg["type"], cfg.get("command", "-"), raw, sep="\t")
+EOF
+  if [[ "$kind" == "stdio" && ! -x "$cmd" ]]; then
+    echo "⏭  $name (no existe $cmd)"; continue
+  fi
+  if $DRY; then echo "• $name ($kind)"; continue; fi
+  claude mcp remove -s user "$name" >/dev/null 2>&1 || true
+  claude mcp add-json -s user "$name" "$json" >/dev/null && echo "✔ $name"
+done
+
+$DRY || echo "Listo. Reinicia Claude Code y autentica OAuth con /mcp."
