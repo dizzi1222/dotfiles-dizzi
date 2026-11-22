@@ -238,20 +238,30 @@ onboarding:
   seen:
     busy_input_prompt: true
 mcp_servers:
+  engram:
+    command: "/home/diego/.local/bin/engram"
+    args: ["mcp", "--tools=agent"]
+    enabled: true
   n8n:
-    command: /home/diego/.local/bin/n8n-mcp-wrapper
+    command: "/home/diego/.local/bin/n8n-mcp-wrapper"
     enabled: true
   shopify:
-    command: /home/diego/.local/bin/shopify-mcp
+    command: "/home/diego/.local/bin/shopify-mcp"
+    enabled: true
+  webshare:
+    command: "/home/diego/.local/bin/webshare-proxy-wrapper"
+    args: ["--show-url", "--country", "us", "--rotate"]
+    env:
+      PATH: "/home/diego/.local/bin:/home/diego/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
     enabled: true
   node_repl:
-    command: /var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl
+    command: "/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl"
     env:
       NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS: '1000'
-      NODE_REPL_NODE_MODULE_DIRS: /var/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules
-      NODE_REPL_NODE_PATH: /var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node
-      NODE_REPL_TRUSTED_CODE_PATHS: /home/diego/.codex:/var/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules
-      CODEX_HOME: /home/diego/.codex
+      NODE_REPL_NODE_MODULE_DIRS: "/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules"
+      NODE_REPL_NODE_PATH: "/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node"
+      NODE_REPL_TRUSTED_CODE_PATHS: "/home/diego/.codex:/home/diego/.local/opt/chatgpt/resources/cua_node/lib/node_modules"
+      CODEX_HOME: "/home/diego/.codex"
       BROWSER_USE_AVAILABLE_BACKENDS: chrome,iab,mcpapps
       BROWSER_USE_TINYSKY_ENABLED: '1'
       NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER: Control the in-app browser in conjunction with the Browser Plugin.
@@ -260,13 +270,13 @@ mcp_servers:
       BROWSER_USE_CODEX_APP_BUILD_FLAVOR: prod
       BROWSER_USE_CODEX_APP_VERSION: 26.1029.61003
       NODE_REPL_TRUSTED_SERVICES: '{"browser":"/home/diego/.codex/plugins/cache/openai-bundled/browser/26.1029.61003/scripts/browser-service.mjs"}'
-      CODEX_CLI_PATH: /var/home/diego/.local/opt/chatgpt/resources/codex
+      CODEX_CLI_PATH: "/home/diego/.local/opt/chatgpt/resources/codex"
   cua_repl:
-    command: /var/home/diego/.local/opt/chatgpt/ChatGPT
+    command: "/home/diego/.local/opt/chatgpt/ChatGPT"
   rentahuman:
     url: https://rentahuman.ai/api/mcp
     headers:
-      X-API-Key: ${env:RENTAHUMAN_API_KEY}
+      X-API-Key: "***"
     enabled: true
 web:
   backend: exa

@@ -58,7 +58,7 @@
           "-c",
           "source ~/.api-keys.sh && exec /home/diego/.npm-global/bin/figma-developer-mcp --stdio"
         ],
-        "cwd": "/var/home/diego/workspace",
+        "cwd": "/home/diego/workspace",
         "type": "local",
         "disabled": false
       },
@@ -72,16 +72,12 @@
         },
         "disabled": false
       },
-      "webshare-es": {
-        "_comment": "Referencia dataimpulse-mcp: cambiar WS_HOST_*/WS_PORT_* para otra IP. Gestión via proxy-manager skill + webshare CLI.",
+      "webshare": {
+        "_comment": "Rotating residential proxies via webshare CLI wrapper. Requires: webshare login OR export WEBSHARE_API_KEY. Fallback: WS_PROXY_* vars from ~/.api-keys.sh. Usage: set HTTP_PROXY/HTTPS_PROXY via wrapper or call webshare-proxy-wrapper --show-url",
         "type": "local",
-        "command": [
-          "bash",
-          "-c",
-          "source ~/.api-keys.sh && export DI_USER=\"$WS_USER\" DI_PASS=\"$WS_PASS\" DI_PROXY_HOST=\"$WS_HOST_ES\" DI_PROXY_PORT=\"$WS_PORT_ES\" && exec node /home/diego/workspace/dataimpulse-mcp/index.js"
-        ],
+        "command": ["/home/diego/.local/bin/webshare-proxy-wrapper", "--show-url", "--country", "us", "--rotate"],
         "environment": {
-          "PATH": "/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+          "PATH": "/home/diego/.local/bin:/home/diego/.linuxbrew/bin:/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
         },
         "disabled": true
       },
@@ -167,38 +163,19 @@
       ],
       "options": {
         "projectId": "cic-ptd-dev"
-        // "reasoning": {
-        //   "disabled":  true
-        // }
       },
       "models": {
         "gemini-2.5-flash": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-2.5-pro": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-3-flash-preview": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         },
         "gemini-3-pro-preview": {
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         }
       }
     },
@@ -206,11 +183,7 @@
       "models": {
         "nemotron-3-super:cloud": {
           "name": "nemotron-3-super:cloud",
-          "options": {
-            // "reasoning": {
-            //   "disabled":  true
-            // }
-          }
+          "options": {}
         }
       },
       "name": "Ollama (local)",
@@ -220,46 +193,22 @@
       }
     },
     "opencode": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "openai": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "anthropic": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "openrouter": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "deepseek": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     },
     "copilot": {
-      "options": {
-        // "reasoning": {
-        //   "disabled":  true
-        // }
-      }
+      "options": {}
     }
   }
 }
