@@ -532,6 +532,7 @@ alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
 alias dot='cd ~/dotfiles-dizzi'
 alias ddot='cd ~/dotfiles-dizzi'
+[[ -r "$HOME/dotfiles-dizzi/zsh/gitflow.zsh" ]] && source "$HOME/dotfiles-dizzi/zsh/gitflow.zsh"
 ALIASES
 # Cargar aliases en shells (bash y zsh)
 grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases' >>~/.bashrc

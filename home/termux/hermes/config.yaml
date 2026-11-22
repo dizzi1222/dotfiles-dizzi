@@ -2557,3 +2557,5 @@ fallback_providers:
     model: nvidia/nemotron-3-ultra-550b-a55b:free
     base_url: https://openrouter.ai/api/v1
     api_mode: chat_completions
+command_allowlist:
+  - git force push (rewrites remote history)

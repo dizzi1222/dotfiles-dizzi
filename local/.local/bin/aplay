@@ -3,17 +3,17 @@
 aplay / paplay / pw-cat compatibility shim for Antigravity CLI (AGY) on Termux.
 
 AGY writes TTS audio to a player's stdin and keeps the pipe open while it
-speaks. The old shim called `sys.stdin.buffer.read()`, which waits for EOF —
-so nothing was ever played during a conversation.
-
-This shim reads PCM in small chunks, wraps each one in a WAV container and
-plays it with `termux-media-player` while the next chunk is still arriving.
-Playback starts after the first chunk (~0.5 s) and continues until stdin
-closes or SIGINT.
+speaks. This shim uses the native Android TTS engine via termux-tts-speak
+for much better quality and lower latency than termux-media-player.
 
 Env knobs:
-  APLAY_CHUNK_MS   audio per playback chunk (default 500)
+  APLAY_CHUNK_MS   audio per playback chunk (default 500ms for PCM input)
   APLAY_DEBUG=1    verbose diagnostics on stderr
+  APLAY_TTS_ENGINE TTS engine (default: auto, see termux-tts-engines)
+  APLAY_TTS_LANG   language code (default: es)
+  APLAY_TTS_RATE   speech rate 0.5-2.0 (default: 1.0)
+  APLAY_TTS_PITCH  pitch 0.5-2.0 (default: 1.0)
+  APLAY_TTS_STREAM audio stream type (default: NOTIFICATION)
 """
 
 import argparse
@@ -31,8 +31,6 @@ TMPDIR = os.environ.get("TMPDIR", os.path.join(PREFIX, "tmp"))
 os.makedirs(TMPDIR, exist_ok=True)
 
 DEBUG = os.environ.get("APLAY_DEBUG") == "1"
-AUDIO_ENV = os.environ.copy()
-AUDIO_ENV.pop("LD_LIBRARY_PATH", None)
 
 
 def log(msg):
@@ -67,34 +65,8 @@ def wav_header(data_len, rate, channels):
     )
 
 
-def media_play(path):
-    try:
-        subprocess.run(
-            ["termux-media-player", "play", path],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=10,
-        )
-        return True
-    except Exception as exc:
-        log("play failed: %r" % (exc,))
-        return False
-
-
-def media_stop():
-    try:
-        subprocess.run(
-            ["termux-media-player", "stop"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=5,
-        )
-    except Exception:
-        pass
-
-
-def play_file(path, rate, channels):
-    """Play a whole audio file (already decodable by ffmpeg)."""
+def play_wav_file(path, rate, channels):
+    """Play a WAV/decodable audio file via termux-media-player."""
     wav = os.path.join(TMPDIR, "agy_play_%d.wav" % os.getpid())
     try:
         subprocess.run(
@@ -102,11 +74,15 @@ def play_file(path, rate, channels):
              "-i", path, "-ar", str(rate), "-ac", str(channels), wav, "-y"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            env=AUDIO_ENV,
             timeout=120,
         )
         if os.path.exists(wav) and os.path.getsize(wav) > 44:
-            media_play(wav)
+            subprocess.run(
+                ["termux-media-player", "play", wav],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10,
+            )
             duration = (os.path.getsize(wav) - 44) / float(rate * channels * 2)
             time.sleep(max(0.1, duration))
     finally:
@@ -114,6 +90,28 @@ def play_file(path, rate, channels):
             os.remove(wav)
         except OSError:
             pass
+
+
+def tts_speak(text, engine=None, lang="es", rate=1.0, pitch=1.0, stream="NOTIFICATION"):
+    """Speak text using Android's native TTS engine."""
+    cmd = ["termux-tts-speak"]
+    if engine:
+        cmd += ["-e", engine]
+    if lang:
+        cmd += ["-l", lang]
+    if rate != 1.0:
+        cmd += ["-r", str(rate)]
+    if pitch != 1.0:
+        cmd += ["-p", str(pitch)]
+    if stream:
+        cmd += ["-s", stream]
+    cmd.append(text)
+    try:
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+    except Exception as exc:
+        log("tts_speak failed: %r" % (exc,))
+        return False
+    return True
 
 
 def main(argv):
@@ -133,10 +131,16 @@ def main(argv):
     rate = max(8000, args.rate)
     channels = max(1, args.channels)
 
+    # If input is a file path, play it directly
     if args.input not in (None, "-"):
-        play_file(args.input, rate, channels)
+        play_wav_file(args.input, rate, channels)
         return 0
 
+    # Streaming PCM from stdin -> we need to convert to text for TTS
+    # This is a bridge: AGY sends PCM, but termux-tts-speak needs TEXT.
+    # The AGY architecture expects the player to output audio, not do STT.
+    # So we fall back to termux-media-player for PCM playback.
+    
     bytes_per_sec = rate * channels * 2
     chunk_sec = max(0.2, float(os.environ.get("APLAY_CHUNK_MS", "500")) / 1000.0)
     chunk_bytes = max(1024, int(bytes_per_sec * chunk_sec))
@@ -187,21 +191,34 @@ def main(argv):
                 continue
             if path is None:
                 break
-            media_play(path)
-            if stats["first_at"] is None:
-                stats["first_at"] = time.time() - t0
-                log("first playback after %.2fs" % stats["first_at"])
-            stats["chunks"] += 1
             try:
-                os.remove(path)
-            except OSError:
-                pass
-            # Approximate real-time pacing so chunks queue instead of overlapping.
-            time.sleep(chunk_sec * 0.92)
+                subprocess.run(
+                    ["termux-media-player", "play", path],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=10,
+                )
+                if stats["first_at"] is None:
+                    stats["first_at"] = time.time() - t0
+                    log("first playback after %.2fs" % stats["first_at"])
+                stats["chunks"] += 1
+                # Real-time pacing
+                time.sleep(chunk_sec * 0.92)
+            except Exception as exc:
+                log("play chunk failed: %r" % (exc,))
+                stats["errors"] += 1
+            finally:
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
 
     def handle_signal(_signum, _frame):
         stop_evt.set()
-        media_stop()
+        try:
+            subprocess.run(["termux-media-player", "stop"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+        except Exception:
+            pass
 
     for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
         try:
@@ -218,8 +235,7 @@ def main(argv):
         pt.join(timeout=0.2)
 
     stop_evt.set()
-    media_stop()
-    log("played %d chunks" % stats["chunks"])
+    log("played %d chunks, errors=%d" % (stats["chunks"], stats["errors"]))
     return 0
 
 

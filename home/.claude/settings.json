@@ -7,13 +7,17 @@
   },
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
-  "model": "haiku",
   "voiceEnabled": true,
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "language": "spanish",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": false,
   "hooks": {
     "Stop": [
       {
