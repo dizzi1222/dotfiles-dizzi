@@ -42,13 +42,13 @@ enabled = true
 [projects."/home/diego/Documentos/ChatGPT/Bazzite"]
 trust_level = "trusted"
 
-[projects."/home/diego/dotfiles-dizzi"]
+[projects."${HOME}/dotfiles-dizzi"]
 trust_level = "trusted"
 
 [projects."/home/diego/Documentos/ChatGPT/AI JOB COPILOT"]
 trust_level = "trusted"
 
-[projects."/var/home/diego/Documentos/ChatGPT/Bazzite"]
+[projects."${HOME}/Documentos/ChatGPT/Bazzite"]
 trust_level = "trusted"
 # Variante Termux (Android): sin node_repl/cua_repl (bundle del app de escritorio
 # ChatGPT) ni codex-discord-presence (Rich Presence requiere Discord de escritorio).
@@ -90,9 +90,9 @@ trusted_content_hash = "sha256:63014b9f7cca45320f0f0c486096ea1067bf4edbd0d3e8c65
 
 
 [mcp_servers.n8n]
-command = "/home/diego/.local/bin/n8n-mcp-wrapper"
+command = "${HOME}/.local/bin/n8n-mcp-wrapper"
 enabled = true
 
 [mcp_servers.shopify]
-command = "/home/diego/.local/bin/shopify-mcp"
+command = "${HOME}/.local/bin/shopify-mcp"
 enabled = true
