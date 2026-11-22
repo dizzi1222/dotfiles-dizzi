@@ -72,15 +72,12 @@
         },
         "disabled": false
       },
-      "webshare": {
-        "_comment": "Rotating residential proxies via webshare CLI wrapper. Requires: webshare login OR export WEBSHARE_API_KEY. Fallback: WS_PROXY_* vars from ~/.api-keys.sh. Usage: set HTTP_PROXY/HTTPS_PROXY via wrapper or call webshare-proxy-wrapper --show-url",
-        "type": "local",
-        "command": ["/var/home/diego/.local/bin/webshare-proxy-wrapper", "--show-url", "--country", "us", "--rotate"],
-        "environment": {
-          "PATH": "/var/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/var/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
-        },
-        "disabled": true
-      },
+      "notion": { "type": "remote", "url": "https://mcp.notion.com/mcp", "disabled": false },
+      "canva": { "type": "remote", "url": "https://mcp.canva.com/mcp", "disabled": false },
+      "cloudflare": { "type": "remote", "url": "https://mcp.cloudflare.com/mcp", "disabled": false },
+      "atlassian": { "type": "remote", "url": "https://mcp.atlassian.com/v1/mcp", "disabled": false },
+      "vercel": { "type": "remote", "url": "https://mcp.vercel.com", "disabled": false },
+      "webshare": { "type": "remote", "url": "https://mcp.webshare.io/", "disabled": false },
       "todoist": {
         "type": "remote",
         "url": "https://ai.todoist.net/mcp",

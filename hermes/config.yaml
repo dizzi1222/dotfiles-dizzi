@@ -269,11 +269,9 @@ mcp_servers:
     command: /var/home/diego/.local/bin/shopify-mcp
     enabled: true
   webshare:
-    command: /var/home/diego/.local/bin/webshare-proxy-wrapper
-    args: ["--show-url", "--country", "us", "--rotate"]
-    env:
-      PATH: "/var/home/diego/.local/bin:/home/linuxbrew/.linuxbrew/bin:/var/home/diego/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+    url: https://mcp.webshare.io/
     enabled: true
+    auth: oauth
   node_repl:
     command: /var/home/diego/.local/opt/chatgpt/resources/cua_node/bin/node_repl
     env:
