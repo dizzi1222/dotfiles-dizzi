@@ -54,6 +54,16 @@ En un host nuevo, `hermes pm install --extra voice` instala captura de audio y F
 
 Reabre `hermes --tui` después de instalar. En el chat ejecuta `/voice status`, `/voice on` y, si quieres respuestas habladas, `/voice tts`. `Ctrl+B` inicia la captura con el atajo por defecto. `/voice off` detiene la voz. La prueba local de instalación genera audio sintético y lo transcribe sin red; la prueba final del micrófono consiste en hablar tú desde la TUI.
 
+## Parches locales del código de Hermes
+
+Las actualizaciones de Hermes Desktop ejecutan `hermes update --keep-stash`: guardan en un stash cualquier cambio local de `~/.hermes/hermes-agent` y no lo reaplican. Por eso los arreglos al código de Hermes viven aquí como parches, no solo en el checkout.
+
+- `patches/tui-q-cierra-selector-sesiones.patch`: `q` cierra el selector de sesiones como `Esc`, salvo en la fila `+ new`, donde se escribe como texto del prompt.
+- `apply-patches.sh` aplica los parches pendientes y salta los ya aplicados. Si hay una actualización en curso sale con código 75 y espera. Solo borra los autostash de Hermes que contienen exactamente estos parches.
+- `apply-patches.sh --install` (lo ejecuta `link-configs.sh`) crea `hermes-patches.path` y `hermes-patches.service` en `~/.config/systemd/user/`: vigilan los archivos parcheados y los reaplican tras cada actualización. La TUI se recompila sola en el siguiente `hermes --tui`.
+
+Para añadir otro parche: edita el código en `~/.hermes/hermes-agent`, guarda `git -C ~/.hermes/hermes-agent diff -- <archivo> > hermes/patches/<nombre>.patch` y vuelve a ejecutar `apply-patches.sh --install`. Si una versión nueva cambia esa zona, el script avisa con «no encaja» y hay que rehacer el parche. Revisa el registro con `journalctl --user -u hermes-patches.service`.
+
 ## Goal de la sesión
 
 Pega este bloque como un solo mensaje con `/goal` únicamente cuando quieras iniciar el bucle automático:

@@ -55,4 +55,8 @@ for agent in "${agents[@]}"; do
   link_path "$pack_agent/skills" "$profile_dir/skills/negocio"
 done
 
+# Parches al código de Hermes: Desktop los aparca en un stash al actualizar (--keep-stash).
+bash "$HERMES_DIR/apply-patches.sh" --install ||
+  printf 'Aviso: revisa hermes/patches (mensaje anterior de apply-patches.sh).\n' >&2
+
 printf 'Enlaces Hermes listos. No se enlazaron .env, auth, sesiones, memoria ni historial.\n'

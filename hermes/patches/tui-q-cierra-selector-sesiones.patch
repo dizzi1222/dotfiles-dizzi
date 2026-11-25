@@ -1,0 +1,14 @@
+diff --git a/ui-tui/src/components/activeSessionSwitcher.tsx b/ui-tui/src/components/activeSessionSwitcher.tsx
+index bc38e3bc41..2a5dc00ddd 100644
+--- a/ui-tui/src/components/activeSessionSwitcher.tsx
++++ b/ui-tui/src/components/activeSessionSwitcher.tsx
+@@ -609,7 +609,8 @@ export function ActiveSessionSwitcher({
+     const lower = ch?.toLowerCase() ?? ''
+     const isCtrl = (letter: string) => key.ctrl && (lower === letter || ch === ctrlChar(letter))
+ 
+-    if (key.escape) {
++    // `q` closes like Esc, except on the New row, where it is prompt text.
++    if (key.escape || (ch === 'q' && !newSelected)) {
+       return onCancel()
+     }
+ 
