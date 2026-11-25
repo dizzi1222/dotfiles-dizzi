@@ -1736,6 +1736,18 @@ if command -v quickshell >/dev/null 2>&1; then
   create_systemd_user_service "quickshell" "/usr/bin/quickshell" "Quickshell desktop widgets"
 fi
 
+# premid-dev: actividad de PreMiD para Exercism (submódulo ~/workspace/premid-activities).
+# El instalador vive en el workspace junto a la unidad y lo comparte con setup.sh.
+# PreMiD apaga "Activity Developer" en cada arranque del navegador: reactivarlo es 1 clic.
+PREMID_DEV_INSTALL="$HOME/workspace/systemd/premid-dev-install.sh"
+if [ -f "$PREMID_DEV_INSTALL" ]; then
+  if ! bash "$PREMID_DEV_INSTALL"; then
+    echo "  ⚠️  premid-dev.service no se pudo instalar (ver el error de arriba)"
+  fi
+else
+  echo "  ⚠️  premid-dev: falta ~/workspace; clónalo con submódulos y vuelve a ejecutar"
+fi
+
 # =============================================================================
 # GTK Themes — Colloid-Pink-Dark + iconos Colloid-Pink-Dark + Kafka cursor
 # =============================================================================
