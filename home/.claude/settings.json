@@ -1,24 +1,13 @@
 {
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true
-  },
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "model": "haiku",
-  "voiceEnabled": true,
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
-  "language": "spanish",
   "attribution": {
     "commit": "",
     "pr": ""
   },
   "includeCoAuthoredBy": false,
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "model": "haiku",
   "hooks": {
     "Stop": [
       {
@@ -31,5 +20,16 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true
+  },
+  "language": "spanish",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "voiceEnabled": true
 }

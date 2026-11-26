@@ -3,7 +3,7 @@
 Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 
 ## Qué hace
-- **Categorías** (grid 3 col): Apps, Trigger, Style, Setup, System, Audio, Herramientas, About, Android, Multimedia, Instalar, Sistema + **"Todos"** (búsqueda recursiva en los 77 ítems).
+- **Categorías** (grid 3 col): Apps, Trigger, Style, Setup, System, Audio, Herramientas, About, Android, Multimedia, Instalar, Sistema + **"Todos"** (búsqueda recursiva en los 80 ítems).
 - **Items** (grid 2 col): cada acción con icono, nombre y chevron ` ` a la derecha.
 - **Búsqueda recursiva**: escribe `nixconf cleanup` y encuentra **Nix Cleanup** (keywords ocultas vía pango markup).
 - **Navegación**: Tab/Enter/flchas. wofi en grid navega por filas/columnas (el `↓` a veces va a la derecha el primer paso — comportamiento nativo del FlowBox de GTK).
@@ -11,10 +11,10 @@ Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 ## Archivos
 | Archivo | Rol |
 |---|---|
-| `home/scripts/system_control.sh` | Script principal: drill-down 2 pasos + case de 77 acciones |
+| `home/scripts/system_control.sh` | Script principal: drill-down 2 pasos + case de 81 acciones |
 | `wofi/.config/wofi/system-control.conf` | Config dedicada (grid, matching fuzzy, allow_markup, centrado) |
 | `wofi/.config/wofi/system-control.css` | GTK CSS con paleta wal (hover/selected, Nerd Font) |
-| `eww/.config/eww/scripts/system-menu-manifest.tsv` | Fuente única: categoría / icono / label (77 ítems) |
+| `eww/.config/eww/scripts/system-menu-manifest.tsv` | Fuente única: categoría / icono / label (80 ítems) |
 | `eww/.config/eww/scripts/system-menu-kw.tsv` | Keywords por icono para búsqueda recursiva |
 | `eww/.config/eww/scripts/toggle-game-mode.sh` | Configuración visual del modo gaming |
 | `eww/.config/eww/scripts/power-modes-fuzzel.sh` | Orquestación de perfiles y carga TLP |
@@ -24,6 +24,7 @@ Menú de control del sistema (reemplaza al viejo eww/rofi) hecho con **wofi**.
 | `home/scripts/jobcopilot-install` | Instalador selectivo de JobCopilot Free (3 componentes, fuente por componente) |
 | `home/scripts/spicetify-native-apply.sh` | Copia Spotify RPM al usuario y aplica Spicetify + Marketplace sin escribir en `/usr` |
 | `home/scripts/spotify-spicetify-launch.sh` | Abre la copia modificada desde el lanzador Spotify (fallback al RPM si aún no existe) |
+| `home/scripts/premid-activity.sh` | Carga las actividades de PreMiD (`all` desde el menú): servidor `premid-dev` y aviso si la extensión no se conecta |
 
 ## Añadir un ítem
 1. Edita `system-menu-manifest.tsv` → nueva línea `Categoría<TAB>icono<TAB>Label`
@@ -440,6 +441,45 @@ kbuildsycoca6 --noincremental
 | Archivo TSV | Categoría | Ícono | Label |
 |---|---|---|---|
 | `system-menu-manifest.tsv` | `Herramientas` | `󰑓` | `Desktop Cache` |
+
+## PreMiD Actividades (󰙯)
+
+`Apps → 󰙯 PreMiD Actividades` carga en la extensión PreMiD (estado de Discord) todas las
+actividades del servicio `premid-dev`: Exercism, Mimo, CodeCrafters, CryptoZombies y Speedrun
+Ethereum. Ejecuta `~/scripts/premid-activity.sh all` en segundo plano:
+
+1. Comprueba el servidor de actividades en `ws://localhost:3021`: el servicio de usuario
+   `premid-dev` (lo instalan `~/workspace/setup.sh` y `~/bazzite-install.sh`). Si está parado lo
+   arranca; si no hay unidad, lanza `~/workspace/systemd/premid-serve.mjs` en segundo plano
+   (log en `~/.local/state/premid-dev/serve.log`).
+2. Espera a que la extensión se conecte: el servidor le manda las 5 actividades a la vez y cada
+   una se activa sola al abrir su web. Con `all` no abre ninguna web.
+3. Lo notifica con la lista de actividades cargadas.
+
+PreMiD apaga **Activity Developer** cada vez que arranca el navegador y no hay forma de
+activarlo desde fuera. Si la extensión no se conecta en 12 s, una notificación crítica indica
+dónde activarlo (Zen → PreMiD → Ajustes → Activity Developer); el script sigue esperando hasta
+3 min y la reemplaza por «Conectada» en cuanto la extensión se conecta. Las actividades quedan
+cargadas hasta el próximo reinicio del navegador. Si lo relanzas mientras espera, el nuevo
+termina al anterior y reutiliza su notificación (no se acumulan).
+
+Discord no tiene que estar abierto: PreMiD 2.x publica la actividad en tu cuenta por la API de
+Discord. Si una actividad aún usa un App ID de relleno (`000…0`), la notificación lo avisa:
+Discord no la mostrará hasta poner el real en su `presence.ts`.
+
+Desde la terminal también se lanza una sola, que además abre su web:
+
+```bash
+~/scripts/premid-activity.sh all                  # lo que hace el menú
+~/scripts/premid-activity.sh Mimo                 # abre mimo.org (tu sección activa)
+~/scripts/premid-activity.sh "Speedrun Ethereum"  # nombres con espacios, entre comillas
+~/scripts/premid-activity.sh Exercism --no-open   # sin abrir la web
+journalctl --user -u premid-dev -f                # "Activity sent to the extension: <Actividad>"
+```
+
+| Archivo TSV | Categoría | Ícono | Label |
+|---|---|---|---|
+| `system-menu-manifest.tsv` | `Apps` | `󰙯` | `PreMiD Actividades` |
 
 ## Atajos
 - `Super+Z` → abre el menú

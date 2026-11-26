@@ -452,6 +452,13 @@ case "$ICON" in
   # no systemd: por eso el script mata el proceso vivo y lo relanza.
   espanso-restart
   ;;
+"󰙯")
+  # PreMiD Actividades: el servicio premid-dev manda todas sus actividades (Exercism, Mimo,
+  # CodeCrafters, CryptoZombies, Speedrun Ethereum) a la extensión en cuanto se conecta;
+  # cada una se activa sola al abrir su web. En segundo plano: avisa si la extensión no se
+  # conecta (Activity Developer apagado) y espera hasta 3 min. Relanzarlo termina al anterior.
+  setsid -f bash ~/scripts/premid-activity.sh all >/dev/null 2>&1
+  ;;
 "󰳾")
   kitty -e ~/wrapper/autoclicker-menu
   ;;

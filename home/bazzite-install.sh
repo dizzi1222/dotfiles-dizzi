@@ -1736,7 +1736,8 @@ if command -v quickshell >/dev/null 2>&1; then
   create_systemd_user_service "quickshell" "/usr/bin/quickshell" "Quickshell desktop widgets"
 fi
 
-# premid-dev: actividades de PreMiD para Exercism y Mimo (submódulo ~/workspace/premid-activities),
+# premid-dev: actividades de PreMiD para Exercism, Mimo, CodeCrafters, CryptoZombies y Speedrun
+# Ethereum (submódulo ~/workspace/premid-activities),
 # servidas por ~/workspace/systemd/premid-serve.mjs (versión ligera de `pmd dev`).
 # El instalador vive en el workspace junto a la unidad y lo comparte con setup.sh.
 # PreMiD apaga "Activity Developer" en cada arranque del navegador: reactivarlo es 1 clic.
