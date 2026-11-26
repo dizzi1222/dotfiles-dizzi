@@ -3,8 +3,9 @@
 export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export PATH="/home/linuxbrew/.linuxbrew/opt/node@22/bin:$PATH"
 
-if [[ -f "$HOME/.n8n/config" ]]; then
-  source "$HOME/.n8n/config"
+# Variables de la instancia (y ~/.api-keys.sh). ~/.n8n/config NO: es el JSON de ajustes de n8n.
+if [[ -f "$HOME/.n8n/env" ]]; then
+  source "$HOME/.n8n/env"
 fi
 
 N8N_BIN="$HOME/.npm-global/lib/node_modules/n8n/bin/n8n"

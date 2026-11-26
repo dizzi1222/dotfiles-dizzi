@@ -2,13 +2,19 @@
 Description=n8n workflow automation (node@22 + Hermes Abogados)
 After=network-online.target
 Wants=network-online.target
+# Un error de arranque (p. ej. un ~/.n8n/config inválido) no se arregla reintentando: tras 5
+# fallos en 5 min queda en `failed` en vez de reintentar sin fin.
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
 WorkingDirectory=%h
-EnvironmentFile=-%h/.n8n/config
+# Las variables (~/.n8n/env y ~/.api-keys.sh) las carga el wrapper con `source`: systemd no
+# entiende `export` en un EnvironmentFile.
 ExecStart=%h/.local/bin/n8n start
-Restart=on-failure
+# always: también vuelve si algo externo lo para con SIGTERM (on-failure lo daría por bueno).
+Restart=always
 RestartSec=10
 StandardOutput=journal
 StandardError=journal

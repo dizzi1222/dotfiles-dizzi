@@ -394,5 +394,6 @@ tts:
 command_allowlist:
   - git force push (rewrites remote history)
   - script execution via -e/-c flag
+  - script execution via heredoc
 wake_word:
   enabled: false

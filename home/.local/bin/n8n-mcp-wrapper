@@ -6,11 +6,11 @@ set -euo pipefail
 export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export PATH="/home/linuxbrew/.linuxbrew/opt/node@22/bin:$PATH"
 
-# Cargar variables de n8n si existen
+# Cargar variables de n8n si existen (~/.n8n/config NO: es el JSON de ajustes de n8n)
 set +u
-if [[ -f "$HOME/.n8n/config" ]]; then
+if [[ -f "$HOME/.n8n/env" ]]; then
   # shellcheck source=/dev/null
-  source "$HOME/.n8n/config"
+  source "$HOME/.n8n/env"
 fi
 
 if [[ -f "$HOME/.api-keys.sh" ]]; then
@@ -24,6 +24,10 @@ export N8N_API_KEY="${N8N_API_KEY:?Error: N8N_API_KEY no configurada. Define la 
 
 # Deshabilitar telemetría
 export N8N_MCP_TELEMETRY_DISABLED=true
+
+# n8n corre en esta máquina (localhost:5678). n8n-mcp 2.103 bloquea localhost en su modo SSRF por
+# defecto (strict); moderate lo permite y sigue bloqueando IPs privadas y metadata de nube.
+export WEBHOOK_SECURITY_MODE="${WEBHOOK_SECURITY_MODE:-moderate}"
 
 exec /home/linuxbrew/.linuxbrew/opt/node@22/bin/node \
   "$HOME/.npm-global/lib/node_modules/n8n-mcp/dist/mcp/stdio-wrapper.js" "$@"

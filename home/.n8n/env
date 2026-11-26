@@ -1,0 +1,37 @@
+# n8n: variables de entorno de la instancia local (Hermes Abogados Landing). Va en ~/.n8n/env.
+# La cargan ~/.local/bin/n8n y ~/.local/bin/n8n-mcp-wrapper con `source`.
+# NO copiar a ~/.n8n/config: ese es el archivo de ajustes de n8n (JSON con su encryptionKey, lo
+# crea n8n en el primer arranque). Con cualquier otra cosa dentro, n8n no arranca.
+# Sin secretos: este repo es público. La API key (N8N_API_KEY) va en ~/.api-keys.sh.
+
+# Basic server config
+export N8N_HOST=0.0.0.0
+export N8N_PORT=5678
+export N8N_PROTOCOL=http
+# Base de TODAS las URLs: n8n añade webhook/ o webhook-test/, y sin N8N_EDITOR_BASE_URL también la usa
+# para el editor y los callbacks OAuth (…/rest/oauth2-credential/callback). WEBHOOK_URL está obsoleta.
+export N8N_WEBHOOK_URL=http://localhost:5678/
+
+# Database (SQLite default)
+export DB_TYPE=sqlite
+export DB_SQLITE_DATABASE=/home/diego/.n8n/database.sqlite
+
+# API for MCP n8n integration (cargada dinámicamente desde ~/.api-keys.sh)
+export N8N_API_URL=http://localhost:5678
+[ -f "$HOME/.api-keys.sh" ] && source "$HOME/.api-keys.sh"
+
+# Performance
+export EXECUTIONS_DATA_PRUNE=true
+export EXECUTIONS_DATA_MAX_AGE=168
+export EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000
+
+# Logging
+export LOG_LEVEL=info
+export LOG_OUTPUT=console
+
+# Timezone
+export GENERIC_TIMEZONE=America/Santo_Domingo
+
+# Disable telemetry
+export N8N_DIAGNOSTICS_ENABLED=false
+export N8N_VERSION_NOTIFICATIONS_ENABLED=false
