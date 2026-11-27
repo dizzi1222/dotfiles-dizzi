@@ -638,6 +638,8 @@ browser:
   # Inactivity timeout in seconds - browser sessions are automatically closed
   # after this period of no activity between agent loops (default: 120 = 2 minutes)
   inactivity_timeout: 120
+  cloud_provider: local
+  use_real_profile: true
 
   # Local Chromium for browser_exec. Empty executable_path = pm's chromium
   # (`hermes pm install chromium`), the Docker image's build, or a system
@@ -2544,6 +2546,8 @@ onboarding:
     busy_input_prompt: true
     tool_progress_prompt: true
 fallback_providers:
+  - provider: opencode-go
+    model: gemini-4-argon
   - provider: openai-codex
     model: gpt-6-luna
     base_url: https://chatgpt.com/backend-api/codex
@@ -2552,6 +2556,8 @@ fallback_providers:
   - provider: antigravity-subscription-directsdk
     model: gemini-3.8-flash-high
   - provider: opencode-free-acp
+    model: opencode/deepseek-v4.1-flash-free
+  - provider: opencode-free-acp
     model: opencode/glm-5.3-flash-free
   - provider: openrouter
     model: nvidia/nemotron-3-ultra-550b-a55b:free
@@ -2559,3 +2565,8 @@ fallback_providers:
     api_mode: chat_completions
 command_allowlist:
   - git force push (rewrites remote history)
+  - script execution via -e/-c flag
+  - script execution via heredoc
+  - shell command via -c/-lc flag
+wake_word:
+  enabled: false
