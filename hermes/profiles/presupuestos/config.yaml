@@ -350,6 +350,8 @@ known_builtin_toolsets:
 _left_core_installed:
   - agent-importers
 fallback_providers:
+  - provider: opencode-go
+    model: gemini-4-argon
   - provider: openai-codex
     model: gpt-6-luna
     base_url: https://chatgpt.com/backend-api/codex

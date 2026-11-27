@@ -43,6 +43,7 @@ terminal:
 browser:
   inactivity_timeout: 120
   cloud_provider: local
+  use_real_profile: true
 tool_loop_guardrails:
   warnings_enabled: true
   hard_stop_enabled: false
@@ -370,6 +371,8 @@ known_builtin_toolsets:
 _left_core_installed:
   - agent-importers
 fallback_providers:
+  - provider: opencode-go
+    model: gemini-4-argon
   - provider: openai-codex
     model: gpt-6-luna
     base_url: https://chatgpt.com/backend-api/codex
@@ -377,6 +380,8 @@ fallback_providers:
     model: gpt-6-luna
   - provider: antigravity-subscription-directsdk
     model: gemini-3.8-flash-high
+  - provider: opencode-free-acp
+    model: opencode/deepseek-v4.1-flash-free
   - provider: opencode-free-acp
     model: opencode/glm-5.3-flash-free
   - provider: openrouter
@@ -395,5 +400,6 @@ command_allowlist:
   - git force push (rewrites remote history)
   - script execution via -e/-c flag
   - script execution via heredoc
+  - shell command via -c/-lc flag
 wake_word:
   enabled: false
