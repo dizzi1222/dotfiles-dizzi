@@ -1,5 +1,15 @@
 # Herramientas para Termux
 
+## Alias de Termux
+
+`../termux-basic-setup.sh` (paso 15) los agrega a `~/.termux_aliases`:
+
+| Alias    | Qué hace                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `widget` | Abre el selector de Termux:Widget para crear un acceso de inicio (`TermuxCreateShortcutActivity`) |
+| `sonido` | Abre el Asistente de sonido de MIUI (volumen por aplicación)                               |
+| `home`   | [`miui-home.sh`](miui-home.sh): Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair) |
+
 ## Atajos de Termux:Widget
 
 El paso **22b** de `../termux-basic-setup.sh` instala Hermes Agent y Grok Build
@@ -115,13 +125,3 @@ interfaz de Xiaomi.
 
 Ver [la guía completa](AUDIO-APLICACIONES.md) para los pasos de uso, cómo se
 encontró la solución y las comprobaciones realizadas en esta ROM.
-
-## Alias de Termux
-
-`../termux-basic-setup.sh` (paso 15) los agrega a `~/.termux_aliases`:
-
-| Alias    | Qué hace                                                                                   |
-| -------- | ------------------------------------------------------------------------------------------ |
-| `widget` | Abre el selector de Termux:Widget para crear un acceso de inicio (`TermuxCreateShortcutActivity`) |
-| `sonido` | Abre el Asistente de sonido de MIUI (volumen por aplicación)                               |
-| `home`   | [`miui-home.sh`](miui-home.sh): Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair) |
