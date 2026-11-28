@@ -1,0 +1,63 @@
+#!/data/data/com.termux/files/usr/bin/python3
+"""agy-resume (Termux) — abre agy y abre el selector /resume.
+
+Port de local/.local/bin/agy-resume (rama main). Allí kitty inyecta
+`Escape` + `/resume\\r` por control remoto; Termux no tiene kitty, así que
+lanzamos agy dentro de un pty propio y escribimos esas teclas en el master
+tras AGY_RESUME_DELAY segundos (por defecto 2.5, como en main).
+
+Uso: agy-resume [args extra para agy]
+"""
+
+import fcntl
+import os
+import pty
+import signal
+import struct
+import sys
+import termios
+import threading
+import time
+
+DELAY = float(os.environ.get("AGY_RESUME_DELAY", "2.5"))
+master = {"fd": None}
+
+
+def sync_winsize(*_):
+  """Copia el tamaño de la terminal real al pty de agy."""
+  fd = master["fd"]
+  if fd is None:
+    return
+  try:
+    size = fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ, b"\0" * 8)
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, size)
+  except OSError:
+    pass
+
+
+def inject():
+  """Escape (cierra modales) y luego /resume + Enter."""
+  time.sleep(DELAY)
+  fd = master["fd"]
+  if fd is None:
+    return
+  try:
+    os.write(fd, b"\x1b")
+    time.sleep(0.4)
+    os.write(fd, b"/resume\r")
+  except OSError:
+    pass
+
+
+def master_read(fd):
+  """Hook de pty.spawn: en la 1ª lectura guarda el fd y arranca la inyección."""
+  if master["fd"] is None:
+    master["fd"] = fd
+    sync_winsize()
+    threading.Thread(target=inject, daemon=True).start()
+  return os.read(fd, 1024)
+
+
+signal.signal(signal.SIGWINCH, sync_winsize)
+status = pty.spawn(["agy", *sys.argv[1:]], master_read)
+sys.exit(os.waitstatus_to_exitcode(status) if hasattr(os, "waitstatus_to_exitcode") else 0)

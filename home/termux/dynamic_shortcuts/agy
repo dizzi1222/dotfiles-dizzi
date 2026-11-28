@@ -1,2 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
-agy
+# agy + selector /resume (port de agy-resume de main; inyecta Escape + /resume en un pty).
+for d in "$HOME/dotfiles-dizzi" "$HOME/dotfiles-termux" "$HOME/dotfiles"; do
+  [[ -x "$d/home/termux/agy-resume" ]] && exec "$d/home/termux/agy-resume" "$@"
+done
+exec agy --continue "$@"

@@ -533,6 +533,8 @@ alias g='git'; alias gs='git status'
 alias dot='cd ~/dotfiles-dizzi'
 alias ddot='cd ~/dotfiles-dizzi'
 alias home='bash ~/dotfiles-dizzi/home/termux/miui-home.sh'
+alias widget='am start -a android.intent.action.CREATE_SHORTCUT -n com.termux.widget/.TermuxCreateShortcutActivity'
+alias sonido='am start -n com.miui.misound/com.miui.misound.playervolume.SoundAssistActivity'
 [[ -r "$HOME/dotfiles-dizzi/zsh/gitflow.zsh" ]] && source "$HOME/dotfiles-dizzi/zsh/gitflow.zsh"
 ALIASES
 # Cargar aliases en shells (bash y zsh)
@@ -541,6 +543,11 @@ grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases'
 # Alias `home`: Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair).
 grep -q "miui-home.sh" ~/.termux_aliases 2>/dev/null ||
   echo "alias home='bash ~/dotfiles-dizzi/home/termux/miui-home.sh'" >>~/.termux_aliases
+# Alias `widget` (crear acceso Termux:Widget) y `sonido` (Asistente de sonido MIUI).
+grep -q "alias widget=" ~/.termux_aliases 2>/dev/null ||
+  echo "alias widget='am start -a android.intent.action.CREATE_SHORTCUT -n com.termux.widget/.TermuxCreateShortcutActivity'" >>~/.termux_aliases
+grep -q "alias sonido=" ~/.termux_aliases 2>/dev/null ||
+  echo "alias sonido='am start -n com.miui.misound/com.miui.misound.playervolume.SoundAssistActivity'" >>~/.termux_aliases
 chmod +x ~/dotfiles-dizzi/home/termux/miui-home.sh 2>/dev/null
 print_success "Aliases"
 
@@ -1107,7 +1114,7 @@ if [[ ! "$widget_ok" =~ ^[Nn]$ ]]; then
       break
     fi
   done
-  for entry in opencode:opencode nvim:nvim agy:agy codex:codex claude-code:claude openclaw:openclaw hermes:hermes grokbot:grokbot; do
+  for entry in "opencode:opencode --continue" nvim:nvim "agy:agy --continue" "codex:codex resume" "claude-code:claude --resume" openclaw:openclaw hermes:hermes grokbot:grokbot; do
     shortcut="${entry%%:*}"
     command="${entry#*:}"
     if [[ -n "$WIDGET_SRC" && -f "$(dirname "$WIDGET_SRC")/$shortcut" ]]; then

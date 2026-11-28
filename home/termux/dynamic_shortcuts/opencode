@@ -1,3 +1,3 @@
 #!/data/data/com.termux/files/usr/bin/bash
 [ -f "$HOME/.api-keys.sh" ] && source "$HOME/.api-keys.sh"
-opencode
+exec opencode --continue "$@"
