@@ -21,6 +21,14 @@ com.termux.widget/.TermuxCreateShortcutActivity` una vez por agente: ocho veces 
 total, esperando entre cada invocación. En el selector, elegí el script indicado
 y confirmá el acceso de inicio antes de continuar con el siguiente.
 
+Para crear otro acceso después de la instalación, usá el alias `widget`
+(definido en `~/.termux_aliases`), que ejecuta ese mismo comando.
+
+Los atajos reanudan la sesión anterior, igual que los `.desktop` de la rama
+`main`: `claude --resume`, `codex resume`, `opencode --continue`, Hermes con
+`--tui --continue` y `agy` vía [`agy-resume`](agy-resume), que inyecta
+`Escape` + `/resume` en un pty porque Termux no tiene kitty.
+
 El instalador de Hermes deja pendiente el primer setup si no hay una terminal
 interactiva. Para completarlo manualmente, ejecutá:
 
@@ -99,9 +107,21 @@ El script ejecuta el comando comprobado:
 am start -n com.miui.misound/com.miui.misound.playervolume.SoundAssistActivity
 ```
 
+También está disponible como el alias `sonido` en `~/.termux_aliases`.
+
 En la pantalla que se abre, activar el ajuste de sonido multimedia en varias
 aplicaciones. El script abre los ajustes; los interruptores se manejan en la
 interfaz de Xiaomi.
 
 Ver [la guía completa](AUDIO-APLICACIONES.md) para los pasos de uso, cómo se
 encontró la solución y las comprobaciones realizadas en esta ROM.
+
+## Alias de Termux
+
+`../termux-basic-setup.sh` (paso 15) los agrega a `~/.termux_aliases`:
+
+| Alias    | Qué hace                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `widget` | Abre el selector de Termux:Widget para crear un acceso de inicio (`TermuxCreateShortcutActivity`) |
+| `sonido` | Abre el Asistente de sonido de MIUI (volumen por aplicación)                               |
+| `home`   | [`miui-home.sh`](miui-home.sh): Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair) |
