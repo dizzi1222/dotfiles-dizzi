@@ -1,0 +1,14 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# rec (sox) shim para Termux: sox no tiene micrófono real (/dev/snd) y graba
+# silencio → Claude Code /voice dice "No speech detected". Redirige al shim
+# `arecord` (Termux:API) conservando rate y canales; siempre PCM s16le a stdout.
+rate=16000 ch=1
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--rate) rate="${2%k}"; [[ "$2" == *k ]] && rate=$((${2%k} * 1000)); shift ;;
+    -c|--channels) ch="$2"; shift ;;
+  esac
+  shift
+done
+AR="$HOME/.local/bin/arecord"; [[ -x "$AR" ]] || AR="$PREFIX/bin/arecord"
+exec "$AR" -q -f S16_LE -t raw -r "$rate" -c "$ch" -

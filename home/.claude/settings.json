@@ -1,23 +1,12 @@
 {
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true
-  },
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "voiceEnabled": true,
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
-  "language": "spanish",
   "attribution": {
     "commit": "",
     "pr": ""
   },
   "includeCoAuthoredBy": false,
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
   "hooks": {
     "Stop": [
       {
@@ -30,5 +19,16 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true
+  },
+  "language": "spanish",
+  "voice": {
+    "enabled": true,
+    "mode": "tap"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "voiceEnabled": true
 }

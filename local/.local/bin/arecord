@@ -167,6 +167,14 @@ def main(argv):
             pass
 
     max_seconds = args.duration if args.duration and args.duration > 0 else 350
+    # Libera una grabación colgada (p.ej. el probe de 150 ms de Claude Code
+    # muere con SIGTERM antes de limpiar): si Termux:API sigue ocupado, el
+    # nuevo archivo nunca se crea y el dictado se cierra al instante.
+    try:
+        subprocess.run(["termux-microphone-record", "-q"], capture_output=True,
+                       timeout=5, env=AUDIO_ENV)
+    except Exception:
+        pass
     recorder = subprocess.Popen(
         [
             "termux-microphone-record", "-f", amr_path,

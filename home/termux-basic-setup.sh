@@ -532,11 +532,16 @@ alias ai='tgpt'; alias ask='tgpt -i'
 alias g='git'; alias gs='git status'
 alias dot='cd ~/dotfiles-dizzi'
 alias ddot='cd ~/dotfiles-dizzi'
+alias home='bash ~/dotfiles-dizzi/home/termux/miui-home.sh'
 [[ -r "$HOME/dotfiles-dizzi/zsh/gitflow.zsh" ]] && source "$HOME/dotfiles-dizzi/zsh/gitflow.zsh"
 ALIASES
 # Cargar aliases en shells (bash y zsh)
 grep -q "termux_aliases" ~/.bashrc 2>/dev/null || echo 'source ~/.termux_aliases' >>~/.bashrc
 grep -q "termux_aliases" ~/.zshrc 2>/dev/null || echo 'source ~/.termux_aliases' >>~/.zshrc
+# Alias `home`: Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair).
+grep -q "miui-home.sh" ~/.termux_aliases 2>/dev/null ||
+  echo "alias home='bash ~/dotfiles-dizzi/home/termux/miui-home.sh'" >>~/.termux_aliases
+chmod +x ~/dotfiles-dizzi/home/termux/miui-home.sh 2>/dev/null
 print_success "Aliases"
 
 print_step "16/23: IA Tools"
@@ -1315,7 +1320,10 @@ if [[ -n "$DOTFILES_LOCAL_BIN" ]]; then
       cp -P "$DOTFILES_LOCAL_BIN/$tool" "$HOME/.local/bin/$tool"
     fi
   done
-  chmod +x "$PREFIX/bin/arecord" "$PREFIX/bin/aplay" "$HOME/.local/bin/arecord" "$HOME/.local/bin/aplay" 2>/dev/null || true
+  # rec (sox) → arecord: sólo en ~/.local/bin para no pisar el rec real de sox.
+  # Claude Code /voice cae a `rec` y sin esto graba silencio ("No speech detected").
+  [[ -e "$DOTFILES_LOCAL_BIN/rec" ]] && cp -P "$DOTFILES_LOCAL_BIN/rec" "$HOME/.local/bin/rec"
+  chmod +x "$PREFIX/bin/arecord" "$PREFIX/bin/aplay" "$HOME/.local/bin/arecord" "$HOME/.local/bin/aplay" "$HOME/.local/bin/rec" 2>/dev/null || true
   print_success "Bridges de audio (arecord + aplay) instalados desde dotfiles"
 else
   cat << 'ARECORD_EOF' > "$PREFIX/bin/arecord"
