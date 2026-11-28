@@ -162,19 +162,67 @@ La clave es mover `card0` a `seat-arzopa` **antes** de que gamescope haga
 `arzopa-gamescope-shim.sh` traduce los flags de gamescope a cage, para que el
 helper de apps funcione sin cambios.
 
-### Puntero y teclado
+### Puntero y teclado (reparto con fallback)
 
-El puntero dedicado se elige con fallback: `Logitech Lenovo USB Optical Mouse`
-→ `G203` → touchpad `Synaptics TM3512-010`. El teclado interno
-(`AT Translated Set 2 keyboard`, `input3`) se adjunta a `seat-arzopa` al
-arrancar Game Mode (`arzopa-attach --keyboard`), así las apps de la Arzopa
-reciben las teclas; al volver a Desktop Mode, `arzopa-detach` lo devuelve a
-`seat0`.
+`arzopa-seat.sh` (instalado como `arzopa-attach` / `arzopa-detach`) decide al
+arrancar Game Mode y al iniciar el servicio de Zen:
 
-Mientras el teclado está en `seat-arzopa`, la UI de Steam (seat0) no recibe
-teclado y se maneja con gamepad. El toggle del menú permite devolverlo sin
-cambiar de sesión. Se adjunta el padre (`inputN`), no el `eventN`: los
-`event*` no siempre tienen el tag `seat`.
+| Dispositivo | Pasa a `seat-arzopa` si… | Si no |
+|---|---|---|
+| `card0` (NVIDIA) | siempre en Game Mode, antes de gamescope | — |
+| Teclado interno (i8042) | hay monitor en `card0` **y** teclado externo | se queda en la laptop |
+| Touchpad | hay monitor en `card0` **y** mouse externo encendido | se queda en la laptop |
+
+- **Monitor**: conector de `card0` `connected` con EDID (HDMI o USB-C).
+- **Teclado externo**: USB con interfaz boot de teclado (dongle Compx del
+  RK61) o Bluetooth con icono `input-keyboard`. No cuentan la interfaz
+  "Keyboard" de macros de un mouse gamer (G203), una YubiKey o el dongle del
+  Steam Controller (vendors `1050`/`28de`), ni un mando (aparato con nodo
+  joystick) que exponga teclado.
+- **Mouse externo**: USB con interfaz boot de mouse y sin interfaz de teclado
+  (la interfaz "Mouse" del dongle Compx no cuenta), hijo de un receptor
+  Logitech con batería HID++ encendida (`online=0` + `Unknown` = apagado, como
+  el G305), o Bluetooth `input-mouse`. Un receptor sin HID++ (c542) cuenta
+  mientras esté enchufado: no hay forma de saber si el mouse está prendido.
+- Bluetooth se decide por aparato (MAC), no por nodo: la colección "Mouse" del
+  RK61 no lo hace mouse. Si BlueZ no da icono, un aparato con nodos de
+  teclado y de mouse no cuenta como ninguno.
+- Los mouse externos se quedan siempre con el juego (seat0); el puntero de la
+  Arzopa es el touchpad.
+- Desktop Mode (sesión `KDE`): `arzopa-attach` no mueve nada. Una sesión KDE
+  en estado `closing` (cambio a Game Mode) no cuenta.
+- Si `card0` no es la NVIDIA (eGPU AMD conectada), no se toca y los inputs
+  vuelven a seat0.
+- libinput ignora los `change` que emite `loginctl attach` (solo atiende `add`
+  y `remove`). Al **salir** de `seat-arzopa`: `remove` sintético (cage suelta
+  el nodo) → `attach` → `add` (gamescope lo toma sin reiniciarse); si el
+  `attach` falla, el `add` lo devuelve a cage para que no quede muerto. Al
+  **entrar**: `attach` → `add`; logind ya revoca el fd de gamescope.
+  Antes del `add` se espera (máx. 1 s) a que logind liste el dispositivo en el
+  seat destino. Se adjunta el padre (`inputN`): los `event*` no siempre tienen
+  el tag `seat`.
+- Las ejecuciones concurrentes (servicio Zen, launcher, menú) se serializan con
+  `flock` en `/run/arzopa-seat.lock`.
+
+Al cerrarse Zen/cage, `arzopa-detach --inputs` devuelve teclado y touchpad
+(`card0` se queda para relanzar Zen). Al salir de Game Mode, `arzopa-detach`
+devuelve todo y borra las reglas `72-seat-*.rules` huérfanas de
+`seat-arzopa`; `arzopa-seat-reset.service` repite eso en cada arranque por si
+Game Mode se cerró mal.
+
+Sin monitor el servicio de Zen no arranca (`ExecCondition`), y si cage falla 3
+veces en un minuto systemd deja de reintentar. Antes cage abortaba con
+`libinput initialization failed, no input devices` (226 de 231 arranques el
+27-nov) y cada reinicio movía teclado y touchpad de seat.
+
+El toggle **Teclado → Arzopa / Laptop** del menú (`--keyboard-only`) sigue
+forzando solo el teclado interno.
+
+- Ver qué haría sin mover nada: `sudo /usr/local/bin/arzopa-attach --dry-run`
+  (solo después de `sudo home/scripts/arzopa/setup-via-a-arzopa.sh`: el
+  helper anterior ignora `--dry-run` y movería los dispositivos de verdad).
+  Sin instalar: `bash home/scripts/arzopa/arzopa-seat.sh --dry-run`.
+- Pruebas: `bash home/scripts/arzopa/test-arzopa-seat.sh`
 
 ## Estado
 
@@ -185,14 +233,18 @@ cambiar de sesión. Se adjunta el padre (`inputN`), no el `eventN`: los
 - [ ] Validar el diseño corregido tras reiniciar Game Mode.
 - [x] Input en la Arzopa (mouse + teclado vía `seat-arzopa`).
 - [x] Integración estable con el menú de System Control.
+- [x] Fallback: sin monitor o sin teclado/mouse externos, teclado y touchpad
+  se quedan en la laptop.
 
 ## Scripts
 
 | Archivo | Rol |
 |---|---|
-| `home/scripts/setup-via-a-arzopa.sh` | Instalador del drop-in, helpers, sudoers y servicio de usuario |
-| `home/scripts/arzopa-gamemode.sh` | Arranque/parada de cage en `card0` (WIP) |
-| `home/scripts/zen-to-arzopa.sh` | Mueve Zen a la Arzopa en **Desktop Mode** vía KWin (funcional) |
+| `home/scripts/arzopa/setup-via-a-arzopa.sh` | Instalador: helpers, sudoers, drop-ins, servicio de usuario y reset al arrancar |
+| `home/scripts/arzopa/arzopa-seat.sh` | Reparto de `card0`/teclado/touchpad (fuente de `arzopa-attach` y `arzopa-detach`) |
+| `home/scripts/arzopa/test-arzopa-seat.sh` | Pruebas del reparto con un `/sys` simulado |
+| `home/scripts/arzopa/arzopa-gamemode.sh` | Arranque, parada y `check` (monitor) de cage en `card0` |
+| `home/scripts/arzopa/zen-to-arzopa.sh` | Mueve Zen a la Arzopa en **Desktop Mode** vía KWin (funcional) |
 | `home/scripts/test-via-a.sh` | Prueba manual antigua de cage (histórico) |
 
 ## Referencias

@@ -29,7 +29,10 @@ start_arzopa() {
   export WLR_NO_HARDWARE_CURSORS=1
   export WLR_RENDERER="${WLR_RENDERER:-gles2}"
   export LD_PRELOAD="/usr/local/lib/libseat-seat-arzopa.so"
-  unset WLR_LIBINPUT_NO_DEVICES
+  # Arranca aunque seat-arzopa no tenga teclado/touchpad (sin periféricos se
+  # quedan en la laptop). Sin esto cage abortaba y systemd lo reiniciaba en
+  # bucle; si después llegan, libinput los toma por hotplug.
+  export WLR_LIBINPUT_NO_DEVICES=1
 
   # Sin sg: cambia fsgid a video y rompe el portal FUSE de Flatpak.
   # El acceso a card0 y al touchpad se resuelve con udev/seat-arzopa.
@@ -41,11 +44,29 @@ stop_arzopa() {
   pkill -f "cage -d -m last" 2>/dev/null || true
 }
 
+# ExecCondition: sin monitor en card0 (NVIDIA) no se lanza cage. Salir con 1
+# deja la unidad omitida, no fallida.
+check_arzopa() {
+  local card="${DRM_DEV##*/}" drv c
+  drv=$(readlink -f "/sys/class/drm/$card/device/driver" 2>/dev/null) || drv=""
+  if [ "${drv##*/}" != nvidia ]; then
+    log "check: $card usa '${drv##*/}', no la NVIDIA; no se lanza cage"
+    return 1
+  fi
+  for c in /sys/class/drm/"$card"-*; do
+    [ "$(cat "$c/status" 2>/dev/null)" = connected ] || continue
+    [ "$(head -c 128 "$c/edid" 2>/dev/null | wc -c)" -ge 128 ] && return 0
+  done
+  log "check: sin monitor en $card; no se lanza cage"
+  return 1
+}
+
 case "${1:-start}" in
   start) start_arzopa ;;
   stop) stop_arzopa ;;
+  check) check_arzopa ;;
   *)
-    printf 'Uso: %s {start|stop}\n' "$0" >&2
+    printf 'Uso: %s {start|stop|check}\n' "$0" >&2
     exit 1
     ;;
 esac
