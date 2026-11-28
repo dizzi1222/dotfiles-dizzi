@@ -35,6 +35,20 @@ bash ~/dotfiles-dizzi/home/termux/quick_termux-setup.sh
 
 ---
 
+## 🔤 Alias de Termux
+
+El setup completo (paso 15) los agrega a `~/.termux_aliases`. Detalle en [`home/termux/README.md`](home/termux/README.md).
+
+| Alias | Qué hace |
+|---|---|
+| `widget` | Abre el selector de Termux:Widget para crear un acceso de inicio (`TermuxCreateShortcutActivity`) |
+| `sonido` | Abre el Asistente de sonido de MIUI (volumen por aplicación) |
+| `home` | [`miui-home.sh`](home/termux/miui-home.sh): Home real de MIUI con el Ultra Ahorro activo (ADB + Lawnchair) |
+
+Los atajos de **Termux:Widget** reanudan la sesión anterior como los `.desktop` de `main`: `claude --resume`, `codex resume`, `opencode --continue`, Hermes `--continue` y `agy` vía [`agy-resume`](home/termux/agy-resume).
+
+---
+
 ## 🔧 Scripts útiles (`home/termux/`)
 
 | Script | Uso |
@@ -45,6 +59,8 @@ bash ~/dotfiles-dizzi/home/termux/quick_termux-setup.sh
 | [`audio-aplicaciones.sh`](home/termux/AUDIO-APLICACIONES.md) | Abre el control nativo de volumen por app de Xiaomi; funcionamiento confirmado en Redmi Note 9 Pro (`joyeuse`), MIUI 14 Global / Android 12, sin root ni Shizuku. |
 | `start_shizuku.sh` / `start_shizuku_enhanced.sh` | Iniciar Shizuku |
 | `ejecutar_comando_PIN_sin_ok.sh` | Ejecutar comando PIN sin OK manual |
+| `miui-home.sh` | Home real de MIUI con el Ultra Ahorro activo: conecta ADB, fuerza `com.miui.home` e instala/abre Lawnchair (alias `home`) |
+| `agy-resume` | Abre agy y su selector `/resume` (port Termux del `agy-resume` de `main`) |
 
 ---
 
